@@ -6,34 +6,23 @@ import 'dart:math';
 
 class Sin extends bscFunction {
 
-  final bscFunction _operand;
+  final bscFunction operand;
 
-  Sin(bscFunction this._operand, [negative = false]) : super(negative);
-
-  @override
-  bscFunction derivative(Variable v) {
-    
-    return Cos(_operand)*(_operand.derivative(v));
-  }
+  Sin(bscFunction this.operand, [negative = false]) : super(negative);
 
   @override
-  num evaluate(Map<String, double> p) {
-    return sin(_operand.evaluate(p));
-  }
+  bscFunction derivative(Variable v) => Cos(operand)*(operand.derivative(v));
 
   @override
-  bscFunction ignoreNegative() {
-    return Sin(_operand, false);
-  }
+  num evaluate(Map<String, double> p) => sin(operand.evaluate(p));
 
   @override
-  bscFunction opposite() {
-    return Sin(_operand, !negative);
-  }
+  bscFunction ignoreNegative() => Sin(operand, false);
 
   @override
-  String toString([bool handleMinus = true]) {
-    return 'sin(' + _operand.toString() + ')';
-  }
+  bscFunction opposite() => Sin(operand, !negative);
+
+  @override
+  String toString([bool handleMinus = true]) => 'sin(' + operand.toString() + ')';
 
 }

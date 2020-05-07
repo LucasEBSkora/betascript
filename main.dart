@@ -5,9 +5,10 @@ int main () {
   Variable x = Variable('x');
   Variable y = Variable('y');
 
-  bscFunction f = Number(-1)*x + Number(-1) + y;
+  bscFunction f = x/y;
 
   print(f);
-  print((-1).abs().toString());
+  print(f.derivative(x));
+  print(f.derivative(y));
   return 0;
 }

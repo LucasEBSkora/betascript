@@ -5,34 +5,24 @@ import 'dart:math';
 
 class Tan extends bscFunction {
 
-  final bscFunction _operand;
+  final bscFunction operand;
 
-  Tan(bscFunction this._operand, [negative = false]) : super(negative);
+  Tan(bscFunction this.operand, [negative = false]) : super(negative);
+
+  //TODO: implement derivative of Tangent (needs Exponentiation and Secant)
+  @override
+  bscFunction derivative(Variable v) => null;
 
   @override
-  bscFunction derivative(Variable v) {
-    //TODO: implement derivative of Tangent (needs Exponentiation and Secant)
-    return null;
-  }
+  num evaluate(Map<String, double> p) => tan(operand.evaluate(p));
 
   @override
-  num evaluate(Map<String, double> p) {
-    return tan(_operand.evaluate(p));
-  }
+  bscFunction ignoreNegative() => Tan(operand, false);
 
   @override
-  bscFunction ignoreNegative() {
-    return Tan(_operand, false);
-  }
+  bscFunction opposite() => Tan(operand, !negative);
 
   @override
-  bscFunction opposite() {
-    return Tan(_operand, !negative);
-  }
-
-  @override
-  String toString([bool handleMinus = true]) {
-    return 'Tan(' + _operand.toString() + ')';
-  }
+  String toString([bool handleMinus = true]) => 'Tan(' + operand.toString() + ')';
 
 }

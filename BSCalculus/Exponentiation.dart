@@ -4,10 +4,10 @@ import 'dart:math';
 import 'Number.dart';
 
 class Exponentiation extends bscFunction {
-  final bscFunction _base;
-  final bscFunction _exponent;
+  final bscFunction base;
+  final bscFunction exponent;
 
-  Exponentiation._(this._exponent, [this._base = Number.e, negative = false]) : super(negative);
+  Exponentiation(this.exponent, [this.base = Number.e, negative = false]) : super(negative);
 
   @override
   bscFunction derivative(Variable v) {
@@ -16,25 +16,19 @@ class Exponentiation extends bscFunction {
   }
 
   @override
-  num evaluate(Map<String, double> p) {
-    return pow(_base.evaluate(p), _exponent.evaluate(p));
-  }
+  num evaluate(Map<String, double> p) => pow(base.evaluate(p), exponent.evaluate(p));
 
   @override
-  bscFunction ignoreNegative() {
-    return Exponentiation._(_base, _exponent, false);
-  }
+  bscFunction ignoreNegative() => Exponentiation(base, exponent, false);
 
   @override
-  bscFunction opposite() {
-    return Exponentiation._(_base, _exponent, !negative);
-  }
+  bscFunction opposite() => Exponentiation(base, exponent, !negative);
 
   @override
   String toString([bool handleMinus = true]) {
     return (handleMinus && negative ? '-' : '') +
-    '(' + _base.toString() + ')^' +
-    '(' + _exponent.toString() + ')';
+    '(' + base.toString() + ')^' +
+    '(' + exponent.toString() + ')';
   }
 
 }

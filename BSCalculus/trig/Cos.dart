@@ -6,34 +6,23 @@ import 'dart:math';
 
 class Cos extends bscFunction {
 
-  final bscFunction _operand;
+  final bscFunction operand;
 
-  Cos(bscFunction this._operand, [negative = false]) : super(negative);
-
-  @override
-  bscFunction derivative(Variable v) {
-    
-    return -Sin(_operand)*(_operand.derivative(v));
-  }
+  Cos(bscFunction this.operand, [negative = false]) : super(negative);
 
   @override
-  num evaluate(Map<String, double> p) {
-    return cos(_operand.evaluate(p));
-  }
+  bscFunction derivative(Variable v) => -Sin(operand)*(operand.derivative(v));
 
   @override
-  bscFunction ignoreNegative() {
-    return Cos(_operand, false);
-  }
+  num evaluate(Map<String, double> p) => cos(operand.evaluate(p));
 
   @override
-  bscFunction opposite() {
-    return Cos(_operand, !negative);
-  }
+  bscFunction ignoreNegative() => Cos(operand, false);
 
   @override
-  String toString([bool handleMinus = true]) {
-    return 'cos(' + _operand.toString() + ')';
-  }
+  bscFunction opposite() => Cos(operand, !negative);
+
+  @override
+  String toString([bool handleMinus = true]) => 'cos(' + operand.toString() + ')';
 
 }

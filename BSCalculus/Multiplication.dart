@@ -3,10 +3,10 @@ import 'bscFunction.dart';
 import 'Variable.dart';
 
 class Multiplication extends bscFunction {
-  final List<bscFunction> _operands;
+  final List<bscFunction> operands;
 
 
-  Multiplication._(List<bscFunction> this._operands, [bool negative = false]) : super(negative);
+  Multiplication._(List<bscFunction> this.operands, [bool negative = false]) : super(negative);
 
   static bscFunction create(List<bscFunction> operands) {
     bool negative = false;
@@ -21,9 +21,8 @@ class Multiplication extends bscFunction {
   bscFunction derivative(Variable v) {
     List<bscFunction> ops;
 
-
-    for (int i = 0; i < _operands.length; ++i) {
-      List<bscFunction> term = [..._operands];
+    for (int i = 0; i < operands.length; ++i) {
+      List<bscFunction> term = [...operands];
       term.removeAt(i);
       ops.add(Multiplication.create(term.map((f) {
         return f.derivative(v);
@@ -36,7 +35,7 @@ class Multiplication extends bscFunction {
   @override
   num evaluate(Map<String, double> p) {
     num value = 1;
-    _operands.forEach((bscFunction f) {
+    operands.forEach((bscFunction f) {
       value *= f.evaluate(p);
     });
     return value;
@@ -50,10 +49,10 @@ class Multiplication extends bscFunction {
     s += '(';
 
 
-    s += '('+  _operands[0].toString(true) + ")";
+    s += '('+  operands[0].toString(true) + ")";
 
-    for (int i = 1; i < _operands.length; ++i) {
-      s += '*'+ _operands[i].toString(true);
+    for (int i = 1; i < operands.length; ++i) {
+      s += '*'+ operands[i].toString(true);
     }
 
      s += ')';
@@ -62,13 +61,9 @@ class Multiplication extends bscFunction {
   }
 
   @override
-  bscFunction ignoreNegative() {
-    return Multiplication._(_operands, false);
-  }
+  bscFunction ignoreNegative() => Multiplication._(operands, false);
 
   @override
-  bscFunction opposite() {
-    return Multiplication._(_operands, !negative);
-  }
+  bscFunction opposite() => Multiplication._(operands, !negative);
 
 }

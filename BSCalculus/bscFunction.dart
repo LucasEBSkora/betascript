@@ -1,6 +1,8 @@
 import 'BSCalculus.dart';
 import 'Multiplication.dart';
 import 'Sum.dart';
+import 'Division.dart';
+import 'Exponentiation.dart';
 
 abstract class bscFunction {
   
@@ -26,17 +28,19 @@ abstract class bscFunction {
   bscFunction ignoreNegative();
 
 
-  bscFunction operator +(bscFunction other) {
-    return Sum.create([this, other]);
-  }
+  bscFunction operator +(bscFunction other) => Sum.create([this, other]);
 
-  bscFunction operator *(bscFunction other) {
-    return Multiplication.create([this, other]);
-  }
+  bscFunction operator -() => this.opposite();
 
-  bscFunction operator -() {
-    return this.opposite();
-  }
+  bscFunction operator -(bscFunction other) => Sum.create([this, -other]);
+
+  bscFunction operator *(bscFunction other) => Multiplication.create([this, other]);
+
+  bscFunction operator ^(bscFunction other) => Exponentiation(this, other);
+
+  bscFunction operator /(bscFunction other) => Division.create([this], [other]);
+
+  bool operator ==(dynamic other) => (other is bscFunction) && toString() == other.toString();
 
 }
 

@@ -6,8 +6,7 @@ class Number extends bscFunction {
 
   static const Number e = Number.named(math.e, 'e');
 
-  //TODO: discover how to print unicode (would it even work on the terminal?)
-  static Number pi = Number.named(math.pi, 'pi');
+  static Number pi = Number.named(math.pi, 'π');
 
   final num value;
   final String name;
@@ -26,24 +25,15 @@ class Number extends bscFunction {
   }
 
   @override
-  bscFunction derivative(Variable v) {
-    
-    return Number(0);
-  }
+  bscFunction derivative(Variable v) => Number(0);
 
   @override
-  num evaluate(Map<String, double> p) {
-    return value* (negative ? -1 : 1);
-  }
+  num evaluate(Map<String, double> p) => value* (negative ? -1 : 1);
 
   @override
-  bscFunction ignoreNegative() { 
-    return Number.named(value, name, false);
-  }
+  bscFunction ignoreNegative() => Number.named(value, name, false);
 
   @override
-  bscFunction opposite() {
-    return Number.named(value, name, !negative);
-  }
+  bscFunction opposite() => Number.named(value, name, !negative);
   
 }
