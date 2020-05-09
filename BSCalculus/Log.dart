@@ -25,14 +25,19 @@ class Log extends bscFunction {
 
   @override
   num evaluate(Map<String, double> p) => math.log(operand.evaluate(p))/math.log(base.evaluate(p));
-
-  @override
-  bscFunction ignoreNegative() => Log(operand, base, false);
-
-  @override
-  bscFunction opposite() => Log(operand, base, !negative);
-
+  
   @override 
-  String toString([bool handleMinus = true]) => null;
+  String toString([bool handleMinus = true]) {
+    String s = (negative && handleMinus ? "-" : "");
+    if (base == Number.e) {
+      s += "ln(" + operand.toString() + ")";
+    } else {
+      s += "log(" + base.toString() + ")(" + operand.toString() + ")";
+    }
+    return s;
+  }
+
+  @override
+  bscFunction withSign(bool negative) => Log(operand, base, negative);
 
 }

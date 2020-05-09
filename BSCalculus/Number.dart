@@ -4,21 +4,22 @@ import 'dart:math' as math;
 
 class Number extends bscFunction {
 
+  final bool isNamed;
+
   static const Number e = Number.named(math.e, 'e');
 
   static Number pi = Number.named(math.pi, 'π');
 
-  final num value;
+  final num absvalue;
   final String name;
 
-  Number(num value) : value = value.abs(), name = value.abs().toString(), super(value < 0); 
+  Number(num value) : absvalue = value.abs(), name = value.abs().toString(), isNamed = false, super(value < 0); 
 
-  const Number.named(num this.value, this.name, [bool negative = false]) :  super(negative);
+  const Number.named(num this.absvalue, this.name, [bool negative = false]) : isNamed = true,  super(negative);
 
   
   @override
   String toString([bool handleMinus = true]) { 
-    print('"' + name + "'");
     return 
       ((handleMinus && negative) ? '-' : '') +
       name;
@@ -28,12 +29,13 @@ class Number extends bscFunction {
   bscFunction derivative(Variable v) => Number(0);
 
   @override
-  num evaluate(Map<String, double> p) => value* (negative ? -1 : 1);
+  num evaluate(Map<String, double> p) => value;
+
+  num get value => absvalue * (negative ? -1 : 1);
 
   @override
-  bscFunction ignoreNegative() => Number.named(value, name, false);
-
-  @override
-  bscFunction opposite() => Number.named(value, name, !negative);
-  
+  bscFunction withSign(bool negative) {
+    if (isNamed) return Number.named(absvalue, name, negative);
+    else return Number(value*(negative ? -1 : 1));
+  }
 }

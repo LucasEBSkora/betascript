@@ -22,26 +22,26 @@ abstract class bscFunction {
   String toString([bool handleMinus = true]);
   
   /// Returns this function multiplied by -1
-  bscFunction opposite();
+  bscFunction get opposite => withSign(!negative);
 
   /// Returns this function with negative as false
-  bscFunction ignoreNegative();
+  bscFunction get ignoreNegative => withSign(false);
 
+  bscFunction withSign(bool negative);
+
+
+  bscFunction operator -() => this.opposite;
 
   bscFunction operator +(bscFunction other) => Sum.create([this, other]);
-
-  bscFunction operator -() => this.opposite();
 
   bscFunction operator -(bscFunction other) => Sum.create([this, -other]);
 
   bscFunction operator *(bscFunction other) => Multiplication.create([this, other]);
 
-  bscFunction operator ^(bscFunction other) => Exponentiation(this, other);
+  bscFunction operator ^(bscFunction other) => Exponentiation.create(this, other);
 
   bscFunction operator /(bscFunction other) => Division.create([this], [other]);
 
   bool operator ==(dynamic other) => (other is bscFunction) && toString() == other.toString();
 
 }
-
-

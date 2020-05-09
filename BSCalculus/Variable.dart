@@ -20,19 +20,16 @@ class Variable extends bscFunction {
   @override
   bscFunction derivative(Variable v) {
     if (v.name == this.name) 
-      return Number(1);
+      return Number(1).withSign(negative);
     else 
       return Number(0);
 
   }
 
   @override
-  String toString([bool handleMinus = true]) => (handleMinus && negative) ? '-' : '' + name;
+  String toString([bool handleMinus = true]) => ((handleMinus && negative) ? '-' : '') + name;
 
   @override
-  bscFunction ignoreNegative() => Variable(name, false);
-
-  @override
-  bscFunction opposite() => Variable(name, !negative);
+  bscFunction withSign(bool negative) => Variable(name, negative);
 
 }

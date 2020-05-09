@@ -10,10 +10,16 @@ class Division extends bscFunction {
 
   Division._(bscFunction this.numerator, bscFunction this.denominator, [bool negative = false]) : super(negative);
 
-  static bscFunction create(List<bscFunction> numerator, List<bscFunction> denominator) {
+  static bscFunction create(List<bscFunction> numeratorList, List<bscFunction> denominatorList) {
     bool negative = false;
 
-    return Division._(Multiplication.create(numerator), Multiplication.create(denominator), negative);
+
+    bscFunction numerator = Multiplication.create(numeratorList);
+    bscFunction denominator = Multiplication.create(denominatorList);
+  
+    if (numerator == Number(0)) return Number(0);
+
+    return Division._(numerator, denominator, negative);
   }
 
   @override
@@ -25,10 +31,8 @@ class Division extends bscFunction {
   @override 
   String toString([bool handleMinus = true]) => (handleMinus && negative ? '-' : '') + '((' + numerator.toString() + ')/(' + denominator.toString() + '))';
 
-  @override
-  bscFunction ignoreNegative() => Division._(numerator, denominator, false);
 
   @override
-  bscFunction opposite() => Division._(numerator, denominator, !negative);
+  bscFunction withSign(bool negative) => Division._(numerator, denominator, negative);
 
 }
