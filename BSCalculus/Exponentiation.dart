@@ -25,14 +25,13 @@ class Exponentiation extends bscFunction {
 
   @override
   String toString([bool handleMinus = true]) {
-
     return (handleMinus && negative ? '-' : '') +
     '((' + base.toString() + ')^' +
     '(' + exponent.toString() + '))';
   }
 
   @override
-  bscFunction withSign(bool negative) => Exponentiation._(base, exponent, negative);
+  bscFunction withSign(bool negative) => Exponentiation._(exponent, base, negative);
 
 }
 
