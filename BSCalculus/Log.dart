@@ -6,7 +6,9 @@ import 'bscFunction.dart';
 
 
 bscFunction log(bscFunction operand, [bscFunction base = Number.e, negative = false]) {
+  //log_a(1) == 0 for every a
   if (operand == Number(1)) return Number(0);
+  //log_a(a) == 1 for every a
   else if (operand == base) return Number(1);
   else return Log(operand, base, negative);
 }
@@ -23,6 +25,8 @@ class Log extends bscFunction {
     if (base is Number) {
       return operand.derivative(v)/(log(base)*operand).withSign(negative);
     }
+
+    //if base is also a function, uses log_b(a) = ln(a)/ln(b) s
     return (log(operand)/log(base)).derivative(v).withSign(negative);
   }
 

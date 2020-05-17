@@ -17,6 +17,8 @@ class Multiplication extends bscFunction {
 
     _openOtherMultiplications(operands);
 
+    //if there are any divions in the operands, makes a new division with its numerator with
+    //the other operands added, and its denominator
     for (int i = 0; i < operands.length; ++i) {
       List<bscFunction> divisions = List();
 
@@ -66,6 +68,7 @@ class Multiplication extends bscFunction {
     else return Multiplication._(operands, negative);
   }
 
+  ///If there are other Multiplications in the operand list, takes its operands and adds them to the list
   static void _openOtherMultiplications(List<bscFunction> operands) {
     int i = 0;
     while (i < operands.length) {
@@ -78,22 +81,27 @@ class Multiplication extends bscFunction {
     }
   }
 
-  ///Returns the value of "negative"
+  ///Returns the value of "negative" and takes all numbers be multiplied.
   static bool _multiplyNumbers(List<bscFunction> operands) {
     double number = 1;
     bool negative = false;
 
-    Map<String, Pair<double, int>> namedNumbers =
-        Map<String, Pair<double, int>>();
+    //used to store named numbers, because they shouldn't be multiplied with the others
+    //the key is the name of the number, the double is its value, and the int is the power
+    //to which it should be raised
+    Map<String, Pair<double, int>> namedNumbers = Map();
 
     int i = 0;
     while (i < operands.length) {
+      //if the operand is a number, removes it and
       if (operands[i] is Number) {
         Number n = operands.removeAt(i);
+        //if it's a regular number, just multiplies the accumulator
         if (!n.isNamed)
           number *= n.value;
         else {
-        
+          //if it's named, adds it to the map.
+
           if (!namedNumbers.containsKey(n.name))
             namedNumbers[n.name] = Pair<double, int>(n.absvalue, 0);
 
@@ -105,20 +113,24 @@ class Multiplication extends bscFunction {
         ++i;
     }
 
+    //if the number is 0, there was a 0 in the List, so the multiplications is 0.
     if (number == 0) operands.clear();
     else {
-
+      //makes a new list with the normal number and the named numbers
       List<bscFunction> numbers = List<bscFunction>();
       if (number < 0) negative = true;
       if (number.abs() != 1) numbers.add(Number(number.abs()));
 
+      //adds the named numbers
       for (String key in namedNumbers.keys) {
         if (namedNumbers[key].second != 0)
           numbers.add(Number.named(namedNumbers[key].first, key) ^ Number(namedNumbers[key].second));
       }
 
+      //adds the numbers to the operands
       operands.insertAll(0, numbers);
 
+      //if the multiplication was only numbers and the number left is 1, adds 1 to the operands.
       if (number.abs() == 1 && operands.length == 0) operands.add(Number(1));
     }
 
@@ -141,6 +153,8 @@ class Multiplication extends bscFunction {
 
     return negative;
   }
+
+  //TODO: Make multiplications of the same function become exponentiations, so x*x becomes x²
 
   @override
   bscFunction derivative(Variable v) {

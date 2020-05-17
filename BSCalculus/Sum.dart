@@ -86,6 +86,8 @@ class Sum extends bscFunction {
     operands.insertAll(0, numbers);
   }
 
+  //TODO: Sum up equal functions so that things like x + x become 2*x
+
   @override
   bscFunction derivative(Variable v) {
     return Sum.create(operands.map((bscFunction f) {
