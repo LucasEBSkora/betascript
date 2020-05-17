@@ -1,3 +1,4 @@
+import 'Division.dart';
 import 'Number.dart';
 import 'Sum.dart';
 import 'Utils/Pair.dart';
@@ -12,20 +13,60 @@ class Multiplication extends bscFunction {
 
   static bscFunction create(List<bscFunction> operands) {
     if (operands == null || operands.length == 0) return(Number(0));
+  
 
-    _openOtherMultiplcations(operands);
+    _openOtherMultiplications(operands);
+
+    for (int i = 0; i < operands.length; ++i) {
+      List<bscFunction> divisions = List();
+
+
+      for (int i = 0; i < operands.length;) {
+        if (operands[i] is Division) {
+          divisions.add(operands.removeAt(i));
+
+        } else ++i;
+      }
+
+      if (divisions.length != 0) {
+        List<bscFunction> nums = List();
+        List<bscFunction> dens = List();
+
+        nums.addAll(operands);
+
+        for (Division f in divisions) {
+          bscFunction num = f.numerator;
+          if (num is Multiplication)
+            nums.addAll(num.operands);
+          else 
+            nums.add(num);
+
+          bscFunction den = f.denominator;
+          if (den is Multiplication)
+            dens.addAll(den.operands);
+          else 
+            dens.add(den);
+        }
+
+        return Division.create(nums, dens);
+
+      }
+
+    }
+
+
     bool negativeForNumbers = _multiplyNumbers(operands);
     bool negativeOthers = _consolidateNegatives(operands);
 
     bool negative = (negativeForNumbers && !negativeOthers) || (!negativeForNumbers && negativeOthers);
 
 
-    if(operands.length == 0) return Number(0);
-    if(operands.length == 1) return operands[0].withSign(negative);
+    if (operands.length == 0) return Number(0);
+    if (operands.length == 1) return operands[0].withSign(negative);
     else return Multiplication._(operands, negative);
   }
 
-  static void _openOtherMultiplcations(List<bscFunction> operands) {
+  static void _openOtherMultiplications(List<bscFunction> operands) {
     int i = 0;
     while (i < operands.length) {
       if (operands[i] is Multiplication) {
@@ -77,7 +118,11 @@ class Multiplication extends bscFunction {
       }
 
       operands.insertAll(0, numbers);
+
+      if (number.abs() == 1 && operands.length == 0) operands.add(Number(1));
     }
+
+
 
     return negative;
   }

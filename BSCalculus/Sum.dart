@@ -107,7 +107,7 @@ class Sum extends bscFunction {
     String s = '';
     if (negative && handleMinus) s += '-';
 
-    if (negative) s += '(';
+    s += '(';
 
     s += operands[0].toString(true);
 
@@ -116,7 +116,7 @@ class Sum extends bscFunction {
           operands[i].toString(false);
     }
 
-    if (negative) s += ')';
+    s += ')';
 
     return s;
   }

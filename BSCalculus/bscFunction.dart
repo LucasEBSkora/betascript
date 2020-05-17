@@ -38,7 +38,7 @@ abstract class bscFunction {
 
   bscFunction operator *(bscFunction other) => Multiplication.create([this, other]);
 
-  bscFunction operator ^(bscFunction other) => Exponentiation.create(this, other);
+  bscFunction operator ^(bscFunction other) => Exponentiation.create(other, this);
 
   bscFunction operator /(bscFunction other) => Division.create([this], [other]);
 

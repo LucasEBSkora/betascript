@@ -5,8 +5,9 @@ int main () {
   Variable x = Variable('x');
   Variable y = Variable('y');
 
-  bscFunction f = Ctg(x);
-  print(f);
+  bscFunction f = log(x, y);
   print(f.derivative(x));
+  // print((Number.e^x).derivative(x));
+  // print((y^Number(2)).derivative(y));
   return 0;
 }

@@ -20,7 +20,10 @@ class Log extends bscFunction {
 
   @override
   bscFunction derivative(Variable v) {
-    return ((operand/operand.derivative(v))*log(base) - log(operand)*(base/base.derivative(v)))/(base^Number(2));
+    if (base is Number) {
+      return operand.derivative(v)/(log(base)*operand).withSign(negative);
+    }
+    return (log(operand)/log(base)).derivative(v).withSign(negative);
   }
 
   @override

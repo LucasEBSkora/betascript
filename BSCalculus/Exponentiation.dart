@@ -12,18 +12,20 @@ class Exponentiation extends bscFunction {
 
   static bscFunction create(bscFunction exponent, [bscFunction base = Number.e, negative = false]) {
     if (exponent == Number(1)) return base.withSign(negative);
+    
     else if (exponent is Number && base is Number && !exponent.isNamed && !base.isNamed) return Number(pow(base.value, exponent.value)).withSign(negative); 
     else return Exponentiation._(exponent, base, negative);
   }
 
   @override
-  bscFunction derivative(Variable v) => this*(exponent*base.derivative(v)/base + exponent.derivative(v)*log(base));
+  bscFunction derivative(Variable v) => (base^exponent)*(exponent*(log(base).derivative(v)) + exponent.derivative(v)*log(base));
 
   @override
   num evaluate(Map<String, double> p) => pow(base.evaluate(p), exponent.evaluate(p));
 
   @override
   String toString([bool handleMinus = true]) {
+
     return (handleMinus && negative ? '-' : '') +
     '((' + base.toString() + ')^' +
     '(' + exponent.toString() + '))';
@@ -33,3 +35,5 @@ class Exponentiation extends bscFunction {
   bscFunction withSign(bool negative) => Exponentiation._(base, exponent, negative);
 
 }
+
+// (((x)^(x))*(((((x)/(0)) - (ln(x)*((((1)^(e)))/(0)))))/(((2)^(e)))))

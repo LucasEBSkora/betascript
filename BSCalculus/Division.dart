@@ -13,26 +13,54 @@ class Division extends bscFunction {
   static bscFunction create(List<bscFunction> numeratorList, List<bscFunction> denominatorList) {
     bool negative = false;
 
+    _eliminateDuplicates(numeratorList, denominatorList);
 
-    bscFunction numerator = Multiplication.create(numeratorList);
-    bscFunction denominator = Multiplication.create(denominatorList);
-  
-    if (numerator == Number(0)) return Number(0);
+    _openMultiplicationsAndDivisions(numeratorList, denominatorList);
+    
+        bscFunction numerator = Multiplication.create(numeratorList);
+        bscFunction denominator = Multiplication.create(denominatorList);
+    
+        if (numerator == denominator) return Number(1);
+        if (numerator == Number(0)) return Number(0);
+    
+        return Division._(numerator, denominator, negative);
+      }
+    
+      static void _eliminateDuplicates(List<bscFunction> numeratorList, List<bscFunction> denominatorList) {
+        int i = 0;
+        while (i < numeratorList.length) {
+          bool remove = false;
+          int j = 0;
+          while (j < denominatorList.length) {
+            if (numeratorList[i] == denominatorList[j]) {
+              remove = true;
+              denominatorList.removeAt(j);
+            } else ++j;
+          }
+          if (remove) numeratorList.removeAt(i);
+          else ++i;
+        }
+      }
 
-    return Division._(numerator, denominator, negative);
-  }
+      //TODO: implement _openMultiplicationsAndDivisions    
+      // static void _openMultiplicationsAndDivisions(List<bscFunction> numeratorList, List<bscFunction> denominatorList) {
+      //   for (int i = 0; i < numeratorList.length;) {
+      //     bscFunction f = numeratorList[i];
+      //     if ( )
+      //   }
+      // }
 
-  @override
-  bscFunction derivative(Variable v) => (numerator.derivative(v)*denominator - denominator.derivative(v)*numerator)/(denominator^(Number(2)));
-
-  @override
-  num evaluate(Map<String, double> p) => numerator.evaluate(p)/denominator.evaluate(p);
-
-  @override 
-  String toString([bool handleMinus = true]) => (handleMinus && negative ? '-' : '') + '((' + numerator.toString() + ')/(' + denominator.toString() + '))';
-
-
-  @override
-  bscFunction withSign(bool negative) => Division._(numerator, denominator, negative);
+      @override
+      bscFunction derivative(Variable v) => (numerator.derivative(v)*denominator - denominator.derivative(v)*numerator)/(denominator^(Number(2)));
+    
+      @override
+      num evaluate(Map<String, double> p) => numerator.evaluate(p)/denominator.evaluate(p);
+    
+      @override 
+      String toString([bool handleMinus = true]) => (handleMinus && negative ? '-' : '') + '((' + numerator.toString() + ')/(' + denominator.toString() + '))';
+    
+    
+      @override
+      bscFunction withSign(bool negative) => Division._(numerator, denominator, negative);
 
 }
