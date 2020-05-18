@@ -39,6 +39,6 @@ class Number extends bscFunction {
   @override
   bscFunction withSign(bool negative) {
     if (isNamed) return Number.named(absvalue, name, negative);
-    else return Number(value*(negative ? -1 : 1));
+    else return Number(absvalue*(negative ? -1 : 1));
   }
 }

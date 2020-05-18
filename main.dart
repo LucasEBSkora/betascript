@@ -5,7 +5,7 @@ int main () {
   Variable x = Variable('x');
   Variable y = Variable('y');
 
-  bscFunction f = x*x;
+  bscFunction f = log(x, y);
   print(f);
   print(f.derivative(x));
 

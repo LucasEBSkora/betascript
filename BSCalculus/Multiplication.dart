@@ -157,12 +157,18 @@ class Multiplication extends bscFunction {
     
         return negative;
       }
-    
+
+      ///if operands can be joined as an exponentiation, does it
       static void _createExponents(List<bscFunction> operands) {
+        
         for (int i = 0; i < operands.length; ++i) {
+          
+          //for each operand, divides it into base and exponent, event if the exponent is 1
           bscFunction f = operands[i];
+
           bscFunction base;
           bscFunction exponent;
+          
           if (f is Exponentiation) {
             base = f.base;
             exponent = f.exponent;
@@ -171,6 +177,7 @@ class Multiplication extends bscFunction {
             exponent = Number(1);
           }
 
+          //for every following operand, checks if the other is equal to the base or if it is also an exponentiation with the same base.
           for (int j = i + 1; j < operands.length; ++j) {
             bscFunction g = operands[j];
             if (g is Exponentiation) {
