@@ -12,13 +12,16 @@ class Exponentiation extends bscFunction {
 
   static bscFunction create(bscFunction exponent, [bscFunction base = Number.e, negative = false]) {
     if (exponent == Number(1)) return base.withSign(negative);
+    if (exponent == Number(0)) return Number(1);
     //if both exponent and base are numbers, but neither is named, performs the operation (so that 2^2 is displayed as 4 but pi^2 is still pi^2)
-    else if (exponent is Number && base is Number && !exponent.isNamed && !base.isNamed) return Number(pow(base.value, exponent.value)).withSign(negative); 
+    if (exponent is Number && base is Number && !exponent.isNamed && !base.isNamed) return Number(pow(base.value, exponent.value)).withSign(negative); 
     else return Exponentiation._(exponent, base, negative);
   }
 
   @override
-  bscFunction derivative(Variable v) => (base^exponent)*(exponent*(log(base).derivative(v)) + exponent.derivative(v)*log(base));
+  bscFunction derivative(Variable v) {
+    return (base^exponent)*(exponent*(log(base).derivative(v)) + exponent.derivative(v)*log(base));
+  }
 
   @override
   num evaluate(Map<String, double> p) => pow(base.evaluate(p), exponent.evaluate(p));

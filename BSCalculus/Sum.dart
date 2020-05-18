@@ -76,7 +76,9 @@ class Sum extends bscFunction {
 
     List<bscFunction> numbers = List<bscFunction>();
 
-    if (number != 0) numbers.add(Number(number));
+    if (number > 0)
+      numbers.add(Number(number));
+    else if (number < 0) operands.add(Number(number));
 
     for (String key in namedNumbers.keys) {
       if (namedNumbers[key].second != 0)
@@ -89,49 +91,48 @@ class Sum extends bscFunction {
 
   //Sums up equal functions so that things like x + x become 2*x
   static void _createMultiplications(List<bscFunction> operands) {
-      for (int i = 0; i < operands.length; ++i) {
-          
-          //for each operand, divides it into numeric factor and function
-          bscFunction f = operands[i];
+    for (int i = 0; i < operands.length; ++i) {
+      //for each operand, divides it into numeric factor and function
+      bscFunction f = operands[i];
 
-          bscFunction h;
-          bscFunction factor;
-          
-          if (f is Multiplication && f.operands.length == 2 && f.operands[0] is Number) {
-            h = f.operands[1];
-            factor = f.operands[0];
-          } else {
-            h = f;
-            factor = Number(1);
+      bscFunction h;
+      bscFunction factor;
+
+      if (f is Multiplication &&
+          f.operands.length == 2 &&
+          f.operands[0] is Number) {
+        h = f.operands[1];
+        factor = f.operands[0];
+      } else {
+        h = f;
+        factor = Number(1);
+      }
+
+      //for every following operand, checks if the other is equal to the base or if it is also an exponentiation with the same base.
+      for (int j = i + 1; j < operands.length; ++j) {
+        bscFunction g = operands[j];
+
+        if (g is Multiplication &&
+            g.operands.length == 2 &&
+            g.operands[0] is Number) {
+          if (h == g.operands[1]) {
+            operands.removeAt(j);
+            factor += g.operands[0];
           }
-
-          //for every following operand, checks if the other is equal to the base or if it is also an exponentiation with the same base.
-          for (int j = i + 1; j < operands.length; ++j) {
-            bscFunction g = operands[j];
-            
-            if (g is Multiplication && g.operands.length == 2 && g.operands[0] is Number) {
-              if (h == g.operands[1]) {
-                operands.removeAt(j);
-                factor += g.operands[0];
-              }
-            } else {
-              if (g == h) {
-                operands.removeAt(j);
-                factor += Number(1);
-              }
-            }
-
+        } else {
+          if (g == h) {
+            operands.removeAt(j);
+            factor += Number(1);
           }
-          
-
-          if (factor != Number(1)) {
-            operands.removeAt(i);
-            operands.insert(i, factor*h);
-          }
-
         }
-  }
+      }
 
+      if (factor != Number(1)) {
+        operands.removeAt(i);
+        operands.insert(i, factor * h);
+      }
+    }
+  }
 
   @override
   bscFunction derivative(Variable v) {

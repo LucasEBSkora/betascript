@@ -66,13 +66,11 @@ class Division extends bscFunction {
         }
       }
 
-      if (exponent != Number(1)) {
-        numeratorList.removeAt(i);
-        if (exponent is Number && exponent.negative) {
-          denominatorList.add(base^(-exponent));
-        } else {
-          numeratorList.insert(i, base^exponent);
-        }
+      numeratorList.removeAt(i);
+      if (exponent is Number && exponent.negative) {
+        denominatorList.add(base ^ (-exponent));
+      } else {
+        numeratorList.insert(i, base ^ exponent);
       }
     }
     if (numeratorList.length == 0) numeratorList.add(Number(1));

@@ -11,7 +11,8 @@ abstract class bscFunction {
 
   const bscFunction ([bool this.negative = false]);
 
-
+  @override
+  double call (Map<string, double> p);
   ///returns the value of this function when called with the parameters having the values in the map. Extra parameters should be ignored, but missing ones will cause a fatal error.
   num evaluate(Map<String, double> p); 
 
