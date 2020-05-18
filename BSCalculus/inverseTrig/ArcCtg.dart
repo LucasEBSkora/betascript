@@ -12,7 +12,7 @@ class ArcCtg extends bscFunction {
   num call(Map<String, double> p) => math.atan(1 / operand(p));
 
   @override
-  bscFunction derivative(Variable p) => -operand.derivative(p)/(Number(1) + operand^Number(2));
+  bscFunction derivative(Variable v) => -operand.derivative(v)/(Number(1) + operand^Number(2));
 
   @override
   bscFunction withSign(bool negative) => ArcCtg(operand, negative);

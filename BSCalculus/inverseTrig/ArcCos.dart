@@ -1,3 +1,4 @@
+import '../BSCalculus.dart';
 import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
@@ -11,10 +12,7 @@ class ArcCos extends bscFunction {
   num call(Map<String, double> p) => math.acos(operand(p));
 
   @override
-  bscFunction derivative(Variable p) {
-    //TODO:: implement derivative of ArcCos - needs root
-    throw UnimplementedError();
-  }
+  bscFunction derivative(Variable v) => -operand.derivative(v)/Root(Number(1) - operand^Number(2));
 
   @override
   bscFunction withSign(bool negative) => ArcCos(operand, negative);

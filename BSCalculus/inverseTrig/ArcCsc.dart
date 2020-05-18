@@ -1,3 +1,6 @@
+import '../Abs.dart';
+import '../Number.dart';
+import '../Root.dart';
 import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
@@ -11,10 +14,7 @@ class ArcCsc extends bscFunction {
   num call(Map<String, double> p) => math.asin(1 / operand(p));
 
   @override
-  bscFunction derivative(Variable p) {
-    //TODO:: implement derivative of ArcCsc - needs root
-    throw UnimplementedError();
-  }
+  bscFunction derivative(Variable v) => operand.derivative(v)/(AbsoluteValue(operand)*Root(operand^Number(2) - Number(1))).withSign(!negative);
 
   @override
   bscFunction withSign(bool negative) => ArcCsc(operand, negative);
