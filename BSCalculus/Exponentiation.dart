@@ -20,7 +20,7 @@ class Exponentiation extends bscFunction {
 
   @override
   bscFunction derivative(Variable v) {
-    return (base^exponent)*(exponent*(log(base).derivative(v)) + exponent.derivative(v)*log(base));
+    return ((base^exponent)*(exponent*(log(base).derivative(v)) + exponent.derivative(v)*log(base))).invertSign(negative);
   }
 
   @override

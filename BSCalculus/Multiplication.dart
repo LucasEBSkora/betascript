@@ -227,7 +227,7 @@ class Multiplication extends bscFunction {
           ops.add(Multiplication.create(termExpression));
         
         }
-        return Sum.create(ops).withSign(negative);
+        return Sum.create(ops).invertSign(negative);
       }
     
       @override

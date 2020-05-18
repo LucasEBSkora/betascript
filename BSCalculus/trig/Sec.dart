@@ -11,7 +11,7 @@ class Sec extends bscFunction {
   Sec(bscFunction this.operand, [negative = false]) : super(negative);
 
   @override
-  bscFunction derivative(Variable v) => this*Tan(operand);
+  bscFunction derivative(Variable v) => (Sec(operand)*Tan(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
   num call(Map<String, double> p) => 1/cos(operand(p));

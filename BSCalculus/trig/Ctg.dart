@@ -13,7 +13,7 @@ class Ctg extends bscFunction {
   Ctg(bscFunction this.operand, [negative = false]) : super(negative);
 
   @override
-  bscFunction derivative(Variable v) => (Csc(operand)^Number(2)).withSign(!negative);
+  bscFunction derivative(Variable v) => ((-Csc(operand)^Number(2))*operand.derivative(v)).invertSign(negative);
 
   @override
   num call(Map<String, double> p) => 1/tan(operand(p));

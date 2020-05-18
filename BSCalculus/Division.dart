@@ -174,9 +174,9 @@ class Division extends bscFunction {
 
   @override
   bscFunction derivative(Variable v) =>
-      (numerator.derivative(v) * denominator -
+      ((numerator.derivative(v) * denominator -
           denominator.derivative(v) * numerator) /
-      (denominator ^ (Number(2)));
+      (denominator ^ (Number(2)))).invertSign(negative);
 
   @override
   num call(Map<String, double> p) => numerator(p) / denominator(p);

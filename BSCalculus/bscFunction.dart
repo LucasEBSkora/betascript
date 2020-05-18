@@ -26,6 +26,9 @@ abstract class bscFunction {
   /// Returns this function with negative as false
   bscFunction get ignoreNegative => withSign(false);
 
+  ///if invert is true, returns this function with the opposite sign. Used to factor in the function sign when doing derivatives, but has little practical use elsewhere.
+  bscFunction invertSign(bool invert) => withSign((invert) ? !negative : negative);
+  
   bscFunction withSign(bool negative);
 
 

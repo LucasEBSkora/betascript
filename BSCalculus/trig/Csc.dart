@@ -11,7 +11,7 @@ class Csc extends bscFunction {
   Csc(bscFunction this.operand, [negative = false]) : super(negative);
 
   @override
-  bscFunction derivative(Variable v) => -this*Ctg(operand);
+  bscFunction derivative(Variable v) => (-Csc(operand)*Ctg(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
   num call(Map<String, double> p) => 1/sin(operand(p));

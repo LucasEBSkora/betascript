@@ -138,7 +138,7 @@ class Sum extends bscFunction {
   bscFunction derivative(Variable v) {
     return Sum.create(operands.map((bscFunction f) {
       return f.derivative(v);
-    }).toList());
+    }).toList()).invertSign(negative);
   }
 
   @override

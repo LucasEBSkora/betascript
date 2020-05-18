@@ -14,7 +14,7 @@ class ArcCsc extends bscFunction {
   num call(Map<String, double> p) => math.asin(1 / operand(p));
 
   @override
-  bscFunction derivative(Variable v) => operand.derivative(v)/(AbsoluteValue(operand)*Root(operand^Number(2) - Number(1))).withSign(!negative);
+  bscFunction derivative(Variable v) => (operand.derivative(v)/(AbsoluteValue(operand)*Root(operand^Number(2) - Number(1)))).invertSign(negative);
 
   @override
   bscFunction withSign(bool negative) => ArcCsc(operand, negative);

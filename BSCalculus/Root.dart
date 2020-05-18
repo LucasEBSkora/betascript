@@ -13,7 +13,7 @@ class Root extends bscFunction {
 
 
   @override
-  bscFunction derivative(Variable v) => Number(1/2)*(operand^Number(-1/2))*operand.derivative(v);
+  bscFunction derivative(Variable v) => (Number(1/2)*(operand^Number(-1/2))*operand.derivative(v)).invertSign(negative);
 
   @override
   num call(Map<String, double> p) => math.sqrt(operand(p));

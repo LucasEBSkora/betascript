@@ -23,11 +23,11 @@ class Log extends bscFunction {
   @override
   bscFunction derivative(Variable v) {
     if (base is Number) {
-      return operand.derivative(v)/(log(base)*operand).withSign(negative);
+      return (operand.derivative(v)/(log(base)*operand)).invertSign(negative);
     }
 
     //if base is also a function, uses log_b(a) = ln(a)/ln(b) s
-    return (log(operand)/log(base)).derivative(v).withSign(negative);
+    return ((log(operand)/log(base)).derivative(v)).invertSign(negative);
   }
 
   @override

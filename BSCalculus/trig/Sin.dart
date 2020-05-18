@@ -11,7 +11,7 @@ class Sin extends bscFunction {
   Sin(bscFunction this.operand, [negative = false]) : super(negative);
 
   @override
-  bscFunction derivative(Variable v) => Cos(operand).withSign(negative)*(operand.derivative(v));
+  bscFunction derivative(Variable v) => (Cos(operand)*(operand.derivative(v))).invertSign(negative);
 
   @override
   num call(Map<String, double> p) => sin(operand(p));

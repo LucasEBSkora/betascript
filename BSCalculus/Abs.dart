@@ -18,7 +18,7 @@ class AbsoluteValue extends bscFunction {
   double call(Map<String, double> p) => (operand(p)).abs();
 
   @override
-  bscFunction derivative(Variable v) => Sgn(operand)*operand.derivative(v);
+  bscFunction derivative(Variable v) => (Sgn(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
   String toString([bool handleMinus = true]) => ((handleMinus && negative) ? '-' : '') + '|' + operand.toString() + '|';

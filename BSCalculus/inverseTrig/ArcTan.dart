@@ -12,7 +12,7 @@ class ArcTan extends bscFunction {
   num call(Map<String, double> p) => math.atan(operand(p));
 
   @override
-  bscFunction derivative(Variable v) => operand.derivative(v)/(Number(1) + operand^Number(2));
+  bscFunction derivative(Variable v) => (operand.derivative(v)/(Number(1) + operand^Number(2))).invertSign(negative);
 
   @override
   bscFunction withSign(bool negative) => ArcTan(operand, negative);
