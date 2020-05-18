@@ -231,10 +231,10 @@ class Multiplication extends bscFunction {
       }
     
       @override
-      num evaluate(Map<String, double> p) {
+      num call(Map<String, double> p) {
         num value = 1;
         operands.forEach((bscFunction f) {
-          value *= f.evaluate(p);
+          value *= f(p);
         });
         return value;
       }

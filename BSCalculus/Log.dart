@@ -31,7 +31,7 @@ class Log extends bscFunction {
   }
 
   @override
-  num evaluate(Map<String, double> p) => math.log(operand.evaluate(p))/math.log(base.evaluate(p));
+  num call(Map<String, double> p) => math.log(operand(p))/math.log(base(p));
   
   @override 
   String toString([bool handleMinus = true]) {

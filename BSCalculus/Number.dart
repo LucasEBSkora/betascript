@@ -32,7 +32,7 @@ class Number extends bscFunction {
   bscFunction derivative(Variable v) => Number(0);
 
   @override
-  num evaluate(Map<String, double> p) => value;
+  num call(Map<String, double> p) => value;
 
   num get value => absvalue * (negative ? -1 : 1);
 

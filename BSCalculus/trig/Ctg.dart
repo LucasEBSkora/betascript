@@ -16,7 +16,7 @@ class Ctg extends bscFunction {
   bscFunction derivative(Variable v) => (Csc(operand)^Number(2)).withSign(!negative);
 
   @override
-  num evaluate(Map<String, double> p) => 1/tan(operand.evaluate(p));
+  num call(Map<String, double> p) => 1/tan(operand(p));
 
   @override
   String toString([bool handleMinus = true]) => 'ctg(' + operand.toString() + ')';

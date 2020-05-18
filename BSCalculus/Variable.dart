@@ -9,12 +9,12 @@ class Variable extends bscFunction {
   Variable(String this.name, [bool negative = false]) : super(negative);
 
   @override
-  double evaluate(Map<String, double> p) {
-    if (!p.containsKey(this)) {
-      print("Error! Missing arguments in evaluate call: " + name + " not defined");
+  double call(Map<String, double> p) {
+    if (!p.containsKey(name)) {
+      print("Error! Missing arguments in call call: " + name + " not defined");
       exit(1);
     }
-    return p[this];
+    return p[name];
   }
 
   @override

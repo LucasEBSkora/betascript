@@ -16,7 +16,7 @@ class Tan extends bscFunction {
   bscFunction derivative(Variable v) => (Sec(operand)^Number(2)).withSign(negative);
 
   @override
-  num evaluate(Map<String, double> p) => tan(operand.evaluate(p));
+  num call(Map<String, double> p) => tan(operand(p));
 
   @override
   String toString([bool handleMinus = true]) => 'tan(' + operand.toString() + ')';

@@ -14,7 +14,7 @@ class Cos extends bscFunction {
   bscFunction derivative(Variable v) => Sin(operand).withSign(!negative)*(operand.derivative(v));
 
   @override
-  num evaluate(Map<String, double> p) => cos(operand.evaluate(p));
+  num call(Map<String, double> p) => cos(operand(p));
 
   @override
   String toString([bool handleMinus = true]) => (negative ? '-' : '') + 'cos(' + operand.toString() + ')';
