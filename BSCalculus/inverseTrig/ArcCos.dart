@@ -12,7 +12,7 @@ class ArcCos extends bscFunction {
   num call(Map<String, double> p) => math.acos(operand(p));
 
   @override
-  bscFunction derivative(Variable v) => (-operand.derivative(v)/Root(Number(1) - operand^Number(2))).invertSign(negative);
+  bscFunction derivative(Variable v) => (-operand.derivative(v)/Root(Number(1) - (operand^Number(2)))).invertSign(negative);
 
   @override
   bscFunction withSign(bool negative) => ArcCos(operand, negative);
