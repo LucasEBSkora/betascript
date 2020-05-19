@@ -22,6 +22,7 @@ class Division extends bscFunction {
     _eliminateDuplicates(numeratorList, denominatorList);
 
     bscFunction numerator = Multiplication.create(numeratorList);
+
     if (denominatorList.length == 0) return numerator;
 
     bscFunction denominator = Multiplication.create(denominatorList);
@@ -65,6 +66,7 @@ class Division extends bscFunction {
           }
         }
       }
+      print (base ^ exponent);
 
       numeratorList.removeAt(i);
       if (exponent is Number && exponent.negative) {
@@ -173,10 +175,11 @@ class Division extends bscFunction {
   }
 
   @override
-  bscFunction derivative(Variable v) =>
-      ((numerator.derivative(v) * denominator -
+  bscFunction derivative(Variable v) {
+    return ((numerator.derivative(v) * denominator -
           denominator.derivative(v) * numerator) /
       (denominator ^ (Number(2)))).invertSign(negative);
+  }
 
   @override
   num call(Map<String, double> p) => numerator(p) / denominator(p);

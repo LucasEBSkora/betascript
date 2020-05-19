@@ -15,7 +15,6 @@ class Multiplication extends bscFunction {
   static bscFunction create(List<bscFunction> operands) {
     if (operands == null || operands.length == 0) return(Number(0));
   
-
     _openOtherMultiplications(operands);
 
     //if there are any divions in the operands, makes a new division with its numerator with
@@ -68,7 +67,7 @@ class Multiplication extends bscFunction {
     _createExponents(operands);
     
         if (operands.length == 0) return Number(0);
-        if (operands.length == 1) return operands[0].withSign(negative);
+        if (operands.length == 1) return operands[0].invertSign(negative);
         else return Multiplication._(operands, negative);
       }
     
