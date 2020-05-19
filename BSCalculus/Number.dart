@@ -2,23 +2,29 @@ import 'bscFunction.dart';
 import 'Variable.dart';
 import 'dart:math' as math;
 
+bscFunction n(num value) => Number._(value);
+bscFunction namedNumber(num absValue, String name, [bool negative = false]) => Number._named(absValue, name, negative);
+
+class constants {
+  static const Number e = Number._named(math.e, 'e');
+  static const Number pi = Number._named(math.pi, 'π');
+}
+
 class Number extends bscFunction {
-  static const Number e = Number.named(math.e, 'e');
-  static Number pi = Number.named(math.pi, 'π');
 
   final bool isNamed;
   final num absvalue;
   final String name;
   final bool isInt;
 
-  Number(num value)
+  Number._(num value)
       : absvalue = value.abs(),
         name = _makeName(value),
         isInt = (value == value.toInt()),
         isNamed = false,
         super(value < 0);
 
-  const Number.named(num this.absvalue, this.name, [bool negative = false])
+  const Number._named(num this.absvalue, this.name, [bool negative = false])
       : isNamed = true,
         isInt = (absvalue is int),
         super(negative);
@@ -36,7 +42,7 @@ class Number extends bscFunction {
       ((handleMinus && negative) ? '-' : '') + name;
 
   @override
-  bscFunction derivative(Variable v) => Number(0);
+  bscFunction derivative(Variable v) => n(0);
 
   @override
   num call(Map<String, double> p) => value;
@@ -46,8 +52,8 @@ class Number extends bscFunction {
   @override
   bscFunction withSign(bool negative) {
     if (isNamed)
-      return Number.named(absvalue, name, negative);
+      return Number._named(absvalue, name, negative);
     else
-      return Number(absvalue * (negative ? -1 : 1));
+      return n(absvalue * (negative ? -1 : 1));
   }
 }

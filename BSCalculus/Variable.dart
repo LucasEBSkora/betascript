@@ -2,11 +2,13 @@ import 'dart:io';
 import 'bscFunction.dart';
 import 'Number.dart';
 
+bscFunction variable(String name, [bool negative = false]) => Variable._(name, negative);
+
 class Variable extends bscFunction {
   
   final String name;
 
-  Variable(String this.name, [bool negative = false]) : super(negative);
+  Variable._(String this.name, [bool negative = false]) : super(negative);
 
   @override
   double call(Map<String, double> p) {
@@ -20,9 +22,9 @@ class Variable extends bscFunction {
   @override
   bscFunction derivative(Variable v) {
     if (v.name == this.name) 
-      return Number(1).withSign(negative);
+      return n(1).withSign(negative);
     else 
-      return Number(0);
+      return n(0);
 
   }
 
@@ -30,6 +32,6 @@ class Variable extends bscFunction {
   String toString([bool handleMinus = true]) => ((handleMinus && negative) ? '-' : '') + name;
 
   @override
-  bscFunction withSign(bool negative) => Variable(name, negative);
+  bscFunction withSign(bool negative) => Variable._(name, negative);
 
 }

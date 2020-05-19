@@ -34,15 +34,15 @@ abstract class bscFunction {
 
   bscFunction operator -() => this.opposite;
 
-  bscFunction operator +(bscFunction other) => Sum.create([this, other]);
+  bscFunction operator +(bscFunction other) => add([this, other]);
 
-  bscFunction operator -(bscFunction other) => Sum.create([this, -other]);
+  bscFunction operator -(bscFunction other) => add([this, -other]);
 
-  bscFunction operator *(bscFunction other) => Multiplication.create([this, other]);
+  bscFunction operator *(bscFunction other) => multiply([this, other]);
 
-  bscFunction operator ^(bscFunction other) => Exponentiation.create(other, this);
+  bscFunction operator ^(bscFunction other) => exp(other, this);
 
-  bscFunction operator /(bscFunction other) => Division.create([this], [other]);
+  bscFunction operator /(bscFunction other) => divide([this], [other]);
 
   bool operator ==(dynamic other) => (other is bscFunction) && toString() == other.toString();
 

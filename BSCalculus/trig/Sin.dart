@@ -1,25 +1,32 @@
 import '../Variable.dart';
 import '../bscFunction.dart';
+import '../inverseTrig/inverseTrig.dart';
 import 'Cos.dart';
-import 'dart:math';
+import 'dart:math' as math;
 
+bscFunction sin(bscFunction operand, [bool negative = false]) {
+  if (operand is ArcSin)
+    return operand.operand.invertSign(negative);
+  else
+    return Sin._(operand, negative);
+}
 
 class Sin extends bscFunction {
 
   final bscFunction operand;
 
-  Sin(bscFunction this.operand, [negative = false]) : super(negative);
+  Sin._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  bscFunction derivative(Variable v) => (Cos(operand)*(operand.derivative(v))).invertSign(negative);
+  bscFunction derivative(Variable v) => (cos(operand)*(operand.derivative(v))).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => sin(operand(p));
+  num call(Map<String, double> p) => math.sin(operand(p));
 
   @override
   String toString([bool handleMinus = true]) => (negative ? '-' : '') + 'sin(' + operand.toString() + ')';
 
   @override
-  bscFunction withSign(bool negative) => Sin(operand, negative);
+  bscFunction withSign(bool negative) => Sin._(operand, negative);
 
 }

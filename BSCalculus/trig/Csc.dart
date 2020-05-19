@@ -1,25 +1,32 @@
 import '../Variable.dart';
 import '../bscFunction.dart';
+import '../inverseTrig/ArcCsc.dart';
 import 'Ctg.dart';
-import 'dart:math';
+import 'dart:math' as math;
 
+bscFunction csc(bscFunction operand, [bool negative = false]) {
+  if (operand is ArcCsc)
+    return operand.operand.invertSign(negative);
+  else
+    return Csc._(operand, negative);
+}
 
 class Csc extends bscFunction {
 
   final bscFunction operand;
 
-  Csc(bscFunction this.operand, [negative = false]) : super(negative);
+  Csc._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  bscFunction derivative(Variable v) => (-Csc(operand)*Ctg(operand)*operand.derivative(v)).invertSign(negative);
+  bscFunction derivative(Variable v) => (-csc(operand)*ctg(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => 1/sin(operand(p));
+  num call(Map<String, double> p) => 1/math.sin(operand(p));
 
   @override
   String toString([bool handleMinus = true]) => (negative ? '-' : '') + 'csc(' + operand.toString() + ')';
 
   @override
-  bscFunction withSign(bool negative) => Csc(operand, negative);
+  bscFunction withSign(bool negative) => Csc._(operand, negative);
 
 }

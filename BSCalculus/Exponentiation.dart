@@ -4,19 +4,20 @@ import 'bscFunction.dart';
 import 'dart:math';
 import 'Number.dart';
 
+
+bscFunction exp(bscFunction exponent, [bscFunction base = constants.e, negative = false]) {
+    if (exponent == n(1)) return base.invertSign(negative);
+    if (exponent == n(0)) return n(1);
+    //if both exponent and base are numbers, but neither is named, performs the operation (so that 2^2 is displayed as 4 but pi^2 is still pi^2)
+    if (exponent is Number && base is Number && !exponent.isNamed && !base.isNamed) return n(pow(base.value, exponent.value)).withSign(negative); 
+    else return Exponentiation._(exponent, base, negative);
+  }
+
 class Exponentiation extends bscFunction {
   final bscFunction base;
   final bscFunction exponent;
 
-  Exponentiation._(this.exponent, [this.base = Number.e, negative = false]) : super(negative);
-
-  static bscFunction create(bscFunction exponent, [bscFunction base = Number.e, negative = false]) {
-    if (exponent == Number(1)) return base.invertSign(negative);
-    if (exponent == Number(0)) return Number(1);
-    //if both exponent and base are numbers, but neither is named, performs the operation (so that 2^2 is displayed as 4 but pi^2 is still pi^2)
-    if (exponent is Number && base is Number && !exponent.isNamed && !base.isNamed) return Number(pow(base.value, exponent.value)).withSign(negative); 
-    else return Exponentiation._(exponent, base, negative);
-  }
+  Exponentiation._(this.exponent, [this.base = constants.e, negative = false]) : super(negative);
 
   @override
   bscFunction derivative(Variable v) {
@@ -37,5 +38,3 @@ class Exponentiation extends bscFunction {
   bscFunction withSign(bool negative) => Exponentiation._(exponent, base, negative);
 
 }
-
-// (((x)^(x))*(((((x)/(0)) - (ln(x)*((((1)^(e)))/(0)))))/(((2)^(e)))))

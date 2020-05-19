@@ -5,25 +5,25 @@ import 'Number.dart';
 
 bscFunction abs(bscFunction operand, [bool negative = false]) {
   if (operand is Number) return operand.withSign(negative);
-  else return AbsoluteValue(operand, negative);
+  else return AbsoluteValue._(operand, negative);
 }
 
 class AbsoluteValue extends bscFunction {
   
   final bscFunction operand;
 
-  AbsoluteValue(bscFunction this.operand, [bool negative = false]) : super(negative);
+  AbsoluteValue._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
   double call(Map<String, double> p) => (operand(p)).abs();
 
   @override
-  bscFunction derivative(Variable v) => (Sgn(operand)*operand.derivative(v)).invertSign(negative);
+  bscFunction derivative(Variable v) => (sgn(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
   String toString([bool handleMinus = true]) => ((handleMinus && negative) ? '-' : '') + '|' + operand.toString() + '|';
 
   @override
-  bscFunction withSign(bool negative) => AbsoluteValue(operand, negative);
+  bscFunction withSign(bool negative) => AbsoluteValue._(operand, negative);
 
 }

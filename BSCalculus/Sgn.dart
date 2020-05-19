@@ -2,24 +2,29 @@ import 'Variable.dart';
 import 'bscFunction.dart';
 import 'Number.dart';
 
-class Sgn extends bscFunction {
+
+bscFunction sgn(bscFunction operand, [bool negative = false]) {
+  return Signum._(operand, negative);
+}
+
+class Signum extends bscFunction {
   
   final bscFunction operand;
 
-  Sgn(bscFunction this.operand, [bool negative = false]) : super(negative);
+  Signum._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
   double call(Map<String, double> p) => sign(operand(p));
 
   //The derivative of the sign function is either 0 or undefined.
   @override
-  bscFunction derivative(Variable v) => Number(0);
+  bscFunction derivative(Variable v) => n(0);
 
   @override
   String toString([bool handleMinus = true]) => ((handleMinus && negative) ? '-' : '') + 'sgn(' + operand.toString() + ')';
 
   @override
-  bscFunction withSign(bool negative) => Sgn(operand, negative);
+  bscFunction withSign(bool negative) => Signum._(operand, negative);
 
 }
 

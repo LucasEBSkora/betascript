@@ -5,19 +5,19 @@ import 'Variable.dart';
 import 'bscFunction.dart';
 
 
-bscFunction log(bscFunction operand, [bscFunction base = Number.e, negative = false]) {
+bscFunction log(bscFunction operand, [bscFunction base = constants.e, negative = false]) {
   //log_a(1) == 0 for every a
-  if (operand == Number(1)) return Number(0);
+  if (operand == n(1)) return n(0);
   //log_a(a) == 1 for every a
-  else if (operand == base) return Number(1);
-  else return Log(operand, base, negative);
+  else if (operand == base) return n(1);
+  else return Log._(operand, base, negative);
 }
 
 class Log extends bscFunction {
   final bscFunction base;
   final bscFunction operand;
 
-  Log(this.operand, [this.base = Number.e, negative = false]) : super(negative);
+  Log._(this.operand, [this.base = constants.e, negative = false]) : super(negative);
 
 
   @override
@@ -36,7 +36,7 @@ class Log extends bscFunction {
   @override 
   String toString([bool handleMinus = true]) {
     String s = (negative && handleMinus ? "-" : "");
-    if (base == Number.e) {
+    if (base == constants.e) {
       s += "ln(" + operand.toString() + ")";
     } else {
       s += "log(" + base.toString() + ")(" + operand.toString() + ")";
@@ -45,6 +45,6 @@ class Log extends bscFunction {
   }
 
   @override
-  bscFunction withSign(bool negative) => Log(operand, base, negative);
+  bscFunction withSign(bool negative) => Log._(operand, base, negative);
 
 }
