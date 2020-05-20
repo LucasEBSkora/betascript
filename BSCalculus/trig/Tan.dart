@@ -3,7 +3,7 @@ import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
 
-import '../inverseTrig/inverseTrig.dart';
+import '../inverseTrig/ArcTan.dart';
 import 'Sec.dart';
 
 bscFunction tan(bscFunction operand, [bool negative = false]) {

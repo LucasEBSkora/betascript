@@ -1,6 +1,6 @@
 import '../Variable.dart';
 import '../bscFunction.dart';
-import '../inverseTrig/inverseTrig.dart';
+import '../inverseTrig/ArcSin.dart';
 import 'Cos.dart';
 import 'dart:math' as math;
 

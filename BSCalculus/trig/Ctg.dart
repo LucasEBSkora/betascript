@@ -3,7 +3,7 @@ import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
 
-import '../inverseTrig/inverseTrig.dart';
+import '../inverseTrig/ArcCtg.dart';
 import 'Csc.dart';
 
 bscFunction ctg(bscFunction operand, [bool negative = false]) {

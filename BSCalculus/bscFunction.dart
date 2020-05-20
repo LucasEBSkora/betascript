@@ -1,8 +1,8 @@
-import 'BSCalculus.dart';
 import 'Multiplication.dart';
 import 'Sum.dart';
 import 'Division.dart';
 import 'Exponentiation.dart';
+import 'Variable.dart';
 
 abstract class bscFunction {
   
