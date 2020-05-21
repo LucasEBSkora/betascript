@@ -22,7 +22,7 @@ class CscH extends bscFunction {
   bscFunction derivative(Variable v) => (-csch(operand)*ctgh(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => _csch(operand(p));
+  num call(Map<String, double> p) => _csch(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) => (negative ? '-' : '') + 'csch(' + operand.toString() + ')';

@@ -21,7 +21,7 @@ class Csc extends bscFunction {
   bscFunction derivative(Variable v) => (-csc(operand)*ctg(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => 1/math.sin(operand(p));
+  num call(Map<String, double> p) => 1/math.sin(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) => (negative ? '-' : '') + 'csc(' + operand.toString() + ')';

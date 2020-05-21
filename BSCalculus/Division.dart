@@ -42,7 +42,7 @@ class Division extends bscFunction {
   }
 
   @override
-  num call(Map<String, double> p) => numerator(p) / denominator(p);
+  num call(Map<String, double> p) => (numerator(p) / denominator(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) =>

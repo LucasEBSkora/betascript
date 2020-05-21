@@ -17,7 +17,7 @@ class ArcCtg extends bscFunction {
   ArcCtg._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  num call(Map<String, double> p) => math.atan(1 / operand(p));
+  num call(Map<String, double> p) => math.atan(1 / operand(p))*factor;
 
   @override
   bscFunction derivative(Variable v) =>

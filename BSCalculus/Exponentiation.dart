@@ -25,7 +25,7 @@ class Exponentiation extends bscFunction {
   }
 
   @override
-  num call(Map<String, double> p) => pow(base(p), exponent(p));
+  num call(Map<String, double> p) => pow(base(p), exponent(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) {

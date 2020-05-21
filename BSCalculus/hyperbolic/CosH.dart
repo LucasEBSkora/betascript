@@ -22,7 +22,7 @@ class CosH extends bscFunction {
       (sinh(operand) * (operand.derivative(v))).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => _cosh(operand(p));
+  num call(Map<String, double> p) => _cosh(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) =>

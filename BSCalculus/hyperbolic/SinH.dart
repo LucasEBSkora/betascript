@@ -22,7 +22,7 @@ class SinH extends bscFunction {
   bscFunction derivative(Variable v) => (cosh(operand)*(operand.derivative(v))).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => _sinh(operand(p));
+  num call(Map<String, double> p) => _sinh(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) => (negative ? '-' : '') + 'sinh(' + operand.toString() + ')';

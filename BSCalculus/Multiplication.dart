@@ -95,7 +95,7 @@ class Multiplication extends bscFunction {
 
   @override
   num call(Map<String, double> p) {
-    num value = 1;
+    num value = factor;
     operands.forEach((bscFunction f) {
       value *= f(p);
     });

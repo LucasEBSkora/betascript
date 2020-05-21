@@ -16,7 +16,7 @@ class Variable extends bscFunction {
       print("Error! Missing arguments in call call: " + name + " not defined");
       exit(1);
     }
-    return p[name]*((negative) ? -1 : 1);
+    return p[name]*factor;
   }
 
   @override

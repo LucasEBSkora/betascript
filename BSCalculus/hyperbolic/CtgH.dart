@@ -25,7 +25,7 @@ class CtgH extends bscFunction {
   bscFunction derivative(Variable v) => ((-csch(operand)^n(2))*operand.derivative(v)).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => _coth(operand(p));
+  num call(Map<String, double> p) => _coth(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) => 'ctgh(' + operand.toString() + ')';

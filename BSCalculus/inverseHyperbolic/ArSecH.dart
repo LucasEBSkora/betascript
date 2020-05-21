@@ -20,7 +20,7 @@ class ArSecH extends bscFunction {
   ArSecH._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  num call(Map<String, double> p) => _arsech(operand(p));
+  num call(Map<String, double> p) => _arsech(operand(p))*factor;
 
   @override
   bscFunction derivative(Variable v) =>

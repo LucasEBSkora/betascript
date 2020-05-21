@@ -20,7 +20,7 @@ class ArcCsc extends bscFunction {
   ArcCsc._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  num call(Map<String, double> p) => math.asin(1 / operand(p));
+  num call(Map<String, double> p) => math.asin(1 / operand(p))*factor;
 
   @override
   bscFunction derivative(Variable v) => (operand.derivative(v) /

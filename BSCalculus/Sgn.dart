@@ -14,7 +14,7 @@ class Signum extends bscFunction {
   Signum._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  double call(Map<String, double> p) => sign(operand(p));
+  double call(Map<String, double> p) => sign(operand(p))*factor;
 
   //The derivative of the sign function is either 0 or undefined.
   @override

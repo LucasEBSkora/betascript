@@ -19,7 +19,7 @@ class ArcSin extends bscFunction {
   ArcSin._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  num call(Map<String, double> p) => math.asin(operand(p));
+  num call(Map<String, double> p) => math.asin(operand(p))*factor;
 
   @override
   bscFunction derivative(Variable v) => (operand.derivative(v)/root(n(1) - (operand^n(2)))).invertSign(negative);

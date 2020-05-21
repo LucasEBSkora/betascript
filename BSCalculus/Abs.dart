@@ -15,7 +15,7 @@ class AbsoluteValue extends bscFunction {
   AbsoluteValue._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  double call(Map<String, double> p) => (operand(p)).abs();
+  double call(Map<String, double> p) => (operand(p)).abs()*factor;
 
   @override
   bscFunction derivative(Variable v) => (sgn(operand)*operand.derivative(v)).invertSign(negative);

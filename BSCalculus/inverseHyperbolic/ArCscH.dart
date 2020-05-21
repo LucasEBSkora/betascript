@@ -19,7 +19,7 @@ class ArCscH extends bscFunction {
   ArCscH._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  num call(Map<String, double> p) => _arcsch(operand(p));
+  num call(Map<String, double> p) => _arcsch(operand(p))*factor;
 
   @override
   bscFunction derivative(Variable v) => (-operand.derivative(v)/(operand*root((operand^n(2)) + n(1)))).invertSign(negative);

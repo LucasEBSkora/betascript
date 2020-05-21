@@ -20,7 +20,7 @@ class ArcSec extends bscFunction {
   ArcSec._(bscFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  num call(Map<String, double> p) => math.acos(1 / operand(p));
+  num call(Map<String, double> p) => math.acos(1 / operand(p))*factor;
 
   @override
   bscFunction derivative(Variable v) => (operand.derivative(v)/(abs(operand)*root((operand^n(2)) - n(1)))).invertSign(negative);

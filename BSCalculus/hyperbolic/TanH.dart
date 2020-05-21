@@ -25,7 +25,7 @@ class TanH extends bscFunction {
   bscFunction derivative(Variable v) => ((sech(operand)^n(2))*operand.derivative(v)).withSign(negative);
 
   @override
-  num call(Map<String, double> p) => _tanh(operand(p));
+  num call(Map<String, double> p) => _tanh(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) => 'tanh(' + operand.toString() + ')';

@@ -22,7 +22,7 @@ class SecH extends bscFunction {
   bscFunction derivative(Variable v) => (-sech(operand)*tanh(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => _sech(operand(p));
+  num call(Map<String, double> p) => _sech(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) => (negative ? '-' : '') + 'sech(' + operand.toString() + ')';

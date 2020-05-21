@@ -21,7 +21,7 @@ class Sec extends bscFunction {
   bscFunction derivative(Variable v) => (sec(operand)*tan(operand)*operand.derivative(v)).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => 1/math.cos(operand(p));
+  num call(Map<String, double> p) => 1/math.cos(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) => (negative ? '-' : '') + 'sec(' + operand.toString() + ')';

@@ -1,3 +1,4 @@
+import 'BSCalculus.dart';
 import 'Multiplication.dart';
 import 'Sum.dart';
 import 'Division.dart';
@@ -31,6 +32,7 @@ abstract class bscFunction {
   
   bscFunction withSign(bool negative);
 
+  num get factor => (negative ? -1 : 1);
 
   bscFunction operator -() => this.opposite;
 

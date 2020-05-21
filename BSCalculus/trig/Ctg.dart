@@ -23,7 +23,7 @@ class Ctg extends bscFunction {
   bscFunction derivative(Variable v) => ((-csc(operand)^n(2))*operand.derivative(v)).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => 1/math.tan(operand(p));
+  num call(Map<String, double> p) => 1/math.tan(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) => 'ctg(' + operand.toString() + ')';

@@ -22,7 +22,7 @@ class Root extends bscFunction {
   bscFunction derivative(Variable v) => (n(1/2)*(operand^n(-1/2))*operand.derivative(v)).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => math.sqrt(operand(p));
+  num call(Map<String, double> p) => math.sqrt(operand(p))*factor;
   
   @override 
   String toString([bool handleMinus = true]) => (negative && handleMinus ? "-" : "") + 'sqrt(' + operand.toString() + ')';

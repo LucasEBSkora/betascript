@@ -21,7 +21,7 @@ class Cos extends bscFunction {
       (-sin(operand) * (operand.derivative(v))).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => math.cos(operand(p));
+  num call(Map<String, double> p) => math.cos(operand(p))*factor;
 
   @override
   String toString([bool handleMinus = true]) =>

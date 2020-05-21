@@ -43,7 +43,7 @@ class Sum extends bscFunction {
     operands.forEach((bscFunction f) {
       value += f(p);
     });
-    return value;
+    return value*factor;
   }
 
   @override
