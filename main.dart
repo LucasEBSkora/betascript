@@ -1,16 +1,15 @@
-import 'BSCalculus/BSCalculus.dart';
+import 'dart:io';
+import 'BetaScript/BetaScript.dart';
+int main (List<String> args) {
 
-int main () {
+  if (args.length > 1) {
+    print("usage: bs [script]");
+    exit(1);
+  } else if (args.length == 1) {
+    BetaScript.runFile(args[0]);
+  } else {
+    BetaScript.runPrompt();
+  }
 
-  Variable x = variable('x');
-  Variable y = variable('y');
-
-  bscFunction f = (x^n(2)) + log(abs(cos(x)), arcsec(y))/n(27);
-  print(f({'x': 4, 'y': 2}));
-  print(f);
-  print(f.derivative(x));
-
-  return 0;
 }
 
-//TODO: most call() implementantions ignore the value of negative.

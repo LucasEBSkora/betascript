@@ -148,7 +148,6 @@ void _createMultiplications(List<bscFunction> operands) {
       factor = n(1);
     }
 
-    //for every following operand, checks if the other is equal to the base or if it is also an exponentiation with the same base.
     for (int j = i + 1; j < operands.length; ++j) {
       bscFunction g = operands[j];
 
