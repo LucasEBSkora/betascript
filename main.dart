@@ -11,6 +11,6 @@ int main (List<String> args) {
   } else {
     BetaScript.runPrompt();
   }
-
+  return 0;
 }
 

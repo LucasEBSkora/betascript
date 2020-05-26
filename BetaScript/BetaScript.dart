@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'ASTPrinter.dart';
+import 'BSParser.dart';
 import 'BSScanner.dart';
+import 'Expr.dart';
 import 'Token.dart';
 
 class BetaScript {
@@ -26,12 +29,24 @@ class BetaScript {
   static void _run(String source) {
     BSScanner scanner = new BSScanner(source);
     List<Token> tokens = scanner.scanTokens();
-
-    print(tokens);
+    BSParser parser = new BSParser(tokens);
+    Expr expression = parser.parse();
+    print(ASTPrinter().print(expression));
   }  
 
-  static void error(int line, String message) {
+  static void error(dynamic value, String message) {
+    if (value is int) _errorAtLine(value, message);
+    else if (value is Token) _errorAtToken(value, message);
+    else _report(-1, "at unknown location: '" + value.toString() + "'", message);
+  }
+
+  static void _errorAtLine(int line, String message) {
     _report(line, "", message);
+  }
+
+  static void _errorAtToken(Token token, String message) {
+    if (token.type == TokenType.EOF) _report(token.line, " at end", message);
+    else _report(token.line, " at '" + token.lexeme + "'", message);
   }
 
   static void _report(int line, String where, String message) {
