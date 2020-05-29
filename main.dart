@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'BetaScript/BetaScript.dart';
-int main (List<String> args) {
 
-
+int main(List<String> args) {
   if (args.length > 1) {
     print("usage: bs [script]");
     exit(1);
@@ -13,4 +12,3 @@ int main (List<String> args) {
   }
   return 0;
 }
-

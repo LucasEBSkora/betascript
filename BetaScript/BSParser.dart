@@ -1,5 +1,6 @@
 import 'BetaScript.dart';
 import 'Expr.dart';
+import 'Stmt.dart';
 import 'Token.dart';
 
 class ParseError implements Exception {}
@@ -18,6 +19,13 @@ class BSParser {
   }
 
   /*The parser works by implementing the rules in the language's formal grammar, which, currently, are:
+
+  program -> statement* EOF
+
+  statement -> exprStmt | printStmt
+
+  exprStmt -> expression ";"
+  printStmt -> "print" expression ";"
 
   expression -> equality
   equality -> comparison ( "==" comparison )*
@@ -48,12 +56,34 @@ class BSParser {
 
   */
 
-  Expr parse() {
-    try {
-      return _expression();
-    } catch (error) {
-      return null;
+
+  ///This function is basically the program -> statement* EOF rule
+  List<Stmt> parse() {
+    List<Stmt> statements = new List();
+    
+    while(!_isAtEnd()) {
+      statements.add(_statement());
     }
+    
+    return statements;
+  }
+
+  ///statement -> exprStmt | printStmt
+  Stmt _statement() {
+    if (_match([TokenType.PRINT])) return _printStatement();
+    return _expressionStatement();
+  }
+
+  Stmt _printStatement() {
+    Expr value = _expression();
+    _consume(TokenType.SEMICOLON, "Expect ';' after value.");
+    return new PrintStmt(value);
+  }
+
+  Stmt _expressionStatement() {
+    Expr expr = _expression();
+    _consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+    return new ExpressionStmt(expr);
   }
 
   ///expression -> equality
@@ -223,7 +253,9 @@ class BSParser {
   Token _consume(TokenType type, String message) {
     if (_check(type)) return _advance();
 
-    throw _error(_peek(), message);
+    //doesn't actually throw the error
+    //TODO: maybe a bad idea
+    _error(_peek(), message);
   }
 
   ///Reports an error to the general interpreter and creates a ParseError without necessarily throwing it

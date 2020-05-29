@@ -20,7 +20,7 @@ int main() {
     ExpressionType("Literal", [
       [
         "dynamic", "value",
-        "Literals are numbers, strings, bools or null. This field holds one of them."
+        "Literals are numbers, strings, booleans or null. This field holds one of them."
       ]
     ]),
     //TODO: fix unary so it can be to the left (the factorial sign is placed after the operand.)
@@ -28,8 +28,17 @@ int main() {
       ["Token", "op", "operator"],
       ["Expr", "right", "all Unary operators have the operand to their right."]
     ])
-  ]);
+  ], ['Token']);
 
+
+  defineAst("..", "Stmt", [
+    ExpressionType("Expression", [
+      ["Expr", "expression",  "Expression statements are basically wrappers for Expressions"]
+    ]),
+    ExpressionType("Print", [
+      ["Expr", "expression", "print statements evaluate and then print their expressions"]
+    ])
+  ], ['Expr']);
   return 0;
 }
 
@@ -40,21 +49,24 @@ class ExpressionType {
   ExpressionType(this.name, this.fields);
 }
 
-void defineAst(String outputDir, String fileName, List<ExpressionType> types) {
+void defineAst(String outputDir, String fileName, List<ExpressionType> types, List<String> imports) {
   String path = outputDir + '/' + fileName + '.dart';
 
   File outputFile = File(path);
 
   
+  String source = "";
 
-  String source = "import 'Token.dart';\n";
+  for (String i in imports) {
+    source += "import '" + i + ".dart';";
+  }
 
   String visitorClassName = fileName + "Visitor";
   
-  source += "abstract class " +  visitorClassName + " {\n";
+  source += "\nabstract class " +  visitorClassName + " {\n";
 
   for (ExpressionType e in types) {
-    source += '  dynamic visit' + e.name + fileName + '(' + fileName + ' e);\n';
+    source += '  dynamic visit' + e.name + fileName + '(' + fileName + ' ' + fileName[0].toLowerCase() + ');\n';
   }
   
   
@@ -65,7 +77,7 @@ void defineAst(String outputDir, String fileName, List<ExpressionType> types) {
   "\n}\n\n";
 
   for (ExpressionType e in types) {
-    source += "class " + e.name + fileName + " extends Expr {\n";
+    source += "class " + e.name + fileName + " extends " + fileName + " {\n";
     for (List<String> field in e.fields) {
       if (field.length > 1) source += "  ///" + field[2] + '\n';
       source += "  final " + field[0] + ' ' + field[1] +';\n';

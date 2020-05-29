@@ -1,13 +1,15 @@
 import 'dart:io';
 
-import 'ASTPrinter.dart';
+import 'BSInterpreter.dart';
 import 'BSParser.dart';
 import 'BSScanner.dart';
-import 'Expr.dart';
+import 'Stmt.dart';
 import 'Token.dart';
 
 class BetaScript {
   static bool hadError = false;
+  static bool hadRuntimeError = false;
+  static final BSInterpreter _interpreter = new BSInterpreter();
 
   static void runFile(String path) {
     File file = File(path);
@@ -15,6 +17,7 @@ class BetaScript {
     _run(fileContents);
 
     if (hadError) exit(1);
+    if (hadRuntimeError) exit(2);
   }
 
   static void runPrompt() {
@@ -30,8 +33,10 @@ class BetaScript {
     BSScanner scanner = new BSScanner(source);
     List<Token> tokens = scanner.scanTokens();
     BSParser parser = new BSParser(tokens);
-    Expr expression = parser.parse();
-    print(ASTPrinter().print(expression));
+    List<Stmt> statements = parser.parse();
+    if (hadError) return;
+
+    _interpreter.interpret(statements);
   }  
 
   static void error(dynamic value, String message) {
@@ -52,6 +57,12 @@ class BetaScript {
   static void _report(int line, String where, String message) {
     print("[line " + line.toString() + "] Error" + where + ": " + message);
     hadError = true;
+  }
+
+  static void runtimeError(RuntimeError e) {
+    print(e);
+    hadRuntimeError = true;
+
   }
 
 }

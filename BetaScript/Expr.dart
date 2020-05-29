@@ -1,5 +1,4 @@
 import 'Token.dart';
-
 abstract class ExprVisitor {
   dynamic visitBinaryExpr(Expr e);
   dynamic visitGroupingExpr(Expr e);
@@ -34,7 +33,7 @@ class GroupingExpr extends Expr {
 }
 
 class LiteralExpr extends Expr {
-  ///Literals are numbers, strings, bools or null. This field holds one of them.
+  ///Literals are numbers, strings, booleans or null. This field holds one of them.
   final dynamic value;
   LiteralExpr(dynamic this.value);
   dynamic accept(ExprVisitor v) => v.visitLiteralExpr(this);
