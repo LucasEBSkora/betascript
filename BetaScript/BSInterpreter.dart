@@ -1,11 +1,13 @@
-import '../BSCalculus/Number.dart';
 import '../BSCalculus/bscFunction.dart';
+import 'BSEnvironment.dart';
 import 'BetaScript.dart';
 import 'Expr.dart';
 import 'Stmt.dart';
 import 'Token.dart';
 
 class BSInterpreter extends ExprVisitor with StmtVisitor {
+  Environment _environment = new Environment();
+
   void interpret(List<Stmt> statements) {
     try {
       for (Stmt stmt in statements) {
@@ -139,6 +141,21 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
     dynamic value = _evaluate((stmt as PrintStmt).expression);
     print(_stringify(value));
   }
+
+  @override
+  void visitVarStmt(Stmt s) {
+    Object value = null;
+    VarStmt varStmt = s;
+    if (varStmt.initializer != null) {
+      value = _evaluate(varStmt.initializer);
+    }
+    _environment.define(varStmt.name.lexeme, value);
+  }
+
+  @override
+  visitVariableExpr(Expr e) => _environment.get((e as VariableExpr).name);
+
+
 }
 
 class RuntimeError implements Exception {

@@ -4,6 +4,7 @@ abstract class ExprVisitor {
   dynamic visitGroupingExpr(Expr e);
   dynamic visitLiteralExpr(Expr e);
   dynamic visitUnaryExpr(Expr e);
+  dynamic visitVariableExpr(Expr e);
 
 }
 
@@ -47,6 +48,14 @@ class UnaryExpr extends Expr {
   final Expr right;
   UnaryExpr(Token this.op, Expr this.right);
   dynamic accept(ExprVisitor v) => v.visitUnaryExpr(this);
+
+}
+
+class VariableExpr extends Expr {
+  ///The token containing the variable's name
+  final Token name;
+  VariableExpr(Token this.name);
+  dynamic accept(ExprVisitor v) => v.visitVariableExpr(this);
 
 }
 

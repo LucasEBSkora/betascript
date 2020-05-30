@@ -40,4 +40,8 @@ class ASTPrinter extends ExprVisitor {
 
     return result;
   }
+
+  @override
+  visitVariableExpr(Expr e) => (e as VariableExpr).name.lexeme;
+
 }

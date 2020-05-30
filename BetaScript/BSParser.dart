@@ -1,3 +1,4 @@
+
 import 'BetaScript.dart';
 import 'Expr.dart';
 import 'Stmt.dart';
@@ -20,7 +21,11 @@ class BSParser {
 
   /*The parser works by implementing the rules in the language's formal grammar, which, currently, are:
 
-  program -> statement* EOF
+  program -> declaration* EOF
+
+  declaration -> varDecl | statement
+
+  varDecl -> "var" IDENTIFIER ( "=" expression): ";"
 
   statement -> exprStmt | printStmt
 
@@ -33,7 +38,7 @@ class BSParser {
   addition -> multiplication ( ("-" | "+") multiplication)*
   multiplication -> unary ( ("*" | "/") unary)*
   unary -> ( "!" | "-") unary | primary
-  primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ")" 
+  primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER" 
   
   these should be interpreted the following way: in order to build a valid BetaScript expression, one starts at the expression rule, and
   them follows the rule set in order to build it, going down.
@@ -62,10 +67,33 @@ class BSParser {
     List<Stmt> statements = new List();
     
     while(!_isAtEnd()) {
-      statements.add(_statement());
+      statements.add(_declaration());
     }
     
     return statements;
+  }
+  ///declaration -> varDecl | statement
+  Stmt _declaration() {
+    try {
+      if (_match([TokenType.VAR])) return _varDeclaration();
+      return _statement();
+    } on ParseError {
+      _synchronize();
+      return null;
+    }
+  }
+
+  ///varDecl -> "var" IDENTIFIER ( "=" expression): ";"
+  Stmt _varDeclaration() {
+    Token name = _consume(TokenType.IDENTIFIER, "Expect variable name");
+
+    Expr initializer = null;
+    if (_match([TokenType.EQUAL])) {
+      initializer = _expression();
+    }
+
+    _consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
+    return new VarStmt(name, initializer);
   }
 
   ///statement -> exprStmt | printStmt
@@ -192,6 +220,8 @@ class BSParser {
     //NUMBER | STRING
     if (_match([TokenType.NUMBER, TokenType.STRING]))
       return new LiteralExpr(_previous().literal);
+
+    if (_match([TokenType.IDENTIFIER])) return new VariableExpr(_previous());
 
     // "(" expression ")"
     if (_match([TokenType.LEFT_PARENTHESES])) {
