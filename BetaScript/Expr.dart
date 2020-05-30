@@ -1,10 +1,11 @@
 import 'Token.dart';
 abstract class ExprVisitor {
-  dynamic visitBinaryExpr(Expr e);
-  dynamic visitGroupingExpr(Expr e);
-  dynamic visitLiteralExpr(Expr e);
-  dynamic visitUnaryExpr(Expr e);
-  dynamic visitVariableExpr(Expr e);
+  dynamic visitBinaryExpr(BinaryExpr e);
+  dynamic visitGroupingExpr(GroupingExpr e);
+  dynamic visitLiteralExpr(LiteralExpr e);
+  dynamic visitUnaryExpr(UnaryExpr e);
+  dynamic visitVariableExpr(VariableExpr e);
+  dynamic visitAssignExpr(AssignExpr e);
 
 }
 
@@ -56,6 +57,16 @@ class VariableExpr extends Expr {
   final Token name;
   VariableExpr(Token this.name);
   dynamic accept(ExprVisitor v) => v.visitVariableExpr(this);
+
+}
+
+class AssignExpr extends Expr {
+  ///The name of the variable being assigned to
+  final Token name;
+  ///The expression whose result should be assigned to the variable
+  final Expr value;
+  AssignExpr(Token this.name, Expr this.value);
+  dynamic accept(ExprVisitor v) => v.visitAssignExpr(this);
 
 }
 

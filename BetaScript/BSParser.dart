@@ -32,7 +32,10 @@ class BSParser {
   exprStmt -> expression ";"
   printStmt -> "print" expression ";"
 
-  expression -> equality
+  expression -> assigment
+
+  assigment -> IDENTIFIER "=" assigment | equality
+
   equality -> comparison ( "==" comparison )*
   comparison -> addition ( (">" | ">=" | "<" | "<=") addition)*
   addition -> multiplication ( ("-" | "+") multiplication)*
@@ -102,21 +105,48 @@ class BSParser {
     return _expressionStatement();
   }
 
+  ///printStmt -> "print" expression ";"
   Stmt _printStatement() {
     Expr value = _expression();
     _consume(TokenType.SEMICOLON, "Expect ';' after value.");
     return new PrintStmt(value);
   }
 
+  ///exprStmt -> expression ";"
   Stmt _expressionStatement() {
     Expr expr = _expression();
     _consume(TokenType.SEMICOLON, "Expect ';' after expression.");
     return new ExpressionStmt(expr);
   }
 
-  ///expression -> equality
+  ///expression -> assigment
   Expr _expression() {
-    return _equality();
+    return _assigment();
+  }
+
+  ///assigment -> IDENTIFIER "=" assigment | equality
+  Expr _assigment() {
+    //Assigment is hard because when you get to the "=" token, you already consumed the identifier token
+    //and if it is something more complex, mainly envolving objects, it may be necessary to go many tokens back to discover 
+    //what is the identifier
+    //So what we must do is first assume it goes to another rule (equality) and store the value of this expression
+    //and if we really have an assigment, transform the previously parsed result into a assigment target
+
+    Expr expr = _equality();
+
+    if (_match([TokenType.EQUAL])) {
+      Token equals = _previous();
+      Expr value = _assigment();
+
+      if (expr is VariableExpr) {
+        Token name = expr.name;
+        return new AssignExpr(name, value);
+      }
+
+      _error(equals, "Invalid assigment target");
+    }
+    
+    return expr;
   }
 
   ///equality -> comparison ( "==" comparison )*
@@ -286,6 +316,7 @@ class BSParser {
     //doesn't actually throw the error
     //TODO: maybe a bad idea
     _error(_peek(), message);
+    return null;
   }
 
   ///Reports an error to the general interpreter and creates a ParseError without necessarily throwing it

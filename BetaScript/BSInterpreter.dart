@@ -38,24 +38,23 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   }
 
   @override
-  visitBinaryExpr(Expr e) {
-    BinaryExpr b = e;
+  visitBinaryExpr(BinaryExpr e) {
 
-    dynamic leftOperand = _evaluate(b.left);
-    dynamic rightOperand = _evaluate(b.right);
+    dynamic leftOperand = _evaluate(e.left);
+    dynamic rightOperand = _evaluate(e.right);
 
-    switch (b.op.type) {
+    switch (e.op.type) {
       case TokenType.MINUS:
-        _checkNumberOperands(b.op, leftOperand, rightOperand);
+        _checkNumberOperands(e.op, leftOperand, rightOperand);
         return leftOperand - rightOperand;
       case TokenType.SLASH:
-        _checkNumberOperands(b.op, leftOperand, rightOperand);
+        _checkNumberOperands(e.op, leftOperand, rightOperand);
         return leftOperand / rightOperand;
       case TokenType.STAR:
-        _checkNumberOperands(b.op, leftOperand, rightOperand);
+        _checkNumberOperands(e.op, leftOperand, rightOperand);
         return leftOperand * rightOperand;
       case TokenType.PLUS:
-        _checkStringOrNumberOperands(b.op, leftOperand, rightOperand);
+        _checkStringOrNumberOperands(e.op, leftOperand, rightOperand);
         return leftOperand + rightOperand;
 
       case TokenType.GREATER:
@@ -75,20 +74,18 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   }
 
   @override
-  visitGroupingExpr(Expr e) => _evaluate((e as GroupingExpr).expression);
+  visitGroupingExpr(GroupingExpr e) => _evaluate(e.expression);
 
   @override
-  dynamic visitLiteralExpr(Expr e) => (e as LiteralExpr).value;
+  dynamic visitLiteralExpr(LiteralExpr e) => e.value;
 
   @override
-  visitUnaryExpr(Expr e) {
-    UnaryExpr u = e;
+  visitUnaryExpr(UnaryExpr e) {
+    dynamic operand = _evaluate(e.right);
 
-    dynamic operand = _evaluate(u.right);
-
-    switch (u.op.type) {
+    switch (e.op.type) {
       case TokenType.MINUS:
-        _checkNum(u.op, operand);
+        _checkNum(e.op, operand);
         return -operand; //Dynamically typed language - if the conversion fails from operand to num fails, it is intended behavior
       //"not" (!) would be here, but i decided to use it for factorials and use the "not" keyword explicitly
       default:
@@ -133,27 +130,36 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   }
 
   @override
-  void visitExpressionStmt(Stmt stmt) =>
-      _evaluate((stmt as ExpressionStmt).expression);
+  void visitExpressionStmt(ExpressionStmt stmt) =>
+      _evaluate(stmt.expression);
 
   @override
-  void visitPrintStmt(Stmt stmt) {
-    dynamic value = _evaluate((stmt as PrintStmt).expression);
+  void visitPrintStmt(PrintStmt stmt) {
+    dynamic value = _evaluate(stmt.expression);
     print(_stringify(value));
   }
 
   @override
-  void visitVarStmt(Stmt s) {
+  void visitVarStmt(VarStmt s) {
     Object value = null;
-    VarStmt varStmt = s;
-    if (varStmt.initializer != null) {
-      value = _evaluate(varStmt.initializer);
+    if (s.initializer != null) {
+      value = _evaluate(s.initializer);
     }
-    _environment.define(varStmt.name.lexeme, value);
+    _environment.define(s.name.lexeme, value);
   }
 
   @override
-  visitVariableExpr(Expr e) => _environment.get((e as VariableExpr).name);
+  visitVariableExpr(VariableExpr e) => _environment.get(e.name);
+
+  @override
+  visitAssignExpr(AssignExpr e) {
+    
+    Object value = _evaluate(e);
+
+    _environment.assign(e.name, value);
+
+    return value;
+  }
 
 
 }

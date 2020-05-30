@@ -5,29 +5,23 @@ class ASTPrinter extends ExprVisitor {
   String print(Expr expr) => expr.accept(this);
 
   @override
-  String visitBinaryExpr(Expr e) {
-    BinaryExpr b = e;
-    return _parenthesize(b.op.lexeme, [b.left, b.right]);
-  }
+  String visitBinaryExpr(BinaryExpr e) => _parenthesize(e.op.lexeme, [e.left, e.right]);
 
   @override
-  String visitGroupingExpr(Expr e) {
-    GroupingExpr g = e;
-    return _parenthesize("group", [g.expression]);
-  }
+  String visitGroupingExpr(GroupingExpr e) => _parenthesize("group", [e.expression]);
 
   @override
-  String visitLiteralExpr(Expr e) {
-    LiteralExpr g = e;
-    if (g.value == null) return 'nil';
-    return g.value.toString();
-  }
+  String visitLiteralExpr(LiteralExpr e) => (e.value == null) ? 'nil' : e.value.toString();
 
   @override
-  String visitUnaryExpr(Expr e) {
-    UnaryExpr u = e;
-    return _parenthesize(u.op.lexeme, [u.right]);
-  }
+  String visitUnaryExpr(UnaryExpr e) => _parenthesize(e.op.lexeme, [e.right]);
+
+
+  @override
+  visitVariableExpr(Expr e) => (e as VariableExpr).name.lexeme;
+
+  @override
+  visitAssignExpr(AssignExpr e) => _parenthesize('(= ' + e.name.lexeme, [e.value]);
 
   String _parenthesize(String lexeme, List<Expr> expressions) {
     String result = '(' + lexeme;
@@ -40,8 +34,4 @@ class ASTPrinter extends ExprVisitor {
 
     return result;
   }
-
-  @override
-  visitVariableExpr(Expr e) => (e as VariableExpr).name.lexeme;
-
 }

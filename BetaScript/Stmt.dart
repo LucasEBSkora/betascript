@@ -1,8 +1,8 @@
 import 'Expr.dart';import 'Token.dart';
 abstract class StmtVisitor {
-  dynamic visitExpressionStmt(Stmt s);
-  dynamic visitPrintStmt(Stmt s);
-  dynamic visitVarStmt(Stmt s);
+  dynamic visitExpressionStmt(ExpressionStmt s);
+  dynamic visitPrintStmt(PrintStmt s);
+  dynamic visitVarStmt(VarStmt s);
 
 }
 

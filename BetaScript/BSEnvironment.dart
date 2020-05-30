@@ -13,4 +13,10 @@ class Environment {
     if (_values.containsKey(name.lexeme)) return _values[name.lexeme];
     throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
   }
+
+  void assign(Token name, Object value) {
+    if (_values.containsKey(name.lexeme)) {
+      _values[name.lexeme] = value;
+    } else throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+  }
 }

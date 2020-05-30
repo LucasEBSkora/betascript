@@ -8,7 +8,7 @@ int main() {
       [
         ["Expr", "left", "operand to the left of the operator"],
         ["Token", "op", "operator"],
-        ["Expr", "right", "operand to the right of the operator"]
+        ["Expr", "right", "operand to the right of the operator"],
       ],
     ),
     ExpressionType("Grouping", [
@@ -16,22 +16,26 @@ int main() {
         "Expr",
         "expression",
         "A grouping is a collection of other Expressions, so it holds only another expression."
-      ]
+      ],
     ]),
     ExpressionType("Literal", [
       [
         "dynamic",
         "value",
         "Literals are numbers, strings, booleans or null. This field holds one of them."
-      ]
+      ],
     ]),
     //TODO: fix unary so it can be to the left (the factorial sign is placed after the operand.)
     ExpressionType("Unary", [
       ["Token", "op", "operator"],
-      ["Expr", "right", "all Unary operators have the operand to their right."]
+      ["Expr", "right", "all Unary operators have the operand to their right."],
     ]),
     ExpressionType("Variable", [
       ["Token", "name", "The token containing the variable's name"],
+    ]),
+    ExpressionType("Assign", [
+      ["Token", "name", "The name of the variable being assigned to"],
+      ["Expr", "value", "The expression whose result should be assigned to the variable"],
     ]),
   ], [
     'Token'
@@ -94,7 +98,7 @@ void defineAst(String outputDir, String fileName, List<ExpressionType> types,
         e.name +
         fileName +
         '(' +
-        fileName +
+        e.name + fileName +
         ' ' +
         fileName[0].toLowerCase() +
         ');\n';
