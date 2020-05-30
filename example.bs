@@ -1,0 +1,16 @@
+var a = "global a";
+var b = "global b";
+
+{
+  print a;
+  print b;
+
+  var a = "local a";
+  var b = "local b";
+
+  print a;
+  print b;
+}
+
+print a;
+print b;

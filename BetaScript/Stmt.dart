@@ -3,6 +3,7 @@ abstract class StmtVisitor {
   dynamic visitExpressionStmt(ExpressionStmt s);
   dynamic visitPrintStmt(PrintStmt s);
   dynamic visitVarStmt(VarStmt s);
+  dynamic visitBlockStmt(BlockStmt s);
 
 }
 
@@ -34,6 +35,14 @@ class VarStmt extends Stmt {
   final Expr initializer;
   VarStmt(Token this.name, Expr this.initializer);
   dynamic accept(StmtVisitor v) => v.visitVarStmt(this);
+
+}
+
+class BlockStmt extends Stmt {
+  ///A block contains a sequence of Statements, being basically a region of code with specific scope
+  final List<Stmt> statements;
+  BlockStmt(List<Stmt> this.statements);
+  dynamic accept(StmtVisitor v) => v.visitBlockStmt(this);
 
 }
 

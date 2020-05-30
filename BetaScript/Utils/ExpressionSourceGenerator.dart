@@ -35,7 +35,11 @@ int main() {
     ]),
     ExpressionType("Assign", [
       ["Token", "name", "The name of the variable being assigned to"],
-      ["Expr", "value", "The expression whose result should be assigned to the variable"],
+      [
+        "Expr",
+        "value",
+        "The expression whose result should be assigned to the variable"
+      ],
     ]),
   ], [
     'Token'
@@ -64,8 +68,12 @@ int main() {
         "If the variable is initialized on declaration, the inicializer is stored here"
       ],
     ]),
+    ExpressionType("Block", [
+      ["List<Stmt>", "statements", "A block contains a sequence of Statements, being basically a region of code with specific scope"]
+    ]),
   ], [
-    'Expr', 'Token'
+    'Expr',
+    'Token'
   ]);
   return 0;
 }
@@ -98,7 +106,8 @@ void defineAst(String outputDir, String fileName, List<ExpressionType> types,
         e.name +
         fileName +
         '(' +
-        e.name + fileName +
+        e.name +
+        fileName +
         ' ' +
         fileName[0].toLowerCase() +
         ');\n';

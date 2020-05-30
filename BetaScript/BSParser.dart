@@ -27,10 +27,11 @@ class BSParser {
 
   varDecl -> "var" IDENTIFIER ( "=" expression): ";"
 
-  statement -> exprStmt | printStmt
+  statement -> exprStmt | printStmt | block
 
   exprStmt -> expression ";"
   printStmt -> "print" expression ";"
+  block -> "{" declaration* "}"
 
   expression -> assigment
 
@@ -99,9 +100,10 @@ class BSParser {
     return new VarStmt(name, initializer);
   }
 
-  ///statement -> exprStmt | printStmt
+  ///statement -> exprStmt | printStmt | block
   Stmt _statement() {
     if (_match([TokenType.PRINT])) return _printStatement();
+    if (_match([TokenType.LEFT_BRACE])) return BlockStmt(_block());
     return _expressionStatement();
   }
 
@@ -117,6 +119,19 @@ class BSParser {
     Expr expr = _expression();
     _consume(TokenType.SEMICOLON, "Expect ';' after expression.");
     return new ExpressionStmt(expr);
+  }
+
+  ///block -> "{" declaration* "}"
+  List<Stmt> _block() {
+    //The left brace was already consumed in _statement
+    List<Stmt> statements = new List();
+
+    while (!_check(TokenType.RIGHT_BRACE) && !_isAtEnd()) 
+      statements.add(_declaration());
+
+    _consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+
+    return statements;
   }
 
   ///expression -> assigment
@@ -138,6 +153,7 @@ class BSParser {
       Token equals = _previous();
       Expr value = _assigment();
 
+      //This is why Grouping is considered a different type of expression: a = 1 is allowed, but (a) = 1 isn't.
       if (expr is VariableExpr) {
         Token name = expr.name;
         return new AssignExpr(name, value);

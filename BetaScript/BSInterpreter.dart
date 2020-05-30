@@ -161,6 +161,25 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
     return value;
   }
 
+  @override
+  visitBlockStmt(BlockStmt s) {
+    //Creates a new environment with current environment enclosing it
+    _executeBlock(s.statements, new Environment(_environment));
+    return null;
+  }
+
+  ///Parameters here are the list of statements to run and the environment in which to run them
+  void _executeBlock(List<Stmt> statements, Environment environment) {
+    Environment previous = _environment;
+    try {
+      _environment = environment;
+      for (Stmt s in statements)
+        _execute(s);
+    } finally {
+      _environment = previous;
+    }
+
+  }
 
 }
 
