@@ -56,4 +56,12 @@ class Number extends bscFunction {
     else
       return n(absvalue * (negative ? -1 : 1));
   }
+
+  bool operator == (dynamic other) => (other is Number) && this.value == other.value;
+
+  bool operator <= (dynamic other) =>  this.value <= other.value;
+bool operator < (dynamic other) =>  this.value < other.value;
+bool operator >= (dynamic other) =>  this.value >= other.value;
+bool operator > (dynamic other) =>  this.value > other.value;
+  
 }

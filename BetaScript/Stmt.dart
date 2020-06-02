@@ -4,6 +4,8 @@ abstract class StmtVisitor {
   dynamic visitPrintStmt(PrintStmt s);
   dynamic visitVarStmt(VarStmt s);
   dynamic visitBlockStmt(BlockStmt s);
+  dynamic visitIfStmt(IfStmt s);
+  dynamic visitWhileStmt(WhileStmt s);
 
 }
 
@@ -43,6 +45,28 @@ class BlockStmt extends Stmt {
   final List<Stmt> statements;
   BlockStmt(List<Stmt> this.statements);
   dynamic accept(StmtVisitor v) => v.visitBlockStmt(this);
+
+}
+
+class IfStmt extends Stmt {
+  ///If this condition evaluates to True, execute ThenBranch. If it doesn't, execute elseBranch
+  final Expr condition;
+  ///
+  final Stmt thenBranch;
+  ///
+  final Stmt elseBranch;
+  IfStmt(Expr this.condition, Stmt this.thenBranch, Stmt this.elseBranch);
+  dynamic accept(StmtVisitor v) => v.visitIfStmt(this);
+
+}
+
+class WhileStmt extends Stmt {
+  ///while this condition evaluates to True, execute body.
+  final Expr condition;
+  ///
+  final Stmt body;
+  WhileStmt(Expr this.condition, Stmt this.body);
+  dynamic accept(StmtVisitor v) => v.visitWhileStmt(this);
 
 }
 

@@ -39,7 +39,6 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
 
   @override
   visitBinaryExpr(BinaryExpr e) {
-
     dynamic leftOperand = _evaluate(e.left);
     dynamic rightOperand = _evaluate(e.right);
 
@@ -86,7 +85,9 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
     switch (e.op.type) {
       case TokenType.MINUS:
         _checkNum(e.op, operand);
-        return -operand; //Dynamically typed language - if the conversion fails from operand to num fails, it is intended behavior
+        return -operand; //Dynamically typed language - if the conversion from operand to num fails, it is intended behavior
+      case TokenType.NOT:
+        return !_istruthy(operand);
       //"not" (!) would be here, but i decided to use it for factorials and use the "not" keyword explicitly
       default:
     }
@@ -96,7 +97,7 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
 
   dynamic _evaluate(Expr e) => e.accept(this);
 
-  //null and false are "falsy" everything else is "truthy" (isn't the value 'true' but can be used in logic as if it was)
+  ///null and false are "falsy", everything else is "truthy" (isn't the value 'true' but can be used in logic as if it was)
   static bool _istruthy(dynamic object) =>
       ((object is bool) ? object : (!object == null));
 
@@ -130,8 +131,7 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   }
 
   @override
-  void visitExpressionStmt(ExpressionStmt stmt) =>
-      _evaluate(stmt.expression);
+  void visitExpressionStmt(ExpressionStmt stmt) => _evaluate(stmt.expression);
 
   @override
   void visitPrintStmt(PrintStmt stmt) {
@@ -153,8 +153,7 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
 
   @override
   visitAssignExpr(AssignExpr e) {
-    
-    Object value = _evaluate(e);
+    Object value = _evaluate(e.value);
 
     _environment.assign(e.name, value);
 
@@ -173,14 +172,40 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
     Environment previous = _environment;
     try {
       _environment = environment;
-      for (Stmt s in statements)
-        _execute(s);
+      for (Stmt s in statements) _execute(s);
     } finally {
       _environment = previous;
     }
-
   }
 
+  @override
+  visitIfStmt(IfStmt s) {
+    if (_istruthy(_evaluate(s.condition)))
+      _execute(s.thenBranch);
+    else if (s.elseBranch != null) _execute(s.elseBranch);
+
+    return null;
+  }
+
+  @override
+  visitlogicBinaryExpr(logicBinaryExpr e) {
+    Object left = _evaluate(e.left);
+
+    //Circuit-breaker logical expressions:
+    //true OR other_expression should return true regardless of other_expression, so it isn't even evaluated
+    //false AND other_expression should return false regardless of other_expression, so it isn't even evaluated
+
+    if (e.op.type == TokenType.OR) {
+      if (_istruthy(left)) return left;
+    } else if (!_istruthy(left)) return left;
+    return _evaluate(e.right);
+  }
+
+  @override
+  visitWhileStmt(WhileStmt s) {
+    while (_istruthy(_evaluate(s.condition))) _execute(s.body);
+    return null;
+  }
 }
 
 class RuntimeError implements Exception {

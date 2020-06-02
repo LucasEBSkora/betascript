@@ -6,6 +6,7 @@ abstract class ExprVisitor {
   dynamic visitUnaryExpr(UnaryExpr e);
   dynamic visitVariableExpr(VariableExpr e);
   dynamic visitAssignExpr(AssignExpr e);
+  dynamic visitlogicBinaryExpr(logicBinaryExpr e);
 
 }
 
@@ -67,6 +68,18 @@ class AssignExpr extends Expr {
   final Expr value;
   AssignExpr(Token this.name, Expr this.value);
   dynamic accept(ExprVisitor v) => v.visitAssignExpr(this);
+
+}
+
+class logicBinaryExpr extends Expr {
+  ///operand to the left of the operator
+  final Expr left;
+  ///operator
+  final Token op;
+  ///operand to the right of the operator
+  final Expr right;
+  logicBinaryExpr(Expr this.left, Token this.op, Expr this.right);
+  dynamic accept(ExprVisitor v) => v.visitlogicBinaryExpr(this);
 
 }
 

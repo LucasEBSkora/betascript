@@ -41,6 +41,14 @@ int main() {
         "The expression whose result should be assigned to the variable"
       ],
     ]),
+    ExpressionType(
+      "logicBinary",
+      [
+        ["Expr", "left", "operand to the left of the operator"],
+        ["Token", "op", "operator"],
+        ["Expr", "right", "operand to the right of the operator"],
+      ],
+    ),
   ], [
     'Token'
   ]);
@@ -69,7 +77,28 @@ int main() {
       ],
     ]),
     ExpressionType("Block", [
-      ["List<Stmt>", "statements", "A block contains a sequence of Statements, being basically a region of code with specific scope"]
+      [
+        "List<Stmt>",
+        "statements",
+        "A block contains a sequence of Statements, being basically a region of code with specific scope"
+      ]
+    ]),
+    ExpressionType("If", [
+      [
+        "Expr",
+        "condition",
+        "If this condition evaluates to True, execute ThenBranch. If it doesn't, execute elseBranch"
+      ],
+      ["Stmt", "thenBranch", ""],
+      ["Stmt", "elseBranch", ""],
+    ]),
+    ExpressionType("While", [
+      [
+        "Expr",
+        "condition",
+        "while this condition evaluates to True, execute body."
+      ],
+      ["Stmt", "body", ""],
     ]),
   ], [
     'Expr',
