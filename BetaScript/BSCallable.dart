@@ -49,7 +49,12 @@ class UserFunction implements BSCallable {
       environment.define(_declaration.parameters[i].lexeme, arguments[i]);
     
     //executes block
-    interpreter.executeBlock(_declaration.body, environment);
+    //using exceptions as a way to exit the function and return here, with the proper return value
+    try {
+      interpreter.executeBlock(_declaration.body, environment);
+    } on Return catch (r) {
+      return r.value;
+    }
     return null;
   }
 

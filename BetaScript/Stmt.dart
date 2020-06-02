@@ -7,6 +7,7 @@ abstract class StmtVisitor {
   dynamic visitIfStmt(IfStmt s);
   dynamic visitFunctionStmt(FunctionStmt s);
   dynamic visitWhileStmt(WhileStmt s);
+  dynamic visitReturnStmt(ReturnStmt s);
 
 }
 
@@ -80,6 +81,16 @@ class WhileStmt extends Stmt {
   final Stmt body;
   WhileStmt(Expr this.condition, Stmt this.body);
   dynamic accept(StmtVisitor v) => v.visitWhileStmt(this);
+
+}
+
+class ReturnStmt extends Stmt {
+  ///The token containing the keyword 'return'
+  final Token keyword;
+  ///The expression whose value should be returned
+  final Expr value;
+  ReturnStmt(Token this.keyword, Expr this.value);
+  dynamic accept(StmtVisitor v) => v.visitReturnStmt(this);
 
 }
 

@@ -3,7 +3,7 @@ import 'dart:io';
 //a helper program that generates a valid dart file with the classes representing each type of expression, for use in ASTs.
 int main() {
   defineAst("..", "Expr", [
-    ExpressionType(
+    NodeType(
       "Binary",
       [
         ["Expr", "left", "operand to the left of the operator"],
@@ -11,20 +11,20 @@ int main() {
         ["Expr", "right", "operand to the right of the operator"],
       ],
     ),
-    ExpressionType( "Call", [
+    NodeType( "Call", [
       ["Expr", "callee", "The function being called"],
       ["Token", "paren", "The parentheses token"],
       ["List<Expr>", "arguments", "The list of arguments being passed"],
     ]
     ),
-    ExpressionType("Grouping", [
+    NodeType("Grouping", [
       [
         "Expr",
         "expression",
         "A grouping is a collection of other Expressions, so it holds only another expression."
       ],
     ]),
-    ExpressionType("Literal", [
+    NodeType("Literal", [
       [
         "dynamic",
         "value",
@@ -32,14 +32,14 @@ int main() {
       ],
     ]),
     //TODO: fix unary so it can be to the left (the factorial sign is placed after the operand.)
-    ExpressionType("Unary", [
+    NodeType("Unary", [
       ["Token", "op", "operator"],
       ["Expr", "right", "all Unary operators have the operand to their right."],
     ]),
-    ExpressionType("Variable", [
+    NodeType("Variable", [
       ["Token", "name", "The token containing the variable's name"],
     ]),
-    ExpressionType("Assign", [
+    NodeType("Assign", [
       ["Token", "name", "The name of the variable being assigned to"],
       [
         "Expr",
@@ -47,7 +47,7 @@ int main() {
         "The expression whose result should be assigned to the variable"
       ],
     ]),
-    ExpressionType(
+    NodeType(
       "logicBinary",
       [
         ["Expr", "left", "operand to the left of the operator"],
@@ -60,21 +60,21 @@ int main() {
   ]);
 
   defineAst("..", "Stmt", [
-    ExpressionType("Expression", [
+    NodeType("Expression", [
       [
         "Expr",
         "expression",
         "Expression statements are basically wrappers for Expressions"
       ]
     ]),
-    ExpressionType("Print", [
+    NodeType("Print", [
       [
         "Expr",
         "expression",
         "print statements evaluate and then print their expressions"
       ]
     ]),
-    ExpressionType("Var", [
+    NodeType("Var", [
       ["Token", "name", "The token holding the variable's name"],
       [
         "Expr",
@@ -82,14 +82,14 @@ int main() {
         "If the variable is initialized on declaration, the inicializer is stored here"
       ],
     ]),
-    ExpressionType("Block", [
+    NodeType("Block", [
       [
         "List<Stmt>",
         "statements",
         "A block contains a sequence of Statements, being basically a region of code with specific scope"
       ]
     ]),
-    ExpressionType("If", [
+    NodeType("If", [
       [
         "Expr",
         "condition",
@@ -98,18 +98,22 @@ int main() {
       ["Stmt", "thenBranch", ""],
       ["Stmt", "elseBranch", ""],
     ]),
-    ExpressionType("Function", [
+    NodeType("Function", [
       ["Token", "name", "The function's name"],
       ["List<Token>", "parameters", "The parameters the function takes"],
       ["List<Stmt>", "body", "The function body"],
     ]),
-    ExpressionType("While", [
+    NodeType("While", [
       [
         "Expr",
         "condition",
         "while this condition evaluates to True, execute body."
       ],
       ["Stmt", "body", ""],
+    ]),
+    NodeType("Return", [
+      ["Token", "keyword", "The token containing the keyword 'return'"],
+      ["Expr", "value", "The expression whose value should be returned"],
     ]),
   ], [
     'Expr',
@@ -118,14 +122,14 @@ int main() {
   return 0;
 }
 
-class ExpressionType {
+class NodeType {
   final name;
   final List<List<String>> fields;
 
-  ExpressionType(this.name, this.fields);
+  NodeType(this.name, this.fields);
 }
 
-void defineAst(String outputDir, String fileName, List<ExpressionType> types,
+void defineAst(String outputDir, String fileName, List<NodeType> types,
     List<String> imports) {
   String path = outputDir + '/' + fileName + '.dart';
 
@@ -141,7 +145,7 @@ void defineAst(String outputDir, String fileName, List<ExpressionType> types,
 
   source += "\nabstract class " + visitorClassName + " {\n";
 
-  for (ExpressionType e in types) {
+  for (NodeType e in types) {
     source += '  dynamic visit' +
         e.name +
         fileName +
@@ -163,7 +167,7 @@ void defineAst(String outputDir, String fileName, List<ExpressionType> types,
       " v);\n" +
       "\n}\n\n";
 
-  for (ExpressionType e in types) {
+  for (NodeType e in types) {
     source += "class " + e.name + fileName + " extends " + fileName + " {\n";
     for (List<String> field in e.fields) {
       if (field.length > 1) source += "  ///" + field[2] + '\n';

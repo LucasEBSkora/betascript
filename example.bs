@@ -1,14 +1,9 @@
-function despa() {
-  print "holy shit my dudes i have functions too";
+function fibonacci(n) {
+  if (n <= 1) return 1;
+  return fibonacci(n - 2) + fibonacci(n - 1);
 }
 
-function cito(number) {
-  print "with parameters too, see?";
-  print number;
+for(var i = 0; i < 20; i = i + 1) {
+  print fibonacci(i);
+  
 }
-
-
-despa();
-cito(1312);
-
-//and comments but that has been in since forever

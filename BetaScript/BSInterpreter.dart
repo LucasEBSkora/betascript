@@ -214,7 +214,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   }
 
   @override
-  BSCallable visitCallExpr(CallExpr e) {
+  Object visitCallExpr(CallExpr e) {
     Object callee = _evaluate(e.callee);
 
     List<Object> arguments = new List();
@@ -223,6 +223,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
     if (!(callee is BSCallable))
       throw new RuntimeError(e.paren, "Can only call functions and classes");
+
     BSCallable function = callee;
 
     if (arguments.length != function.arity) {
@@ -237,6 +238,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     UserFunction function = new UserFunction(s);
     _environment.define(s.name.lexeme, function);
   }
+
+  @override
+  void visitReturnStmt(ReturnStmt s) {
+    Object value = (s.value != null) ? _evaluate(s.value) : null;
+    
+    throw new Return(value);
+  }
 }
 
 class RuntimeError implements Exception {
@@ -248,4 +256,11 @@ class RuntimeError implements Exception {
   @override
   String toString() =>
       "Runtime Error: '" + message + "' at line " + token.line.toString();
+}
+
+class Return implements Exception {
+  final Object value;
+
+  Return(this.value);
+
 }

@@ -29,17 +29,21 @@ class BSParser {
 
   varDecl -> "var" IDENTIFIER ( "=" expression): ";"
 
-  statement -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block
+  statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
 
-  
 
   exprStmt -> expression ";"
-  ifStmt -> "if" "(" expression ")" statement ( "else" statement)? 
-  
+
   forStmt -> "for" "(" (varDecl | exprStmt | ";") expression? ";" expression? ")" statement
   
+  ifStmt -> "if" "(" expression ")" statement ( "else" statement)? 
+  
   printStmt -> "print" expression ";"
+  
+  returnStmt -> "return" expression? ";"
+
   whileStmt -> "while" "(" expression ")" statement
+  
   block -> "{" declaration* "}"
 
   expression -> assigment
@@ -95,8 +99,8 @@ class BSParser {
   Stmt _declaration() {
     try {
       ///funDecl -> "function" function
-      if (_matchSingle(TokenType.FUNCTION)) return _function("function");
-      if (_matchSingle(TokenType.VAR)) return _varDeclaration();
+      if (_match(TokenType.FUNCTION)) return _function("function");
+      if (_match(TokenType.VAR)) return _varDeclaration();
       return _statement();
     } on ParseError {
       _synchronize();
@@ -117,7 +121,7 @@ class BSParser {
     if (!_check(TokenType.RIGHT_PARENTHESES)) {
       do {
         parameters.add(_consume(TokenType.IDENTIFIER, "Expect parameter name"));
-      } while (_matchSingle(TokenType.COMMA));
+      } while (_match(TokenType.COMMA));
     }
 
     _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after parameters.");
@@ -131,7 +135,7 @@ class BSParser {
     Token name = _consume(TokenType.IDENTIFIER, "Expect variable name");
 
     Expr initializer = null;
-    if (_matchSingle(TokenType.EQUAL)) {
+    if (_match(TokenType.EQUAL)) {
       initializer = _expression();
     }
 
@@ -139,13 +143,14 @@ class BSParser {
     return new VarStmt(name, initializer);
   }
 
-  ///statement -> exprStmt | printStmt | block
+  //statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
   Stmt _statement() {
-    if (_matchSingle(TokenType.FOR)) return _forStatement();
-    if (_matchSingle(TokenType.PRINT)) return _printStatement();
-    if (_matchSingle(TokenType.WHILE)) return _whileStatement();
-    if (_matchSingle(TokenType.LEFT_BRACE)) return BlockStmt(_block());
-    if (_matchSingle(TokenType.IF)) return _ifStatement();
+    if (_match(TokenType.FOR)) return _forStatement();
+    if (_match(TokenType.IF)) return _ifStatement();
+    if (_match(TokenType.PRINT)) return _printStatement();
+    if (_match(TokenType.RETURN)) return _returnStatement();
+    if (_match(TokenType.WHILE)) return _whileStatement();
+    if (_match(TokenType.LEFT_BRACE)) return BlockStmt(_block());
     return _expressionStatement();
   }
 
@@ -156,9 +161,9 @@ class BSParser {
     Stmt initializer;
 
     //the initializer may be empty, a variable declaration or any other expression
-    if (_matchSingle(TokenType.SEMICOLON))
+    if (_match(TokenType.SEMICOLON))
       initializer = null;
-    else if (_matchSingle(TokenType.VAR))
+    else if (_match(TokenType.VAR))
       initializer = _varDeclaration();
     else
       initializer = _expressionStatement();
@@ -171,6 +176,7 @@ class BSParser {
     Expr increment =
         (_check(TokenType.RIGHT_PARENTHESES)) ? null : _expression();
 
+    _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after increment in for statement");
     Stmt body = _statement();
 
     if (increment != null)
@@ -218,7 +224,7 @@ class BSParser {
     _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after if condition.");
 
     Stmt thenBranch = _statement();
-    Stmt elseBranch = (_matchSingle(TokenType.ELSE)) ? _statement() : null;
+    Stmt elseBranch = (_match(TokenType.ELSE)) ? _statement() : null;
 
     return new IfStmt(condition, thenBranch, elseBranch);
   }
@@ -232,6 +238,15 @@ class BSParser {
     Stmt body = _statement();
 
     return new WhileStmt(condition, body);
+  }
+
+  ///returnStmt -> "return" expression? ";"
+  Stmt _returnStatement() {
+    Token keyword = _previous();
+    Expr value = (_check(TokenType.SEMICOLON)) ? null : _expression();
+    _consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+
+    return new ReturnStmt(keyword, value);
   }
 
   ///expression -> assigment
@@ -249,7 +264,7 @@ class BSParser {
 
     Expr expr = _or();
 
-    if (_matchSingle(TokenType.EQUAL)) {
+    if (_match(TokenType.EQUAL)) {
       Token equals = _previous();
       Expr value = _assigment();
 
@@ -269,7 +284,7 @@ class BSParser {
   Expr _or() {
     Expr expr = _and();
 
-    while (_matchSingle(TokenType.OR)) {
+    while (_match(TokenType.OR)) {
       Token op = _previous();
       Expr right = _and();
       expr = new logicBinaryExpr(expr, op, right);
@@ -282,7 +297,7 @@ class BSParser {
   Expr _and() {
     Expr expr = _equality();
 
-    while (_matchSingle(TokenType.AND)) {
+    while (_match(TokenType.AND)) {
       Token op = _previous();
       Expr right = _equality();
       expr = new logicBinaryExpr(expr, op, right);
@@ -297,7 +312,7 @@ class BSParser {
     Expr expr = _comparison();
 
     //( "==" comparison)* translates here to "as long as you find '==' tokens, keep adding more comparisons after them"
-    while (_matchSingle(TokenType.EQUAL_EQUAL)) {
+    while (_match(TokenType.EQUAL_EQUAL)) {
       Token op = _previous();
       Expr right = _comparison();
       expr = new BinaryExpr(expr, op, right);
@@ -380,7 +395,7 @@ class BSParser {
     //if after a primary expression you find a parentheses, parses it as a function call, and keeps doing it until you don't find more parentheses
     //to allow for things like getFunction()();
     while (true) {
-      if (_matchSingle(TokenType.LEFT_PARENTHESES))
+      if (_match(TokenType.LEFT_PARENTHESES))
         expr = _finishCall(expr);
       else
         break;
@@ -399,7 +414,7 @@ class BSParser {
       //do note that there is no max number of arguments. That might be a problem when (if) translating the interpreter to a lower level language.
       do {
         arguments.add(_expression());
-      } while (_matchSingle(TokenType.COMMA));
+      } while (_match(TokenType.COMMA));
     }
 
     Token paren =
@@ -411,21 +426,20 @@ class BSParser {
   ///primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER"
   Expr _primary() {
     //false
-    if (_matchSingle(TokenType.FALSE)) return new LiteralExpr(false);
+    if (_match(TokenType.FALSE)) return new LiteralExpr(false);
     //true
-    if (_matchSingle(TokenType.TRUE)) return new LiteralExpr(true);
+    if (_match(TokenType.TRUE)) return new LiteralExpr(true);
     //nil
-    if (_matchSingle(TokenType.NIL)) return new LiteralExpr(null);
+    if (_match(TokenType.NIL)) return new LiteralExpr(null);
 
     //NUMBER | STRING
     if (_matchAny([TokenType.NUMBER, TokenType.STRING]))
       return new LiteralExpr(_previous().literal);
 
-    if (_matchSingle(TokenType.IDENTIFIER))
-      return new VariableExpr(_previous());
+    if (_match(TokenType.IDENTIFIER)) return new VariableExpr(_previous());
 
     // "(" expression ")"
-    if (_matchSingle(TokenType.LEFT_PARENTHESES)) {
+    if (_match(TokenType.LEFT_PARENTHESES)) {
       Expr expr = _expression();
       //if the ')' is not there, it's an error
       _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after expression");
@@ -439,7 +453,7 @@ class BSParser {
   //Helper function corner
 
   ///returns whether the current token's type is 'type', consuming it if it is
-  bool _matchSingle(TokenType type) {
+  bool _match(TokenType type) {
     if (_check(type)) {
       _advance();
       return true;
@@ -450,7 +464,7 @@ class BSParser {
   ///returns true if the current token matches any in 'types', consuming it if it does
   bool _matchAny(List<TokenType> types) {
     for (TokenType type in types) {
-      if (_matchSingle(type)) return true;
+      if (_match(type)) return true;
     }
     return false;
   }
