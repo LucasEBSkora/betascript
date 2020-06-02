@@ -1,12 +1,22 @@
 import '../BSCalculus/bscFunction.dart';
+import 'BSCallable.dart';
 import 'BSEnvironment.dart';
 import 'BetaScript.dart';
 import 'Expr.dart';
 import 'Stmt.dart';
 import 'Token.dart';
 
-class BSInterpreter extends ExprVisitor with StmtVisitor {
-  Environment _environment = new Environment();
+class BSInterpreter implements ExprVisitor, StmtVisitor {
+  final Environment globals = new Environment(); //Global scope
+  Environment _environment; //Current scope
+
+  BSInterpreter() {
+    globals.define("clock", new NativeCallable(0, (BSInterpreter interpreter, List<Object> arguments) => DateTime.now().millisecondsSinceEpoch));
+    
+    _environment = globals;
+
+
+  }
 
   void interpret(List<Stmt> statements) {
     try {
@@ -38,7 +48,7 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   }
 
   @override
-  visitBinaryExpr(BinaryExpr e) {
+  Object visitBinaryExpr(BinaryExpr e) {
     dynamic leftOperand = _evaluate(e.left);
     dynamic rightOperand = _evaluate(e.right);
 
@@ -79,7 +89,7 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   dynamic visitLiteralExpr(LiteralExpr e) => e.value;
 
   @override
-  visitUnaryExpr(UnaryExpr e) {
+  Object visitUnaryExpr(UnaryExpr e) {
     dynamic operand = _evaluate(e.right);
 
     switch (e.op.type) {
@@ -161,14 +171,13 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   }
 
   @override
-  visitBlockStmt(BlockStmt s) {
+  void visitBlockStmt(BlockStmt s) {
     //Creates a new environment with current environment enclosing it
-    _executeBlock(s.statements, new Environment(_environment));
-    return null;
+    executeBlock(s.statements, new Environment(_environment));
   }
 
   ///Parameters here are the list of statements to run and the environment in which to run them
-  void _executeBlock(List<Stmt> statements, Environment environment) {
+  void executeBlock(List<Stmt> statements, Environment environment) {
     Environment previous = _environment;
     try {
       _environment = environment;
@@ -179,16 +188,14 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   }
 
   @override
-  visitIfStmt(IfStmt s) {
+  void visitIfStmt(IfStmt s) {
     if (_istruthy(_evaluate(s.condition)))
       _execute(s.thenBranch);
     else if (s.elseBranch != null) _execute(s.elseBranch);
-
-    return null;
   }
 
   @override
-  visitlogicBinaryExpr(logicBinaryExpr e) {
+  Object visitlogicBinaryExpr(logicBinaryExpr e) {
     Object left = _evaluate(e.left);
 
     //Circuit-breaker logical expressions:
@@ -202,9 +209,33 @@ class BSInterpreter extends ExprVisitor with StmtVisitor {
   }
 
   @override
-  visitWhileStmt(WhileStmt s) {
+  void visitWhileStmt(WhileStmt s) {
     while (_istruthy(_evaluate(s.condition))) _execute(s.body);
-    return null;
+  }
+
+  @override
+  BSCallable visitCallExpr(CallExpr e) {
+    Object callee = _evaluate(e.callee);
+
+    List<Object> arguments = new List();
+
+    for (Expr argument in e.arguments) arguments.add(_evaluate(argument));
+
+    if (!(callee is BSCallable))
+      throw new RuntimeError(e.paren, "Can only call functions and classes");
+    BSCallable function = callee;
+
+    if (arguments.length != function.arity) {
+      throw new RuntimeError(e.paren,
+          "Expected ${function.arity.toString()} paramenters, but got ${arguments.length.toString()}.");
+    }
+    return function(this, arguments);
+  }
+
+  @override
+  void visitFunctionStmt(FunctionStmt s) {
+    UserFunction function = new UserFunction(s);
+    _environment.define(s.name.lexeme, function);
   }
 }
 

@@ -11,6 +11,12 @@ int main() {
         ["Expr", "right", "operand to the right of the operator"],
       ],
     ),
+    ExpressionType( "Call", [
+      ["Expr", "callee", "The function being called"],
+      ["Token", "paren", "The parentheses token"],
+      ["List<Expr>", "arguments", "The list of arguments being passed"],
+    ]
+    ),
     ExpressionType("Grouping", [
       [
         "Expr",
@@ -91,6 +97,11 @@ int main() {
       ],
       ["Stmt", "thenBranch", ""],
       ["Stmt", "elseBranch", ""],
+    ]),
+    ExpressionType("Function", [
+      ["Token", "name", "The function's name"],
+      ["List<Token>", "parameters", "The parameters the function takes"],
+      ["List<Stmt>", "body", "The function body"],
     ]),
     ExpressionType("While", [
       [

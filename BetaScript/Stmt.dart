@@ -5,6 +5,7 @@ abstract class StmtVisitor {
   dynamic visitVarStmt(VarStmt s);
   dynamic visitBlockStmt(BlockStmt s);
   dynamic visitIfStmt(IfStmt s);
+  dynamic visitFunctionStmt(FunctionStmt s);
   dynamic visitWhileStmt(WhileStmt s);
 
 }
@@ -57,6 +58,18 @@ class IfStmt extends Stmt {
   final Stmt elseBranch;
   IfStmt(Expr this.condition, Stmt this.thenBranch, Stmt this.elseBranch);
   dynamic accept(StmtVisitor v) => v.visitIfStmt(this);
+
+}
+
+class FunctionStmt extends Stmt {
+  ///The function's name
+  final Token name;
+  ///The parameters the function takes
+  final List<Token> parameters;
+  ///The function body
+  final List<Stmt> body;
+  FunctionStmt(Token this.name, List<Token> this.parameters, List<Stmt> this.body);
+  dynamic accept(StmtVisitor v) => v.visitFunctionStmt(this);
 
 }
 

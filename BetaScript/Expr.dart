@@ -1,6 +1,7 @@
 import 'Token.dart';
 abstract class ExprVisitor {
   dynamic visitBinaryExpr(BinaryExpr e);
+  dynamic visitCallExpr(CallExpr e);
   dynamic visitGroupingExpr(GroupingExpr e);
   dynamic visitLiteralExpr(LiteralExpr e);
   dynamic visitUnaryExpr(UnaryExpr e);
@@ -24,6 +25,18 @@ class BinaryExpr extends Expr {
   final Expr right;
   BinaryExpr(Expr this.left, Token this.op, Expr this.right);
   dynamic accept(ExprVisitor v) => v.visitBinaryExpr(this);
+
+}
+
+class CallExpr extends Expr {
+  ///The function being called
+  final Expr callee;
+  ///The parentheses token
+  final Token paren;
+  ///The list of arguments being passed
+  final List<Expr> arguments;
+  CallExpr(Expr this.callee, Token this.paren, List<Expr> this.arguments);
+  dynamic accept(ExprVisitor v) => v.visitCallExpr(this);
 
 }
 

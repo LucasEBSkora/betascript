@@ -3,7 +3,8 @@ import 'Variable.dart';
 import 'dart:math' as math;
 
 bscFunction n(num value) => Number._(value);
-bscFunction namedNumber(num absValue, String name, [bool negative = false]) => Number._named(absValue, name, negative);
+bscFunction namedNumber(num absValue, String name, [bool negative = false]) =>
+    Number._named(absValue, name, negative);
 
 class constants {
   static const Number e = Number._named(math.e, 'e');
@@ -11,7 +12,6 @@ class constants {
 }
 
 class Number extends bscFunction {
-
   final bool isNamed;
   final num absvalue;
   final String name;
@@ -57,11 +57,11 @@ class Number extends bscFunction {
       return n(absvalue * (negative ? -1 : 1));
   }
 
-  bool operator == (dynamic other) => (other is Number) && this.value == other.value;
+  bool operator ==(dynamic other) =>
+      (other is Number) && this.value == other.value;
 
-  bool operator <= (dynamic other) =>  this.value <= other.value;
-bool operator < (dynamic other) =>  this.value < other.value;
-bool operator >= (dynamic other) =>  this.value >= other.value;
-bool operator > (dynamic other) =>  this.value > other.value;
-  
+  bool operator <=(dynamic other) => this.value <= other.value;
+  bool operator <(dynamic other) => this.value < other.value;
+  bool operator >=(dynamic other) => this.value >= other.value;
+  bool operator >(dynamic other) => this.value > other.value;
 }
