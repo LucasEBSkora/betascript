@@ -3,6 +3,7 @@ import 'dart:io';
 import 'BSInterpreter.dart';
 import 'BSParser.dart';
 import 'BSScanner.dart';
+import 'Resolver.dart';
 import 'Stmt.dart';
 import 'Token.dart';
 
@@ -31,11 +32,15 @@ class BetaScript {
 
   static void _run(String source) {
     BSScanner scanner = new BSScanner(source);
-    List<Token> tokens = scanner.scanTokens();
+    List<Token> tokens = scanner.scanTokens(); //lexical analysis
     BSParser parser = new BSParser(tokens);
-    List<Stmt> statements = parser.parse();
+    List<Stmt> statements = parser.parse(); //Syntax analysis
     if (hadError) return;
 
+    Resolver resolver = new Resolver(_interpreter);
+    resolver.resolveAll(statements); //Semantic analysis
+
+    if (hadError) return;
     _interpreter.interpret(statements);
   }  
 

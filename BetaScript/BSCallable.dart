@@ -31,8 +31,9 @@ class NativeCallable implements BSCallable {
 
 class UserFunction implements BSCallable {
   final FunctionStmt _declaration;
+  final Environment _closure;
 
-  UserFunction(this._declaration);
+  UserFunction(this._declaration, this._closure);
 
   @override
   int get arity => _declaration.parameters.length;
@@ -40,7 +41,7 @@ class UserFunction implements BSCallable {
   @override
   Object call(BSInterpreter interpreter, List<Object> arguments) {
     //Creates function scope
-    Environment environment = new Environment(interpreter.globals);
+    Environment environment = new Environment(_closure);
     
     //defines and initializes parameters in function scope
 

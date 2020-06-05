@@ -1,9 +1,10 @@
-function fibonacci(n) {
-  if (n <= 1) return 1;
-  return fibonacci(n - 2) + fibonacci(n - 1);
-}
+var a = "global";
+{
+  function showA() {
+    print a;
+  }
 
-for(var i = 0; i < 20; i = i + 1) {
-  print fibonacci(i);
-  
+  showA();
+  var a = "block";
+  showA();
 }
