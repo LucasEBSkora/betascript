@@ -155,7 +155,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   @override
   void visitPrintStmt(PrintStmt stmt) {
     dynamic value = _evaluate(stmt.expression);
-    print(_stringify(value));
+    
+    //calls the appropriate print function 
+    BetaScript.printCallback(_stringify(value));
+    
   }
 
   @override

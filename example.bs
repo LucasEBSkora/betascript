@@ -14,6 +14,22 @@ class B < A {
   }
 }
 
-class C < B {}
+class C < B {
+  C(callback) {
+    this.callback = callback;
+  }
 
-C().test();
+  callCallback() {
+    this.callback();
+  }
+}
+
+function printStuff() {
+  print "stu" + "ff";
+}
+
+var thing = C(printStuff);
+
+thing.test();
+thing.method();
+thing.callCallback();

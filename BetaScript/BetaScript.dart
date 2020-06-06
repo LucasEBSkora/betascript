@@ -12,7 +12,11 @@ class BetaScript {
   static bool hadRuntimeError = false;
   static final BSInterpreter _interpreter = new BSInterpreter();
 
+  ///The callback used when the function 'print' is called. Might print to a string (web version), to a file (not yet implemented) or to the console
+  static Function printCallback;
+
   static void runFile(String path) {
+    printCallback = print;
     File file = File(path);
     String fileContents = file.readAsStringSync();
     _run(fileContents);
@@ -22,12 +26,26 @@ class BetaScript {
   }
 
   static void runPrompt() {
-    
+    printCallback = print;
     while (true) {
       stdout.write("> ");
       _run(stdin.readLineSync());
       hadError = false;
     }
+  }
+
+  static String runForWeb(String source) {
+    String output = "";
+
+    //all print statements redirect to this function, allowing the results to be printed in the 'output' field
+    printCallback = (dynamic object) {
+      print(object.toString());
+      output += object.toString() + '\n';
+    };
+
+    _run(source);
+
+    return output;
   }
 
   static void _run(String source) {
@@ -42,12 +60,15 @@ class BetaScript {
 
     if (hadError) return;
     _interpreter.interpret(statements);
-  }  
+  }
 
   static void error(dynamic value, String message) {
-    if (value is int) _errorAtLine(value, message);
-    else if (value is Token) _errorAtToken(value, message);
-    else _report(-1, "at unknown location: '" + value.toString() + "'", message);
+    if (value is int)
+      _errorAtLine(value, message);
+    else if (value is Token)
+      _errorAtToken(value, message);
+    else
+      _report(-1, "at unknown location: '" + value.toString() + "'", message);
   }
 
   static void _errorAtLine(int line, String message) {
@@ -55,19 +76,20 @@ class BetaScript {
   }
 
   static void _errorAtToken(Token token, String message) {
-    if (token.type == TokenType.EOF) _report(token.line, " at end", message);
-    else _report(token.line, " at '" + token.lexeme + "'", message);
+    if (token.type == TokenType.EOF)
+      _report(token.line, " at end", message);
+    else
+      _report(token.line, " at '" + token.lexeme + "'", message);
   }
 
   static void _report(int line, String where, String message) {
-    print("[line " + line.toString() + "] Error" + where + ": " + message);
+    printCallback(
+        "[line " + line.toString() + "] Error" + where + ": " + message);
     hadError = true;
   }
 
   static void runtimeError(RuntimeError e) {
-    print(e);
+    printCallback(e);
     hadRuntimeError = true;
-
   }
-
 }
