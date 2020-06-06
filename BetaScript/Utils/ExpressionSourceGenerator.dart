@@ -1,6 +1,6 @@
 import 'dart:io';
 
-//a helper program that generates a valid dart file with the classes representing each type of expression, for use in ASTs.
+//a helper program that generates valid dart files with the classes representing each type of Expression and Statement, for use in ASTs.
 int main() {
   defineAst("..", "Expr", [
     NodeType(
@@ -17,6 +17,10 @@ int main() {
       ["List<Expr>", "arguments", "The list of arguments being passed"],
     ]
     ),
+    NodeType("Get",[
+      ["Expr", "object", "The object whose field is being accessed"],
+      ["Token", "name", "The field being accessed"],
+    ]),
     NodeType("Grouping", [
       [
         "Expr",
@@ -55,6 +59,18 @@ int main() {
         ["Expr", "right", "operand to the right of the operator"],
       ],
     ),
+    NodeType("Set", [
+      ["Expr", "object", "Object whose field is being set"],
+      ["Token", "name", "name of the field being set"],
+      ["Expr", "value", "The value being assigned to the field"]
+    ]),
+    NodeType("This", [
+      ["Token", "keyword", "The token containing the keyword 'this'"],
+    ]),
+    NodeType("Super", [
+      ["Token", "keyword", "The token containing the keyword 'super'"],
+      ["Token", "method", "The method being accessed"],
+    ]),
   ], [
     'Token'
   ]);
@@ -114,6 +130,11 @@ int main() {
     NodeType("Return", [
       ["Token", "keyword", "The token containing the keyword 'return'"],
       ["Expr", "value", "The expression whose value should be returned"],
+    ]),
+    NodeType("Class", [
+      ["Token", "name", "Token containing the class' name"],
+      ["VariableExpr", "superclass", "A variable containing a reference to the superclass"],
+      ["List<FunctionStmt>", "methods", "A list of the class' methods"],
     ]),
   ], [
     'Expr',

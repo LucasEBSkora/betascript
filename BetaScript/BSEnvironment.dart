@@ -32,7 +32,7 @@ class Environment {
   }
 
   ///Gets the value of the variable with 'name', stored in the distance-th scope enclosing this one
-  void getAt(int distance, String name) => _ancestor(distance).values[name]; //Assumes the variable is there - might be error prone
+  Object getAt(int distance, String name) => _ancestor(distance).values[name]; //Assumes the variable is there - might be error prone
 
   
   //assigns 'value' to the variable with 'name'. stored in the distance-th scope enclosing this one

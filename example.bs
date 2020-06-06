@@ -1,10 +1,19 @@
-var a = "global";
-{
-  function showA() {
-    print a;
+class A {
+  method() {
+    print "a method";
+  }
+}
+
+class B < A {
+  method() {
+    print "B method";
   }
 
-  showA();
-  var a = "block";
-  showA();
+  test() {
+    super.method();
+  }
 }
+
+class C < B {}
+
+C().test();

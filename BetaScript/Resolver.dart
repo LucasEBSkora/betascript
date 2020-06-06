@@ -4,11 +4,9 @@ import 'Expr.dart';
 import 'Stmt.dart';
 import 'Token.dart';
 
-enum FunctionType {
-  NONE,
-  FUNCTION
-}
+enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD }
 
+enum ClassType { NONE, CLASS, SUBCLASS }
 
 ///This class is used for variable resolution, running between the parser and the intepreter to determine exactly which variable a name refers to
 ///It does so by determining how many Environments it needs to traverse in order to find the variable to use
@@ -17,8 +15,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
   final BSInterpreter _interpreter;
   //Used to see if we're currently traversing a function, which is important to check if a return statement is valid
   FunctionType _currentFunction = FunctionType.NONE;
-  
-
+  ClassType _currentClass = ClassType.NONE;
 
   ///A stack representing Scopes, where the key is the identifier name and the value is wheter it is ready to be referenced
   ///because things like var a = a; should cause compile errors
@@ -96,7 +93,10 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitReturnStmt(ReturnStmt s) {
-    if (_currentFunction == FunctionType.NONE) BetaScript.error(s.keyword, "Cannot return from top-level code.");
+    if (_currentFunction == FunctionType.NONE)
+      BetaScript.error(s.keyword, "Cannot return from top-level code.");
+    if (_currentFunction == FunctionType.INITIALIZER)
+      BetaScript.error(s.keyword, "Cannot return a value from a constructor");
     _resolveExpr(s.value);
   }
 
@@ -158,9 +158,10 @@ class Resolver implements ExprVisitor, StmtVisitor {
   //Creates a variable in current scope without saying it is ready to be referenced
   void _declare(Token name) {
     if (!_scopes.isEmpty) {
-
       //Variable declared twice - error in functions (honestly should always be error, or variables shouldn't need declaration)
-      if (_scopes.last.containsKey(name.lexeme))  BetaScript.error(name, "Variable wit this name already declared in this scope.");
+      if (_scopes.last.containsKey(name.lexeme))
+        BetaScript.error(
+            name, "Variable wit this name already declared in this scope.");
       Map<String, bool> scope = _scopes.last;
       scope[name.lexeme] = false;
     }
@@ -186,14 +187,12 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   ///Resolves both functions and methods
   void _resolveFunction(FunctionStmt s, FunctionType type) {
-    
     //Stores the last function type, because functions can call other functions (or methods)
     FunctionType enclosingFunction = _currentFunction;
     _currentFunction = type;
 
     _beginScope();
     for (Token param in s.parameters) {
-      
       _declare(param);
       _define(param);
     }
@@ -201,5 +200,69 @@ class Resolver implements ExprVisitor, StmtVisitor {
     _endScope();
     //Restores the last function type (basically piggybacks on the call stack to simulate a stack)
     _currentFunction = enclosingFunction;
+  }
+
+  @override
+  void visitClassStmt(ClassStmt s) {
+    ClassType enclosingClass = _currentClass;
+    _currentClass = ClassType.CLASS;
+
+    _declare(s.name);
+    _define(s.name);
+
+    if (s.superclass != null) {
+      
+      if (s.name.lexeme == s.superclass.name.lexeme)
+        BetaScript.error(
+            s.superclass.name, "A class cannot inherit from itself");
+      
+      _currentClass = ClassType.SUBCLASS;
+      _resolveExpr(s.superclass);
+
+      //Creates a new closure containing super, which contains all the methods
+      _beginScope();
+      _scopes.last["super"] = true;
+    }
+
+    _beginScope();
+    _scopes.last["this"] = true;
+    for (FunctionStmt method in s.methods) {
+      FunctionType declaration = (method.name.lexeme == s.name.lexeme)
+          ? FunctionType.INITIALIZER
+          : FunctionType.METHOD;
+      _resolveFunction(method, declaration);
+    }
+
+    _endScope();
+
+    if (s.superclass != null) _endScope();
+
+    _currentClass = enclosingClass;
+  }
+
+  @override
+  void visitGetExpr(GetExpr e) {
+    _resolveExpr(e.object);
+  }
+
+  @override
+  void visitSetExpr(SetExpr e) {
+    _resolveExpr(e.value);
+    _resolveExpr(e.object);
+  }
+
+  @override
+  visitThisExpr(ThisExpr e) {
+    if (_currentClass == ClassType.NONE) {
+      BetaScript.error(e.keyword, "Cannot use 'this' outside of a class");
+    }
+    _resolveLocal(e, e.keyword);
+  }
+
+  @override
+  void visitSuperExpr(SuperExpr e) {
+    if (_currentClass == ClassType.NONE) BetaScript.error(e.keyword, "Cannot use 'super' outside of a class.");
+    else if (_currentClass != ClassType.SUBCLASS) BetaScript.error(e.keyword, "Cannot use 'super' in a class with no superclass");
+    _resolveLocal(e, e.keyword);
   }
 }

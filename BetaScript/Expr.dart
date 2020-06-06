@@ -2,12 +2,16 @@ import 'Token.dart';
 abstract class ExprVisitor {
   dynamic visitBinaryExpr(BinaryExpr e);
   dynamic visitCallExpr(CallExpr e);
+  dynamic visitGetExpr(GetExpr e);
   dynamic visitGroupingExpr(GroupingExpr e);
   dynamic visitLiteralExpr(LiteralExpr e);
   dynamic visitUnaryExpr(UnaryExpr e);
   dynamic visitVariableExpr(VariableExpr e);
   dynamic visitAssignExpr(AssignExpr e);
   dynamic visitlogicBinaryExpr(logicBinaryExpr e);
+  dynamic visitSetExpr(SetExpr e);
+  dynamic visitThisExpr(ThisExpr e);
+  dynamic visitSuperExpr(SuperExpr e);
 
 }
 
@@ -37,6 +41,16 @@ class CallExpr extends Expr {
   final List<Expr> arguments;
   CallExpr(Expr this.callee, Token this.paren, List<Expr> this.arguments);
   dynamic accept(ExprVisitor v) => v.visitCallExpr(this);
+
+}
+
+class GetExpr extends Expr {
+  ///The object whose field is being accessed
+  final Expr object;
+  ///The field being accessed
+  final Token name;
+  GetExpr(Expr this.object, Token this.name);
+  dynamic accept(ExprVisitor v) => v.visitGetExpr(this);
 
 }
 
@@ -93,6 +107,36 @@ class logicBinaryExpr extends Expr {
   final Expr right;
   logicBinaryExpr(Expr this.left, Token this.op, Expr this.right);
   dynamic accept(ExprVisitor v) => v.visitlogicBinaryExpr(this);
+
+}
+
+class SetExpr extends Expr {
+  ///Object whose field is being set
+  final Expr object;
+  ///name of the field being set
+  final Token name;
+  ///The value being assigned to the field
+  final Expr value;
+  SetExpr(Expr this.object, Token this.name, Expr this.value);
+  dynamic accept(ExprVisitor v) => v.visitSetExpr(this);
+
+}
+
+class ThisExpr extends Expr {
+  ///The token containing the keyword 'this'
+  final Token keyword;
+  ThisExpr(Token this.keyword);
+  dynamic accept(ExprVisitor v) => v.visitThisExpr(this);
+
+}
+
+class SuperExpr extends Expr {
+  ///The token containing the keyword 'super'
+  final Token keyword;
+  ///The method being accessed
+  final Token method;
+  SuperExpr(Token this.keyword, Token this.method);
+  dynamic accept(ExprVisitor v) => v.visitSuperExpr(this);
 
 }
 

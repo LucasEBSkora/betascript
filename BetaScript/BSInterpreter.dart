@@ -1,10 +1,14 @@
 import '../BSCalculus/bscFunction.dart';
 import 'BSCallable.dart';
 import 'BSEnvironment.dart';
+import 'BSInstance.dart';
 import 'BetaScript.dart';
 import 'Expr.dart';
+import 'NativeCallable.dart';
 import 'Stmt.dart';
 import 'Token.dart';
+import 'BSClass.dart';
+import 'UserFunction.dart';
 
 class BSInterpreter implements ExprVisitor, StmtVisitor {
   final Environment globals = new Environment(); //Global scope
@@ -171,8 +175,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     Object value = _evaluate(e.value);
 
     int distance = _locals[e];
-    if (distance != null) _environment.assignAt(distance, e.name, value);
-    else globals.assign(e.name, value);
+    if (distance != null)
+      _environment.assignAt(distance, e.name, value);
+    else
+      globals.assign(e.name, value);
 
     return value;
   }
@@ -242,7 +248,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitFunctionStmt(FunctionStmt s) {
-    UserFunction function = new UserFunction(s, _environment);
+    UserFunction function = new UserFunction(s, _environment, false);
     _environment.define(s.name.lexeme, function);
   }
 
@@ -262,9 +268,79 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   ///which are stored directly in globals
   Object _lookUpVariable(Token name, Expr e) {
     int distance = _locals[e];
-    if (distance != null) _environment.getAt(distance, name.lexeme);
-    else return globals.get(name);
+    if (distance != null)
+      return _environment.getAt(distance, name.lexeme);
+    else
+      return globals.get(name);
+  }
 
+  @override
+  void visitClassStmt(ClassStmt s) {
+    Object superclass = null;
+    if (s.superclass != null) {
+      superclass = _evaluate(s.superclass);
+      if (!(superclass is BSClass)) throw new RuntimeError(s.superclass.name, "Superclass must be a class"); 
+    }
+
+
+    _environment.define(s.name.lexeme, null);
+
+    //Creates a new closure containing super, which contains all the methods
+    if (s.superclass != null) {
+      _environment = new Environment(_environment);
+      _environment.define("super", superclass);
+    }
+
+    Map<String, UserFunction> methods = new Map();
+
+    for (FunctionStmt method in s.methods)
+      methods[method.name.lexeme] = new UserFunction(method, _environment, method.name.lexeme == s.name.lexeme); 
+
+    BSClass bsclass = new BSClass(s.name.lexeme, superclass, methods);
+
+    if (superclass != null) _environment = _environment.enclosing;
+
+    _environment.assign(s.name, bsclass);
+  }
+
+  @override
+  visitGetExpr(GetExpr e) {
+    Object object = _evaluate(e.object);
+    if (object is BSInstance) {
+      return object.get(e.name);
+    }
+    throw new RuntimeError(e.name, "Only instances have properties");
+  }
+
+  @override
+  visitSetExpr(SetExpr e) {
+    Object object = _evaluate(e.object);
+
+    if (!(object is BSInstance))
+      throw new RuntimeError(e.name, "Only instances have field");
+
+    Object value = _evaluate(e.value);
+    (object as BSInstance).set(e.name, value);
+    return value;
+  }
+
+  @override
+  Object visitThisExpr(ThisExpr e) => _lookUpVariable(e.keyword, e);
+
+  @override
+  Object visitSuperExpr(SuperExpr e) {
+    int distance = _locals[e];
+    BSClass superclass = _environment.getAt(distance, "super");
+
+    //'this' is always contained one closure "inner" than 'super'
+    BSInstance object = _environment.getAt(distance - 1, "this");
+
+    //finds the method in the superclass and binds it to 'this'
+    UserFunction method = superclass.findMethod(e.method.lexeme);
+    
+    if (method == null) throw new RuntimeError(e.method, "Undefined property '${e.method.lexeme}'.");
+    
+    return method.bind(object);
   }
 }
 

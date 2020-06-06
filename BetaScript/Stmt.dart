@@ -8,6 +8,7 @@ abstract class StmtVisitor {
   dynamic visitFunctionStmt(FunctionStmt s);
   dynamic visitWhileStmt(WhileStmt s);
   dynamic visitReturnStmt(ReturnStmt s);
+  dynamic visitClassStmt(ClassStmt s);
 
 }
 
@@ -91,6 +92,18 @@ class ReturnStmt extends Stmt {
   final Expr value;
   ReturnStmt(Token this.keyword, Expr this.value);
   dynamic accept(StmtVisitor v) => v.visitReturnStmt(this);
+
+}
+
+class ClassStmt extends Stmt {
+  ///Token containing the class' name
+  final Token name;
+  ///A variable containing a reference to the superclass
+  final VariableExpr superclass;
+  ///A list of the class' methods
+  final List<FunctionStmt> methods;
+  ClassStmt(Token this.name, VariableExpr this.superclass, List<FunctionStmt> this.methods);
+  dynamic accept(StmtVisitor v) => v.visitClassStmt(this);
 
 }
 

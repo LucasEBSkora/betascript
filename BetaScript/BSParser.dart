@@ -21,13 +21,15 @@ class BSParser {
 
   program -> declaration* EOF
 
-  declaration -> funDecl | varDecl | statement
+  declaration -> classDecl | funDecl | varDecl | statement 
+
+  classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER) "{" function "}"
 
   funDecl -> "function" function
   function -> IDENTIFIER "(" parameters? ")" block
   parameters -> IDENTIFIER ( "," IDENTIFIER)*
 
-  varDecl -> "var" IDENTIFIER ( "=" expression): ";"
+  varDecl -> "var" IDENTIFIER ( "=" expression)? ";"
 
   statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
 
@@ -48,7 +50,7 @@ class BSParser {
 
   expression -> assigment
 
-  assigment -> IDENTIFIER "=" assigment | logicOr
+  assigment -> ( call ".")? IDENTIFIER "=" assigment | logicOr
 
   logicOr -> logicAnd ( "or" logicAnd)*
   logicAnd -> equality ( "and" equality)*
@@ -59,9 +61,9 @@ class BSParser {
   addition -> multiplication ( ("-" | "+") multiplication)*
   multiplication -> unary ( ("*" | "/") unary)*
   unary -> ( "!" | "-") unary | call
-  call -> primary ( "(" arguments? ")" )*
+  call -> primary ( "(" arguments? ")" | "." IDENTIFIER)*
   arguments -> expression ( "," expression )*
-  primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER" 
+  primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER | "super" "." IDENTIFIER 
   
   these should be interpreted the following way: in order to build a valid BetaScript expression, one starts at the expression rule, and
   them follows the rule set in order to build it, going down.
@@ -95,9 +97,11 @@ class BSParser {
     return statements;
   }
 
-  ///declaration -> funDecl | varDecl | statement
+  ///declaration -> classDecl | funDecl | varDecl | statement
   Stmt _declaration() {
     try {
+      if (_match(TokenType.CLASS)) return _classDeclaration();
+
       ///funDecl -> "function" function
       if (_match(TokenType.FUNCTION)) return _function("function");
       if (_match(TokenType.VAR)) return _varDeclaration();
@@ -106,6 +110,29 @@ class BSParser {
       _synchronize();
       return null;
     }
+  }
+
+  ///classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER) "{" function "}"
+  Stmt _classDeclaration() {
+    Token name = _consume(TokenType.IDENTIFIER, "Expect class name");
+
+    //( "<" IDENTIFIER)
+    VariableExpr superclass = null;
+    if (_match(TokenType.LESS)) {
+      _consume(TokenType.IDENTIFIER, "Expect superclass name.");
+      superclass = new VariableExpr(_previous());
+    }
+
+    _consume(TokenType.LEFT_BRACE, "Expect '{' before class body");
+
+    List<FunctionStmt> methods = new List();
+
+    while (!_check(TokenType.RIGHT_BRACE) && !_isAtEnd())
+      methods.add(_function("method"));
+
+    _consume(TokenType.RIGHT_BRACE, "Expect '}' after class body");
+
+    return new ClassStmt(name, superclass, methods);
   }
 
   ///kind is either 'function' or 'method'
@@ -176,7 +203,8 @@ class BSParser {
     Expr increment =
         (_check(TokenType.RIGHT_PARENTHESES)) ? null : _expression();
 
-    _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after increment in for statement");
+    _consume(TokenType.RIGHT_PARENTHESES,
+        "Expect ')' after increment in for statement");
     Stmt body = _statement();
 
     if (increment != null)
@@ -272,6 +300,8 @@ class BSParser {
       if (expr is VariableExpr) {
         Token name = expr.name;
         return new AssignExpr(name, value);
+      } else if (expr is GetExpr) {
+        return new SetExpr(expr.object, expr.name, value);
       }
 
       _error(equals, "Invalid assigment target");
@@ -387,7 +417,7 @@ class BSParser {
     return _call();
   }
 
-  ///call -> primary ( "(" arguments? ")" )*
+  ///call -> primary ( "(" arguments? ")" | "." IDENTIFIER)*
   ///arguments -> expression ( "," expression )*
   Expr _call() {
     Expr expr = _primary();
@@ -397,7 +427,11 @@ class BSParser {
     while (true) {
       if (_match(TokenType.LEFT_PARENTHESES))
         expr = _finishCall(expr);
-      else
+      else if (_match(TokenType.DOT)) {
+        Token name =
+            _consume(TokenType.IDENTIFIER, "Expect property name after '.'");
+        expr = new GetExpr(expr, name);
+      } else
         break;
     }
 
@@ -423,20 +457,20 @@ class BSParser {
     return new CallExpr(callee, paren, arguments);
   }
 
-  ///primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER"
+  ///primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER | "super" "." IDENTIFIER
   Expr _primary() {
-    //false
-    if (_match(TokenType.FALSE)) return new LiteralExpr(false);
-    //true
-    if (_match(TokenType.TRUE)) return new LiteralExpr(true);
-    //nil
-    if (_match(TokenType.NIL)) return new LiteralExpr(null);
-
     //NUMBER | STRING
     if (_matchAny([TokenType.NUMBER, TokenType.STRING]))
       return new LiteralExpr(_previous().literal);
 
-    if (_match(TokenType.IDENTIFIER)) return new VariableExpr(_previous());
+    //false
+    if (_match(TokenType.FALSE)) return new LiteralExpr(false);
+
+    //true
+    if (_match(TokenType.TRUE)) return new LiteralExpr(true);
+
+    //nil
+    if (_match(TokenType.NIL)) return new LiteralExpr(null);
 
     // "(" expression ")"
     if (_match(TokenType.LEFT_PARENTHESES)) {
@@ -444,6 +478,19 @@ class BSParser {
       //if the ')' is not there, it's an error
       _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after expression");
       return new GroupingExpr(expr);
+    }
+
+    //IDENTIFIER
+    if (_match(TokenType.IDENTIFIER)) return new VariableExpr(_previous());
+    if (_match(TokenType.THIS)) return new ThisExpr(_previous());
+
+    //"super" "." IDENTIFIER
+    if (_match(TokenType.SUPER)) {
+      Token keyword = _previous();
+      _consume(TokenType.DOT, "Expect '.' after 'super'");
+      Token method =
+          _consume(TokenType.IDENTIFIER, "Expect superclass method name");
+      return new SuperExpr(keyword, method);
     }
 
     //if you get to this rule and don't find any of the above, you found a syntax error instead
@@ -475,8 +522,8 @@ class BSParser {
     return _peek().type == type;
   }
 
-  ///Goes to the next token, returning the current one. If already at the end, doesn't keep going (remember that, in theory, every list of tokens
-  ///generated by BSScanner ends with an EOF token)
+  ///Goes to the next token, returning the current one. If already at the end, doesn't keep going
+  ///(remember that, in theory, every list of tokens generated by BSScanner ends with an EOF token)
   Token _advance() {
     if (!_isAtEnd()) _current++;
     return _previous();
