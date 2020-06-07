@@ -1,4 +1,4 @@
-import '../BSCalculus/Number.dart';
+import 'BSFunction/Number.dart';
 import 'BetaScript.dart';
 import 'Token.dart';
 

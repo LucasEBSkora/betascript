@@ -152,62 +152,45 @@ class NodeType {
 
 void defineAst(String outputDir, String fileName, List<NodeType> types,
     List<String> imports) {
-  String path = outputDir + '/' + fileName + '.dart';
+  String path = "$outputDir/$fileName.dart";
 
   File outputFile = File(path);
 
   String source = "";
 
-  for (String i in imports) {
-    source += "import '" + i + ".dart';";
+  for (String import in imports) {
+    source += "import '$import.dart';";
   }
 
   String visitorClassName = fileName + "Visitor";
 
-  source += "\nabstract class " + visitorClassName + " {\n";
+  source += "\nabstract class $visitorClassName {\n";
 
   for (NodeType e in types) {
-    source += '  dynamic visit' +
-        e.name +
-        fileName +
-        '(' +
-        e.name +
-        fileName +
-        ' ' +
-        fileName[0].toLowerCase() +
-        ');\n';
+    String className = e.name + fileName;
+    source += "  dynami visit$className($className ${fileName[0].toLowerCase()});\n";
   }
 
   source += "\n}\n";
 
-  source += "\nabstract class " +
-      fileName +
-      "  {\n" +
-      "  dynamic accept(" +
-      visitorClassName +
-      " v);\n" +
-      "\n}\n\n";
+  source += "\nabstract class $fileName {\n dynamic accept($visitorClassName v);\n}\n\n";
 
   for (NodeType e in types) {
-    source += "class " + e.name + fileName + " extends " + fileName + " {\n";
+    String className = e.name + fileName;
+    source += "class $className extends $fileName {\n";
     for (List<String> field in e.fields) {
-      if (field.length > 1) source += "  ///" + field[2] + '\n';
-      source += "  final " + field[0] + ' ' + field[1] + ';\n';
+      if (field.length > 2) source += "  ///${field[2]}\n";
+      source += "  final ${field[0]} ${field[1]};\n";
     }
 
-    source += '  ' + e.name + fileName + '(';
+    source += '  $className(';
     int i;
-    for (i = 0; i < e.fields.length - 1; ++i) {
-      source += e.fields[i][0] + ' this.' + e.fields[i][1] + ', ';
-    }
+    for (i = 0; i < e.fields.length - 1; ++i) 
+      source += "${e.fields[i][0]} this.${e.fields[i][1]}, ";
 
-    source += e.fields[i][0] + ' this.' + e.fields[i][1] + ');\n';
-    source += "  dynamic accept(" +
-        visitorClassName +
-        " v) => v.visit" +
-        e.name +
-        fileName +
-        "(this);\n";
+    source += "${e.fields[i][0]} this.${e.fields[i][1]});\n";
+    
+    source += " dynamic accept($visitorClassName v) => v.visit$className(this);\n";
 
     source += '\n}\n\n';
   }

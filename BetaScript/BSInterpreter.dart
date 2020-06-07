@@ -1,4 +1,4 @@
-import '../BSCalculus/bscFunction.dart';
+import 'BSFunction/bscFunction.dart';
 import 'BSCallable.dart';
 import 'BSEnvironment.dart';
 import 'BSInstance.dart';
@@ -130,13 +130,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   static void _checkNum(Token token, dynamic value) {
     if (!(value is bscFunction))
       throw new RuntimeError(
-          value, "Operand for " + token.lexeme + " must be a number");
+          value, "Operand for ${token.lexeme} must be function");
   }
 
   static void _checkNumberOperands(Token token, dynamic left, dynamic right) {
     if (!(left is bscFunction) || !(right is bscFunction))
       throw new RuntimeError(
-          token, "Operands for " + token.lexeme + " must be numbers");
+          token, "Operands for ${token.lexeme} must be functions");
   }
 
   void _checkStringOrNumberOperands(Token token, dynamic left, dynamic right) {
@@ -144,8 +144,8 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       _checkNumberOperands(token, left, right);
     } on RuntimeError {
       if (!(left is String) || !(right is String))
-        throw new RuntimeError(token,
-            "Operands for " + token.lexeme + " must be numbers or strings");
+        throw new RuntimeError(
+            token, "Operands for ${token.lexeme} must be functions or strings");
     }
   }
 
@@ -155,10 +155,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   @override
   void visitPrintStmt(PrintStmt stmt) {
     dynamic value = _evaluate(stmt.expression);
-    
-    //calls the appropriate print function 
+
+    //calls the appropriate print function
     BetaScript.printCallback(_stringify(value));
-    
   }
 
   @override
@@ -282,9 +281,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     Object superclass = null;
     if (s.superclass != null) {
       superclass = _evaluate(s.superclass);
-      if (!(superclass is BSClass)) throw new RuntimeError(s.superclass.name, "Superclass must be a class"); 
+      if (!(superclass is BSClass))
+        throw new RuntimeError(s.superclass.name, "Superclass must be a class");
     }
-
 
     _environment.define(s.name.lexeme, null);
 
@@ -297,7 +296,8 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     Map<String, UserFunction> methods = new Map();
 
     for (FunctionStmt method in s.methods)
-      methods[method.name.lexeme] = new UserFunction(method, _environment, method.name.lexeme == s.name.lexeme); 
+      methods[method.name.lexeme] = new UserFunction(
+          method, _environment, method.name.lexeme == s.name.lexeme);
 
     BSClass bsclass = new BSClass(s.name.lexeme, superclass, methods);
 
@@ -320,7 +320,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     Object object = _evaluate(e.object);
 
     if (!(object is BSInstance))
-      throw new RuntimeError(e.name, "Only instances have field");
+      throw new RuntimeError(e.name, "Only instances have fields");
 
     Object value = _evaluate(e.value);
     (object as BSInstance).set(e.name, value);
@@ -340,9 +340,11 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
     //finds the method in the superclass and binds it to 'this'
     UserFunction method = superclass.findMethod(e.method.lexeme);
-    
-    if (method == null) throw new RuntimeError(e.method, "Undefined property '${e.method.lexeme}'.");
-    
+
+    if (method == null)
+      throw new RuntimeError(
+          e.method, "Undefined property '${e.method.lexeme}'.");
+
     return method.bind(object);
   }
 }
@@ -354,8 +356,7 @@ class RuntimeError implements Exception {
   RuntimeError(Token this.token, String this.message);
 
   @override
-  String toString() =>
-      "Runtime Error: '" + message + "' at line " + token.line.toString();
+  String toString() => "Runtime Error: '$message' at line ${token.line}";
 }
 
 class Return implements Exception {

@@ -211,11 +211,10 @@ class Resolver implements ExprVisitor, StmtVisitor {
     _define(s.name);
 
     if (s.superclass != null) {
-      
       if (s.name.lexeme == s.superclass.name.lexeme)
         BetaScript.error(
             s.superclass.name, "A class cannot inherit from itself");
-      
+
       _currentClass = ClassType.SUBCLASS;
       _resolveExpr(s.superclass);
 
@@ -261,8 +260,11 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitSuperExpr(SuperExpr e) {
-    if (_currentClass == ClassType.NONE) BetaScript.error(e.keyword, "Cannot use 'super' outside of a class.");
-    else if (_currentClass != ClassType.SUBCLASS) BetaScript.error(e.keyword, "Cannot use 'super' in a class with no superclass");
+    if (_currentClass == ClassType.NONE)
+      BetaScript.error(e.keyword, "Cannot use 'super' outside of a class.");
+    else if (_currentClass != ClassType.SUBCLASS)
+      BetaScript.error(
+          e.keyword, "Cannot use 'super' in a class with no superclass");
     _resolveLocal(e, e.keyword);
   }
 }

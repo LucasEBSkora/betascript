@@ -17,74 +17,8 @@ class BSParser {
     _current = 0;
   }
 
-  /*The parser works by implementing the rules in the language's formal grammar, which, currently, are:
-
-  program -> declaration* EOF
-
-  declaration -> classDecl | funDecl | varDecl | statement 
-
-  classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER) "{" function "}"
-
-  funDecl -> "function" function
-  function -> IDENTIFIER "(" parameters? ")" block
-  parameters -> IDENTIFIER ( "," IDENTIFIER)*
-
-  varDecl -> "var" IDENTIFIER ( "=" expression)? ";"
-
-  statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
-
-
-  exprStmt -> expression ";"
-
-  forStmt -> "for" "(" (varDecl | exprStmt | ";") expression? ";" expression? ")" statement
-  
-  ifStmt -> "if" "(" expression ")" statement ( "else" statement)? 
-  
-  printStmt -> "print" expression ";"
-  
-  returnStmt -> "return" expression? ";"
-
-  whileStmt -> "while" "(" expression ")" statement
-  
-  block -> "{" declaration* "}"
-
-  expression -> assigment
-
-  assigment -> ( call ".")? IDENTIFIER "=" assigment | logicOr
-
-  logicOr -> logicAnd ( "or" logicAnd)*
-  logicAnd -> equality ( "and" equality)*
-
-
-  equality -> comparison ( "==" comparison )*
-  comparison -> addition ( (">" | ">=" | "<" | "<=") addition)*
-  addition -> multiplication ( ("-" | "+") multiplication)*
-  multiplication -> unary ( ("*" | "/") unary)*
-  unary -> ( "!" | "-") unary | call
-  call -> primary ( "(" arguments? ")" | "." IDENTIFIER)*
-  arguments -> expression ( "," expression )*
-  primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER | "super" "." IDENTIFIER 
-  
-  these should be interpreted the following way: in order to build a valid BetaScript expression, one starts at the expression rule, and
-  them follows the rule set in order to build it, going down.
-
-  "expression -> equality" means "in order to build an expression, use the equality rule"
-
-  equality -> comparison ( "==" comparison )* means "in order to build an equality, use a comparison rule followed by any number of '==' tokens followed by more comparisons"
-  this also means equality is left-associative, which means that, in a chain of equalities, the left-most equality is evaluated first.
-
-  a == b == c == d is evaluated as (((a == b) == c) == d) 
-
-  looking at the wy the expression is written, one may think it's the other way around, but it is actually written that way to avoid recursion.
-  In the recursive form, more intuitive, it reads as equality -> equality ("==" comparison)? (where ? means "may happen one or zero times"),
-  and it is more apparent that the left-most operand is nested deeper, and thus evaluated first.
-
-  The parse function simply follows the ruleset defined above, by calling methods which emulate each rule.
-
-  Since evaluating a AST begins at the leaves, the lowest precedence rule is the one which is called first, so that they are nested upwards in the tree
-
-
-  */
+  //The parser works by implementing the rules in the language's formal grammar, 
+  //which are described in 'formal grammar representation.txt'
 
   ///This function is basically the program -> statement* EOF rule
   List<Stmt> parse() {

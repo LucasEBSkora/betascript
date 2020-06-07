@@ -13,7 +13,6 @@ enum TokenType {
   SLASH, // /
   STAR, // *
   FACTORIAL, // !
-  
 
   EQUAL, // =
   EQUAL_EQUAL, // ==
@@ -46,18 +45,17 @@ enum TokenType {
   WHILE,
 
   EOF
-
 }
 
 class Token {
   final TokenType type;
   final String lexeme; //the source string that generated this lexeme
-  final dynamic literal; //the literal value of the Token. Only initialized for NUMBER and STRING literals.
+  final dynamic
+      literal; //the literal value of the Token. Only initialized for NUMBER and STRING literals.
   final int line;
 
   Token(this.type, this.lexeme, this.literal, this.line);
-  
-  String toString() => type.toString() + " \"" + lexeme.toString() + "\" " + ((type == TokenType.NUMBER) ? literal.toString() : "");
 
-
+  @override
+  String toString() => "$type '$lexeme' $literal";
 }

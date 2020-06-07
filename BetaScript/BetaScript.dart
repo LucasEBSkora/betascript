@@ -68,7 +68,7 @@ class BetaScript {
     else if (value is Token)
       _errorAtToken(value, message);
     else
-      _report(-1, "at unknown location: '" + value.toString() + "'", message);
+      _report(-1, "at unknown location: '${value}'", message);
   }
 
   static void _errorAtLine(int line, String message) {
@@ -79,12 +79,11 @@ class BetaScript {
     if (token.type == TokenType.EOF)
       _report(token.line, " at end", message);
     else
-      _report(token.line, " at '" + token.lexeme + "'", message);
+      _report(token.line, " at '${token.lexeme}'", message);
   }
 
   static void _report(int line, String where, String message) {
-    printCallback(
-        "[line " + line.toString() + "] Error" + where + ": " + message);
+    printCallback("[Line $line] Error $where: $message");
     hadError = true;
   }
 
