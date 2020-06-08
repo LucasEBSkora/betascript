@@ -3,6 +3,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../inverseHyperbolic/ArSecH.dart';
+import '../singleOperandFunction.dart';
 import 'TanH.dart';
 
 bscFunction sech(bscFunction operand, [bool negative = false]) {
@@ -12,10 +13,9 @@ bscFunction sech(bscFunction operand, [bool negative = false]) {
     return SecH._(operand, negative);
 }
 
-class SecH extends bscFunction {
-  final bscFunction operand;
-
-  SecH._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class SecH extends singleOperandFunction {
+  SecH._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   bscFunction derivative(Variable v) =>
@@ -26,14 +26,7 @@ class SecH extends bscFunction {
   num call(Map<String, double> p) => _sech(operand(p)) * factor;
 
   @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}sech($operand)";
-
-  @override
   bscFunction withSign(bool negative) => SecH._(operand, negative);
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }
 
 double _sech(double v) => 2 / (math.exp(v) + math.exp(-v));

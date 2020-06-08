@@ -6,6 +6,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../hyperbolic/SinH.dart';
+import '../singleOperandFunction.dart';
 
 bscFunction arsinh(bscFunction operand, [bool negative = false]) {
   if (operand is SinH)
@@ -14,10 +15,9 @@ bscFunction arsinh(bscFunction operand, [bool negative = false]) {
     return ArSinH._(operand, negative);
 }
 
-class ArSinH extends bscFunction {
-  final bscFunction operand;
-
-  ArSinH._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class ArSinH extends singleOperandFunction {
+  ArSinH._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => _arsinh(operand(p)) * factor;
@@ -29,13 +29,6 @@ class ArSinH extends bscFunction {
 
   @override
   bscFunction withSign(bool negative) => ArSinH._(operand, negative);
-
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arsinh($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }
 
 double _arsinh(double v) => math.log(v + math.sqrt(1 + math.pow(v, 2)));

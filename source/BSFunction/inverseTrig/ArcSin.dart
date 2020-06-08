@@ -5,6 +5,8 @@ import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
 
+import '../singleOperandFunction.dart';
+
 bscFunction arcsin(bscFunction operand, [bool negative = false]) {
   if (operand is Sin)
     return operand.operand.invertSign(negative);
@@ -12,10 +14,9 @@ bscFunction arcsin(bscFunction operand, [bool negative = false]) {
     return ArcSin._(operand, negative);
 }
 
-class ArcSin extends bscFunction {
-  final bscFunction operand;
-
-  ArcSin._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class ArcSin extends singleOperandFunction {
+  ArcSin._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => math.asin(operand(p)) * factor;
@@ -27,11 +28,4 @@ class ArcSin extends bscFunction {
 
   @override
   bscFunction withSign(bool negative) => ArcSin._(operand, negative);
-
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arccos($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }

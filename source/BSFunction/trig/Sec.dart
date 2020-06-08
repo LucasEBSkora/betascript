@@ -1,6 +1,7 @@
 import '../Variable.dart';
 import '../bscFunction.dart';
 import '../inverseTrig/ArcSec.dart';
+import '../singleOperandFunction.dart';
 import 'Tan.dart';
 import 'dart:math' as math;
 
@@ -11,10 +12,9 @@ bscFunction sec(bscFunction operand, [bool negative = false]) {
     return Sec._(operand, negative);
 }
 
-class Sec extends bscFunction {
-  final bscFunction operand;
-
-  Sec._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class Sec extends singleOperandFunction {
+  Sec._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   bscFunction derivative(Variable v) =>
@@ -25,12 +25,5 @@ class Sec extends bscFunction {
   num call(Map<String, double> p) => 1 / math.cos(operand(p)) * factor;
 
   @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}sec($operand)";
-
-  @override
   bscFunction withSign(bool negative) => Sec._(operand, negative);
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }

@@ -4,6 +4,8 @@ import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
 
+import '../singleOperandFunction.dart';
+
 bscFunction arcctg(bscFunction operand, [bool negative = false]) {
   if (operand is Ctg)
     return operand.operand.invertSign(negative);
@@ -11,10 +13,9 @@ bscFunction arcctg(bscFunction operand, [bool negative = false]) {
     return ArcCtg._(operand, negative);
 }
 
-class ArcCtg extends bscFunction {
-  final bscFunction operand;
-
-  ArcCtg._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class ArcCtg extends singleOperandFunction {
+  ArcCtg._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => math.atan(1 / operand(p)) * factor;
@@ -25,11 +26,4 @@ class ArcCtg extends bscFunction {
 
   @override
   bscFunction withSign(bool negative) => ArcCtg._(operand, negative);
-
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arcctg($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }

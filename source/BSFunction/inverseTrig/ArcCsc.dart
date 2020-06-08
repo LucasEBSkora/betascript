@@ -5,6 +5,7 @@ import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
 
+import '../singleOperandFunction.dart';
 import '../trig/Csc.dart';
 
 bscFunction arccsc(bscFunction operand, [bool negative = false]) {
@@ -14,10 +15,9 @@ bscFunction arccsc(bscFunction operand, [bool negative = false]) {
     return ArcCsc._(operand, negative);
 }
 
-class ArcCsc extends bscFunction {
-  final bscFunction operand;
-
-  ArcCsc._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class ArcCsc extends singleOperandFunction {
+  ArcCsc._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => math.asin(1 / operand(p)) * factor;
@@ -29,11 +29,4 @@ class ArcCsc extends bscFunction {
 
   @override
   bscFunction withSign(bool negative) => ArcCsc._(operand, negative);
-
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arccsc($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }

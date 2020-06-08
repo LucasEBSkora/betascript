@@ -5,6 +5,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../hyperbolic/CscH.dart';
+import '../singleOperandFunction.dart';
 
 bscFunction arcsch(bscFunction operand, [bool negative = false]) {
   if (operand is CscH)
@@ -13,10 +14,9 @@ bscFunction arcsch(bscFunction operand, [bool negative = false]) {
     return ArCscH._(operand, negative);
 }
 
-class ArCscH extends bscFunction {
-  final bscFunction operand;
+class ArCscH extends singleOperandFunction {
 
-  ArCscH._(bscFunction this.operand, [bool negative = false]) : super(negative);
+  ArCscH._(bscFunction operand, [bool negative = false]) : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => _arcsch(operand(p)) * factor;
@@ -29,12 +29,6 @@ class ArCscH extends bscFunction {
   @override
   bscFunction withSign(bool negative) => ArCscH._(operand, negative);
 
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arcsch($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }
 
 double _arcsch(double v) => math.log(math.sqrt(1 + math.pow(v, 2)) / v);

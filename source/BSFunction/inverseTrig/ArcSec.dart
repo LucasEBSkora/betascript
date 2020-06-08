@@ -6,6 +6,8 @@ import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
 
+import '../singleOperandFunction.dart';
+
 bscFunction arcsec(bscFunction operand, [bool negative = false]) {
   if (operand is Sec)
     return operand.operand.invertSign(negative);
@@ -13,10 +15,9 @@ bscFunction arcsec(bscFunction operand, [bool negative = false]) {
     return ArcSec._(operand, negative);
 }
 
-class ArcSec extends bscFunction {
-  final bscFunction operand;
-
-  ArcSec._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class ArcSec extends singleOperandFunction {
+  ArcSec._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => math.acos(1 / operand(p)) * factor;
@@ -28,11 +29,4 @@ class ArcSec extends bscFunction {
 
   @override
   bscFunction withSign(bool negative) => ArcSec._(operand, negative);
-
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arcsec($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }

@@ -3,6 +3,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../inverseHyperbolic/ArCscH.dart';
+import '../singleOperandFunction.dart';
 import 'CtgH.dart';
 
 bscFunction csch(bscFunction operand, [bool negative = false]) {
@@ -12,10 +13,9 @@ bscFunction csch(bscFunction operand, [bool negative = false]) {
     return CscH._(operand, negative);
 }
 
-class CscH extends bscFunction {
-  final bscFunction operand;
-
-  CscH._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class CscH extends singleOperandFunction {
+  CscH._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   bscFunction derivative(Variable v) =>
@@ -26,14 +26,7 @@ class CscH extends bscFunction {
   num call(Map<String, double> p) => _csch(operand(p)) * factor;
 
   @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}csch($operand)";
-
-  @override
   bscFunction withSign(bool negative) => CscH._(operand, negative);
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }
 
 double _csch(double v) => 2 / (math.exp(v) - math.exp(-v));

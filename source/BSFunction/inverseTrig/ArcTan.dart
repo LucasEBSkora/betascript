@@ -4,6 +4,8 @@ import '../Variable.dart';
 import '../bscFunction.dart';
 import 'dart:math' as math;
 
+import '../singleOperandFunction.dart';
+
 bscFunction arctan(bscFunction operand, [bool negative = false]) {
   if (operand is Tan)
     return operand.operand.invertSign(negative);
@@ -11,10 +13,9 @@ bscFunction arctan(bscFunction operand, [bool negative = false]) {
     return ArcTan._(operand, negative);
 }
 
-class ArcTan extends bscFunction {
-  final bscFunction operand;
-
-  ArcTan._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class ArcTan extends singleOperandFunction {
+  ArcTan._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => math.atan(operand(p)) * factor;
@@ -25,11 +26,4 @@ class ArcTan extends bscFunction {
 
   @override
   bscFunction withSign(bool negative) => ArcTan._(operand, negative);
-
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arctan($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }

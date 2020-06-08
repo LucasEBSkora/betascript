@@ -5,6 +5,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../hyperbolic/CtgH.dart';
+import '../singleOperandFunction.dart';
 
 bscFunction arctgh(bscFunction operand, [bool negative = false]) {
   if (operand is CtgH)
@@ -13,10 +14,9 @@ bscFunction arctgh(bscFunction operand, [bool negative = false]) {
     return ArCtgH._(operand, negative);
 }
 
-class ArCtgH extends bscFunction {
-  final bscFunction operand;
-
-  ArCtgH._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class ArCtgH extends singleOperandFunction {
+  ArCtgH._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => _arctgh(operand(p)) * factor;
@@ -27,13 +27,6 @@ class ArCtgH extends bscFunction {
 
   @override
   bscFunction withSign(bool negative) => ArCtgH._(operand, negative);
-
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arctgh($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }
 
 double _arctgh(double v) => 0.5 * math.log((v + 1) / (v - 1));

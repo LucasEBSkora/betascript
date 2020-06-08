@@ -26,7 +26,6 @@ class Signum extends bscFunction {
   @override
   bscFunction withSign(bool negative) => Signum._(operand, negative);
 
-  @override
   Set<Variable> get parameters => operand.parameters;
 
 }

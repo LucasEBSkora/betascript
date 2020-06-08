@@ -4,6 +4,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../inverseTrig/ArcTan.dart';
+import '../singleOperandFunction.dart';
 import 'Sec.dart';
 
 bscFunction tan(bscFunction operand, [bool negative = false]) {
@@ -13,10 +14,9 @@ bscFunction tan(bscFunction operand, [bool negative = false]) {
     return Tan._(operand, negative);
 }
 
-class Tan extends bscFunction {
-  final bscFunction operand;
-
-  Tan._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class Tan extends singleOperandFunction {
+  Tan._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   bscFunction derivative(Variable v) =>
@@ -26,12 +26,5 @@ class Tan extends bscFunction {
   num call(Map<String, double> p) => math.tan(operand(p)) * factor;
 
   @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}tan($operand)";
-
-  @override
   bscFunction withSign(bool negative) => Tan._(operand, negative);
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }

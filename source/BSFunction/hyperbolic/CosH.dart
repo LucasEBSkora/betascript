@@ -3,6 +3,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../inverseHyperbolic/ArCosH.dart';
+import '../singleOperandFunction.dart';
 import 'SinH.dart';
 
 bscFunction cosh(bscFunction operand, [bool negative = false]) {
@@ -12,10 +13,9 @@ bscFunction cosh(bscFunction operand, [bool negative = false]) {
     return CosH._(operand, negative);
 }
 
-class CosH extends bscFunction {
-  final bscFunction operand;
-
-  CosH._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class CosH extends singleOperandFunction {
+  CosH._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   bscFunction derivative(Variable v) =>
@@ -25,14 +25,7 @@ class CosH extends bscFunction {
   num call(Map<String, double> p) => _cosh(operand(p)) * factor;
 
   @override
-  String toString([bool handleMinus = true]) =>
-      " ${minusSign(handleMinus)}cosh($operand)";
-
-  @override
   bscFunction withSign(bool negative) => CosH._(operand, negative);
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }
 
 double _cosh(double v) => (math.exp(v) + math.exp(-v)) / 2;

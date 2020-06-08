@@ -6,6 +6,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../hyperbolic/SecH.dart';
+import '../singleOperandFunction.dart';
 
 bscFunction arsech(bscFunction operand, [bool negative = false]) {
   if (operand is SecH)
@@ -14,10 +15,9 @@ bscFunction arsech(bscFunction operand, [bool negative = false]) {
     return ArSecH._(operand, negative);
 }
 
-class ArSecH extends bscFunction {
-  final bscFunction operand;
-
-  ArSecH._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class ArSecH extends singleOperandFunction {
+  ArSecH._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   num call(Map<String, double> p) => _arsech(operand(p)) * factor;
@@ -29,13 +29,6 @@ class ArSecH extends bscFunction {
 
   @override
   bscFunction withSign(bool negative) => ArSecH._(operand, negative);
-
-  @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}arsech($operand)";
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }
 
 double _arsech(double v) => math.log((1 + math.sqrt(1 - math.pow(v, 2))) / v);

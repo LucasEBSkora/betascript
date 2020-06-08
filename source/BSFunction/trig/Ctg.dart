@@ -4,6 +4,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../inverseTrig/ArcCtg.dart';
+import '../singleOperandFunction.dart';
 import 'Csc.dart';
 
 bscFunction ctg(bscFunction operand, [bool negative = false]) {
@@ -13,10 +14,9 @@ bscFunction ctg(bscFunction operand, [bool negative = false]) {
     return Ctg._(operand, negative);
 }
 
-class Ctg extends bscFunction {
-  final bscFunction operand;
-
-  Ctg._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class Ctg extends singleOperandFunction {
+  Ctg._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   bscFunction derivative(Variable v) =>
@@ -26,12 +26,5 @@ class Ctg extends bscFunction {
   num call(Map<String, double> p) => 1 / math.tan(operand(p)) * factor;
 
   @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}ctg($operand)";
-
-  @override
   bscFunction withSign(bool negative) => Ctg._(operand, negative);
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }

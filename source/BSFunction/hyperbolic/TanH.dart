@@ -5,6 +5,7 @@ import '../bscFunction.dart';
 import 'dart:math' as math;
 
 import '../inverseHyperbolic/ArTanH.dart';
+import '../singleOperandFunction.dart';
 
 bscFunction tanh(bscFunction operand, [bool negative = false]) {
   if (operand is ArTanH)
@@ -13,10 +14,9 @@ bscFunction tanh(bscFunction operand, [bool negative = false]) {
     return TanH._(operand, negative);
 }
 
-class TanH extends bscFunction {
-  final bscFunction operand;
-
-  TanH._(bscFunction this.operand, [bool negative = false]) : super(negative);
+class TanH extends singleOperandFunction {
+  TanH._(bscFunction operand, [bool negative = false])
+      : super(operand, negative);
 
   @override
   bscFunction derivative(Variable v) =>
@@ -26,14 +26,7 @@ class TanH extends bscFunction {
   num call(Map<String, double> p) => _tanh(operand(p)) * factor;
 
   @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}tanh($operand)";
-
-  @override
   bscFunction withSign(bool negative) => TanH._(operand, negative);
-
-  @override
-  Set<Variable> get parameters => operand.parameters;
 }
 
 double _tanh(double v) =>

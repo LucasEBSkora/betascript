@@ -5,7 +5,7 @@ void main() {
   Variable y = variable("y");
   Variable z = variable("z");
   
-  bscFunction f = sin(x + y)*z;
+  bscFunction f = tan(x + y)*z;
   bscFunction g = n(1);
   bscFunction h = x^n(44);
 
