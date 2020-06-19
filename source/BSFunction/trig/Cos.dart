@@ -1,11 +1,12 @@
+import '../Number.dart';
 import '../Variable.dart';
-import '../bscFunction.dart';
+import '../BSFunction.dart';
 import '../inverseTrig/ArcCos.dart';
 import '../singleOperandFunction.dart';
 import 'Sin.dart';
 import 'dart:math' as math;
 
-bscFunction cos(bscFunction operand, [bool negative = false]) {
+BSFunction cos(BSFunction operand, [bool negative = false]) {
   if (operand is ArcCos)
     return operand.operand.invertSign(negative);
   else
@@ -14,16 +15,32 @@ bscFunction cos(bscFunction operand, [bool negative = false]) {
 
 class Cos extends singleOperandFunction {
   
-  Cos._(bscFunction operand, [bool negative = false]) : super(operand, negative);
+  Cos._(BSFunction operand, [bool negative = false]) : super(operand, negative);
 
   @override
-  bscFunction derivative(Variable v) =>
+  BSFunction derivative(Variable v) =>
       (-sin(operand) * (operand.derivative(v))).invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => math.cos(operand(p)) * factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction op = operand(p);
+    if (op is Number) {
+      double v = math.cos(op.value) * factor;
+      //Doesn't cover nearly enough angles with exact cosines, but will do for now
+      if (v == v.toInt()) return n(v);
+    }
+    return cos(op, negative);
+  }
 
   @override
-  bscFunction withSign(bool negative) => Cos._(operand, negative);
+  BSFunction get approx {
+    BSFunction op = operand.approx;
+    if (op is Number) return n(math.cos(op.value) * factor);
+    return cos(op, negative);
+  }
+
+
+  @override
+  BSFunction withSign(bool negative) => Cos._(operand, negative);
 
 }

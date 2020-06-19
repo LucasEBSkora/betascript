@@ -5,9 +5,9 @@ void main() {
   Variable y = variable("y");
   Variable z = variable("z");
   
-  bscFunction f = tan(x + y)*z;
-  bscFunction g = n(1);
-  bscFunction h = x^n(44);
+  BSFunction f = tan(x + y)*z;
+  BSFunction g = n(1);
+  BSFunction h = x^n(44);
 
 
   print("$f: ${f.parameters}");

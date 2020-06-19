@@ -1,12 +1,12 @@
 import 'Variable.dart';
-import 'bscFunction.dart';
+import 'BSFunction.dart';
 
 ///This abstract class is used to improve code reutilization in function classes that have only one operand and are printed
 ///in the following way: name('operand'), where name is the class' name
-abstract class singleOperandFunction extends bscFunction {
-  final bscFunction operand;
+abstract class singleOperandFunction extends BSFunction {
+  final BSFunction operand;
 
-  singleOperandFunction(bscFunction this.operand, [bool negative = false]) : super(negative);
+  singleOperandFunction(BSFunction this.operand, [bool negative = false]) : super(negative);
 
   //assumes the class name matches the function name, ignoring camel case
   @override
@@ -19,13 +19,13 @@ abstract class singleOperandFunction extends bscFunction {
   //can't define the following, since they actually depend on the function.
 
   // @override
-  // bscFunction derivative(Variable v);
+  // BSFunction derivative(Variable v);
   // @override
-  // num call(Map<String, double> p);
+  // BSFunction call(Map<String, BSFunction> p);
 
   // unfortunately can't define this one either, because we must call the correct constructor
   // @override
-  // bscFunction withSign(bool negative);
+  // BSFunction withSign(bool negative);
 
 
 }

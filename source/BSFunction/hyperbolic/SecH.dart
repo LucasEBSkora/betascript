@@ -1,12 +1,13 @@
+import '../Number.dart';
 import '../Variable.dart';
-import '../bscFunction.dart';
+import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../inverseHyperbolic/ArSecH.dart';
 import '../singleOperandFunction.dart';
 import 'TanH.dart';
 
-bscFunction sech(bscFunction operand, [bool negative = false]) {
+BSFunction sech(BSFunction operand, [bool negative = false]) {
   if (operand is ArSecH)
     return operand.operand.invertSign(negative);
   else
@@ -14,19 +15,34 @@ bscFunction sech(bscFunction operand, [bool negative = false]) {
 }
 
 class SecH extends singleOperandFunction {
-  SecH._(bscFunction operand, [bool negative = false])
+  SecH._(BSFunction operand, [bool negative = false])
       : super(operand, negative);
 
   @override
-  bscFunction derivative(Variable v) =>
+  BSFunction derivative(Variable v) =>
       (-sech(operand) * tanh(operand) * operand.derivative(v))
           .invertSign(negative);
 
   @override
-  num call(Map<String, double> p) => _sech(operand(p)) * factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction op = operand(p);
+    if (op is Number) {
+      //put simplifications here
+    }
+    return sech(op, negative);
+  }
 
   @override
-  bscFunction withSign(bool negative) => SecH._(operand, negative);
+  BSFunction get approx {
+    BSFunction op = operand.approx;
+    if (op is Number)
+      return n(_sech(op.value) * factor);
+    else
+      return sech(op, negative);
+  }
+
+  @override
+  BSFunction withSign(bool negative) => SecH._(operand, negative);
 }
 
 double _sech(double v) => 2 / (math.exp(v) + math.exp(-v));

@@ -1,4 +1,4 @@
-export 'bscFunction.dart';
+export 'BSFunction.dart';
 export 'Number.dart' show n, namedNumber;
 export 'Variable.dart';
 export 'trig/TrigFunctions.dart';

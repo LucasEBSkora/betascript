@@ -3,12 +3,12 @@ import '../BSCalculus.dart';
 import '../Number.dart';
 import '../Root.dart';
 import '../Variable.dart';
-import '../bscFunction.dart';
+import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 
-bscFunction arcsec(bscFunction operand, [bool negative = false]) {
+BSFunction arcsec(BSFunction operand, [bool negative = false]) {
   if (operand is Sec)
     return operand.operand.invertSign(negative);
   else
@@ -16,17 +16,31 @@ bscFunction arcsec(bscFunction operand, [bool negative = false]) {
 }
 
 class ArcSec extends singleOperandFunction {
-  ArcSec._(bscFunction operand, [bool negative = false])
+  ArcSec._(BSFunction operand, [bool negative = false])
       : super(operand, negative);
 
   @override
-  num call(Map<String, double> p) => math.acos(1 / operand(p)) * factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction op = operand(p);
+    if (op is Number) {
+      //put simplifications here
+    }
+    return arcsec(op, negative);
+  }
 
   @override
-  bscFunction derivative(Variable v) =>
+  BSFunction get approx {
+    BSFunction op = operand.approx;
+    if (op is Number)
+      return n(math.acos(1 / op.value) * factor);
+    else
+      return arcsec(op, negative);
+  }
+  @override
+  BSFunction derivative(Variable v) =>
       (operand.derivative(v) / (abs(operand) * root((operand ^ n(2)) - n(1))))
           .invertSign(negative);
 
   @override
-  bscFunction withSign(bool negative) => ArcSec._(operand, negative);
+  BSFunction withSign(bool negative) => ArcSec._(operand, negative);
 }

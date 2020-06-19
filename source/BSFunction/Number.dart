@@ -1,9 +1,9 @@
-import 'bscFunction.dart';
+import 'BSFunction.dart';
 import 'Variable.dart';
 import 'dart:math' as math;
 
-bscFunction n(num value) => Number._(value);
-bscFunction namedNumber(num absValue, String name, [bool negative = false]) =>
+BSFunction n(num value) => Number._(value);
+BSFunction namedNumber(num absValue, String name, [bool negative = false]) =>
     Number._named(absValue, name, negative);
 
 class constants {
@@ -11,7 +11,7 @@ class constants {
   static const Number pi = Number._named(math.pi, 'π');
 }
 
-class Number extends bscFunction {
+class Number extends BSFunction {
   final bool isNamed;
   final num absvalue;
   final String name;
@@ -41,15 +41,15 @@ class Number extends bscFunction {
   String toString([bool handleMinus = true]) => minusSign(handleMinus) + name;
 
   @override
-  bscFunction derivative(Variable v) => n(0);
+  BSFunction derivative(Variable v) => n(0);
 
   @override
-  num call(Map<String, double> p) => value;
+  BSFunction call(Map<String, BSFunction> p) => this;
 
   num get value => absvalue * factor;
 
   @override
-  bscFunction withSign(bool negative) {
+  BSFunction withSign(bool negative) {
     if (isNamed)
       return Number._named(absvalue, name, negative);
     else
@@ -67,5 +67,8 @@ class Number extends bscFunction {
   bool operator <(dynamic other) => this.value < other.value;
   bool operator >=(dynamic other) => this.value >= other.value;
   bool operator >(dynamic other) => this.value > other.value;
+
+  @override
+  BSFunction get approx => n(value); //only difference is that it ignores named numbers
 
 }

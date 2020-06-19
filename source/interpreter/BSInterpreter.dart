@@ -128,13 +128,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   }
 
   static void _checkNum(Token token, dynamic value) {
-    if (!(value is bscFunction))
+    if (!(value is BSFunction))
       throw new RuntimeError(
           value, "Operand for ${token.lexeme} must be function");
   }
 
   static void _checkNumberOperands(Token token, dynamic left, dynamic right) {
-    if (!(left is bscFunction) || !(right is bscFunction))
+    if (!(left is BSFunction) || !(right is BSFunction))
       throw new RuntimeError(
           token, "Operands for ${token.lexeme} must be functions");
   }

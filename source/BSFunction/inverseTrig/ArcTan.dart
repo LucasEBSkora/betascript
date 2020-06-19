@@ -1,12 +1,12 @@
 import '../BSCalculus.dart';
 import '../Number.dart';
 import '../Variable.dart';
-import '../bscFunction.dart';
+import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 
-bscFunction arctan(bscFunction operand, [bool negative = false]) {
+BSFunction arctan(BSFunction operand, [bool negative = false]) {
   if (operand is Tan)
     return operand.operand.invertSign(negative);
   else
@@ -14,16 +14,30 @@ bscFunction arctan(bscFunction operand, [bool negative = false]) {
 }
 
 class ArcTan extends singleOperandFunction {
-  ArcTan._(bscFunction operand, [bool negative = false])
+  ArcTan._(BSFunction operand, [bool negative = false])
       : super(operand, negative);
 
   @override
-  num call(Map<String, double> p) => math.atan(operand(p)) * factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction op = operand(p);
+    if (op is Number) {
+      //put simplifications here
+    }
+    return arctan(op, negative);
+  }
 
   @override
-  bscFunction derivative(Variable v) =>
+  BSFunction get approx {
+    BSFunction op = operand.approx;
+    if (op is Number)
+      return n(math.atan(op.value) * factor);
+    else
+      return arctan(op, negative);
+  }
+  @override
+  BSFunction derivative(Variable v) =>
       (operand.derivative(v) / (n(1) + (operand ^ n(2)))).invertSign(negative);
 
   @override
-  bscFunction withSign(bool negative) => ArcTan._(operand, negative);
+  BSFunction withSign(bool negative) => ArcTan._(operand, negative);
 }

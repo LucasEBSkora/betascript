@@ -1,32 +1,51 @@
 import 'Variable.dart';
-import 'bscFunction.dart';
+import 'BSFunction.dart';
 import 'Number.dart';
 
 
-bscFunction sgn(bscFunction operand, [bool negative = false]) {
+BSFunction sgn(BSFunction operand, [bool negative = false]) {
   return Signum._(operand, negative);
 }
 
-class Signum extends bscFunction {
+class Signum extends BSFunction {
   
-  final bscFunction operand;
+  final BSFunction operand;
 
-  Signum._(bscFunction this.operand, [bool negative = false]) : super(negative);
+  Signum._(BSFunction this.operand, [bool negative = false]) : super(negative);
 
   @override
-  double call(Map<String, double> p) => sign(operand(p))*factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction op = operand;
+    if (op is Number) {
+      if (op.value < 0) return n(-1*factor);
+      else if (op.value > 0) return n(1*factor);
+      else return n(0);
+    } else return sgn(op, negative);
+
+  }
 
   //The derivative of the sign function is either 0 or undefined.
   @override
-  bscFunction derivative(Variable v) => n(0);
+  BSFunction derivative(Variable v) => n(0);
 
   @override
   String toString([bool handleMinus = true])  => "${minusSign(handleMinus)}sign($operand)";
 
   @override
-  bscFunction withSign(bool negative) => Signum._(operand, negative);
+  BSFunction withSign(bool negative) => Signum._(operand, negative);
 
   Set<Variable> get parameters => operand.parameters;
+
+  @override
+  BSFunction get approx {
+    BSFunction op = operand.approx;
+    if (op is Number) {
+      if (op.value < 0) return n(-1);
+      else if (op.value > 0) return n(1);
+      else return n(0);
+    } else return sgn(op, negative);
+
+  }
 
 }
 

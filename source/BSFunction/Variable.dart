@@ -1,26 +1,26 @@
 import 'dart:io';
-import 'bscFunction.dart';
+import 'BSFunction.dart';
 import 'Number.dart';
 
-bscFunction variable(String name, [bool negative = false]) => Variable._(name, negative);
+BSFunction variable(String name, [bool negative = false]) => Variable._(name, negative);
 
-class Variable extends bscFunction {
+class Variable extends BSFunction {
   
   final String name;
 
   Variable._(String this.name, [bool negative = false]) : super(negative);
 
   @override
-  double call(Map<String, double> p) {
+  BSFunction call(Map<String, BSFunction> p) {
     if (!p.containsKey(name)) {
       print("Error! Missing arguments in call call: " + name + " not defined");
       exit(1);
     }
-    return p[name]*factor;
+    return p[name].withSign(negative);
   }
 
   @override
-  bscFunction derivative(Variable v) {
+  BSFunction derivative(Variable v) {
     if (v.name == this.name) 
       return n(1).withSign(negative);
     else 
@@ -32,9 +32,12 @@ class Variable extends bscFunction {
   String toString([bool handleMinus = true]) => minusSign(handleMinus) + name;
 
   @override
-  bscFunction withSign(bool negative) => Variable._(name, negative);
+  BSFunction withSign(bool negative) => Variable._(name, negative);
 
   @override
   Set<Variable> get parameters => Set.from([this]);
+
+  @override
+  BSFunction get approx => this;
 
 }

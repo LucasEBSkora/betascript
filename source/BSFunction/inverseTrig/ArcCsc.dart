@@ -2,13 +2,13 @@ import '../Abs.dart';
 import '../Number.dart';
 import '../Root.dart';
 import '../Variable.dart';
-import '../bscFunction.dart';
+import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 import '../trig/Csc.dart';
 
-bscFunction arccsc(bscFunction operand, [bool negative = false]) {
+BSFunction arccsc(BSFunction operand, [bool negative = false]) {
   if (operand is Csc)
     return operand.operand.invertSign(negative);
   else
@@ -16,17 +16,32 @@ bscFunction arccsc(bscFunction operand, [bool negative = false]) {
 }
 
 class ArcCsc extends singleOperandFunction {
-  ArcCsc._(bscFunction operand, [bool negative = false])
+  ArcCsc._(BSFunction operand, [bool negative = false])
       : super(operand, negative);
 
   @override
-  num call(Map<String, double> p) => math.asin(1 / operand(p)) * factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction op = operand(p);
+    if (op is Number) {
+      //put simplifications here
+    }
+    return arccsc(op, negative);
+  }
 
   @override
-  bscFunction derivative(Variable v) =>
+  BSFunction get approx {
+    BSFunction op = operand.approx;
+    if (op is Number)
+      return n(math.asin(1 / op.value) * factor);
+    else
+      return arccsc(op, negative);
+  }
+
+  @override
+  BSFunction derivative(Variable v) =>
       (operand.derivative(v) / (abs(operand) * root((operand ^ n(2)) - n(1))))
           .invertSign(negative);
 
   @override
-  bscFunction withSign(bool negative) => ArcCsc._(operand, negative);
+  BSFunction withSign(bool negative) => ArcCsc._(operand, negative);
 }

@@ -1,11 +1,11 @@
 import 'Multiplication.dart';
 import 'Number.dart';
 import 'Variable.dart';
-import 'bscFunction.dart';
+import 'BSFunction.dart';
 
 import '../Utils/Pair.dart';
 
-bscFunction add(List<bscFunction> operands) {
+BSFunction add(List<BSFunction> operands) {
   if (operands == null || operands.length == 0) return n(0);
 
   bool negative = false;
@@ -23,27 +23,28 @@ bscFunction add(List<bscFunction> operands) {
     return Sum._(operands, negative);
 }
 
-class Sum extends bscFunction {
-  final List<bscFunction> operands;
+class Sum extends BSFunction {
+  final List<BSFunction> operands;
 
-  Sum._(List<bscFunction> this.operands, [bool negative = false])
+  Sum._(List<BSFunction> this.operands, [bool negative = false])
       : super(negative);
 
   @override
-  bscFunction derivative(Variable v) {
-    return add(operands.map((bscFunction f) {
+  BSFunction derivative(Variable v) {
+    return add(operands.map((BSFunction f) {
       return f.derivative(v);
     }).toList())
         .invertSign(negative);
   }
 
   @override
-  num call(Map<String, double> p) {
-    num value = 0;
-    operands.forEach((bscFunction f) {
-      value += f(p);
+  BSFunction call(Map<String, BSFunction> p) {
+    
+    List<BSFunction> ops = new List();
+    operands.forEach((BSFunction f) {
+      ops.add(f(p));
     });
-    return value * factor;
+    return add(operands).withSign(negative);
   }
 
   @override
@@ -64,29 +65,38 @@ class Sum extends bscFunction {
   }
 
   @override
-  bscFunction withSign(bool negative) => Sum._(operands, negative);
+  BSFunction withSign(bool negative) => Sum._(operands, negative);
 
   @override
   Set<Variable> get parameters {
     Set<Variable> params = Set();
 
-    for (bscFunction operand in operands) params.addAll(operand.parameters);
+    for (BSFunction operand in operands) params.addAll(operand.parameters);
 
     return params;
+  }
+
+  @override
+  BSFunction get approx {
+    List<BSFunction> ops = new List();
+    operands.forEach((BSFunction f) {
+      ops.add(f.approx);
+    });
+    return add(operands).withSign(negative);
   }
 }
 
 ///If the List passed already has Sums in it, removes the Sum and adds its operators to the list
-void _openOtherSums(List<bscFunction> operands) {
+void _openOtherSums(List<BSFunction> operands) {
   int i = 0;
   while (i < operands.length) {
     if (operands[i] is Sum) {
       Sum s = operands.removeAt(i);
 
-      List<bscFunction> newOperands = List<bscFunction>();
+      List<BSFunction> newOperands = List<BSFunction>();
 
       if (s.negative) {
-        s.operands.forEach((bscFunction f) {
+        s.operands.forEach((BSFunction f) {
           newOperands.add(-f);
         });
       } else
@@ -99,7 +109,7 @@ void _openOtherSums(List<bscFunction> operands) {
 }
 
 ///Gets the operands, sums up all numbers and adds them to the beginning of the list (which already eliminates zeros)
-void _SumNumbers(List<bscFunction> operands) {
+void _SumNumbers(List<BSFunction> operands) {
   double number = 0;
 
   Map<String, Pair<double, int>> namedNumbers =
@@ -121,7 +131,7 @@ void _SumNumbers(List<bscFunction> operands) {
       ++i;
   }
 
-  List<bscFunction> numbers = List<bscFunction>();
+  List<BSFunction> numbers = List<BSFunction>();
 
   if (number > 0)
     numbers.add(n(number));
@@ -137,13 +147,13 @@ void _SumNumbers(List<bscFunction> operands) {
 }
 
 //Sums up equal functions so that things like x + x become 2*x
-void _createMultiplications(List<bscFunction> operands) {
+void _createMultiplications(List<BSFunction> operands) {
   for (int i = 0; i < operands.length; ++i) {
     //for each operand, divides it into numeric factor and function
-    bscFunction f = operands[i];
+    BSFunction f = operands[i];
 
-    bscFunction h;
-    bscFunction factor;
+    BSFunction h;
+    BSFunction factor;
 
     if (f is Multiplication &&
         f.operands.length == 2 &&
@@ -156,7 +166,7 @@ void _createMultiplications(List<bscFunction> operands) {
     }
 
     for (int j = i + 1; j < operands.length; ++j) {
-      bscFunction g = operands[j];
+      BSFunction g = operands[j];
 
       if (g is Multiplication &&
           g.operands.length == 2 &&

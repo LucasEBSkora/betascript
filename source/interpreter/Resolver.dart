@@ -130,13 +130,12 @@ class Resolver implements ExprVisitor, StmtVisitor {
     }
 
     _resolveLocal(e, e.name);
-    return null;
   }
 
   @override
   void visitWhileStmt(WhileStmt s) {
-    // TODO: implement void visitWhileStmt
-    throw UnimplementedError();
+    _resolveExpr(s.condition);
+    _resolveStmt(s.body);
   }
 
   @override

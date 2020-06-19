@@ -1,11 +1,12 @@
 import '../BSCalculus.dart';
+import '../Number.dart';
 import '../Variable.dart';
-import '../bscFunction.dart';
+import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 
-bscFunction arccos(bscFunction operand, [bool negative = false]) {
+BSFunction arccos(BSFunction operand, [bool negative = false]) {
   if (operand is Cos)
     return operand.operand.invertSign(negative);
   else
@@ -13,17 +14,32 @@ bscFunction arccos(bscFunction operand, [bool negative = false]) {
 }
 
 class ArcCos extends singleOperandFunction {
-  ArcCos._(bscFunction operand, [bool negative = false])
+  ArcCos._(BSFunction operand, [bool negative = false])
       : super(operand, negative);
 
   @override
-  num call(Map<String, double> p) => math.acos(operand(p)) * factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction op = operand(p);
+    if (op is Number) {
+      //put simplifications here
+    }
+    return arccos(op, negative);
+  }
 
   @override
-  bscFunction derivative(Variable v) =>
+  BSFunction get approx {
+    BSFunction op = operand.approx;
+    if (op is Number)
+      return n(math.acos(op.value) * factor);
+    else
+      return arccos(op, negative);
+  }
+
+  @override
+  BSFunction derivative(Variable v) =>
       (-operand.derivative(v) / root(n(1) - (operand ^ n(2))))
           .invertSign(negative);
 
   @override
-  bscFunction withSign(bool negative) => ArcCos._(operand, negative);
+  BSFunction withSign(bool negative) => ArcCos._(operand, negative);
 }

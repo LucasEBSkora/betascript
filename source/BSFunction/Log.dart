@@ -2,10 +2,10 @@ import 'dart:math' as math;
 
 import 'Number.dart';
 import 'Variable.dart';
-import 'bscFunction.dart';
+import 'BSFunction.dart';
 
-bscFunction log(bscFunction operand,
-    [bscFunction base = constants.e, negative = false]) {
+BSFunction log(BSFunction operand,
+    [BSFunction base = constants.e, negative = false]) {
   //log_a(1) == 0 for every a
   if (operand == n(1))
     return n(0);
@@ -16,15 +16,15 @@ bscFunction log(bscFunction operand,
     return Log._(operand, base, negative);
 }
 
-class Log extends bscFunction {
-  final bscFunction base;
-  final bscFunction operand;
+class Log extends BSFunction {
+  final BSFunction base;
+  final BSFunction operand;
 
   Log._(this.operand, [this.base = constants.e, negative = false])
       : super(negative);
 
   @override
-  bscFunction derivative(Variable v) {
+  BSFunction derivative(Variable v) {
     if (base is Number) {
       return (operand.derivative(v) / (log(base) * operand))
           .invertSign(negative);
@@ -35,8 +35,16 @@ class Log extends bscFunction {
   }
 
   @override
-  num call(Map<String, double> p) =>
-      math.log(operand(p)) / math.log(base(p)) * factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction b = base(p);
+    BSFunction op = operand(p);
+    if (b is Number && op is Number) {
+      //if both are numbers, checks if the evaluation is a integer. if it is, returns the integer.
+      double v = math.log(b.value) / math.log(b.value) * factor;
+      if (v == v.toInt()) return n(v);
+    }
+    return log(b, op, negative);
+  }
 
   @override
   String toString([bool handleMinus = true]) {
@@ -47,12 +55,21 @@ class Log extends bscFunction {
   }
 
   @override
-  bscFunction withSign(bool negative) => Log._(operand, base, negative);
+  BSFunction withSign(bool negative) => Log._(operand, base, negative);
 
   @override
   Set<Variable> get parameters {
     Set<Variable> params = base.parameters;
     params.addAll(operand.parameters);
     return params;
+  }
+
+  @override
+  BSFunction get approx {
+    BSFunction b = base.approx;
+    BSFunction op = operand.approx;
+    if (b is Number && op is Number)
+      return n(math.log(b.value) / math.log(b.value) * factor);
+    return log(b, op, negative);
   }
 }

@@ -3,10 +3,10 @@ import 'Exponentiation.dart';
 import 'Number.dart';
 import 'Sum.dart';
 import '../Utils/Pair.dart';
-import 'bscFunction.dart';
+import 'BSFunction.dart';
 import 'Variable.dart';
 
-bscFunction multiply(List<bscFunction> operands) {
+BSFunction multiply(List<BSFunction> operands) {
   if (operands == null || operands.length == 0) return (n(0));
 
   _openOtherMultiplications(operands);
@@ -14,7 +14,7 @@ bscFunction multiply(List<bscFunction> operands) {
   //if there are any divions in the operands, makes a new division with its numerator with
   //the other operands added, and its denominator
   for (int i = 0; i < operands.length; ++i) {
-    List<bscFunction> divisions = List();
+    List<BSFunction> divisions = List();
 
     for (int i = 0; i < operands.length;) {
       if (operands[i] is Division) {
@@ -24,19 +24,19 @@ bscFunction multiply(List<bscFunction> operands) {
     }
 
     if (divisions.length != 0) {
-      List<bscFunction> nums = List();
-      List<bscFunction> dens = List();
+      List<BSFunction> nums = List();
+      List<BSFunction> dens = List();
 
       nums.addAll(operands);
 
       for (Division f in divisions) {
-        bscFunction num = f.numerator;
+        BSFunction num = f.numerator;
         if (num is Multiplication)
           nums.addAll(num.operands);
         else
           nums.add(num);
 
-        bscFunction den = f.denominator;
+        BSFunction den = f.denominator;
         if (den is Multiplication)
           dens.addAll(den.operands);
         else
@@ -62,25 +62,25 @@ bscFunction multiply(List<bscFunction> operands) {
     return Multiplication._(operands, negative);
 }
 
-class Multiplication extends bscFunction {
-  final List<bscFunction> operands;
+class Multiplication extends BSFunction {
+  final List<BSFunction> operands;
 
-  Multiplication._(List<bscFunction> this.operands, [bool negative = false])
+  Multiplication._(List<BSFunction> this.operands, [bool negative = false])
       : super(negative);
 
   @override
-  bscFunction derivative(Variable v) {
-    List<bscFunction> ops = List<bscFunction>();
+  BSFunction derivative(Variable v) {
+    List<BSFunction> ops = List<BSFunction>();
 
     for (int i = 0; i < operands.length; ++i) {
       //copies list
-      List<bscFunction> term = [...operands];
+      List<BSFunction> term = [...operands];
 
       //removes "current" operand (which isn't derivated)
-      bscFunction current = term.removeAt(i);
+      BSFunction current = term.removeAt(i);
 
       //Derivates the others
-      List<bscFunction> termExpression = term.map((f) {
+      List<BSFunction> termExpression = term.map((f) {
         return f.derivative(v);
       }).toList();
 
@@ -94,12 +94,12 @@ class Multiplication extends bscFunction {
   }
 
   @override
-  num call(Map<String, double> p) {
-    num value = factor;
-    operands.forEach((bscFunction f) {
-      value *= f(p);
+  BSFunction call(Map<String, BSFunction> p) {
+    List<BSFunction> ops = new List();
+    operands.forEach((BSFunction f) {
+      ops.add(f(p));
     });
-    return value;
+    return multiply(operands).withSign(negative);
   }
 
   @override
@@ -120,20 +120,29 @@ class Multiplication extends bscFunction {
   }
 
   @override
-  bscFunction withSign(bool negative) => Multiplication._(operands, negative);
+  BSFunction withSign(bool negative) => Multiplication._(operands, negative);
 
   @override
   Set<Variable> get parameters {
     Set<Variable> params = Set();
 
-    for (bscFunction operand in operands) params.addAll(operand.parameters);
+    for (BSFunction operand in operands) params.addAll(operand.parameters);
 
     return params;
+  }
+
+  @override
+  BSFunction get approx {
+    List<BSFunction> ops = new List();
+    operands.forEach((BSFunction f) {
+      ops.add(f.approx);
+    });
+    return multiply(operands).withSign(negative);
   }
 }
 
 ///If there are other Multiplications in the operand list, takes its operands and adds them to the list
-void _openOtherMultiplications(List<bscFunction> operands) {
+void _openOtherMultiplications(List<BSFunction> operands) {
   int i = 0;
   while (i < operands.length) {
     if (operands[i] is Multiplication) {
@@ -146,7 +155,7 @@ void _openOtherMultiplications(List<bscFunction> operands) {
 }
 
 ///Returns the value of "negative" and takes all numbers be multiplied.
-bool _multiplyNumbers(List<bscFunction> operands) {
+bool _multiplyNumbers(List<BSFunction> operands) {
   double number = 1;
   bool negative = false;
 
@@ -182,7 +191,7 @@ bool _multiplyNumbers(List<bscFunction> operands) {
     operands.clear();
   else {
     //makes a new list with the normal number and the named numbers
-    List<bscFunction> numbers = List<bscFunction>();
+    List<BSFunction> numbers = List<BSFunction>();
     if (number < 0) negative = true;
     if (number.abs() != 1) numbers.add(n(number.abs()));
 
@@ -203,10 +212,10 @@ bool _multiplyNumbers(List<bscFunction> operands) {
   return negative;
 }
 
-bool _consolidateNegatives(List<bscFunction> operands) {
+bool _consolidateNegatives(List<BSFunction> operands) {
   bool negative = false;
 
-  List<bscFunction> newOperands = operands.map((bscFunction f) {
+  List<BSFunction> newOperands = operands.map((BSFunction f) {
     if (f.negative) negative = !negative;
     return f.ignoreNegative;
   }).toList();
@@ -218,13 +227,13 @@ bool _consolidateNegatives(List<bscFunction> operands) {
 }
 
 ///if operands can be joined as an exponentiation, does it
-void _createExponents(List<bscFunction> operands) {
+void _createExponents(List<BSFunction> operands) {
   for (int i = 0; i < operands.length; ++i) {
     //for each operand, divides it into base and exponent, event if the exponent is 1
-    bscFunction f = operands[i];
+    BSFunction f = operands[i];
 
-    bscFunction base;
-    bscFunction exponent;
+    BSFunction base;
+    BSFunction exponent;
 
     if (f is Exponentiation) {
       base = f.base;
@@ -236,7 +245,7 @@ void _createExponents(List<bscFunction> operands) {
 
     //for every following operand, checks if the other is equal to the base or if it is also an exponentiation with the same base.
     for (int j = i + 1; j < operands.length; ++j) {
-      bscFunction g = operands[j];
+      BSFunction g = operands[j];
       if (g is Exponentiation) {
         if (g.base == base) {
           operands.removeAt(j);

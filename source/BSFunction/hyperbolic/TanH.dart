@@ -1,13 +1,13 @@
 import '../BSCalculus.dart';
 import '../Number.dart';
 import '../Variable.dart';
-import '../bscFunction.dart';
+import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../inverseHyperbolic/ArTanH.dart';
 import '../singleOperandFunction.dart';
 
-bscFunction tanh(bscFunction operand, [bool negative = false]) {
+BSFunction tanh(BSFunction operand, [bool negative = false]) {
   if (operand is ArTanH)
     return operand.operand.invertSign(negative);
   else
@@ -15,18 +15,32 @@ bscFunction tanh(bscFunction operand, [bool negative = false]) {
 }
 
 class TanH extends singleOperandFunction {
-  TanH._(bscFunction operand, [bool negative = false])
+  TanH._(BSFunction operand, [bool negative = false])
       : super(operand, negative);
 
   @override
-  bscFunction derivative(Variable v) =>
+  BSFunction derivative(Variable v) =>
       ((sech(operand) ^ n(2)) * operand.derivative(v)).withSign(negative);
 
   @override
-  num call(Map<String, double> p) => _tanh(operand(p)) * factor;
+  BSFunction call(Map<String, BSFunction> p) {
+    BSFunction op = operand(p);
+    if (op is Number) {
+      //put simplifications here
+    }
+    return tanh(op, negative);
+  }
 
   @override
-  bscFunction withSign(bool negative) => TanH._(operand, negative);
+  BSFunction get approx {
+    BSFunction op = operand.approx;
+    if (op is Number)
+      return n(_tanh(op.value) * factor);
+    else
+      return tanh(op, negative);
+  }
+  @override
+  BSFunction withSign(bool negative) => TanH._(operand, negative);
 }
 
 double _tanh(double v) =>
