@@ -7,23 +7,23 @@ import '../inverseTrig/ArcCtg.dart';
 import '../singleOperandFunction.dart';
 import 'Csc.dart';
 
-BSFunction ctg(BSFunction operand, [bool negative = false]) {
+BSFunction ctg(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is ArcCtg)
     return operand.operand.invertSign(negative);
   else
-    return Ctg._(operand, negative);
+    return Ctg._(operand, negative, params);
 }
 
 class Ctg extends singleOperandFunction {
-  Ctg._(BSFunction operand, [bool negative = false]) : super(operand, negative);
+  Ctg._(BSFunction operand, bool negative, Set<Variable> params) : super(operand, negative, params);
 
   @override
   BSFunction derivative(Variable v) =>
       ((-csc(operand) ^ n(2)) * operand.derivative(v)).invertSign(negative);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       double v = factor / math.tan(op.value);
       //Doesn't cover nearly enough angles with exact cotagents, but will do for now
@@ -40,5 +40,5 @@ class Ctg extends singleOperandFunction {
   }
 
   @override
-  BSFunction withSign(bool negative) => Ctg._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Ctg._(operand, negative, params);
 }

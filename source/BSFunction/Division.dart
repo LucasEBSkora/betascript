@@ -3,6 +3,7 @@ import 'Multiplication.dart';
 import 'Number.dart';
 import 'BSFunction.dart';
 import 'Variable.dart';
+import 'dart:collection' show SplayTreeSet;
 
 BSFunction divide(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {
@@ -22,7 +23,7 @@ BSFunction divide(
   if (numerator == denominator) return n(1);
   if (numerator == n(0)) return n(0);
 
-  return Division._(numerator, denominator, negative);
+  return Division._(numerator, denominator, negative, null);
 }
 
 class Division extends BSFunction {
@@ -30,8 +31,8 @@ class Division extends BSFunction {
   final BSFunction denominator;
 
   Division._(BSFunction this.numerator, BSFunction this.denominator,
-      [bool negative = false])
-      : super(negative);
+      bool negative, Set<Variable> params)
+      : super(negative, params);
 
   @override
   BSFunction derivative(Variable v) {
@@ -42,14 +43,14 @@ class Division extends BSFunction {
   }
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction _num = numerator(p);
-    BSFunction _den = denominator(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction _num = numerator.evaluate(p);
+    BSFunction _den = denominator.evaluate(p);
     if (_num is Number && _den is Number) {
       double v = _num.value / _den.value * factor;
       if (v == v.toInt()) return n(v);
     }
-    return divide([_num], [_den]).withSign(negative);
+    return divide([_num], [_den]).copy(negative);
   }
 
   @override
@@ -57,11 +58,11 @@ class Division extends BSFunction {
       "${minusSign(handleMinus)}(($numerator)/($denominator))";
 
   @override
-  BSFunction withSign(bool negative) =>
-      Division._(numerator, denominator, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) =>
+      Division._(numerator, denominator, negative, params);
 
   @override
-  Set<Variable> get parameters {
+  SplayTreeSet<Variable> get minParameters {
     Set<Variable> params = numerator.parameters;
     params.addAll(denominator.parameters);
     return params;
@@ -73,7 +74,7 @@ class Division extends BSFunction {
     BSFunction _den = denominator.approx;
     if (_num is Number && _den is Number)
       return n(_num.value / _den.value * factor);
-    return divide([_num], [_den]).withSign(negative);
+    return divide([_num], [_den]).copy(negative);
   }
 }
 

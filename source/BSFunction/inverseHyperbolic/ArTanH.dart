@@ -7,20 +7,20 @@ import 'dart:math' as math;
 import '../hyperbolic/TanH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction artanh(BSFunction operand, [bool negative = false]) {
+BSFunction artanh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is TanH)
     return operand.operand.invertSign(negative);
   else
-    return ArTanH._(operand, negative);
+    return ArTanH._(operand, negative, params);
 }
 
 class ArTanH extends singleOperandFunction {
-  ArTanH._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  ArTanH._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -40,7 +40,7 @@ class ArTanH extends singleOperandFunction {
       (operand.derivative(v) / (n(1) - (operand ^ n(2)))).invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArTanH._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArTanH._(operand, negative, params);
 }
 
 double _artanh(double v) => (1 / 2) * math.log((1 + v) / (1 - v));

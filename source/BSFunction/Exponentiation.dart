@@ -3,9 +3,12 @@ import 'Variable.dart';
 import 'BSFunction.dart';
 import 'dart:math';
 import 'Number.dart';
+import 'dart:collection' show SplayTreeSet;
 
 BSFunction exp(BSFunction exponent,
-    [BSFunction base = constants.e, negative = false]) {
+    [BSFunction base = constants.e,
+    negative = false,
+    Set<Variable> params = null]) {
   if (exponent == n(1)) return base.invertSign(negative);
   if (exponent == n(0)) return n(1);
   //if both exponent and base are numbers, but neither is named, performs the operation (so that 2^2 is displayed as 4 but pi^2 is still pi^2)
@@ -13,17 +16,17 @@ BSFunction exp(BSFunction exponent,
       base is Number &&
       !exponent.isNamed &&
       !base.isNamed)
-    return n(pow(base.value, exponent.value)).withSign(negative);
+    return n(pow(base.value, exponent.value)).copy(negative);
   else
-    return Exponentiation._(exponent, base, negative);
+    return Exponentiation._(exponent, base, negative, params);
 }
 
 class Exponentiation extends BSFunction {
   final BSFunction base;
   final BSFunction exponent;
 
-  Exponentiation._(this.exponent, [this.base = constants.e, negative = false])
-      : super(negative);
+  Exponentiation._(this.exponent, this.base, negative, Set<Variable> params)
+      : super(negative, params);
 
   @override
   BSFunction derivative(Variable v) {
@@ -34,9 +37,9 @@ class Exponentiation extends BSFunction {
   }
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction b = base(p);
-    BSFunction expo = exponent(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction b = base.evaluate(p);
+    BSFunction expo = exponent.evaluate(p);
     if (b is Number && expo is Number) {
       double v = pow(b.value, expo.value) * factor;
       if (v == v.toInt()) return n(v);
@@ -48,11 +51,11 @@ class Exponentiation extends BSFunction {
   String toString([bool handleMinus = true]) =>
       "${minusSign(handleMinus)}(($base)^($exponent))";
 
-  BSFunction withSign(bool negative) =>
-      Exponentiation._(exponent, base, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) =>
+      Exponentiation._(exponent, base, negative, params);
 
   @override
-  Set<Variable> get parameters {
+  SplayTreeSet<Variable> get minParameters {
     Set<Variable> params = base.parameters;
     params.addAll(exponent.parameters);
     return params;

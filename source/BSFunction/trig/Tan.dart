@@ -7,23 +7,23 @@ import '../inverseTrig/ArcTan.dart';
 import '../singleOperandFunction.dart';
 import 'Sec.dart';
 
-BSFunction tan(BSFunction operand, [bool negative = false]) {
+BSFunction tan(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is ArcTan)
     return operand.operand.invertSign(negative);
   else
-    return Tan._(operand, negative);
+    return Tan._(operand, negative, params);
 }
 
 class Tan extends singleOperandFunction {
-  Tan._(BSFunction operand, [bool negative = false]) : super(operand, negative);
+  Tan._(BSFunction operand, bool negative, Set<Variable> params) : super(operand, negative, params);
 
   @override
   BSFunction derivative(Variable v) =>
-      ((sec(operand) ^ n(2)) * operand.derivative(v)).withSign(negative);
+      ((sec(operand) ^ n(2)) * operand.derivative(v)).copy(negative);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       double v = math.tan(op.value) * factor;
       //Doesn't cover nearly enough angles with exact tangents, but will do for now
@@ -40,5 +40,5 @@ class Tan extends singleOperandFunction {
   }
 
   @override
-  BSFunction withSign(bool negative) => Tan._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Tan._(operand, negative, params);
 }

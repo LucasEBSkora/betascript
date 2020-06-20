@@ -8,20 +8,20 @@ import 'dart:math' as math;
 import '../hyperbolic/SecH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arsech(BSFunction operand, [bool negative = false]) {
+BSFunction arsech(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is SecH)
     return operand.operand.invertSign(negative);
   else
-    return ArSecH._(operand, negative);
+    return ArSecH._(operand, negative, params);
 }
 
 class ArSecH extends singleOperandFunction {
-  ArSecH._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  ArSecH._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -42,7 +42,7 @@ class ArSecH extends singleOperandFunction {
           .invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArSecH._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArSecH._(operand, negative, params);
 }
 
 double _arsech(double v) => math.log((1 + math.sqrt(1 - math.pow(v, 2))) / v);

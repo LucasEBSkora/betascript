@@ -1,20 +1,20 @@
 import 'Variable.dart';
 import 'BSFunction.dart';
 import 'Number.dart';
+import 'dart:collection' show SplayTreeSet;
 
-
-BSFunction sgn(BSFunction operand, [bool negative = false]) {
-  return Signum._(operand, negative);
+BSFunction sgn(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+  return Signum._(operand, negative, params);
 }
 
 class Signum extends BSFunction {
   
   final BSFunction operand;
 
-  Signum._(BSFunction this.operand, [bool negative = false]) : super(negative);
+  Signum._(BSFunction this.operand, bool negative, Set<Variable> params) : super(negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
+  BSFunction evaluate(Map<String, BSFunction> p) {
     BSFunction op = operand;
     if (op is Number) {
       if (op.value < 0) return n(-1*factor);
@@ -32,9 +32,9 @@ class Signum extends BSFunction {
   String toString([bool handleMinus = true])  => "${minusSign(handleMinus)}sign($operand)";
 
   @override
-  BSFunction withSign(bool negative) => Signum._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Signum._(operand, negative, params);
 
-  Set<Variable> get parameters => operand.parameters;
+  SplayTreeSet<Variable> get minParameters => operand.parameters;
 
   @override
   BSFunction get approx {

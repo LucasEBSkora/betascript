@@ -8,20 +8,20 @@ import 'dart:math' as math;
 import '../singleOperandFunction.dart';
 import '../trig/Csc.dart';
 
-BSFunction arccsc(BSFunction operand, [bool negative = false]) {
+BSFunction arccsc(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is Csc)
     return operand.operand.invertSign(negative);
   else
-    return ArcCsc._(operand, negative);
+    return ArcCsc._(operand, negative, params);
 }
 
 class ArcCsc extends singleOperandFunction {
-  ArcCsc._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  ArcCsc._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -43,5 +43,5 @@ class ArcCsc extends singleOperandFunction {
           .invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArcCsc._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArcCsc._(operand, negative, params);
 }

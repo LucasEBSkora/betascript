@@ -6,20 +6,20 @@ import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 
-BSFunction arcctg(BSFunction operand, [bool negative = false]) {
+BSFunction arcctg(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is Ctg)
     return operand.operand.invertSign(negative);
   else
-    return ArcCtg._(operand, negative);
+    return ArcCtg._(operand, negative, params);
 }
 
 class ArcCtg extends singleOperandFunction {
-  ArcCtg._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  ArcCtg._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -40,5 +40,5 @@ class ArcCtg extends singleOperandFunction {
       (-operand.derivative(v) / (n(1) + (operand ^ n(2)))).invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArcCtg._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArcCtg._(operand, negative, params);
 }

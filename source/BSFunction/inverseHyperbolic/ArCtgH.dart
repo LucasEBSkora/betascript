@@ -7,20 +7,20 @@ import 'dart:math' as math;
 import '../hyperbolic/CtgH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arctgh(BSFunction operand, [bool negative = false]) {
+BSFunction arctgh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is CtgH)
     return operand.operand.invertSign(negative);
   else
-    return ArCtgH._(operand, negative);
+    return ArCtgH._(operand, negative, params);
 }
 
 class ArCtgH extends singleOperandFunction {
-  ArCtgH._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  ArCtgH._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -40,7 +40,7 @@ class ArCtgH extends singleOperandFunction {
       (operand.derivative(v) / (n(1) - operand ^ n(2))).invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArCtgH._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArCtgH._(operand, negative, params);
 }
 
 double _arctgh(double v) => 0.5 * math.log((v + 1) / (v - 1));

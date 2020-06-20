@@ -7,21 +7,21 @@ import 'dart:math' as math;
 import '../hyperbolic/CosH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arcosh(BSFunction operand, [bool negative = false]) {
+BSFunction arcosh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is CosH)
     return operand.operand.invertSign(negative);
   else
-    return ArCosH._(operand, negative);
+    return ArCosH._(operand, negative, params);
 }
 
 class ArCosH extends singleOperandFunction {
-  ArCosH._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  ArCosH._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -43,7 +43,7 @@ class ArCosH extends singleOperandFunction {
           .invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArCosH._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArCosH._(operand, negative, params);
 }
 
 double _arcosh(double v) => math.log(v + math.sqrt(math.pow(v, 2) - 1));

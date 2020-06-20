@@ -1,43 +1,54 @@
 import 'dart:io';
+import 'BSCalculus.dart';
 import 'BSFunction.dart';
 import 'Number.dart';
+import 'dart:collection' show SplayTreeSet;
 
-BSFunction variable(String name, [bool negative = false]) => Variable._(name, negative);
+BSFunction variable(String name,
+        [bool negative = false, Set<Variable> params = null]) =>
+    Variable._(name, negative, params);
 
-class Variable extends BSFunction {
-  
+class Variable extends BSFunction implements Comparable {
   final String name;
 
-  Variable._(String this.name, [bool negative = false]) : super(negative);
+  Variable._(String this.name, bool negative, Set<Variable> params)
+      : super(negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
+  BSFunction evaluate(Map<String, BSFunction> p) {
     if (!p.containsKey(name)) {
       print("Error! Missing arguments in call call: " + name + " not defined");
       exit(1);
     }
-    return p[name].withSign(negative);
+    return p[name].copy(negative);
   }
 
   @override
   BSFunction derivative(Variable v) {
-    if (v.name == this.name) 
-      return n(1).withSign(negative);
-    else 
+    if (v.name == this.name)
+      return n(1).copy(negative);
+    else
       return n(0);
-
   }
 
   @override
   String toString([bool handleMinus = true]) => minusSign(handleMinus) + name;
 
   @override
-  BSFunction withSign(bool negative) => Variable._(name, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) =>
+      Variable._(name, negative, params);
 
   @override
-  Set<Variable> get parameters => Set.from([this]);
+  SplayTreeSet<Variable> get minParameters => SplayTreeSet.from([this]);
 
   @override
   BSFunction get approx => this;
 
+  @override
+  int compareTo(dynamic other) {
+    if (other is Variable) {
+      return name.compareTo(other.name);
+    } else
+      throw new Exception("Can't compare Variable with ${other.runtimeType}!");
+  }
 }

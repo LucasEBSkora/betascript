@@ -8,20 +8,20 @@ import 'dart:math' as math;
 import '../hyperbolic/SinH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arsinh(BSFunction operand, [bool negative = false]) {
+BSFunction arsinh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is SinH)
     return operand.operand.invertSign(negative);
   else
-    return ArSinH._(operand, negative);
+    return ArSinH._(operand, negative, params);
 }
 
 class ArSinH extends singleOperandFunction {
-  ArSinH._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  ArSinH._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -42,7 +42,7 @@ class ArSinH extends singleOperandFunction {
           .invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArSinH._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArSinH._(operand, negative, params);
 }
 
 double _arsinh(double v) => math.log(v + math.sqrt(1 + math.pow(v, 2)));

@@ -7,20 +7,20 @@ import 'dart:math' as math;
 import '../hyperbolic/CscH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arcsch(BSFunction operand, [bool negative = false]) {
+BSFunction arcsch(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is CscH)
     return operand.operand.invertSign(negative);
   else
-    return ArCscH._(operand, negative);
+    return ArCscH._(operand, negative, params);
 }
 
 class ArCscH extends singleOperandFunction {
 
-  ArCscH._(BSFunction operand, [bool negative = false]) : super(operand, negative);
+  ArCscH._(BSFunction operand, bool negative, Set<Variable> params) : super(operand, negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -41,7 +41,7 @@ class ArCscH extends singleOperandFunction {
           .invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArCscH._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArCscH._(operand, negative, params);
 
 }
 

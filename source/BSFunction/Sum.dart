@@ -4,7 +4,7 @@ import 'Variable.dart';
 import 'BSFunction.dart';
 
 import '../Utils/Pair.dart';
-
+import 'dart:collection' show SplayTreeSet;
 BSFunction add(List<BSFunction> operands) {
   if (operands == null || operands.length == 0) return n(0);
 
@@ -20,14 +20,14 @@ BSFunction add(List<BSFunction> operands) {
   else if (operands.length == 1)
     return operands[0];
   else
-    return Sum._(operands, negative);
+    return Sum._(operands, negative, null);
 }
 
 class Sum extends BSFunction {
   final List<BSFunction> operands;
 
-  Sum._(List<BSFunction> this.operands, [bool negative = false])
-      : super(negative);
+  Sum._(List<BSFunction> this.operands, bool negative, Set<Variable> params)
+      : super(negative, params);
 
   @override
   BSFunction derivative(Variable v) {
@@ -38,13 +38,13 @@ class Sum extends BSFunction {
   }
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
+  BSFunction evaluate(Map<String, BSFunction> p) {
     
     List<BSFunction> ops = new List();
     operands.forEach((BSFunction f) {
-      ops.add(f(p));
+      ops.add(f.evaluate(p));
     });
-    return add(operands).withSign(negative);
+    return add(ops).copy(negative);
   }
 
   @override
@@ -65,11 +65,11 @@ class Sum extends BSFunction {
   }
 
   @override
-  BSFunction withSign(bool negative) => Sum._(operands, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Sum._(operands, negative, params);
 
   @override
-  Set<Variable> get parameters {
-    Set<Variable> params = Set();
+  SplayTreeSet<Variable> get minParameters {
+    Set<Variable> params = SplayTreeSet();
 
     for (BSFunction operand in operands) params.addAll(operand.parameters);
 
@@ -82,7 +82,7 @@ class Sum extends BSFunction {
     operands.forEach((BSFunction f) {
       ops.add(f.approx);
     });
-    return add(operands).withSign(negative);
+    return add(ops).copy(negative);
   }
 }
 

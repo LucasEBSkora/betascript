@@ -1,22 +1,24 @@
+import 'dart:collection' show SplayTreeSet;
+
 import 'Sgn.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
 import 'Number.dart';
 
-BSFunction abs(BSFunction operand, [bool negative = false]) {
-  if (operand is Number) return operand.withSign(negative);
-  else return AbsoluteValue._(operand, negative);
+BSFunction abs(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+  if (operand is Number) return operand.copy(negative, params);
+  else return AbsoluteValue._(operand, negative, params);
 }
 
 class AbsoluteValue extends BSFunction {
   
   final BSFunction operand;
 
-  AbsoluteValue._(BSFunction this.operand, [bool negative = false]) : super(negative);
+  AbsoluteValue._(BSFunction this.operand, bool negative, Set<Variable> params) : super(negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) return op.ignoreNegative;
     else return abs(op, negative);
   }
@@ -28,10 +30,10 @@ class AbsoluteValue extends BSFunction {
   String toString([bool handleMinus = true]) => "${minusSign(handleMinus)}|${operand}|";
 
   @override
-  BSFunction withSign(bool negative) => AbsoluteValue._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => AbsoluteValue._(operand, negative, params);
 
   @override
-  Set<Variable> get parameters => operand.parameters;
+  SplayTreeSet<Variable> get minParameters => operand.minParameters;
 
   @override
   BSFunction get approx {

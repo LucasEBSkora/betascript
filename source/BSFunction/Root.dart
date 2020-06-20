@@ -3,20 +3,20 @@ import 'Number.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
 import 'dart:math' as math;
-
+import 'dart:collection' show SplayTreeSet;
 //TODO: Implement roots that aren't square roots
 
-BSFunction root(BSFunction operand, [bool negative = false]) {
+BSFunction root(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is Exponentiation)
     return (operand.base ^ (operand.exponent / n(2))).invertSign(negative);
   else
-    return Root._(operand, negative);
+    return Root._(operand, negative, params);
 }
 
 class Root extends BSFunction {
   final BSFunction operand;
 
-  Root._(this.operand, [bool negative = false]) : super(negative);
+  Root._(this.operand, bool negative, Set<Variable> params) : super(negative, params);
 
   @override
   BSFunction derivative(Variable v) =>
@@ -24,8 +24,8 @@ class Root extends BSFunction {
           .invertSign(negative);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction opvalue = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction opvalue = operand.evaluate(p);
     if (opvalue is Number) {
       double v = math.sqrt(opvalue.value);
       if (v == v.toInt()) {
@@ -41,10 +41,10 @@ class Root extends BSFunction {
       "${minusSign(handleMinus)}sqrt($operand)";
 
   @override
-  BSFunction withSign(bool negative) => Root._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Root._(operand, negative, params);
 
   @override
-  Set<Variable> get parameters => operand.parameters;
+  SplayTreeSet<Variable> get minParameters => operand.parameters;
 
   @override
   // TODO: implement approx

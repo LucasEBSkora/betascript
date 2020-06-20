@@ -7,24 +7,24 @@ import 'dart:math' as math;
 import '../inverseHyperbolic/ArTanH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction tanh(BSFunction operand, [bool negative = false]) {
+BSFunction tanh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is ArTanH)
     return operand.operand.invertSign(negative);
   else
-    return TanH._(operand, negative);
+    return TanH._(operand, negative, params);
 }
 
 class TanH extends singleOperandFunction {
-  TanH._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  TanH._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
   @override
   BSFunction derivative(Variable v) =>
-      ((sech(operand) ^ n(2)) * operand.derivative(v)).withSign(negative);
+      ((sech(operand) ^ n(2)) * operand.derivative(v)).copy(negative);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -40,7 +40,7 @@ class TanH extends singleOperandFunction {
       return tanh(op, negative);
   }
   @override
-  BSFunction withSign(bool negative) => TanH._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => TanH._(operand, negative, params);
 }
 
 double _tanh(double v) =>

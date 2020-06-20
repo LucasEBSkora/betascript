@@ -7,20 +7,20 @@ import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 
-BSFunction arcsin(BSFunction operand, [bool negative = false]) {
+BSFunction arcsin(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
   if (operand is Sin)
     return operand.operand.invertSign(negative);
   else
-    return ArcSin._(operand, negative);
+    return ArcSin._(operand, negative, params);
 }
 
 class ArcSin extends singleOperandFunction {
-  ArcSin._(BSFunction operand, [bool negative = false])
-      : super(operand, negative);
+  ArcSin._(BSFunction operand, bool negative, Set<Variable> params)
+      : super(operand, negative, params);
 
   @override
-  BSFunction call(Map<String, BSFunction> p) {
-    BSFunction op = operand(p);
+  BSFunction evaluate(Map<String, BSFunction> p) {
+    BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -41,5 +41,5 @@ class ArcSin extends singleOperandFunction {
           .invertSign(negative);
 
   @override
-  BSFunction withSign(bool negative) => ArcSin._(operand, negative);
+  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArcSin._(operand, negative, params);
 }
