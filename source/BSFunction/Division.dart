@@ -1,14 +1,15 @@
 import 'Exponentiation.dart';
 import 'Multiplication.dart';
+import 'Negative.dart';
 import 'Number.dart';
 import 'BSFunction.dart';
 import 'Variable.dart';
 import 'dart:collection' show SplayTreeSet;
+import '../Utils/xor.dart';
+import '../Utils/Tuples.dart';
 
 BSFunction divide(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {
-  bool negative = false;
-
   _openMultiplicationsAndDivisions(numeratorList, denominatorList);
   _createExponents(numeratorList);
   _createExponents(denominatorList);
@@ -23,7 +24,14 @@ BSFunction divide(
   if (numerator == denominator) return n(1);
   if (numerator == n(0)) return n(0);
 
-  return Division._(numerator, denominator, negative, null);
+  Division div = Division._(
+      (numerator is Negative) ? numerator.operand : numerator,
+      (denominator is Negative) ? denominator.operand : denominator,
+      null);
+
+  return (xor(numerator is Negative, denominator is Negative)
+      ? negative(div)
+      : div);
 }
 
 class Division extends BSFunction {
@@ -31,38 +39,49 @@ class Division extends BSFunction {
   final BSFunction denominator;
 
   Division._(BSFunction this.numerator, BSFunction this.denominator,
-      bool negative, Set<Variable> params)
-      : super(negative, params);
+      Set<Variable> params)
+      : super(params);
 
   @override
-  BSFunction derivative(Variable v) {
-    return ((numerator.derivative(v) * denominator -
-                denominator.derivative(v) * numerator) /
-            (denominator ^ (n(2))))
-        .invertSign(negative);
+  BSFunction derivativeInternal(Variable v) {
+    return ((numerator.derivativeInternal(v) * denominator -
+            denominator.derivativeInternal(v) * numerator) /
+        (denominator ^ (n(2))));
   }
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
-    BSFunction _num = numerator.evaluate(p);
-    BSFunction _den = denominator.evaluate(p);
-    if (_num is Number && _den is Number) {
-      double v = _num.value / _den.value * factor;
-      if (v == v.toInt()) return n(v);
+    BSFunction _n = numerator.evaluate(p);
+    BSFunction _d = denominator.evaluate(p);
+    Trio<Number, bool, bool> _numNumber =
+        BSFunction.extractFromNegative<Number>(_n);
+
+    Trio<Number, bool, bool> _denNumber =
+        BSFunction.extractFromNegative<Number>(_d);
+
+    if (_numNumber.second && _denNumber.second) {
+      double v = _numNumber.first.value / _denNumber.first.value;
+      if (v == v.toInt())
+        return n(v * (xor(_numNumber.third, _denNumber.third) ? -1 : 1));
     }
-    return divide([_num], [_den]).copy(negative);
+
+    Trio<BSFunction, bool, bool> _num = BSFunction.extractFromNegative(_n);
+    Trio<BSFunction, bool, bool> _den = BSFunction.extractFromNegative(_d);
+
+    return (xor(_num.third, _den.third))
+        ? negative(divide([_num.first], [_den.first]))
+        : divide([_num.first], [_den.first]);
   }
 
   @override
-  String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}(($numerator)/($denominator))";
+  String toString([bool handleMinus = true]) => "(($numerator)/($denominator))";
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) =>
-      Division._(numerator, denominator, negative, params);
+  BSFunction copy([Set<Variable> params = null]) =>
+      Division._(numerator, denominator, params);
 
   @override
-  SplayTreeSet<Variable> get minParameters {
+  SplayTreeSet<Variable> get defaultParameters {
     Set<Variable> params = numerator.parameters;
     params.addAll(denominator.parameters);
     return params;
@@ -70,11 +89,26 @@ class Division extends BSFunction {
 
   @override
   BSFunction get approx {
-    BSFunction _num = numerator.approx;
-    BSFunction _den = denominator.approx;
-    if (_num is Number && _den is Number)
-      return n(_num.value / _den.value * factor);
-    return divide([_num], [_den]).copy(negative);
+    BSFunction _n = numerator.approx;
+    BSFunction _d = denominator.approx;
+    Trio<Number, bool, bool> _numNumber =
+        BSFunction.extractFromNegative<Number>(_n);
+
+    Trio<Number, bool, bool> _denNumber =
+        BSFunction.extractFromNegative<Number>(_d);
+
+    if (_numNumber.second && _denNumber.second) {
+      return n(_numNumber.first.value /
+          _denNumber.first.value *
+          (xor(_numNumber.third, _denNumber.third) ? -1 : 1));
+    }
+
+    Trio<BSFunction, bool, bool> _num = BSFunction.extractFromNegative(_n);
+    Trio<BSFunction, bool, bool> _den = BSFunction.extractFromNegative(_d);
+
+    return (xor(_num.third, _den.third))
+        ? negative(divide([_num.first], [_den.first]))
+        : divide([_num.first], [_den.first]);
   }
 }
 
@@ -113,7 +147,7 @@ void _eliminateDuplicates(
     }
 
     numeratorList.removeAt(i);
-    if (exponent is Number && exponent.negative) {
+    if (exponent is Negative && (exponent.operand) is Number) {
       denominatorList.add(base ^ (-exponent));
     } else {
       numeratorList.insert(i, base ^ exponent);

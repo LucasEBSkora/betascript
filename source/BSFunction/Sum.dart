@@ -1,14 +1,14 @@
 import 'Multiplication.dart';
+import 'Negative.dart';
 import 'Number.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
 
-import '../Utils/Pair.dart';
+import '../Utils/Tuples.dart';
 import 'dart:collection' show SplayTreeSet;
+
 BSFunction add(List<BSFunction> operands) {
   if (operands == null || operands.length == 0) return n(0);
-
-  bool negative = false;
 
   _openOtherSums(operands);
   _SumNumbers(operands);
@@ -20,43 +20,37 @@ BSFunction add(List<BSFunction> operands) {
   else if (operands.length == 1)
     return operands[0];
   else
-    return Sum._(operands, negative, null);
+    return Sum._(operands, null);
 }
 
 class Sum extends BSFunction {
   final List<BSFunction> operands;
 
-  Sum._(List<BSFunction> this.operands, bool negative, Set<Variable> params)
-      : super(negative, params);
+  Sum._(List<BSFunction> this.operands, Set<Variable> params) : super(params);
 
   @override
-  BSFunction derivative(Variable v) {
-    return add(operands.map((BSFunction f) {
-      return f.derivative(v);
-    }).toList())
-        .invertSign(negative);
-  }
+  BSFunction derivativeInternal(Variable v) =>
+      add(operands.map((BSFunction f) => f.derivativeInternal(v)).toList());
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
-    
-    List<BSFunction> ops = new List();
-    operands.forEach((BSFunction f) {
-      ops.add(f.evaluate(p));
-    });
-    return add(ops).copy(negative);
-  }
+  BSFunction evaluate(Map<String, BSFunction> p) =>
+      add(operands.map((BSFunction f) => f.evaluate(p)).toList());
 
   @override
   String toString([bool handleMinus = true]) {
-    String s = minusSign(handleMinus);
-    s += '(';
+    String s = '(';
 
-    s += operands[0].toString(true);
+    s += operands[0].toString();
 
     for (int i = 1; i < operands.length; ++i) {
-      s += ((operands[i].negative) ? " - " : " + ") +
-          operands[i].toString(false);
+      BSFunction _op = operands[i];
+      if (_op is Negative) {
+        s += " - ";
+        _op = (_op as Negative).operand;
+      } else
+        s += " + ";
+
+      s += _op.toString();
     }
 
     s += ')';
@@ -65,10 +59,10 @@ class Sum extends BSFunction {
   }
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Sum._(operands, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => Sum._(operands, params);
 
   @override
-  SplayTreeSet<Variable> get minParameters {
+  SplayTreeSet<Variable> get defaultParameters {
     Set<Variable> params = SplayTreeSet();
 
     for (BSFunction operand in operands) params.addAll(operand.parameters);
@@ -82,7 +76,7 @@ class Sum extends BSFunction {
     operands.forEach((BSFunction f) {
       ops.add(f.approx);
     });
-    return add(ops).copy(negative);
+    return add(ops);
   }
 }
 
@@ -90,12 +84,17 @@ class Sum extends BSFunction {
 void _openOtherSums(List<BSFunction> operands) {
   int i = 0;
   while (i < operands.length) {
-    if (operands[i] is Sum) {
+
+    Trio<Sum, bool, bool> _op = BSFunction.extractFromNegative<Sum>(operands[i]);
+    
+    //if it finds a sum
+    if (_op.second) {
       Sum s = operands.removeAt(i);
 
       List<BSFunction> newOperands = List<BSFunction>();
 
-      if (s.negative) {
+      //if it finds a sum within a negative
+      if (_op.third) {
         s.operands.forEach((BSFunction f) {
           newOperands.add(-f);
         });
@@ -117,15 +116,20 @@ void _SumNumbers(List<BSFunction> operands) {
 
   int i = 0;
   while (i < operands.length) {
-    if (operands[i] is Number) {
-      Number n = operands.removeAt(i);
-      if (!n.isNamed)
-        number += n.value;
+    bool _negative = operands[i] is Negative;
+    BSFunction op = ((_negative) ? (operands[i] as Negative).operand : operands[i]);
+    
+    if (op is Number) {
+
+      operands.removeAt(i);
+      Number n = op;
+      if (!n.isNamed) 
+        number += n.value * (_negative ? -1 : 1);
       else {
         if (!namedNumbers.containsKey(n.name))
           namedNumbers[n.name] = Pair<double, int>(n.value, 0);
 
-        namedNumbers[n.name].second += (n.negative ? -1 : 1);
+        namedNumbers[n.name].second += (_negative ? -1 : 1);
       }
     } else
       ++i;

@@ -7,17 +7,15 @@ import 'dart:math' as math;
 import '../hyperbolic/CosH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arcosh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction arcosh(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is CosH)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return ArCosH._(operand, negative, params);
+    return ArCosH._(operand, params);
 }
 
 class ArCosH extends singleOperandFunction {
-  ArCosH._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
-
+  ArCosH._(BSFunction operand, Set<Variable> params) : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -25,25 +23,24 @@ class ArCosH extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return arcosh(op, negative);
+    return arcosh(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_arcosh(op.value) * factor);
+      return n(_arcosh(op.value));
     else
-      return arcosh(op, negative);
+      return arcosh(op);
   }
 
   @override
-  BSFunction derivative(Variable v) =>
-      (operand.derivative(v) / root((operand ^ n(2)) - n(1)))
-          .invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (operand.derivativeInternal(v) / root((operand ^ n(2)) - n(1)));
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArCosH._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => ArCosH._(operand, params);
 }
 
 double _arcosh(double v) => math.log(v + math.sqrt(math.pow(v, 2) - 1));

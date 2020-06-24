@@ -6,20 +6,20 @@ import 'dart:collection' show SplayTreeSet;
 abstract class singleOperandFunction extends BSFunction {
   final BSFunction operand;
 
-  singleOperandFunction(BSFunction this.operand, bool negative, Set<Variable> params) : super(negative, params);
+  singleOperandFunction(BSFunction this.operand, Set<Variable> params) : super(params);
 
   //assumes the class name matches the function name, ignoring camel case
   @override
   String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}${runtimeType.toString().toLowerCase()}($operand)";
+      "${runtimeType.toString().toLowerCase()}($operand)";
 
   @override
-  SplayTreeSet<Variable> get minParameters => operand.parameters;
+  SplayTreeSet<Variable> get defaultParameters => operand.parameters;
 
   //can't define the following, since they actually depend on the function.
 
   // @override
-  // BSFunction derivative(Variable v);
+  // BSFunction derivativeInternal(Variable v);
   // @override
   // BSFunction evaluate(Map<String, BSFunction> p);
 

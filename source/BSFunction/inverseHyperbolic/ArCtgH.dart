@@ -7,16 +7,16 @@ import 'dart:math' as math;
 import '../hyperbolic/CtgH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arctgh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction arctgh(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is CtgH)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return ArCtgH._(operand, negative, params);
+    return ArCtgH._(operand, params);
 }
 
 class ArCtgH extends singleOperandFunction {
-  ArCtgH._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  ArCtgH._(BSFunction operand, Set<Variable> params)
+      : super(operand,  params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -24,23 +24,23 @@ class ArCtgH extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return arctgh(op, negative);
+    return arctgh(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_arctgh(op.value) * factor);
+      return n(_arctgh(op.value) );
     else
-      return arctgh(op, negative);
+      return arctgh(op);
   }
   @override
-  BSFunction derivative(Variable v) =>
-      (operand.derivative(v) / (n(1) - operand ^ n(2))).invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (operand.derivativeInternal(v) / (n(1) - operand ^ n(2)));
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArCtgH._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => ArCtgH._(operand, params);
 }
 
 double _arctgh(double v) => 0.5 * math.log((v + 1) / (v - 1));

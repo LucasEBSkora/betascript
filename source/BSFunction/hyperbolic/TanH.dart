@@ -7,20 +7,19 @@ import 'dart:math' as math;
 import '../inverseHyperbolic/ArTanH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction tanh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction tanh(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is ArTanH)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return TanH._(operand, negative, params);
+    return TanH._(operand, params);
 }
 
 class TanH extends singleOperandFunction {
-  TanH._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  TanH._(BSFunction operand, Set<Variable> params) : super(operand, params);
 
   @override
-  BSFunction derivative(Variable v) =>
-      ((sech(operand) ^ n(2)) * operand.derivative(v)).copy(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      ((sech(operand) ^ n(2)) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -28,19 +27,20 @@ class TanH extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return tanh(op, negative);
+    return tanh(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_tanh(op.value) * factor);
+      return n(_tanh(op.value));
     else
-      return tanh(op, negative);
+      return tanh(op);
   }
+
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => TanH._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => TanH._(operand, params);
 }
 
 double _tanh(double v) =>

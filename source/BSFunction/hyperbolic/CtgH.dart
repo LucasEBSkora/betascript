@@ -7,20 +7,20 @@ import '../inverseHyperbolic/ArCtgH.dart';
 import '../singleOperandFunction.dart';
 import 'CscH.dart';
 
-BSFunction ctgh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction ctgh(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is ArCtgH)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return CtgH._(operand, negative, params);
+    return CtgH._(operand, params);
 }
 
 class CtgH extends singleOperandFunction {
-  CtgH._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  CtgH._(BSFunction operand, Set<Variable> params)
+      : super(operand, params);
 
   @override
-  BSFunction derivative(Variable v) =>
-      ((-csch(operand) ^ n(2)) * operand.derivative(v)).invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      ((-csch(operand) ^ n(2)) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -28,20 +28,20 @@ class CtgH extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return ctgh(op, negative);
+    return ctgh(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_ctgh(op.value) * factor);
+      return n(_ctgh(op.value) );
     else
-      return ctgh(op, negative);
+      return ctgh(op);
   }
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => CtgH._(operand, negative, params);
+  BSFunction copy([ Set<Variable> params = null]) => CtgH._(operand, params);
 }
 
 double _ctgh(double v) =>

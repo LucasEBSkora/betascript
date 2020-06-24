@@ -1,45 +1,44 @@
 import 'dart:collection' show SplayTreeSet;
 
+import 'Negative.dart';
+import 'Number.dart';
 import 'Sgn.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
-import 'Number.dart';
 
-BSFunction abs(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
-  if (operand is Number) return operand.copy(negative, params);
-  else return AbsoluteValue._(operand, negative, params);
+BSFunction abs(BSFunction operand, [Set<Variable> params = null]) {
+  //It makes no sense to keep a negative sign inside a absolute value.
+  if (operand is Negative) operand = (operand as Negative).operand;
+
+  //If the operand is a number, it can be returned directly, since it will always have the same absolute value
+  if (operand is Number) return operand.copy(params);
+  
+  return AbsoluteValue._(operand, params);
 }
 
 class AbsoluteValue extends BSFunction {
-  
   final BSFunction operand;
 
-  AbsoluteValue._(BSFunction this.operand, bool negative, Set<Variable> params) : super(negative, params);
+  AbsoluteValue._(BSFunction this.operand, Set<Variable> params)
+      : super(params);
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
-    BSFunction op = operand.evaluate(p);
-    if (op is Number) return op.ignoreNegative;
-    else return abs(op, negative);
-  }
+  BSFunction evaluate(Map<String, BSFunction> p) => abs(operand.evaluate(p));
 
   @override
-  BSFunction derivative(Variable v) => (sgn(operand)*operand.derivative(v)).invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (sgn(operand) * operand.derivativeInternal(v));
 
   @override
-  String toString([bool handleMinus = true]) => "${minusSign(handleMinus)}|${operand}|";
+  String toString([bool handleMinus = true]) => "|${operand}|";
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => AbsoluteValue._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) =>
+      AbsoluteValue._(operand, params);
 
   @override
-  SplayTreeSet<Variable> get minParameters => operand.minParameters;
+  SplayTreeSet<Variable> get defaultParameters => operand.defaultParameters;
 
   @override
-  BSFunction get approx {
-    BSFunction op = operand.approx;
-    if (op is Number) return op.ignoreNegative;
-    else return abs(op, negative);
-  }
-
+  BSFunction get approx => abs(operand.approx);
 }

@@ -7,38 +7,38 @@ import '../inverseTrig/ArcCtg.dart';
 import '../singleOperandFunction.dart';
 import 'Csc.dart';
 
-BSFunction ctg(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction ctg(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is ArcCtg)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return Ctg._(operand, negative, params);
+    return Ctg._(operand, params);
 }
 
 class Ctg extends singleOperandFunction {
-  Ctg._(BSFunction operand, bool negative, Set<Variable> params) : super(operand, negative, params);
+  Ctg._(BSFunction operand,  Set<Variable> params) : super(operand, params);
 
   @override
-  BSFunction derivative(Variable v) =>
-      ((-csc(operand) ^ n(2)) * operand.derivative(v)).invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      ((-csc(operand) ^ n(2)) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
-      double v = factor / math.tan(op.value);
+      double v = 1 / math.tan(op.value);
       //Doesn't cover nearly enough angles with exact cotagents, but will do for now
       if (v == v.toInt()) return n(v);
     }
-    return ctg(op, negative);
+    return ctg(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number) return n(factor / math.tan(op.value));
-    return ctg(op, negative);
+    if (op is Number) return n(1 / math.tan(op.value));
+    return ctg(op);
   }
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Ctg._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => Ctg._(operand, params);
 }

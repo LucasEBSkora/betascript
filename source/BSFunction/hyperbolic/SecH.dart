@@ -7,21 +7,19 @@ import '../inverseHyperbolic/ArSecH.dart';
 import '../singleOperandFunction.dart';
 import 'TanH.dart';
 
-BSFunction sech(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction sech(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is ArSecH)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return SecH._(operand, negative, params);
+    return SecH._(operand, params);
 }
 
 class SecH extends singleOperandFunction {
-  SecH._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  SecH._(BSFunction operand, Set<Variable> params) : super(operand, params);
 
   @override
-  BSFunction derivative(Variable v) =>
-      (-sech(operand) * tanh(operand) * operand.derivative(v))
-          .invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (-sech(operand) * tanh(operand) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -29,20 +27,20 @@ class SecH extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return sech(op, negative);
+    return sech(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_sech(op.value) * factor);
+      return n(_sech(op.value));
     else
-      return sech(op, negative);
+      return sech(op);
   }
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => SecH._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => SecH._(operand, params);
 }
 
 double _sech(double v) => 2 / (math.exp(v) + math.exp(-v));

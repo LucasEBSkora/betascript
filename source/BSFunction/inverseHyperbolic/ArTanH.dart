@@ -7,16 +7,15 @@ import 'dart:math' as math;
 import '../hyperbolic/TanH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction artanh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction artanh(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is TanH)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return ArTanH._(operand, negative, params);
+    return ArTanH._(operand, params);
 }
 
 class ArTanH extends singleOperandFunction {
-  ArTanH._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  ArTanH._(BSFunction operand, Set<Variable> params) : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -24,23 +23,24 @@ class ArTanH extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return artanh(op, negative);
+    return artanh(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_artanh(op.value) * factor);
+      return n(_artanh(op.value));
     else
-      return artanh(op, negative);
+      return artanh(op);
   }
-  @override
-  BSFunction derivative(Variable v) =>
-      (operand.derivative(v) / (n(1) - (operand ^ n(2)))).invertSign(negative);
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArTanH._(operand, negative, params);
+  BSFunction derivativeInternal(Variable v) =>
+      (operand.derivativeInternal(v) / (n(1) - (operand ^ n(2))));
+
+  @override
+  BSFunction copy([Set<Variable> params = null]) => ArTanH._(operand, params);
 }
 
 double _artanh(double v) => (1 / 2) * math.log((1 + v) / (1 - v));

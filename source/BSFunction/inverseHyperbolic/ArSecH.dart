@@ -8,16 +8,15 @@ import 'dart:math' as math;
 import '../hyperbolic/SecH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arsech(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction arsech(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is SecH)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return ArSecH._(operand, negative, params);
+    return ArSecH._(operand, params);
 }
 
 class ArSecH extends singleOperandFunction {
-  ArSecH._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  ArSecH._(BSFunction operand, Set<Variable> params) : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -25,24 +24,24 @@ class ArSecH extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return arsech(op, negative);
+    return arsech(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_arsech(op.value) * factor);
+      return n(_arsech(op.value));
     else
-      return arsech(op, negative);
+      return arsech(op);
   }
-  @override
-  BSFunction derivative(Variable v) =>
-      (-operand.derivative(v) / (operand * root(n(1) - (operand ^ n(2)))))
-          .invertSign(negative);
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArSecH._(operand, negative, params);
+  BSFunction derivativeInternal(Variable v) => (-operand.derivativeInternal(v) /
+      (operand * root(n(1) - (operand ^ n(2)))));
+
+  @override
+  BSFunction copy([Set<Variable> params = null]) => ArSecH._(operand, params);
 }
 
 double _arsech(double v) => math.log((1 + math.sqrt(1 - math.pow(v, 2))) / v);

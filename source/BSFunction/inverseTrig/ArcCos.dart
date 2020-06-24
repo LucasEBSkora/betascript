@@ -6,16 +6,16 @@ import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 
-BSFunction arccos(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction arccos(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is Cos)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return ArcCos._(operand, negative, params);
+    return ArcCos._(operand, params);
 }
 
 class ArcCos extends singleOperandFunction {
-  ArcCos._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  ArcCos._(BSFunction operand,  Set<Variable> params)
+      : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -23,23 +23,23 @@ class ArcCos extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return arccos(op, negative);
+    return arccos(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(math.acos(op.value) * factor);
+      return n(math.acos(op.value));
     else
-      return arccos(op, negative);
+      return arccos(op);
   }
 
   @override
-  BSFunction derivative(Variable v) =>
-      (-operand.derivative(v) / root(n(1) - (operand ^ n(2))))
-          .invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (-operand.derivativeInternal(v) / root(n(1) - (operand ^ n(2))))
+          ;
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArcCos._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => ArcCos._(operand, params);
 }

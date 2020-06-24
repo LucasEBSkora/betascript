@@ -6,22 +6,21 @@ import 'dart:math' as math;
 import 'dart:collection' show SplayTreeSet;
 //TODO: Implement roots that aren't square roots
 
-BSFunction root(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction root(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is Exponentiation)
-    return (operand.base ^ (operand.exponent / n(2))).invertSign(negative);
+    return (operand.base ^ (operand.exponent / n(2)));
   else
-    return Root._(operand, negative, params);
+    return Root._(operand, params);
 }
 
 class Root extends BSFunction {
   final BSFunction operand;
 
-  Root._(this.operand, bool negative, Set<Variable> params) : super(negative, params);
+  Root._(this.operand, Set<Variable> params) : super(params);
 
   @override
-  BSFunction derivative(Variable v) =>
-      (n(1 / 2) * (operand ^ n(-1 / 2)) * operand.derivative(v))
-          .invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (n(1 / 2) * (operand ^ n(-1 / 2)) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -33,27 +32,26 @@ class Root extends BSFunction {
         return n(v);
       }
     }
-    return root(opvalue, negative); //in any other case, returns a root
+    return root(opvalue); //in any other case, returns a root
   }
 
   @override
   String toString([bool handleMinus = true]) =>
-      "${minusSign(handleMinus)}sqrt($operand)";
+      "sqrt($operand)";
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Root._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => Root._(operand, params);
 
   @override
-  SplayTreeSet<Variable> get minParameters => operand.parameters;
+  SplayTreeSet<Variable> get defaultParameters => operand.parameters;
 
   @override
-  // TODO: implement approx
   BSFunction get approx {
     BSFunction opvalue = operand.approx;
     if (opvalue
         is Number) //if the operand already evaluates to a number, returns its root
       return n(math.sqrt(opvalue.value));
     else
-      return root(opvalue, negative); //in any other case, returns a root
+      return root(opvalue); //in any other case, returns a root
   }
 }

@@ -6,38 +6,38 @@ import '../singleOperandFunction.dart';
 import 'Cos.dart';
 import 'dart:math' as math;
 
-BSFunction sin(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction sin(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is ArcSin)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return Sin._(operand, negative, params);
+    return Sin._(operand, params);
 }
 
 class Sin extends singleOperandFunction {
-  Sin._(BSFunction operand, bool negative, Set<Variable> params) : super(operand, negative, params);
+  Sin._(BSFunction operand,  Set<Variable> params) : super(operand, params);
 
   @override
-  BSFunction derivative(Variable v) =>
-      (cos(operand) * (operand.derivative(v))).invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (cos(operand) * (operand.derivativeInternal(v)));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
-      double v = math.sin(op.value) * factor;
+      double v = math.sin(op.value);
       //Doesn't cover nearly enough angles with exact sines, but will do for now
       if (v == v.toInt()) return n(v);
     }
-    return sin(op, negative);
+    return sin(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number) return n(math.sin(op.value) * factor);
-    return sin(op, negative);
+    if (op is Number) return n(math.sin(op.value));
+    return sin(op);
   }
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Sin._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => Sin._(operand, params);
 }

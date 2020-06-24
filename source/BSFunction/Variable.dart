@@ -4,15 +4,13 @@ import 'BSFunction.dart';
 import 'Number.dart';
 import 'dart:collection' show SplayTreeSet;
 
-BSFunction variable(String name,
-        [bool negative = false, Set<Variable> params = null]) =>
-    Variable._(name, negative, params);
+BSFunction variable(String name, [Set<Variable> params = null]) =>
+    Variable._(name, params);
 
 class Variable extends BSFunction implements Comparable {
   final String name;
 
-  Variable._(String this.name, bool negative, Set<Variable> params)
-      : super(negative, params);
+  Variable._(String this.name, Set<Variable> params) : super(params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -20,26 +18,21 @@ class Variable extends BSFunction implements Comparable {
       print("Error! Missing arguments in call call: " + name + " not defined");
       exit(1);
     }
-    return p[name].copy(negative);
+    return p[name];
   }
 
   @override
-  BSFunction derivative(Variable v) {
-    if (v.name == this.name)
-      return n(1).copy(negative);
-    else
-      return n(0);
-  }
+  BSFunction derivativeInternal(Variable v) => n((v.name == this.name) ? 1 : 0);
 
   @override
-  String toString([bool handleMinus = true]) => minusSign(handleMinus) + name;
+  String toString() => name;
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) =>
-      Variable._(name, negative, params);
+  BSFunction copy([Set<Variable> params = null]) =>
+      Variable._(name, this.parameters);
 
   @override
-  SplayTreeSet<Variable> get minParameters => SplayTreeSet.from([this]);
+  SplayTreeSet<Variable> get defaultParameters => SplayTreeSet.from([this]);
 
   @override
   BSFunction get approx => this;

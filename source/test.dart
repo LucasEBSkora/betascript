@@ -5,14 +5,18 @@ void main() {
   Variable y = variable("y");
   Variable z = variable("z");
 
-  BSFunction f = tan(y + x) * z;
+  BSFunction f = tan(y - x) * z;
   BSFunction g = f([arctan(x), sin(n(0.5)), n(1) / n(2)]);
   BSFunction h = f.withParameters(Set.from([z, y, x]));
-  BSFunction i = h([arctan(x), sin(n(0.5)), n(1) / n(2)]);
+  BSFunction i = h([arctan(x), sin(n(0.5)), n(4) / n(2)]);
 
   print(f);
   print(f.parameters);
   print(g);
   print(h);
   print(i);
+
+  //TODO: fix this nonsense
+  BSFunction j = x/y + (-x)/y + x/(-y) + (-x)/(-y);
+  print(j);
 }

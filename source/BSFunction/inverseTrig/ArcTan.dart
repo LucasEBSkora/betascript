@@ -6,16 +6,16 @@ import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 
-BSFunction arctan(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction arctan(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is Tan)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return ArcTan._(operand, negative, params);
+    return ArcTan._(operand, params);
 }
 
 class ArcTan extends singleOperandFunction {
-  ArcTan._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  ArcTan._(BSFunction operand,  Set<Variable> params)
+      : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -23,21 +23,21 @@ class ArcTan extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return arctan(op, negative);
+    return arctan(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(math.atan(op.value) * factor);
+      return n(math.atan(op.value));
     else
-      return arctan(op, negative);
+      return arctan(op);
   }
   @override
-  BSFunction derivative(Variable v) =>
-      (operand.derivative(v) / (n(1) + (operand ^ n(2)))).invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (operand.derivativeInternal(v) / (n(1) + (operand ^ n(2))));
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArcTan._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => ArcTan._(operand, params);
 }

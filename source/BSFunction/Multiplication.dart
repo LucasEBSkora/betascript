@@ -1,10 +1,13 @@
 import 'Division.dart';
 import 'Exponentiation.dart';
+import 'Negative.dart';
 import 'Number.dart';
 import 'Sum.dart';
-import '../Utils/Pair.dart';
+import '../Utils/Tuples.dart';
 import 'BSFunction.dart';
 import 'Variable.dart';
+
+import '../Utils/xor.dart';
 
 import 'dart:collection' show SplayTreeSet;
 
@@ -13,14 +16,22 @@ BSFunction multiply(List<BSFunction> operands) {
 
   _openOtherMultiplications(operands);
 
+  bool divisionNegatives = false;
+
   //if there are any divions in the operands, makes a new division with its numerator with
   //the other operands added, and its denominator
   for (int i = 0; i < operands.length; ++i) {
     List<BSFunction> divisions = List();
 
     for (int i = 0; i < operands.length;) {
-      if (operands[i] is Division) {
-        divisions.add(operands.removeAt(i));
+      Trio<Division, bool, bool> _op =
+          BSFunction.extractFromNegative<Division>(operands[i]);
+      if (_op.second) {
+        operands.removeAt(i);
+
+        if (_op.third) divisionNegatives = !divisionNegatives;
+
+        divisions.add(_op.first);
       } else
         ++i;
     }
@@ -52,27 +63,31 @@ BSFunction multiply(List<BSFunction> operands) {
   bool negativeForNumbers = _multiplyNumbers(operands);
   bool negativeOthers = _consolidateNegatives(operands);
 
-  bool negative = (negativeForNumbers && !negativeOthers) ||
-      (!negativeForNumbers && negativeOthers);
+  bool _negative = xor(negativeForNumbers, negativeOthers);
+  _negative = xor(_negative, divisionNegatives);
 
   _createExponents(operands);
 
-  if (operands.length == 0) return n(0);
-  if (operands.length == 1)
-    return operands[0].invertSign(negative);
+  BSFunction _mul;
+
+  if (operands.length == 0)
+    return n(0);
+  else if (operands.length == 1)
+    _mul = operands[0];
   else
-    return Multiplication._(operands, negative, null);
+    _mul = Multiplication._(operands, null);
+
+  return (_negative) ? negative(_mul) : _mul;
 }
 
 class Multiplication extends BSFunction {
   final List<BSFunction> operands;
 
-  Multiplication._(
-      List<BSFunction> this.operands, bool negative, Set<Variable> params)
-      : super(negative, params);
+  Multiplication._(List<BSFunction> this.operands, Set<Variable> params)
+      : super(params);
 
   @override
-  BSFunction derivative(Variable v) {
+  BSFunction derivativeInternal(Variable v) {
     List<BSFunction> ops = List<BSFunction>();
 
     for (int i = 0; i < operands.length; ++i) {
@@ -84,7 +99,7 @@ class Multiplication extends BSFunction {
 
       //Derivates the others
       List<BSFunction> termExpression = term.map((f) {
-        return f.derivative(v);
+        return f.derivativeInternal(v);
       }).toList();
 
       //includes the current element again
@@ -93,7 +108,7 @@ class Multiplication extends BSFunction {
       //adds to the list of elements to sum
       ops.add(multiply(termExpression));
     }
-    return add(ops).invertSign(negative);
+    return add(ops);
   }
 
   @override
@@ -102,19 +117,17 @@ class Multiplication extends BSFunction {
     operands.forEach((BSFunction f) {
       ops.add(f.evaluate(p));
     });
-    return multiply(ops).copy(negative);
+    return multiply(ops);
   }
 
   @override
   String toString([bool handleMinus = true]) {
-    String s = minusSign(handleMinus);
+    String s = '(';
 
-    s += '(';
-
-    s += operands[0].toString(true);
+    s += operands[0].toString();
 
     for (int i = 1; i < operands.length; ++i) {
-      s += '*' + operands[i].toString(true);
+      s += '*' + operands[i].toString();
     }
 
     s += ')';
@@ -123,11 +136,11 @@ class Multiplication extends BSFunction {
   }
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) =>
-      Multiplication._(operands, negative, params);
+  BSFunction copy([Set<Variable> params = null]) =>
+      Multiplication._(operands, params);
 
   @override
-  SplayTreeSet<Variable> get minParameters {
+  SplayTreeSet<Variable> get defaultParameters {
     Set<Variable> params = SplayTreeSet();
 
     for (BSFunction operand in operands) params.addAll(operand.parameters);
@@ -141,7 +154,7 @@ class Multiplication extends BSFunction {
     operands.forEach((BSFunction f) {
       ops.add(f.approx);
     });
-    return multiply(ops).copy(negative);
+    return multiply(ops);
   }
 }
 
@@ -149,10 +162,14 @@ class Multiplication extends BSFunction {
 void _openOtherMultiplications(List<BSFunction> operands) {
   int i = 0;
   while (i < operands.length) {
-    if (operands[i] is Multiplication) {
-      Multiplication m = operands.removeAt(i);
+    Trio<Multiplication, bool, bool> _op =
+        BSFunction.extractFromNegative<Multiplication>(operands[i]);
+
+    if (_op.second) {
+      operands.removeAt(i);
+      Multiplication m = _op.first;
       operands.insertAll(i, m.operands);
-      if (m.negative) operands.add(n(-1));
+      if (_op.third) operands.add(n(-1));
     } else
       ++i;
   }
@@ -171,11 +188,16 @@ bool _multiplyNumbers(List<BSFunction> operands) {
   int i = 0;
   while (i < operands.length) {
     //if the operand is a number, removes it and
-    if (operands[i] is Number) {
-      Number n = operands.removeAt(i);
+
+    Trio<Number, bool, bool> _op =
+        BSFunction.extractFromNegative<Number>(operands[i]);
+
+    if (_op.second) {
+      operands.removeAt(i);
+      Number n = _op.first;
       //if it's a regular number, just multiplies the accumulator
       if (!n.isNamed)
-        number *= n.value;
+        number *= n.value * (_op.third ? -1 : 1);
       else {
         //if it's named, adds it to the map.
 
@@ -184,7 +206,7 @@ bool _multiplyNumbers(List<BSFunction> operands) {
 
         ++namedNumbers[n.name].second;
 
-        if (n.negative) number *= -1;
+        if (_op.third) number *= -1;
       }
     } else
       ++i;
@@ -217,17 +239,18 @@ bool _multiplyNumbers(List<BSFunction> operands) {
 }
 
 bool _consolidateNegatives(List<BSFunction> operands) {
-  bool negative = false;
+  bool _negative = false;
 
   List<BSFunction> newOperands = operands.map((BSFunction f) {
-    if (f.negative) negative = !negative;
-    return f.ignoreNegative;
+    Trio<BSFunction, bool, bool> _op = BSFunction.extractFromNegative(f);
+    if (_op.third) _negative = !_negative;
+    return _op.first;
   }).toList();
 
   operands.clear();
   operands.insertAll(0, newOperands);
 
-  return negative;
+  return _negative;
 }
 
 ///if operands can be joined as an exponentiation, does it

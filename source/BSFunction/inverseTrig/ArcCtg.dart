@@ -6,16 +6,16 @@ import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 
-BSFunction arcctg(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction arcctg(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is Ctg)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return ArcCtg._(operand, negative, params);
+    return ArcCtg._(operand, params);
 }
 
 class ArcCtg extends singleOperandFunction {
-  ArcCtg._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  ArcCtg._(BSFunction operand,  Set<Variable> params)
+      : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -23,22 +23,22 @@ class ArcCtg extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return arcctg(op, negative);
+    return arcctg(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(math.atan(1 / op.value) * factor);
+      return n(math.atan(1 / op.value));
     else
-      return arcctg(op, negative);
+      return arcctg(op);
   }
 
   @override
-  BSFunction derivative(Variable v) =>
-      (-operand.derivative(v) / (n(1) + (operand ^ n(2)))).invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      (-operand.derivativeInternal(v) / (n(1) + (operand ^ n(2))));
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => ArcCtg._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => ArcCtg._(operand, params);
 }

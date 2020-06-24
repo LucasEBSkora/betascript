@@ -7,38 +7,38 @@ import '../inverseTrig/ArcTan.dart';
 import '../singleOperandFunction.dart';
 import 'Sec.dart';
 
-BSFunction tan(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction tan(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is ArcTan)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return Tan._(operand, negative, params);
+    return Tan._(operand, params);
 }
 
 class Tan extends singleOperandFunction {
-  Tan._(BSFunction operand, bool negative, Set<Variable> params) : super(operand, negative, params);
+  Tan._(BSFunction operand, Set<Variable> params) : super(operand, params);
 
   @override
-  BSFunction derivative(Variable v) =>
-      ((sec(operand) ^ n(2)) * operand.derivative(v)).copy(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      ((sec(operand) ^ n(2)) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
-      double v = math.tan(op.value) * factor;
+      double v = math.tan(op.value);
       //Doesn't cover nearly enough angles with exact tangents, but will do for now
       if (v == v.toInt()) return n(v);
     }
-    return tan(op, negative);
+    return tan(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number) return n(math.tan(op.value) * factor);
-    return tan(op, negative);
+    if (op is Number) return n(math.tan(op.value));
+    return tan(op);
   }
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => Tan._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => Tan._(operand, params);
 }

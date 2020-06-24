@@ -7,20 +7,19 @@ import '../inverseHyperbolic/ArCosH.dart';
 import '../singleOperandFunction.dart';
 import 'SinH.dart';
 
-BSFunction cosh(BSFunction operand, [bool negative = false, Set<Variable> params = null]) {
+BSFunction cosh(BSFunction operand, [Set<Variable> params = null]) {
   if (operand is ArCosH)
-    return operand.operand.invertSign(negative);
+    return operand.operand;
   else
-    return CosH._(operand, negative, params);
+    return CosH._(operand, params);
 }
 
 class CosH extends singleOperandFunction {
-  CosH._(BSFunction operand, bool negative, Set<Variable> params)
-      : super(operand, negative, params);
+  CosH._(BSFunction operand, Set<Variable> params) : super(operand, params);
 
   @override
-  BSFunction derivative(Variable v) =>
-      (sinh(operand) * (operand.derivative(v))).invertSign(negative);
+  BSFunction derivativeInternal(Variable v) =>
+      sinh(operand) * (operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
@@ -28,20 +27,20 @@ class CosH extends singleOperandFunction {
     if (op is Number) {
       //put simplifications here
     }
-    return cosh(op, negative);
+    return cosh(op);
   }
 
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_cosh(op.value) * factor);
+      return n(_cosh(op.value));
     else
-      return cosh(op, negative);
+      return cosh(op);
   }
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) => CosH._(operand, negative, params);
+  BSFunction copy([Set<Variable> params = null]) => CosH._(operand, params);
 }
 
 double _cosh(double v) => (math.exp(v) + math.exp(-v)) / 2;

@@ -1,17 +1,21 @@
 import 'BSFunction.dart';
+import 'Negative.dart';
 import 'Variable.dart';
 import 'dart:math' as math;
 import 'dart:collection' show SplayTreeSet;
 
-BSFunction n(num value, [Set<Variable> params = null]) =>
-    Number._(value, params);
+BSFunction n(num value, [Set<Variable> params = null]) {
+  if (value < 0) return negative(Number._(value.abs(), params));
+  return Number._(value, params);
+}
+
 BSFunction namedNumber(num absValue, String name,
-        [bool negative = false, Set<Variable> params = null]) =>
-    Number._named(absValue, name, negative, params);
+        [Set<Variable> params = null]) =>
+    Number._named(absValue, name, params);
 
 class constants {
-  static const Number e = Number._named(math.e, 'e', false, null);
-  static const Number pi = Number._named(math.pi, 'π', false, null);
+  static const Number e = Number._named(math.e, 'e', null);
+  static const Number pi = Number._named(math.pi, 'π', null);
 }
 
 class Number extends BSFunction {
@@ -25,13 +29,12 @@ class Number extends BSFunction {
         name = _makeName(value),
         isInt = (value == value.toInt()),
         isNamed = false,
-        super(value < 0, params);
+        super(params);
 
-  const Number._named(
-      num this.absvalue, this.name, bool negative, Set<Variable> params)
+  const Number._named(num this.absvalue, this.name, Set<Variable> params)
       : isNamed = true,
         isInt = (absvalue is int),
-        super(negative, params);
+        super(params);
 
   ///creates a name from the number, but if it can be cast to a int, does it (so 1.0 is displayed as 1)
   static String _makeName(num value) {
@@ -42,26 +45,26 @@ class Number extends BSFunction {
   }
 
   @override
-  String toString([bool handleMinus = true]) => minusSign(handleMinus) + name;
+  String toString([bool handleMinus = true]) => name;
 
   @override
-  BSFunction derivative(Variable v) => n(0);
+  BSFunction derivativeInternal(Variable v) => n(0);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) => this;
 
-  num get value => absvalue * factor;
+  num get value => absvalue;
 
   @override
-  BSFunction copy([bool negative = null, Set<Variable> params = null]) {
+  BSFunction copy([Set<Variable> params = null]) {
     if (isNamed)
-      return Number._named(absvalue, name, negative, params);
+      return Number._named(absvalue, name, params);
     else
-      return Number._(absvalue * factor, params);
+      return Number._(absvalue, params);
   }
 
   @override
-  SplayTreeSet<Variable> get minParameters => SplayTreeSet();
+  SplayTreeSet<Variable> get defaultParameters => SplayTreeSet();
 
   bool operator ==(dynamic other) =>
       (other is Number) && this.value == other.value;
