@@ -16,7 +16,6 @@ void main() {
   print(h);
   print(i);
 
-  //TODO: fix this nonsense
   BSFunction j = x/y + (-x)/y + x/(-y) + (-x)/(-y);
   print(j);
 }

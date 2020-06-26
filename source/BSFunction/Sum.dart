@@ -84,9 +84,9 @@ class Sum extends BSFunction {
 void _openOtherSums(List<BSFunction> operands) {
   int i = 0;
   while (i < operands.length) {
+    Trio<Sum, bool, bool> _op =
+        BSFunction.extractFromNegative<Sum>(operands[i]);
 
-    Trio<Sum, bool, bool> _op = BSFunction.extractFromNegative<Sum>(operands[i]);
-    
     //if it finds a sum
     if (_op.second) {
       Sum s = operands.removeAt(i);
@@ -117,13 +117,13 @@ void _SumNumbers(List<BSFunction> operands) {
   int i = 0;
   while (i < operands.length) {
     bool _negative = operands[i] is Negative;
-    BSFunction op = ((_negative) ? (operands[i] as Negative).operand : operands[i]);
-    
-    if (op is Number) {
+    BSFunction op =
+        ((_negative) ? (operands[i] as Negative).operand : operands[i]);
 
+    if (op is Number) {
       operands.removeAt(i);
       Number n = op;
-      if (!n.isNamed) 
+      if (!n.isNamed)
         number += n.value * (_negative ? -1 : 1);
       else {
         if (!namedNumbers.containsKey(n.name))
@@ -158,31 +158,38 @@ void _createMultiplications(List<BSFunction> operands) {
 
     BSFunction h;
     BSFunction factor;
+    Trio<Multiplication, bool, bool> _mul =
+        BSFunction.extractFromNegative<Multiplication>(f);
 
-    if (f is Multiplication &&
-        f.operands.length == 2 &&
-        f.operands[0] is Number) {
-      h = f.operands[1];
-      factor = f.operands[0];
+    if (_mul.second &&
+        _mul.first.operands.length == 2 &&
+        _mul.first.operands[0] is Number) {
+      h = _mul.first.operands[1];
+      factor = _mul.first.operands[1] * n(_mul.third ? -1 : 1);
     } else {
-      h = f;
-      factor = n(1);
+      Trio<BSFunction, bool, bool> _f = BSFunction.extractFromNegative(f);
+      h = _f.first;
+      factor = n((_f.third ? -1 : 1));
     }
 
     for (int j = i + 1; j < operands.length; ++j) {
       BSFunction g = operands[j];
 
-      if (g is Multiplication &&
-          g.operands.length == 2 &&
-          g.operands[0] is Number) {
-        if (h == g.operands[1]) {
+      Trio<Multiplication, bool, bool> _mul =
+          BSFunction.extractFromNegative<Multiplication>(f);
+
+      if (_mul.second &&
+          _mul.first.operands.length == 2 &&
+          _mul.first.operands[0] is Number) {
+        if (h == _mul.first.operands[1]) {
           operands.removeAt(j);
-          factor += g.operands[0];
+          factor += _mul.first.operands[0] * n(_mul.third ? -1 : 1);
         }
       } else {
-        if (g == h) {
+        Trio<BSFunction, bool, bool> _g = BSFunction.extractFromNegative(g);
+        if (_g.first == h) {
           operands.removeAt(j);
-          factor += n(1);
+          factor += n((_g.third ? -1 : 1));
         }
       }
     }

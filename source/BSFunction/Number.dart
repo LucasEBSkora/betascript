@@ -1,5 +1,6 @@
 import 'BSFunction.dart';
 import 'Negative.dart';
+import 'Sum.dart';
 import 'Variable.dart';
 import 'dart:math' as math;
 import 'dart:collection' show SplayTreeSet;
