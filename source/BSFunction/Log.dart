@@ -5,8 +5,7 @@ import 'Number.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
 
-BSFunction log(BSFunction operand,
-    [BSFunction base = constants.e, Set<Variable> params = null]) {
+BSFunction log(BSFunction operand, [BSFunction base = constants.e]) {
   //log_a(1) == 0 for every a
   if (operand == n(1))
     return n(0);
@@ -14,14 +13,14 @@ BSFunction log(BSFunction operand,
   else if (operand == base)
     return n(1);
   else
-    return Log._(operand, base, params);
+    return Log._(operand, base);
 }
 
 class Log extends BSFunction {
   final BSFunction base;
   final BSFunction operand;
 
-  Log._(this.operand, this.base, Set<Variable> params) : super(params);
+  Log._(this.operand, this.base, [Set<Variable> params = null]) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) {

@@ -10,13 +10,13 @@ BSFunction negative(BSFunction op) {
   if (op == n(0))
     return op;
   else
-    return Negative._(op, null);
+    return Negative._(op);
 }
 
 class Negative extends BSFunction {
   final BSFunction operand;
 
-  Negative._(BSFunction this.operand, Set<Variable> params) : super(params);
+  Negative._(BSFunction this.operand, [Set<Variable> params = null]) : super(params);
 
   @override
   BSFunction get approx => negative(operand.approx);

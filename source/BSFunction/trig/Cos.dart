@@ -6,16 +6,16 @@ import '../singleOperandFunction.dart';
 import 'Sin.dart';
 import 'dart:math' as math;
 
-BSFunction cos(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction cos(BSFunction operand) {
   if (operand is ArcCos)
     return operand.operand;
   else
-    return Cos._(operand, params);
+    return Cos._(operand);
 }
 
 class Cos extends singleOperandFunction {
-  
-  Cos._(BSFunction operand,  Set<Variable> params) : super(operand, params);
+  Cos._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -39,8 +39,6 @@ class Cos extends singleOperandFunction {
     return cos(op);
   }
 
-
   @override
   BSFunction copy([Set<Variable> params = null]) => Cos._(operand, params);
-
 }

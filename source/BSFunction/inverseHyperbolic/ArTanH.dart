@@ -7,15 +7,15 @@ import 'dart:math' as math;
 import '../hyperbolic/TanH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction artanh(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction artanh(BSFunction operand) {
   if (operand is TanH)
     return operand.operand;
   else
-    return ArTanH._(operand, params);
+    return ArTanH._(operand);
 }
 
 class ArTanH extends singleOperandFunction {
-  ArTanH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  ArTanH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {

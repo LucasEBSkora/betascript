@@ -7,15 +7,16 @@ import '../inverseTrig/ArcTan.dart';
 import '../singleOperandFunction.dart';
 import 'Sec.dart';
 
-BSFunction tan(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction tan(BSFunction operand) {
   if (operand is ArcTan)
     return operand.operand;
   else
-    return Tan._(operand, params);
+    return Tan._(operand);
 }
 
 class Tan extends singleOperandFunction {
-  Tan._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  Tan._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

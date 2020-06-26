@@ -7,15 +7,16 @@ import '../inverseHyperbolic/ArSecH.dart';
 import '../singleOperandFunction.dart';
 import 'TanH.dart';
 
-BSFunction sech(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction sech(BSFunction operand) {
   if (operand is ArSecH)
     return operand.operand;
   else
-    return SecH._(operand, params);
+    return SecH._(operand);
 }
 
 class SecH extends singleOperandFunction {
-  SecH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  SecH._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

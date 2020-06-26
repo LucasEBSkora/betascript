@@ -75,7 +75,7 @@ BSFunction multiply(List<BSFunction> operands) {
   else if (operands.length == 1)
     _mul = operands[0];
   else
-    _mul = Multiplication._(operands, null);
+    _mul = Multiplication._(operands);
 
   return (_negative) ? negative(_mul) : _mul;
 }
@@ -83,7 +83,7 @@ BSFunction multiply(List<BSFunction> operands) {
 class Multiplication extends BSFunction {
   final List<BSFunction> operands;
 
-  Multiplication._(List<BSFunction> this.operands, Set<Variable> params)
+  Multiplication._(List<BSFunction> this.operands, [Set<Variable> params = null])
       : super(params);
 
   @override

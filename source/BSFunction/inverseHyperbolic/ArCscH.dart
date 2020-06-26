@@ -8,15 +8,15 @@ import 'dart:math' as math;
 import '../hyperbolic/CscH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arcsch(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arcsch(BSFunction operand) {
   if (operand is CscH)
     return operand.operand;
   else
-    return ArCscH._(operand, params);
+    return ArCscH._(operand);
 }
 
 class ArCscH extends singleOperandFunction {
-  ArCscH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  ArCscH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {

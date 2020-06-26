@@ -7,15 +7,15 @@ import 'dart:math' as math;
 import '../inverseHyperbolic/ArTanH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction tanh(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction tanh(BSFunction operand) {
   if (operand is ArTanH)
     return operand.operand;
   else
-    return TanH._(operand, params);
+    return TanH._(operand);
 }
 
 class TanH extends singleOperandFunction {
-  TanH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  TanH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

@@ -7,15 +7,15 @@ import 'dart:math' as math;
 import '../hyperbolic/CtgH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arctgh(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arctgh(BSFunction operand) {
   if (operand is CtgH)
     return operand.operand;
   else
-    return ArCtgH._(operand, params);
+    return ArCtgH._(operand);
 }
 
 class ArCtgH extends singleOperandFunction {
-  ArCtgH._(BSFunction operand, Set<Variable> params)
+  ArCtgH._(BSFunction operand, [Set<Variable> params = null])
       : super(operand,  params);
 
   @override

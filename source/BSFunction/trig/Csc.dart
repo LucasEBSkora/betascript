@@ -6,21 +6,20 @@ import '../singleOperandFunction.dart';
 import 'Ctg.dart';
 import 'dart:math' as math;
 
-BSFunction csc(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction csc(BSFunction operand) {
   if (operand is ArcCsc)
     return operand.operand;
   else
-    return Csc._(operand, params);
+    return Csc._(operand);
 }
 
 class Csc extends singleOperandFunction {
-
-  Csc._(BSFunction operand,  Set<Variable> params) : super(operand, params);
+  Csc._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
-      (-csc(operand) * ctg(operand) * operand.derivativeInternal(v))
-          ;
+      (-csc(operand) * ctg(operand) * operand.derivativeInternal(v));
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
@@ -39,8 +38,6 @@ class Csc extends singleOperandFunction {
     return csc(op);
   }
 
-
   @override
   BSFunction copy([Set<Variable> params = null]) => Csc._(operand, params);
-
 }

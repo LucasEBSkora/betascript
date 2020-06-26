@@ -6,20 +6,20 @@ import 'Sgn.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
 
-BSFunction abs(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction abs(BSFunction operand) {
   //It makes no sense to keep a negative sign inside a absolute value.
   if (operand is Negative) operand = (operand as Negative).operand;
 
   //If the operand is a number, it can be returned directly, since it will always have the same absolute value
-  if (operand is Number) return operand.copy(params);
-  
-  return AbsoluteValue._(operand, params);
+  if (operand is Number) return operand;
+
+  return AbsoluteValue._(operand);
 }
 
 class AbsoluteValue extends BSFunction {
   final BSFunction operand;
 
-  AbsoluteValue._(BSFunction this.operand, Set<Variable> params)
+  AbsoluteValue._(BSFunction this.operand, [Set<Variable> params = null])
       : super(params);
 
   @override

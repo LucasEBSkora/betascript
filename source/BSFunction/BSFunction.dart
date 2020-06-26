@@ -78,8 +78,7 @@ abstract class BSFunction {
   @protected
   BSFunction evaluate(Map<String, BSFunction> p);
 
-  /// whether or not the function itself should print a minus sign before it (if applicable), because the Sum class, which is used to implement sums and subtractions, uses it.
-  String toString();
+  String toString() => throw UnimplementedError();
 
   ///returns the variables which this function actually needs to be evaluated ( e.g. (sin(x+y)*z).parameters returns [x, y, z]).
   ///It does, however, take into account custom parameters of its child functions
@@ -96,7 +95,8 @@ abstract class BSFunction {
   ///Checks if the function f is of Type 'type', or if it is of type Negative and its operand of type 'type'.
   ///if it manages to find something of the 'type', second is set to true.
   ///If it is contained inside a negative, third is set to true.
-  static Trio<T, bool, bool> extractFromNegative<T extends BSFunction>(BSFunction f) {
+  static Trio<T, bool, bool> extractFromNegative<T extends BSFunction>(
+      BSFunction f) {
     bool _isInNegative = false;
     if (f is Negative) {
       f = (f as Negative).operand;

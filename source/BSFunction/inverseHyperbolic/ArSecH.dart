@@ -8,15 +8,15 @@ import 'dart:math' as math;
 import '../hyperbolic/SecH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arsech(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arsech(BSFunction operand) {
   if (operand is SecH)
     return operand.operand;
   else
-    return ArSecH._(operand, params);
+    return ArSecH._(operand);
 }
 
 class ArSecH extends singleOperandFunction {
-  ArSecH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  ArSecH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {

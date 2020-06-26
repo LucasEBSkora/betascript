@@ -1,18 +1,16 @@
 import 'BSFunction.dart';
 import 'Negative.dart';
-import 'Sum.dart';
 import 'Variable.dart';
 import 'dart:math' as math;
 import 'dart:collection' show SplayTreeSet;
 
-BSFunction n(num value, [Set<Variable> params = null]) {
-  if (value < 0) return negative(Number._(value.abs(), params));
-  return Number._(value, params);
+BSFunction n(num value) {
+  if (value < 0) return negative(Number._(value.abs(), null));
+  return Number._(value);
 }
 
-BSFunction namedNumber(num absValue, String name,
-        [Set<Variable> params = null]) =>
-    Number._named(absValue, name, params);
+BSFunction namedNumber(num absValue, String name) =>
+    Number._named(absValue, name);
 
 class constants {
   static const Number e = Number._named(math.e, 'e', null);
@@ -25,14 +23,14 @@ class Number extends BSFunction {
   final String name;
   final bool isInt;
 
-  Number._(num value, Set<Variable> params)
+  Number._(num value, [Set<Variable> params = null])
       : absvalue = value.abs(),
         name = _makeName(value),
         isInt = (value == value.toInt()),
         isNamed = false,
         super(params);
 
-  const Number._named(num this.absvalue, this.name, Set<Variable> params)
+  const Number._named(num this.absvalue, this.name, [Set<Variable> params = null])
       : isNamed = true,
         isInt = (absvalue is int),
         super(params);

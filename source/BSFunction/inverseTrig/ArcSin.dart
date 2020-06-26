@@ -6,16 +6,17 @@ import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
+import '../trig/Sin.dart';
 
-BSFunction arcsin(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arcsin(BSFunction operand) {
   if (operand is Sin)
     return operand.operand;
   else
-    return ArcSin._(operand, params);
+    return ArcSin._(operand);
 }
 
 class ArcSin extends singleOperandFunction {
-  ArcSin._(BSFunction operand,  Set<Variable> params)
+  ArcSin._(BSFunction operand, [Set<Variable> params = null])
       : super(operand, params);
 
   @override
@@ -35,10 +36,10 @@ class ArcSin extends singleOperandFunction {
     else
       return arcsin(op);
   }
+
   @override
   BSFunction derivativeInternal(Variable v) =>
-      (operand.derivativeInternal(v) / root(n(1) - (operand ^ n(2))))
-          ;
+      (operand.derivativeInternal(v) / root(n(1) - (operand ^ n(2))));
 
   @override
   BSFunction copy([Set<Variable> params = null]) => ArcSin._(operand, params);

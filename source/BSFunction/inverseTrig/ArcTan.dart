@@ -5,16 +5,17 @@ import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
+import '../trig/Tan.dart';
 
-BSFunction arctan(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arctan(BSFunction operand) {
   if (operand is Tan)
     return operand.operand;
   else
-    return ArcTan._(operand, params);
+    return ArcTan._(operand);
 }
 
 class ArcTan extends singleOperandFunction {
-  ArcTan._(BSFunction operand,  Set<Variable> params)
+  ArcTan._(BSFunction operand, [Set<Variable> params = null])
       : super(operand, params);
 
   @override
@@ -34,6 +35,7 @@ class ArcTan extends singleOperandFunction {
     else
       return arctan(op);
   }
+
   @override
   BSFunction derivativeInternal(Variable v) =>
       (operand.derivativeInternal(v) / (n(1) + (operand ^ n(2))));

@@ -7,15 +7,15 @@ import 'dart:math' as math;
 import '../hyperbolic/CosH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arcosh(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arcosh(BSFunction operand) {
   if (operand is CosH)
     return operand.operand;
   else
-    return ArCosH._(operand, params);
+    return ArCosH._(operand);
 }
 
 class ArCosH extends singleOperandFunction {
-  ArCosH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  ArCosH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {

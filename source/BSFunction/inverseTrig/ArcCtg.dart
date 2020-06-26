@@ -5,16 +5,17 @@ import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
+import '../trig/Ctg.dart';
 
-BSFunction arcctg(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arcctg(BSFunction operand) {
   if (operand is Ctg)
     return operand.operand;
   else
-    return ArcCtg._(operand, params);
+    return ArcCtg._(operand);
 }
 
 class ArcCtg extends singleOperandFunction {
-  ArcCtg._(BSFunction operand,  Set<Variable> params)
+  ArcCtg._(BSFunction operand, [Set<Variable> params = null])
       : super(operand, params);
 
   @override

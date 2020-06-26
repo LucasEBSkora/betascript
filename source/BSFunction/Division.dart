@@ -26,8 +26,7 @@ BSFunction divide(
 
   Division div = Division._(
       (numerator is Negative) ? numerator.operand : numerator,
-      (denominator is Negative) ? denominator.operand : denominator,
-      null);
+      (denominator is Negative) ? denominator.operand : denominator);
 
   return (xor(numerator is Negative, denominator is Negative)
       ? negative(div)
@@ -39,7 +38,7 @@ class Division extends BSFunction {
   final BSFunction denominator;
 
   Division._(BSFunction this.numerator, BSFunction this.denominator,
-      Set<Variable> params)
+      [Set<Variable> params = null])
       : super(params);
 
   @override

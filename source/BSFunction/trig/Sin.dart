@@ -6,15 +6,16 @@ import '../singleOperandFunction.dart';
 import 'Cos.dart';
 import 'dart:math' as math;
 
-BSFunction sin(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction sin(BSFunction operand) {
   if (operand is ArcSin)
     return operand.operand;
   else
-    return Sin._(operand, params);
+    return Sin._(operand);
 }
 
 class Sin extends singleOperandFunction {
-  Sin._(BSFunction operand,  Set<Variable> params) : super(operand, params);
+  Sin._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

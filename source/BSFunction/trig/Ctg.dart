@@ -7,15 +7,16 @@ import '../inverseTrig/ArcCtg.dart';
 import '../singleOperandFunction.dart';
 import 'Csc.dart';
 
-BSFunction ctg(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction ctg(BSFunction operand) {
   if (operand is ArcCtg)
     return operand.operand;
   else
-    return Ctg._(operand, params);
+    return Ctg._(operand);
 }
 
 class Ctg extends singleOperandFunction {
-  Ctg._(BSFunction operand,  Set<Variable> params) : super(operand, params);
+  Ctg._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

@@ -8,15 +8,15 @@ import 'dart:math' as math;
 import '../hyperbolic/SinH.dart';
 import '../singleOperandFunction.dart';
 
-BSFunction arsinh(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arsinh(BSFunction operand) {
   if (operand is SinH)
     return operand.operand;
   else
-    return ArSinH._(operand, params);
+    return ArSinH._(operand);
 }
 
 class ArSinH extends singleOperandFunction {
-  ArSinH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  ArSinH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {

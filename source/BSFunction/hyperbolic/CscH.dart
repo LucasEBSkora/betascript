@@ -7,15 +7,15 @@ import '../inverseHyperbolic/ArCscH.dart';
 import '../singleOperandFunction.dart';
 import 'CtgH.dart';
 
-BSFunction csch(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction csch(BSFunction operand) {
   if (operand is ArCscH)
     return operand.operand;
   else
-    return CscH._(operand, params);
+    return CscH._(operand);
 }
 
 class CscH extends singleOperandFunction {
-  CscH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  CscH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

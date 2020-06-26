@@ -7,15 +7,15 @@ import '../inverseHyperbolic/ArSinH.dart';
 import '../singleOperandFunction.dart';
 import 'CosH.dart';
 
-BSFunction sinh(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction sinh(BSFunction operand) {
   if (operand is ArSinH)
     return operand.operand;
   else
-    return SinH._(operand,  params);
+    return SinH._(operand);
 }
 
 class SinH extends singleOperandFunction {
-  SinH._(BSFunction operand,  Set<Variable> params)
+  SinH._(BSFunction operand,  [Set<Variable> params = null])
       : super(operand, params);
 
   @override

@@ -7,15 +7,15 @@ import '../inverseHyperbolic/ArCosH.dart';
 import '../singleOperandFunction.dart';
 import 'SinH.dart';
 
-BSFunction cosh(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction cosh(BSFunction operand) {
   if (operand is ArCosH)
     return operand.operand;
   else
-    return CosH._(operand, params);
+    return CosH._(operand);
 }
 
 class CosH extends singleOperandFunction {
-  CosH._(BSFunction operand, Set<Variable> params) : super(operand, params);
+  CosH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

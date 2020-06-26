@@ -6,17 +6,17 @@ import 'dart:math' as math;
 import 'dart:collection' show SplayTreeSet;
 //TODO: Implement roots that aren't square roots
 
-BSFunction root(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction root(BSFunction operand) {
   if (operand is Exponentiation)
     return (operand.base ^ (operand.exponent / n(2)));
   else
-    return Root._(operand, params);
+    return Root._(operand);
 }
 
 class Root extends BSFunction {
   final BSFunction operand;
 
-  Root._(this.operand, Set<Variable> params) : super(params);
+  Root._(this.operand, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

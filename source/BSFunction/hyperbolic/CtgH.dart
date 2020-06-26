@@ -7,15 +7,15 @@ import '../inverseHyperbolic/ArCtgH.dart';
 import '../singleOperandFunction.dart';
 import 'CscH.dart';
 
-BSFunction ctgh(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction ctgh(BSFunction operand) {
   if (operand is ArCtgH)
     return operand.operand;
   else
-    return CtgH._(operand, params);
+    return CtgH._(operand);
 }
 
 class CtgH extends singleOperandFunction {
-  CtgH._(BSFunction operand, Set<Variable> params)
+  CtgH._(BSFunction operand, [Set<Variable> params = null])
       : super(operand, params);
 
   @override

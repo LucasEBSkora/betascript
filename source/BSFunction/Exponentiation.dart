@@ -6,7 +6,7 @@ import 'Number.dart';
 import 'dart:collection' show SplayTreeSet;
 
 BSFunction exp(BSFunction exponent,
-    [BSFunction base = constants.e, Set<Variable> params = null]) {
+    [BSFunction base = constants.e]) {
   if (exponent == n(1)) return base;
   if (exponent == n(0)) return n(1);
   //if both exponent and base are numbers, but neither is named, performs the operation (so that 2^2 is displayed as 4 but pi^2 is still pi^2)
@@ -16,14 +16,14 @@ BSFunction exp(BSFunction exponent,
       !base.isNamed)
     return n(pow(base.value, exponent.value));
   else
-    return Exponentiation._(exponent, base, params);
+    return Exponentiation._(exponent, base);
 }
 
 class Exponentiation extends BSFunction {
   final BSFunction base;
   final BSFunction exponent;
 
-  Exponentiation._(this.exponent, this.base, Set<Variable> params)
+  Exponentiation._(this.exponent, this.base, [Set<Variable> params = null])
       : super(params);
 
   @override

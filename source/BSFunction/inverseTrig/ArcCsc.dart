@@ -8,15 +8,15 @@ import 'dart:math' as math;
 import '../singleOperandFunction.dart';
 import '../trig/Csc.dart';
 
-BSFunction arccsc(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arccsc(BSFunction operand) {
   if (operand is Csc)
     return operand.operand;
   else
-    return ArcCsc._(operand, params);
+    return ArcCsc._(operand);
 }
 
 class ArcCsc extends singleOperandFunction {
-  ArcCsc._(BSFunction operand,  Set<Variable> params)
+  ArcCsc._(BSFunction operand, [Set<Variable> params = null])
       : super(operand, params);
 
   @override
@@ -38,9 +38,8 @@ class ArcCsc extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (operand.derivativeInternal(v) / (abs(operand) * root((operand ^ n(2)) - n(1))))
-          ;
+  BSFunction derivativeInternal(Variable v) => (operand.derivativeInternal(v) /
+      (abs(operand) * root((operand ^ n(2)) - n(1))));
 
   @override
   BSFunction copy([Set<Variable> params = null]) => ArcCsc._(operand, params);

@@ -5,16 +5,17 @@ import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
+import '../trig/Cos.dart';
 
-BSFunction arccos(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arccos(BSFunction operand) {
   if (operand is Cos)
     return operand.operand;
   else
-    return ArcCos._(operand, params);
+    return ArcCos._(operand);
 }
 
 class ArcCos extends singleOperandFunction {
-  ArcCos._(BSFunction operand,  Set<Variable> params)
+  ArcCos._(BSFunction operand, [Set<Variable> params = null])
       : super(operand, params);
 
   @override
@@ -37,8 +38,7 @@ class ArcCos extends singleOperandFunction {
 
   @override
   BSFunction derivativeInternal(Variable v) =>
-      (-operand.derivativeInternal(v) / root(n(1) - (operand ^ n(2))))
-          ;
+      (-operand.derivativeInternal(v) / root(n(1) - (operand ^ n(2))));
 
   @override
   BSFunction copy([Set<Variable> params = null]) => ArcCos._(operand, params);

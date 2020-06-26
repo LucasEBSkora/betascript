@@ -7,16 +7,17 @@ import '../BSFunction.dart';
 import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
+import '../trig/Sec.dart';
 
-BSFunction arcsec(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction arcsec(BSFunction operand) {
   if (operand is Sec)
     return operand.operand;
   else
-    return ArcSec._(operand, params);
+    return ArcSec._(operand);
 }
 
 class ArcSec extends singleOperandFunction {
-  ArcSec._(BSFunction operand,  Set<Variable> params)
+  ArcSec._(BSFunction operand, [Set<Variable> params = null])
       : super(operand, params);
 
   @override
@@ -36,10 +37,10 @@ class ArcSec extends singleOperandFunction {
     else
       return arcsec(op);
   }
+
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (operand.derivativeInternal(v) / (abs(operand) * root((operand ^ n(2)) - n(1))))
-          ;
+  BSFunction derivativeInternal(Variable v) => (operand.derivativeInternal(v) /
+      (abs(operand) * root((operand ^ n(2)) - n(1))));
 
   @override
   BSFunction copy([Set<Variable> params = null]) => ArcSec._(operand, params);

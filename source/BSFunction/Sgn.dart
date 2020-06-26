@@ -1,35 +1,41 @@
+import 'Abs.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
 import 'Number.dart';
 import 'dart:collection' show SplayTreeSet;
+import '../Utils/Tuples.dart';
 
-BSFunction sgn(BSFunction operand, [Set<Variable> params = null]) {
-  return Signum._(operand, params);
+BSFunction sgn(BSFunction operand) {
+      Trio<Number, bool, bool> _f1 = BSFunction.extractFromNegative<Number>(operand);
+    if (_f1.second) {
+      if (_f1.first.value == 0)
+        return n(0);
+      else
+        return n(_f1.third ? -1 : 1);
+    }
+
+    Trio<AbsoluteValue, bool, bool> _f2 =
+        BSFunction.extractFromNegative<AbsoluteValue>(operand);
+    if (_f2.second) return n(_f2.third ? -1 : 1);
+
+  return Signum._(operand, null);
 }
 
 class Signum extends BSFunction {
-  
   final BSFunction operand;
 
-  Signum._(BSFunction this.operand, Set<Variable> params) : super(params);
+  const Signum._(BSFunction this.operand, [Set<Variable> params = null])
+      : super(params);
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
-    BSFunction op = operand;
-    if (op is Number) {
-      if (op.value < 0) return n(-1);
-      else if (op.value > 0) return n(1);
-      else return n(0);
-    } else return sgn(op);
+  BSFunction evaluate(Map<String, BSFunction> p) => sgn(operand.evaluate(p));
 
-  }
-
-  //The derivativeInternal of the sign function is either 0 or undefined.
+  //The derivative of the sign function is either 0 or undefined.
   @override
   BSFunction derivativeInternal(Variable v) => n(0);
 
   @override
-  String toString([bool handleMinus = true])  => "sign($operand)";
+  String toString([bool handleMinus = true]) => "sign($operand)";
 
   @override
   BSFunction copy([Set<Variable> params = null]) => Signum._(operand, params);
@@ -37,19 +43,13 @@ class Signum extends BSFunction {
   SplayTreeSet<Variable> get defaultParameters => operand.parameters;
 
   @override
-  BSFunction get approx {
-    BSFunction op = operand.approx;
-    if (op is Number) {
-      if (op.value < 0) return n(-1);
-      else if (op.value > 0) return n(1);
-      else return n(0);
-    } else return sgn(op);
-
-  }
+  BSFunction get approx => sgn(operand.approx);
 
 }
 
 double sign(double v) {
-  if (v == 0) return 0;
-  else return ((v > 0) ? 1 : -1);
+  if (v == 0)
+    return 0;
+  else
+    return ((v > 0) ? 1 : -1);
 }

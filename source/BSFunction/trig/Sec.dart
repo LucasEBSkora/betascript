@@ -6,20 +6,20 @@ import '../singleOperandFunction.dart';
 import 'Tan.dart';
 import 'dart:math' as math;
 
-BSFunction sec(BSFunction operand, [Set<Variable> params = null]) {
+BSFunction sec(BSFunction operand) {
   if (operand is ArcSec)
     return operand.operand;
   else
-    return Sec._(operand, params);
+    return Sec._(operand);
 }
 
 class Sec extends singleOperandFunction {
-  Sec._(BSFunction operand,  Set<Variable> params) : super(operand, params);
+  Sec._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
-      (sec(operand) * tan(operand) * operand.derivativeInternal(v))
-          ;
+      (sec(operand) * tan(operand) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) {
