@@ -1,0 +1,17 @@
+let f(x) = sin(x);
+
+let g = f(cos(x));
+
+print g;
+
+print f + g;
+
+
+print e^x;
+
+let h(x, y, z) = 0;
+
+print h(1, 2, arcosh(z));
+
+let i(y,x) = pi + 2 - log(y, 33)*sec(y/x);
+print i(11, 2);

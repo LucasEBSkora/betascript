@@ -123,8 +123,17 @@ class Resolver implements ExprVisitor, StmtVisitor {
         causes a compile error, because it might be masking a user mistake
     
         */
-
     _declare(s.name);
+    if (s.parameters != null) {
+      for (Token parameter in s.parameters) {
+        //if a parameter has a name not yet declared, defines it in current scope
+        if (!(!_scopes.isEmpty && _scopes.last.containsKey(parameter.lexeme)) && !_globals.containsKey(parameter.lexeme)) {
+          _declare(parameter);
+          _define(parameter);
+        }
+      }
+
+    }
     if (s.initializer != null) _resolveExpr(s.initializer);
     _define(s.name);
   }

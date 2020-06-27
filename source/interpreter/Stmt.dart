@@ -35,9 +35,11 @@ class PrintStmt extends Stmt {
 class VarStmt extends Stmt {
   ///The token holding the variable's name
   final Token name;
+  ///for functions, the list of variables it is defined in
+  final List<Token> parameters;
   ///If the variable is initialized on declaration, the inicializer is stored here
   final Expr initializer;
-  VarStmt(Token this.name, Expr this.initializer);
+  VarStmt(Token this.name, List<Token> this.parameters, Expr this.initializer);
  dynamic accept(StmtVisitor v) => v.visitVarStmt(this);
 
 }

@@ -10,7 +10,7 @@ rouDecl -> "routine" routine
 routine -> IDENTIFIER "(" parameters? ")" block
 parameters -> IDENTIFIER ( "," IDENTIFIER)*
 
-varDecl -> "let" IDENTIFIER ("(" parameters ")")* ( "=" expression)? ";"
+varDecl -> "let" IDENTIFIER ("(" parameters ")")? ( "=" expression)? ";"
 
 statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
 
@@ -40,7 +40,8 @@ logicAnd -> equality ( "and" equality)*
 equality -> comparison ( "==" comparison )*
 comparison -> addition ( (">" | ">=" | "<" | "<=") addition)*
 addition -> multiplication ( ("-" | "+") multiplication)*
-multiplication -> unary ( ("*" | "/") unary)*
+multiplication -> exponentiation ( ("*" | "/") exponentiation)*
+exponentiation -> unary ("^" unary)*
 unary -> ( "!" | "-") unary | call
 call -> primary ( "(" arguments? ")" | "." IDENTIFIER)*
 arguments -> expression ( "," expression )*

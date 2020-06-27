@@ -14,6 +14,7 @@ enum TokenType {
   STAR, // *
   FACTORIAL, // !
   APPROX, //~
+  EXP, //^
 
   EQUAL, // =
   EQUAL_EQUAL, // ==

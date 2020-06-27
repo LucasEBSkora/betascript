@@ -17,7 +17,7 @@ class BSParser {
     _current = 0;
   }
 
-  //The parser works by implementing the rules in the language's formal grammar, 
+  //The parser works by implementing the rules in the language's formal grammar,
   //which are described in 'formal grammar representation.txt'
 
   ///This function is basically the program -> statement* EOF rule
@@ -91,17 +91,27 @@ class BSParser {
     return new RoutineStmt(name, parameters, body);
   }
 
-  ///varDecl -> "let" IDENTIFIER ( "=" expression): ";"
+  ///varDecl -> "let" IDENTIFIER ("(" parameters ")")? ( "=" expression)? ";"
   Stmt _varDeclaration() {
     Token name = _consume(TokenType.IDENTIFIER, "Expect variable name");
 
-    Expr initializer = null;
-    if (_match(TokenType.EQUAL)) {
-      initializer = _expression();
+    List<Token> parameters = null;
+    if (_match(TokenType.LEFT_PARENTHESES)) {
+      parameters = List();
+      do {
+        if (_check(TokenType.RIGHT_PARENTHESES)) break;
+
+        parameters.add(_consume(TokenType.IDENTIFIER, "Expect parameter name"));
+      } while (_match(TokenType.COMMA));
+      
+      _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after parameters.");
     }
 
+    Expr initializer = null;
+    if (_match(TokenType.EQUAL)) initializer = _expression();
+
     _consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
-    return new VarStmt(name, initializer);
+    return new VarStmt(name, parameters, initializer);
   }
 
   //statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
@@ -320,13 +330,27 @@ class BSParser {
     return expr;
   }
 
-  ///multiplication -> unary ( ("*" | "/") unary)*
+  ///multiplication -> exponentiation ( ("*" | "/") exponentiation)*
   Expr _multiplication() {
+    //follows the pattern in _equality
+
+    Expr expr = _exponentiation();
+
+    while (_matchAny([TokenType.SLASH, TokenType.STAR])) {
+      Token op = _previous();
+      Expr right = _exponentiation();
+      expr = new BinaryExpr(expr, op, right);
+    }
+    return expr;
+  }
+
+  ///exponentiation -> unary ("^" unary)*
+  Expr _exponentiation() {
     //follows the pattern in _equality
 
     Expr expr = _unary();
 
-    while (_matchAny([TokenType.SLASH, TokenType.STAR])) {
+    while (_match(TokenType.EXP)) {
       Token op = _previous();
       Expr right = _unary();
       expr = new BinaryExpr(expr, op, right);

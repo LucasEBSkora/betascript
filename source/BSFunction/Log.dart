@@ -37,10 +37,11 @@ class Log extends BSFunction {
     BSFunction op = operand.evaluate(p);
     if (b is Number && op is Number) {
       //if both are numbers, checks if the evaluation is a integer. if it is, returns the integer.
-      double v = math.log(b.value) / math.log(b.value);
+      double v = math.log(op.value) / math.log(b.value);
+
       if (v == v.toInt()) return n(v);
     }
-    return log(b, op);
+    return log(op, b);
   }
 
   @override

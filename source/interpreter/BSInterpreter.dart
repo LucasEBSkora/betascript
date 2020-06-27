@@ -18,7 +18,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   Environment _environment; //Current scope
 
   BSInterpreter() {
-    for (String _name in nativeGlobals.keys) globals.define("_name", nativeGlobals[_name]);
+    for (String _name in nativeGlobals.keys) globals.define(_name, nativeGlobals[_name]);
     _environment = globals;
   }
 
@@ -51,6 +51,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       case TokenType.STAR:
         _checkNumberOperands(e.op, leftOperand, rightOperand);
         return leftOperand * rightOperand;
+      case TokenType.EXP:
+        _checkNumberOperands(e.op, leftOperand, rightOperand);
+        return leftOperand ^ rightOperand;
       case TokenType.PLUS:
         _checkStringOrNumberOperands(e.op, leftOperand, rightOperand);
         return leftOperand + rightOperand;
@@ -142,10 +145,40 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitVarStmt(VarStmt s) {
+    //checks for parameters (which only exist in function declarations)
+    List<Variable> _variables = null;
+
+    if (s.parameters != null) {
+      _variables = List();
+      //Checks if each of the parameters is already a Variable, and when they don't exist, create them as variables
+      for (Token parameter in s.parameters) {
+        Object _variable = _environment.search(parameter);
+        if (_variable == null) {
+          _variable = variable(parameter.lexeme);
+          _environment.define(parameter.lexeme, _variable);
+        }
+        else if (!(_variable is Variable)) throw new RuntimeError(parameter, "Parameters to a function must always be Variables");
+        
+        _variables.add(_variable);
+      }
+
+      //checks if there are any duplicate variables (not supported)
+
+      for (int i = 0; i < _variables.length; ++i) 
+        for (int j = i + 1; j < _variables.length; ++j) 
+          if (_variables[i] == _variables[j]) throw new RuntimeError(s.name, "Duplicate parameters not allowed in function variables");
+       
+    }
+    
     Object value = null;
     if (s.initializer != null) {
       value = _evaluate(s.initializer);
     }
+
+    if (_variables != null && value == null) throw new RuntimeError(s.name, "Function variable declarations with explicit parameter lists must always be initialized");
+    else if (_variables != null && !(value is BSFunction)) throw new RuntimeError(s.name, "Only function variable declarations may include parameters");
+    else if (_variables != null && value is BSFunction) value = (value as BSFunction).withParameters(Set<Variable>.from(_variables));
+
     _environment.define(s.name.lexeme, value);
   }
 
@@ -214,7 +247,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
     if (!(callee is BSCallable))
       throw new RuntimeError(
-          e.paren, "Can only call routines, functions and classes");
+          e.paren, "Can only call routines, functions and classes.");
 
     List<Object> arguments = new List();
 
@@ -230,7 +263,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       for (Object a in arguments)
         if (!(a is BSFunction))
           throw new RuntimeError(
-              e.paren, "functions only support other functions as parameters!");
+              e.paren, "functions only support other functions as parameters.");
     }
 
     return function.callThing(this, arguments);

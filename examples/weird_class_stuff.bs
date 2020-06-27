@@ -1,0 +1,35 @@
+class A {
+  method() {
+    print "a method";
+  }
+}
+
+class B < A {
+  method() {
+    print "B method";
+  }
+
+  test() {
+    super.method();
+  }
+}
+
+class C < B {
+  C(callback) {
+    this.callback = callback;
+  }
+
+  callCallback() {
+    this.callback();
+  }
+}
+
+routine printStuff() {
+  print "stu" + "ff";
+}
+
+let thing = C(printStuff);
+
+thing.test();
+thing.method();
+thing.callCallback();

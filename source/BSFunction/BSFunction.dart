@@ -43,8 +43,9 @@ abstract class BSFunction implements BSCallable {
   ///Returns a copy of this function with the custom parameters passed in p, and checks if they include all needed parameters
   BSFunction withParameters(Set<Variable> p) {
     Set<Variable> _p = defaultParameters;
-    p.forEach((element) {
-      if (!_p.contains(element))
+    
+    _p.forEach((element) {
+      if (!p.contains(element))
         throw new BetascriptFunctionError(
             "Error! Function parameters not sufficient to evaluate this function!");
     });
@@ -113,8 +114,8 @@ abstract class BSFunction implements BSCallable {
   @override
   int get arity => parameters.length;
 
-  
-  Object callThing(BSInterpreter interpreter, List<Object> arguments) => call(arguments);
+  //Doesn't check if the cast is succesful because it assumes the interpreter did its job
+  Object callThing(BSInterpreter interpreter, List<Object> arguments) => call(arguments.map((object) => object as BSFunction).toList());
 
 }
 

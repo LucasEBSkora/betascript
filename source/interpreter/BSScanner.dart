@@ -53,6 +53,7 @@ class BSScanner {
       ';': () => _addToken(TokenType.SEMICOLON),
       '*': () => _addToken(TokenType.STAR),
       '!': () => _addToken(TokenType.FACTORIAL),
+      '^': () => _addToken(TokenType.EXP),
       //since things like .01 are valid numeric literals, '.' needs to be checked to be sure it's a dot or part of a literal.
       '.': () {
         if (_IsDigit(_peek()))

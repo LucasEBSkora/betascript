@@ -11,13 +11,12 @@ int main() {
         ["Expr", "right", "operand to the right of the operator"],
       ],
     ),
-    NodeType( "Call", [
+    NodeType("Call", [
       ["Expr", "callee", "The routine/function/method being called"],
       ["Token", "paren", "The parentheses token"],
       ["List<Expr>", "arguments", "The list of arguments being passed"],
-    ]
-    ),
-    NodeType("Get",[
+    ]),
+    NodeType("Get", [
       ["Expr", "object", "The object whose field is being accessed"],
       ["Token", "name", "The field being accessed"],
     ]),
@@ -93,6 +92,11 @@ int main() {
     NodeType("Var", [
       ["Token", "name", "The token holding the variable's name"],
       [
+        "List<Token>",
+        "parameters",
+        "for functions, the list of variables it is defined in"
+      ],
+      [
         "Expr",
         "initializer",
         "If the variable is initialized on declaration, the inicializer is stored here"
@@ -133,7 +137,11 @@ int main() {
     ]),
     NodeType("Class", [
       ["Token", "name", "Token containing the class' name"],
-      ["VariableExpr", "superclass", "A variable containing a reference to the superclass"],
+      [
+        "VariableExpr",
+        "superclass",
+        "A variable containing a reference to the superclass"
+      ],
       ["List<RoutineStmt>", "methods", "A list of the class' methods"],
     ]),
   ], [
@@ -168,12 +176,14 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
 
   for (NodeType e in types) {
     String className = e.name + fileName;
-    source += "  dynamic visit$className($className ${fileName[0].toLowerCase()});\n";
+    source +=
+        "  dynamic visit$className($className ${fileName[0].toLowerCase()});\n";
   }
 
   source += "\n}\n";
 
-  source += "\nabstract class $fileName {\n dynamic accept($visitorClassName v);\n}\n\n";
+  source +=
+      "\nabstract class $fileName {\n dynamic accept($visitorClassName v);\n}\n\n";
 
   for (NodeType e in types) {
     String className = e.name + fileName;
@@ -185,12 +195,13 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
 
     source += '  $className(';
     int i;
-    for (i = 0; i < e.fields.length - 1; ++i) 
+    for (i = 0; i < e.fields.length - 1; ++i)
       source += "${e.fields[i][0]} this.${e.fields[i][1]}, ";
 
     source += "${e.fields[i][0]} this.${e.fields[i][1]});\n";
-    
-    source += " dynamic accept($visitorClassName v) => v.visit$className(this);\n";
+
+    source +=
+        " dynamic accept($visitorClassName v) => v.visit$className(this);\n";
 
     source += '\n}\n\n';
   }
