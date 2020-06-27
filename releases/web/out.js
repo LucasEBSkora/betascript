@@ -228,6 +228,17 @@
       _.__internal$_index = 0;
       _.__internal$_current = null;
       _.$ti = t2;
+    }, MappedIterable: function MappedIterable() {
+    }, EfficientLengthMappedIterable: function EfficientLengthMappedIterable(t0, t1, t2) {
+      this.__internal$_iterable = t0;
+      this._f = t1;
+      this.$ti = t2;
+    }, MappedIterator: function MappedIterator(t0, t1, t2) {
+      var _ = this;
+      _.__internal$_current = null;
+      _._iterator = t0;
+      _._f = t1;
+      _.$ti = t2;
     }, MappedListIterable: function MappedListIterable(t0, t1, t2) {
       this.__internal$_source = t0;
       this._f = t1;
@@ -328,11 +339,6 @@
     },
     argumentErrorValue: function(object) {
       return new P.ArgumentError(true, object, null, null);
-    },
-    checkNum: function(value) {
-      if (typeof value != "number")
-        throw H.wrapException(H.argumentErrorValue(value));
-      return value;
     },
     wrapException: function(ex) {
       var wrapper;
@@ -526,7 +532,7 @@
         case 4:
           return closure.call$4(arg1, arg2, arg3, arg4);
       }
-      throw H.wrapException(new P._Exception("Unsupported number of arguments for wrapped closure"));
+      throw H.wrapException(P.Exception_Exception("Unsupported number of arguments for wrapped closure"));
     },
     convertDartClosureToJS: function(closure, arity) {
       var $function;
@@ -825,6 +831,10 @@
     getRuntimeTypeArguments: function(interceptor, object, substitutionName) {
       return H.substitute(interceptor["$as" + H.S(substitutionName)], H.getRuntimeTypeInfo(object));
     },
+    getRuntimeType: function(object) {
+      var rti = object instanceof H.Closure ? H.closureFunctionType(object) : null;
+      return H.createRuntimeType(rti == null ? H.instanceType(object) : rti);
+    },
     substitute: function(substitution, $arguments) {
       if (substitution == null)
         return $arguments;
@@ -993,6 +1003,10 @@
       _._jsObject = t1;
       _._keys = t2;
       _.$ti = t3;
+    },
+    _ConstantMapKeyIterable: function _ConstantMapKeyIterable(t0, t1) {
+      this._map = t0;
+      this.$ti = t1;
     },
     TypeErrorDecoder: function TypeErrorDecoder(t0, t1, t2, t3, t4, t5) {
       var _ = this;
@@ -1274,6 +1288,22 @@
         return rti;
       }
       return type;
+    },
+    createRuntimeType: function(rti) {
+      var recipe, starErasedRecipe, starErasedRti,
+        type = rti._cachedRuntimeType;
+      if (type != null)
+        return type;
+      recipe = rti._canonicalRecipe;
+      starErasedRecipe = recipe.replace(/\*/g, "");
+      if (starErasedRecipe === recipe)
+        return rti._cachedRuntimeType = new H._Type(rti);
+      starErasedRti = H._Universe_eval(init.typeUniverse, starErasedRecipe, true);
+      type = starErasedRti._cachedRuntimeType;
+      return rti._cachedRuntimeType = type == null ? starErasedRti._cachedRuntimeType = new H._Type(starErasedRti) : type;
+    },
+    typeLiteral: function(recipe) {
+      return H.createRuntimeType(H._Universe_eval(init.typeUniverse, recipe, false));
     },
     _installSpecializedIsTest: function(object) {
       var testRti = this,
@@ -2294,6 +2324,9 @@
     _FunctionParameters: function _FunctionParameters() {
       this._optionalNamed = this._optionalPositional = this._requiredPositional = null;
     },
+    _Type: function _Type(t0) {
+      this._rti = t0;
+    },
     _Error: function _Error() {
     },
     _TypeError: function _TypeError(t0) {
@@ -2450,6 +2483,15 @@
         return receiver;
       return J.getNativeInterceptor(receiver);
     },
+    getInterceptor$a: function(receiver) {
+      if (receiver == null)
+        return receiver;
+      if (receiver.constructor == Array)
+        return J.JSArray.prototype;
+      if (!(receiver instanceof P.Object))
+        return J.UnknownJavaScriptObject.prototype;
+      return receiver;
+    },
     getInterceptor$ans: function(receiver) {
       if (typeof receiver == "number")
         return J.JSNumber.prototype;
@@ -2478,6 +2520,17 @@
       if (receiver instanceof P.Object)
         return receiver;
       return J.getNativeInterceptor(receiver);
+    },
+    getInterceptor$bn: function(receiver) {
+      if (typeof receiver == "number")
+        return J.JSNumber.prototype;
+      if (receiver == null)
+        return receiver;
+      if (typeof receiver == "boolean")
+        return J.JSBool.prototype;
+      if (!(receiver instanceof P.Object))
+        return J.UnknownJavaScriptObject.prototype;
+      return receiver;
     },
     getInterceptor$in: function(receiver) {
       if (typeof receiver == "number") {
@@ -2535,11 +2588,17 @@
     get$hashCode$: function(receiver) {
       return J.getInterceptor$(receiver).get$hashCode(receiver);
     },
+    get$iterator$a: function(receiver) {
+      return J.getInterceptor$a(receiver).get$iterator(receiver);
+    },
     get$length$asx: function(receiver) {
       return J.getInterceptor$asx(receiver).get$length(receiver);
     },
     get$onClick$x: function(receiver) {
       return J.getInterceptor$x(receiver).get$onClick(receiver);
+    },
+    get$runtimeType$: function(receiver) {
+      return J.getInterceptor$(receiver).get$runtimeType(receiver);
     },
     get$value$x: function(receiver) {
       return J.getInterceptor$x(receiver).get$value(receiver);
@@ -2596,20 +2655,25 @@
         return receiver - a0;
       return J.getInterceptor$n(receiver).$sub(receiver, a0);
     },
+    $xor$bn: function(receiver, a0) {
+      if (typeof receiver == "number" && typeof a0 == "number")
+        return (receiver ^ a0) >>> 0;
+      return J.getInterceptor$bn(receiver).$xor(receiver, a0);
+    },
     _addEventListener$3$x: function(receiver, a0, a1, a2) {
       return J.getInterceptor$x(receiver)._addEventListener$3(receiver, a0, a1, a2);
     },
     _codeUnitAt$1$s: function(receiver, a0) {
       return J.getInterceptor$s(receiver)._codeUnitAt$1(receiver, a0);
     },
+    compareTo$1$ns: function(receiver, a0) {
+      return J.getInterceptor$ns(receiver).compareTo$1(receiver, a0);
+    },
     substring$2$s: function(receiver, a0, a1) {
       return J.getInterceptor$s(receiver).substring$2(receiver, a0, a1);
     },
     toString$0$: function(receiver) {
       return J.getInterceptor$(receiver).toString$0(receiver);
-    },
-    toString$1$: function(receiver, a0) {
-      return J.getInterceptor$(receiver).toString$1(receiver, a0);
     },
     Interceptor: function Interceptor() {
     },
@@ -3053,8 +3117,20 @@
       this.f = t1;
       this.T = t2;
     },
+    LinkedHashMap_LinkedHashMap: function($K, $V) {
+      return new H.JsLinkedHashMap($K._eval$1("@<0>")._bind$1($V)._eval$1("JsLinkedHashMap<1,2>"));
+    },
     LinkedHashMap_LinkedHashMap$_literal: function(keyValuePairs, $K, $V) {
       return $K._eval$1("@<0>")._bind$1($V)._eval$1("LinkedHashMap<1,2>")._as(H.fillLiteralMap(keyValuePairs, new H.JsLinkedHashMap($K._eval$1("@<0>")._bind$1($V)._eval$1("JsLinkedHashMap<1,2>"))));
+    },
+    LinkedHashSet_LinkedHashSet: function($E) {
+      return new P._LinkedHashSet($E._eval$1("_LinkedHashSet<0>"));
+    },
+    _LinkedHashSet__newHashTable: function() {
+      var table = Object.create(null);
+      table["<non-identifier-key>"] = table;
+      delete table["<non-identifier-key>"];
+      return table;
     },
     IterableBase_iterableToShortString: function(iterable, leftDelimiter, rightDelimiter) {
       var parts, t1;
@@ -3102,7 +3178,7 @@
     },
     _iterablePartsToStrings: function(iterable, parts) {
       var next, ultimateString, penultimateString, penultimate, ultimate, ultimate0, elision,
-        it = iterable.get$iterator(iterable),
+        it = J.get$iterator$a(iterable),
         $length = 0, count = 0;
       while (true) {
         if (!($length < 80 || count < 3))
@@ -3181,6 +3257,13 @@
       C.JSArray_methods.add$1(parts, penultimateString);
       C.JSArray_methods.add$1(parts, ultimateString);
     },
+    LinkedHashSet_LinkedHashSet$from: function(elements, $E) {
+      var t1, _i,
+        result = P.LinkedHashSet_LinkedHashSet($E);
+      for (t1 = elements.length, _i = 0; _i < elements.length; elements.length === t1 || (0, H.throwConcurrentModificationError)(elements), ++_i)
+        result.add$1(0, $E._as(elements[_i]));
+      return result;
+    },
     MapBase_mapToString: function(m) {
       var result, t1 = {};
       if (P._isToStringVisiting(m))
@@ -3200,6 +3283,73 @@
       t1 = result._contents;
       return t1.charCodeAt(0) == 0 ? t1 : t1;
     },
+    MapBase__id: function(x) {
+      return x;
+    },
+    MapBase__fillMapWithMappedIterable: function(map, iterable, key, value) {
+      var t1, element;
+      for (t1 = iterable.get$iterator(iterable); t1.moveNext$0();) {
+        element = t1.get$current();
+        map.$indexSet(0, P.MapBase__id(element), value.call$1(element));
+      }
+    },
+    MapBase__fillMapWithIterables: function(map, keys, values) {
+      var t1 = keys.__internal$_iterable,
+        t2 = keys.$ti,
+        keyIterator = new H.MappedIterator(t1.get$iterator(t1), keys._f, t2._eval$1("@<1>")._bind$1(t2._rest[1])._eval$1("MappedIterator<1,2>")),
+        valueIterator = new J.ArrayIterator(values, values.length, H._arrayInstanceType(values)._eval$1("ArrayIterator<1>")),
+        hasNextKey = keyIterator.moveNext$0(),
+        hasNextValue = valueIterator.moveNext$0();
+      while (true) {
+        if (!(hasNextKey && hasNextValue))
+          break;
+        map.$indexSet(0, keyIterator.__internal$_current, valueIterator._current);
+        hasNextKey = keyIterator.moveNext$0();
+        hasNextValue = valueIterator.moveNext$0();
+      }
+      if (hasNextKey || hasNextValue)
+        throw H.wrapException(P.ArgumentError$("Iterables do not have same length."));
+    },
+    _dynamicCompare: function(a, b) {
+      var t1 = type$.Comparable_dynamic;
+      return J.compareTo$1$ns(t1._as(a), t1._as(b));
+    },
+    _defaultCompare: function($K) {
+      if ($K._eval$1("int(0,0)")._is(P.core_Comparable_compare$closure()))
+        return P.core_Comparable_compare$closure();
+      return P.collection___dynamicCompare$closure();
+    },
+    SplayTreeSet$: function(compare, isValidKey, $E) {
+      var t1 = P._defaultCompare($E);
+      return new P.SplayTreeSet(new P._SplayTreeNode(null, $E._eval$1("_SplayTreeNode<0>")), t1, new P.SplayTreeSet_closure($E), $E._eval$1("SplayTreeSet<0>"));
+    },
+    SplayTreeSet_SplayTreeSet$from: function(elements, $E) {
+      var _i,
+        result = P.SplayTreeSet$(null, null, $E);
+      for (_i = 0; _i < 1; ++_i)
+        result.add$1(0, $E._as(elements[_i]));
+      return result;
+    },
+    _LinkedHashSet: function _LinkedHashSet(t0) {
+      var _ = this;
+      _._collection$_length = 0;
+      _._collection$_last = _._collection$_first = _._collection$_rest = _._collection$_nums = _._collection$_strings = null;
+      _._collection$_modifications = 0;
+      _.$ti = t0;
+    },
+    _LinkedHashSetCell: function _LinkedHashSetCell(t0) {
+      this._element = t0;
+      this._collection$_next = null;
+    },
+    _LinkedHashSetIterator: function _LinkedHashSetIterator(t0, t1, t2) {
+      var _ = this;
+      _._set = t0;
+      _._collection$_modifications = t1;
+      _._collection$_current = _._collection$_cell = null;
+      _.$ti = t2;
+    },
+    IterableMixin: function IterableMixin() {
+    },
     MapBase: function MapBase() {
     },
     MapBase_mapToString_closure: function MapBase_mapToString_closure(t0, t1) {
@@ -3207,6 +3357,45 @@
       this.result = t1;
     },
     MapMixin: function MapMixin() {
+    },
+    SetMixin: function SetMixin() {
+    },
+    _SetBase: function _SetBase() {
+    },
+    _SplayTreeNode: function _SplayTreeNode(t0, t1) {
+      var _ = this;
+      _.key = t0;
+      _.right = _.left = null;
+      _.$ti = t1;
+    },
+    _SplayTree: function _SplayTree() {
+    },
+    _SplayTreeIterator: function _SplayTreeIterator() {
+    },
+    _SplayTreeKeyIterator: function _SplayTreeKeyIterator(t0, t1, t2, t3, t4) {
+      var _ = this;
+      _._tree = t0;
+      _._workList = t1;
+      _._modificationCount = t2;
+      _._splayCount = t3;
+      _._currentNode = null;
+      _.$ti = t4;
+    },
+    SplayTreeSet: function SplayTreeSet(t0, t1, t2, t3) {
+      var _ = this;
+      _._root = null;
+      _._dummy = t0;
+      _._comparator = t1;
+      _._validKey = t2;
+      _._splayCount = _._modificationCount = _._count = 0;
+      _.$ti = t3;
+    },
+    SplayTreeSet_closure: function SplayTreeSet_closure(t0) {
+      this.E = t0;
+    },
+    _SplayTreeSet__SplayTree_IterableMixin: function _SplayTreeSet__SplayTree_IterableMixin() {
+    },
+    _SplayTreeSet__SplayTree_IterableMixin_SetMixin: function _SplayTreeSet__SplayTree_IterableMixin_SetMixin() {
     },
     double_parse: function(source) {
       var value = H.Primitives_parseDouble(source);
@@ -3220,17 +3409,17 @@
       return "Instance of '" + H.S(H.Primitives_objectTypeName(object)) + "'";
     },
     StringBuffer__writeAll: function(string, objects, separator) {
-      var iterator = new J.ArrayIterator(objects, objects.length, H._arrayInstanceType(objects)._eval$1("ArrayIterator<1>"));
+      var iterator = J.get$iterator$a(objects);
       if (!iterator.moveNext$0())
         return string;
       if (separator.length === 0) {
         do
-          string += H.S(iterator._current);
+          string += H.S(iterator.get$current());
         while (iterator.moveNext$0());
       } else {
-        string += H.S(iterator._current);
+        string += H.S(iterator.get$current());
         for (; iterator.moveNext$0();)
-          string = string + separator + H.S(iterator._current);
+          string = string + separator + H.S(iterator.get$current());
       }
       return string;
     },
@@ -3246,6 +3435,10 @@
         return stackTrace;
       }
     },
+    Comparable_compare: function(a, b) {
+      var t1 = type$.Comparable_dynamic;
+      return J.compareTo$1$ns(t1._as(a), t1._as(b));
+    },
     Error_safeToString: function(object) {
       if (typeof object == "number" || H._isBool(object) || null == object)
         return J.toString$0$(object);
@@ -3255,6 +3448,9 @@
     },
     AssertionError$: function(message) {
       return new P.AssertionError(message);
+    },
+    ArgumentError$: function(message) {
+      return new P.ArgumentError(false, null, null, message);
     },
     ArgumentError$value: function(value, $name, message) {
       return new P.ArgumentError(true, value, $name, message);
@@ -3303,7 +3499,15 @@
     ConcurrentModificationError$: function(modifiedObject) {
       return new P.ConcurrentModificationError(modifiedObject);
     },
+    Exception_Exception: function(message) {
+      return new P._Exception(message);
+    },
+    print: function(object) {
+      H.printString(object);
+    },
     bool: function bool() {
+    },
+    Comparable: function Comparable() {
     },
     double: function double() {
     },
@@ -3370,6 +3574,8 @@
     },
     Iterable: function Iterable() {
     },
+    Iterator: function Iterator() {
+    },
     List: function List() {
     },
     Map: function Map() {
@@ -3390,6 +3596,9 @@
       this._contents = t0;
     },
     SvgElement: function SvgElement() {
+    },
+    _ProcessUtils__exit: function($status) {
+      throw H.wrapException(P.UnsupportedError$("ProcessUtils._exit"));
     }
   },
   W = {
@@ -3477,155 +3686,644 @@
       this.onData = t0;
     }
   },
-  U = {BSClass: function BSClass(t0, t1, t2) {
-      this.name = t0;
-      this._superclass = t1;
-      this._methods = t2;
-    }, NativeCallable: function NativeCallable(t0, t1) {
-      this._arity = t0;
-      this._function = t1;
-    }},
-  D = {Environment: function Environment(t0, t1) {
-      this.values = t0;
-      this.enclosing = t1;
+  S = {
+    abs: function(operand) {
+      if (operand instanceof G.Negative)
+        operand = operand.operand;
+      if (operand instanceof R.Number)
+        return operand;
+      return new S.AbsoluteValue(operand, null);
     },
-    exp: function(exponent, base) {
-      var t1 = J.getInterceptor$(exponent);
-      if (t1.$eq(exponent, R.Number$_(1)))
-        return base.withSign$1(base.negative);
-      if (t1.$eq(exponent, R.Number$_(0)))
-        return R.Number$_(1);
-      if (exponent instanceof R.Number && base instanceof R.Number && !exponent.isNamed && !base.isNamed)
-        return R.Number$_(Math.pow(base.get$value(base), exponent.get$value(exponent))).withSign$1(false);
+    AbsoluteValue: function AbsoluteValue(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    multiply: function(operands) {
+      var t2, divisionNegatives, i, divisions, i0, _op, nums, dens, _i, num, den, negativeForNumbers, negativeOthers, _negative, _mul,
+        t1 = operands.length;
+      if (t1 === 0)
+        return R.n(0);
+      S._openOtherMultiplications(operands);
+      for (t1 = type$.Division, t2 = type$.JSArray_BSFunction, divisionNegatives = false, i = 0; i < operands.length; ++i) {
+        divisions = H.setRuntimeTypeInfo([], t2);
+        for (i0 = 0; i0 < operands.length;) {
+          _op = X.BSFunction_extractFromNegative(operands[i0], t1);
+          if (_op.second) {
+            C.JSArray_methods.removeAt$1(operands, i0);
+            if (_op.third)
+              divisionNegatives = !divisionNegatives;
+            C.JSArray_methods.add$1(divisions, _op.first);
+          } else
+            ++i0;
+        }
+        if (divisions.length !== 0) {
+          nums = H.setRuntimeTypeInfo([], t2);
+          dens = H.setRuntimeTypeInfo([], t2);
+          C.JSArray_methods.addAll$1(nums, operands);
+          for (t1 = divisions.length, _i = 0; _i < divisions.length; divisions.length === t1 || (0, H.throwConcurrentModificationError)(divisions), ++_i) {
+            t2 = divisions[_i];
+            num = t2.numerator;
+            if (num instanceof S.Multiplication)
+              C.JSArray_methods.addAll$1(nums, num.operands);
+            else
+              C.JSArray_methods.add$1(nums, num);
+            den = t2.denominator;
+            if (den instanceof S.Multiplication)
+              C.JSArray_methods.addAll$1(dens, den.operands);
+            else
+              C.JSArray_methods.add$1(dens, den);
+          }
+          return K.divide(nums, dens);
+        }
+      }
+      negativeForNumbers = S._multiplyNumbers(operands);
+      negativeOthers = S._consolidateNegatives(operands);
+      if (!(negativeForNumbers && !negativeOthers))
+        _negative = !negativeForNumbers && negativeOthers;
       else
-        return new D.Exponentiation(base, exponent, false);
+        _negative = true;
+      if (!(_negative && !divisionNegatives))
+        _negative = !_negative && divisionNegatives;
+      else
+        _negative = true;
+      S._createExponents0(operands);
+      t1 = operands.length;
+      if (t1 === 0)
+        return R.n(0);
+      else if (t1 === 1) {
+        if (0 >= t1)
+          return H.ioore(operands, 0);
+        _mul = operands[0];
+      } else
+        _mul = new S.Multiplication(operands, null);
+      return _negative ? G.negative(_mul) : _mul;
     },
-    Exponentiation: function Exponentiation(t0, t1, t2) {
-      this.base = t0;
-      this.exponent = t1;
-      this.negative = t2;
+    _openOtherMultiplications: function(operands) {
+      var t1, i, _op;
+      for (t1 = type$.Multiplication, i = 0; i < operands.length;) {
+        _op = X.BSFunction_extractFromNegative(operands[i], t1);
+        if (_op.second) {
+          C.JSArray_methods.removeAt$1(operands, i);
+          C.JSArray_methods.insertAll$2(operands, i, _op.first.operands);
+          if (_op.third)
+            C.JSArray_methods.add$1(operands, R.n(-1));
+        } else
+          ++i;
+      }
+    },
+    _multiplyNumbers: function(operands) {
+      var t1, t2, number, i, _op, n, t3, negative, numbers, t4,
+        namedNumbers = new H.JsLinkedHashMap(type$.JsLinkedHashMap_of_String_and_Pair_double_int);
+      for (t1 = type$.Number, t2 = type$.Pair_double_int, number = 1, i = 0; i < operands.length;) {
+        _op = X.BSFunction_extractFromNegative(operands[i], t1);
+        if (_op.second) {
+          C.JSArray_methods.removeAt$1(operands, i);
+          n = _op.first;
+          if (!n.isNamed) {
+            t3 = n.absvalue;
+            number *= t3 * (_op.third ? -1 : 1);
+          } else {
+            t3 = n.name;
+            if (!namedNumbers.containsKey$1(t3))
+              namedNumbers.$indexSet(0, t3, new Z.Pair(n.absvalue, 0, t2));
+            t3 = namedNumbers.$index(0, t3);
+            t3.set$second(t3.second + 1);
+            if (_op.third)
+              number *= -1;
+          }
+        } else
+          ++i;
+      }
+      if (number === 0) {
+        C.JSArray_methods.set$length(operands, 0);
+        negative = false;
+      } else {
+        numbers = H.setRuntimeTypeInfo([], type$.JSArray_BSFunction);
+        negative = number < 0 && true;
+        t1 = Math.abs(number);
+        t2 = t1 === 1;
+        if (!t2)
+          C.JSArray_methods.add$1(numbers, R.n(t1));
+        for (t1 = namedNumbers.get$keys(), t1 = t1.get$iterator(t1); t1.moveNext$0();) {
+          t3 = t1.get$current();
+          if (namedNumbers.$index(0, t3).second !== 0) {
+            t4 = namedNumbers.$index(0, t3).first;
+            C.JSArray_methods.add$1(numbers, D.exp(R.n(namedNumbers.$index(0, t3).second), new R.Number(true, t4, t3, null)));
+          }
+        }
+        C.JSArray_methods.insertAll$2(operands, 0, numbers);
+        if (t2 && operands.length === 0)
+          C.JSArray_methods.add$1(operands, R.n(1));
+      }
+      return negative;
+    },
+    _consolidateNegatives: function(operands) {
+      var t2, newOperands, t1 = {};
+      t1._negative = false;
+      t2 = H._arrayInstanceType(operands);
+      newOperands = new H.MappedListIterable(operands, t2._eval$1("BSFunction(1)")._as(new S._consolidateNegatives_closure(t1)), t2._eval$1("MappedListIterable<1,BSFunction>")).toList$0(0);
+      C.JSArray_methods.set$length(operands, 0);
+      C.JSArray_methods.insertAll$2(operands, 0, newOperands);
+      return t1._negative;
+    },
+    _createExponents0: function(operands) {
+      var t1, i, f, base, exponent, j, j0, g, t2;
+      for (t1 = type$.JSArray_BSFunction, i = 0; i < operands.length; i = j) {
+        f = operands[i];
+        if (f instanceof D.Exponentiation) {
+          base = f.base;
+          exponent = f.exponent;
+        } else {
+          exponent = R.n(1);
+          base = f;
+        }
+        for (j = i + 1, j0 = j; j0 < operands.length; ++j0) {
+          g = operands[j0];
+          if (g instanceof D.Exponentiation) {
+            if (J.$eq$(g.base, base)) {
+              C.JSArray_methods.removeAt$1(operands, j0);
+              t2 = g.exponent;
+              exponent.toString;
+              exponent = N.add(H.setRuntimeTypeInfo([exponent, t2], t1));
+            }
+          } else if (J.$eq$(g, base)) {
+            C.JSArray_methods.removeAt$1(operands, j0);
+            t2 = R.n(1);
+            exponent.toString;
+            exponent = N.add(H.setRuntimeTypeInfo([exponent, t2], t1));
+          }
+        }
+        if (!J.$eq$(exponent, R.n(1))) {
+          C.JSArray_methods.removeAt$1(operands, i);
+          base.toString;
+          C.JSArray_methods.insert$2(operands, i, D.exp(exponent, base));
+        }
+      }
+    },
+    Multiplication: function Multiplication(t0, t1) {
+      this.operands = t0;
+      this._parameters = t1;
+    },
+    Multiplication_evaluate_closure: function Multiplication_evaluate_closure(t0, t1) {
+      this.ops = t0;
+      this.p = t1;
+    },
+    _consolidateNegatives_closure: function _consolidateNegatives_closure(t0) {
+      this._box_0 = t0;
     }
   },
-  N = {BSInstance: function BSInstance(t0, t1) {
+  Z = {
+    arcosh: function(operand) {
+      if (operand instanceof Z.CosH)
+        return operand.operand;
+      else
+        return new Z.ArCosH(operand, null);
+    },
+    ArCosH: function ArCosH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    arctgh: function(operand) {
+      if (operand instanceof G.CtgH)
+        return operand.operand;
+      else
+        return new Z.ArCtgH(operand, null);
+    },
+    ArCtgH: function ArCtgH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    arccsc: function(operand) {
+      if (operand instanceof Q.Csc)
+        return operand.operand;
+      else
+        return new Z.ArcCsc(operand, null);
+    },
+    ArcCsc: function ArcCsc(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    BetaScript_runForWeb: function(source) {
+      var t1 = {};
+      t1.output = "";
+      $.BetaScript_printCallback = new Z.BetaScript_runForWeb_closure(t1);
+      Z.BetaScript__run(source);
+      return t1.output;
+    },
+    BetaScript__run: function(source) {
+      var parser, statements, t1, t2, t3, map,
+        scanner = new X.BSScanner(source, H.setRuntimeTypeInfo([], type$.JSArray_Token));
+      scanner._BSScanner$_current = scanner._start = 0;
+      scanner._line = 1;
+      scanner._initializeMap$0();
+      parser = new R.BSParser(scanner.scanTokens$0());
+      parser._BSParser$_current = 0;
+      statements = parser.parse$0();
+      if ($.BetaScript_hadError)
+        return;
+      t1 = $.$get$BetaScript__interpreter();
+      t2 = H.setRuntimeTypeInfo([], type$.JSArray_Map_String_bool);
+      t3 = $.$get$nativeGlobals().get$keys();
+      map = P.LinkedHashMap_LinkedHashMap(type$.String, type$.bool);
+      P.MapBase__fillMapWithMappedIterable(map, t3, null, new F.Resolver_closure());
+      new F.Resolver(t1, C.RoutineType_0, C.ClassType_0, t2, map).resolveAll$1(statements);
+      if ($.BetaScript_hadError)
+        return;
+      t1.interpret$1(statements);
+    },
+    BetaScript_error: function(value, message) {
+      var t1, t2, t3;
+      if (H._isInt(value)) {
+        $.BetaScript_printCallback.call$1("[Line " + H.S(value) + "] Error : " + message);
+        $.BetaScript_hadError = true;
+      } else if (value instanceof V.Token) {
+        t1 = $.BetaScript_printCallback;
+        t2 = value.line;
+        if (value.type === C.TokenType_42) {
+          t1.call$1("[Line " + t2 + "] Error  at end: " + message);
+          $.BetaScript_hadError = true;
+        } else {
+          t3 = " at '" + value.lexeme + "'";
+          t1.call$1("[Line " + t2 + "] Error " + t3 + ": " + message);
+          $.BetaScript_hadError = true;
+        }
+      } else {
+        t1 = "at unknown location: '" + H.S(value) + "'";
+        $.BetaScript_printCallback.call$1("[Line " + -1 + "] Error " + t1 + ": " + message);
+        $.BetaScript_hadError = true;
+      }
+    },
+    BetaScript_runForWeb_closure: function BetaScript_runForWeb_closure(t0) {
+      this._box_0 = t0;
+    },
+    cosh: function(operand) {
+      if (operand instanceof Z.ArCosH)
+        return operand.operand;
+      else
+        return new Z.CosH(operand, null);
+    },
+    CosH: function CosH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    Pair: function Pair(t0, t1, t2) {
+      this.first = t0;
+      this.second = t1;
+      this.$ti = t2;
+    },
+    Trio: function Trio(t0, t1, t2, t3) {
+      var _ = this;
+      _.first = t0;
+      _.second = t1;
+      _.third = t2;
+      _.$ti = t3;
+    }
+  },
+  R = {
+    arcsch: function(operand) {
+      if (operand instanceof X.CscH)
+        return operand.operand;
+      else
+        return new R.ArCscH(operand, null);
+    },
+    ArCscH: function ArCscH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    arcsin: function(operand) {
+      if (operand instanceof U.Sin)
+        return operand.operand;
+      else
+        return new R.ArcSin(operand, null);
+    },
+    ArcSin: function ArcSin(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    ParseError: function ParseError() {
+    },
+    BSParser: function BSParser(t0) {
+      this._tokens = t0;
+      this._BSParser$_current = null;
+    },
+    n: function(value) {
+      if (typeof value !== "number")
+        return value.$lt();
+      if (value < 0)
+        return G.negative(R.Number$_(Math.abs(value), null));
+      return R.Number$_(value, null);
+    },
+    Number$_: function(value, params) {
+      var t1 = R.Number__makeName(value);
+      C.JSNumber_methods.toInt$0(value);
+      return new R.Number(false, Math.abs(value), t1, params);
+    },
+    Number__makeName: function(value) {
+      if (value === C.JSNumber_methods.toInt$0(value))
+        return C.JSInt_methods.toString$0(Math.abs(C.JSNumber_methods.toInt$0(value)));
+      else
+        return C.JSNumber_methods.toString$0(Math.abs(value));
+    },
+    Number: function Number(t0, t1, t2, t3) {
+      var _ = this;
+      _.isNamed = t0;
+      _.absvalue = t1;
+      _.name = t2;
+      _._parameters = t3;
+    },
+    root: function(operand) {
+      var t1, t2, t3, t4;
+      if (operand instanceof D.Exponentiation) {
+        t1 = operand.base;
+        t2 = operand.exponent;
+        t3 = R.n(2);
+        t2.toString;
+        t4 = type$.JSArray_BSFunction;
+        t4 = K.divide(H.setRuntimeTypeInfo([t2], t4), H.setRuntimeTypeInfo([t3], t4));
+        t1.toString;
+        return D.exp(t4, t1);
+      } else
+        return new R.Root(operand, null);
+    },
+    Root: function Root(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    }
+  },
+  T = {
+    arsech: function(operand) {
+      if (operand instanceof Q.SecH)
+        return operand.operand;
+      else
+        return new T.ArSecH(operand, null);
+    },
+    ArSecH: function ArSecH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    sgn: function(operand) {
+      var _f2,
+        _f1 = X.BSFunction_extractFromNegative(operand, type$.Number);
+      if (_f1.second)
+        if (_f1.first.absvalue === 0)
+          return R.n(0);
+        else
+          return R.n(_f1.third ? -1 : 1);
+      _f2 = X.BSFunction_extractFromNegative(operand, type$.AbsoluteValue);
+      if (_f2.second)
+        return R.n(_f2.third ? -1 : 1);
+      return new T.Signum(operand, null);
+    },
+    Signum: function Signum(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    }
+  },
+  E = {
+    arsinh: function(operand) {
+      if (operand instanceof U.SinH)
+        return operand.operand;
+      else
+        return new E.ArSinH(operand, null);
+    },
+    ArSinH: function ArSinH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    arctan: function(operand) {
+      if (operand instanceof M.Tan)
+        return operand.operand;
+      else
+        return new E.ArcTan(operand, null);
+    },
+    ArcTan: function ArcTan(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    }
+  },
+  Y = {
+    artanh: function(operand) {
+      if (operand instanceof X.TanH)
+        return operand.operand;
+      else
+        return new Y.ArTanH(operand, null);
+    },
+    ArTanH: function ArTanH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    BSInterpreter$: function() {
+      var t1 = new Y.BSInterpreter(new D.Environment(new H.JsLinkedHashMap(type$.JsLinkedHashMap_String_Object), null), new H.JsLinkedHashMap(type$.JsLinkedHashMap_Expr_int));
+      t1.BSInterpreter$0();
+      return t1;
+    },
+    BSInterpreter__isEqual: function(a, b) {
+      var t1 = a == null;
+      if (t1 && b == null)
+        return true;
+      if (t1 || b == null)
+        return false;
+      return J.$eq$(a, b);
+    },
+    BSInterpreter__checkNumberOperands: function(token, left, right) {
+      if (!(left instanceof X.BSFunction) || !(right instanceof X.BSFunction))
+        throw H.wrapException(Y.RuntimeError$0(token, "Operands for " + token.lexeme + " must be functions"));
+    },
+    RuntimeError$0: function(token, message) {
+      return new Y.RuntimeError0(token, message);
+    },
+    BSInterpreter: function BSInterpreter(t0, t1) {
+      this.globals = t0;
+      this._locals = t1;
+      this._environment = null;
+    },
+    RuntimeError0: function RuntimeError0(t0, t1) {
+      this.token = t0;
+      this.message = t1;
+    },
+    Return: function Return(t0) {
+      this.value = t0;
+    }
+  },
+  O = {
+    arccos: function(operand) {
+      if (operand instanceof O.Cos)
+        return operand.operand;
+      else
+        return new O.ArcCos(operand, null);
+    },
+    ArcCos: function ArcCos(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    cos: function(operand) {
+      if (operand instanceof O.ArcCos)
+        return operand.operand;
+      else
+        return new O.Cos(operand, null);
+    },
+    Cos: function Cos(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    }
+  },
+  N = {
+    arcctg: function(operand) {
+      if (operand instanceof L.Ctg)
+        return operand.operand;
+      else
+        return new N.ArcCtg(operand, null);
+    },
+    ArcCtg: function ArcCtg(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    BSInstance: function BSInstance(t0, t1) {
       this._class = t0;
       this._fields = t1;
-    }, Expr: function Expr() {
-    }, BinaryExpr: function BinaryExpr(t0, t1, t2) {
+    },
+    Expr: function Expr() {
+    },
+    BinaryExpr: function BinaryExpr(t0, t1, t2) {
       this.left = t0;
       this.op = t1;
       this.right = t2;
-    }, CallExpr: function CallExpr(t0, t1, t2) {
+    },
+    CallExpr: function CallExpr(t0, t1, t2) {
       this.callee = t0;
       this.paren = t1;
       this.$arguments = t2;
-    }, GetExpr: function GetExpr(t0, t1) {
+    },
+    GetExpr: function GetExpr(t0, t1) {
       this.object = t0;
       this.name = t1;
-    }, GroupingExpr: function GroupingExpr(t0) {
+    },
+    GroupingExpr: function GroupingExpr(t0) {
       this.expression = t0;
-    }, LiteralExpr: function LiteralExpr(t0) {
+    },
+    LiteralExpr: function LiteralExpr(t0) {
       this.value = t0;
-    }, UnaryExpr: function UnaryExpr(t0, t1) {
+    },
+    UnaryExpr: function UnaryExpr(t0, t1) {
       this.op = t0;
       this.right = t1;
-    }, VariableExpr: function VariableExpr(t0) {
+    },
+    VariableExpr: function VariableExpr(t0) {
       this.name = t0;
-    }, AssignExpr: function AssignExpr(t0, t1) {
+    },
+    AssignExpr: function AssignExpr(t0, t1) {
       this.name = t0;
       this.value = t1;
-    }, logicBinaryExpr: function logicBinaryExpr(t0, t1, t2) {
+    },
+    logicBinaryExpr: function logicBinaryExpr(t0, t1, t2) {
       this.left = t0;
       this.op = t1;
       this.right = t2;
-    }, SetExpr: function SetExpr(t0, t1, t2) {
+    },
+    SetExpr: function SetExpr(t0, t1, t2) {
       this.object = t0;
       this.name = t1;
       this.value = t2;
-    }, ThisExpr: function ThisExpr(t0) {
+    },
+    ThisExpr: function ThisExpr(t0) {
       this.keyword = t0;
-    }, SuperExpr: function SuperExpr(t0, t1) {
+    },
+    SuperExpr: function SuperExpr(t0, t1) {
       this.keyword = t0;
       this.method = t1;
+    },
+    sec: function(operand) {
+      if (operand instanceof D.ArcSec)
+        return operand.operand;
+      else
+        return new N.Sec(operand, null);
+    },
+    Sec: function Sec(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
     },
     add: function(operands) {
       var t1 = operands.length;
       if (t1 === 0)
-        return R.Number$_(0);
+        return R.n(0);
       N._openOtherSums(operands);
       N._SumNumbers(operands);
       N._createMultiplications(operands);
       t1 = operands.length;
       if (t1 === 0)
-        return R.Number$_(0);
+        return R.n(0);
       else if (t1 === 1) {
         if (0 >= t1)
           return H.ioore(operands, 0);
         return operands[0];
       } else
-        return new N.Sum(operands, false);
+        return new N.Sum(operands, null);
     },
     _openOtherSums: function(operands) {
-      var t1, t2, i, t3, s, t4, t5;
-      for (t1 = type$.Sum, t2 = type$.JSArray_bscFunction, i = 0; i < operands.length;) {
+      var t1, t2, i, t3, _op, s;
+      for (t1 = type$.Sum, t2 = type$.JSArray_BSFunction, i = 0; i < operands.length;) {
         t3 = {};
-        if (operands[i] instanceof N.Sum) {
+        _op = X.BSFunction_extractFromNegative(operands[i], t1);
+        if (_op.second) {
           s = t1._as(C.JSArray_methods.removeAt$1(operands, i));
           t3.newOperands = H.setRuntimeTypeInfo([], t2);
-          t4 = s.negative;
-          t5 = s.operands;
-          if (t4)
-            C.JSArray_methods.forEach$1(t5, new N._openOtherSums_closure(t3));
+          if (_op.third)
+            C.JSArray_methods.forEach$1(s.operands, new N._openOtherSums_closure(t3));
           else
-            t3.newOperands = t5;
+            t3.newOperands = s.operands;
           C.JSArray_methods.insertAll$2(operands, i, t3.newOperands);
         } else
           ++i;
       }
     },
     _SumNumbers: function(operands) {
-      var t1, t2, number, i, n, t3, t4, numbers, t5,
+      var t1, number, i, op, _negative, t2, t3, numbers, t4, t5,
         namedNumbers = new H.JsLinkedHashMap(type$.JsLinkedHashMap_of_String_and_Pair_double_int);
-      for (t1 = type$.Number, t2 = type$.Pair_double_int, number = 0, i = 0; i < operands.length;)
-        if (operands[i] instanceof R.Number) {
-          n = t1._as(C.JSArray_methods.removeAt$1(operands, i));
-          if (!n.isNamed) {
-            t3 = n.absvalue;
-            number += t3 * (n.negative ? -1 : 1);
+      for (t1 = type$.Pair_double_int, number = 0, i = 0; i < operands.length;) {
+        op = operands[i];
+        _negative = op instanceof G.Negative;
+        if (_negative)
+          op = op.operand;
+        if (op instanceof R.Number) {
+          C.JSArray_methods.removeAt$1(operands, i);
+          if (!op.isNamed) {
+            t2 = op.absvalue;
+            number += t2 * (_negative ? -1 : 1);
           } else {
-            t3 = n.name;
-            if (!namedNumbers.containsKey$1(t3)) {
-              t4 = n.absvalue;
-              namedNumbers.$indexSet(0, t3, new R.Pair(t4 * (n.negative ? -1 : 1), 0, t2));
-            }
-            t3 = namedNumbers.$index(0, t3);
-            t4 = t3.second;
-            t3.set$second(t4 + (n.negative ? -1 : 1));
+            t2 = op.name;
+            if (!namedNumbers.containsKey$1(t2))
+              namedNumbers.$indexSet(0, t2, new Z.Pair(op.absvalue, 0, t1));
+            t2 = namedNumbers.$index(0, t2);
+            t3 = t2.second;
+            t2.set$second(t3 + (_negative ? -1 : 1));
           }
         } else
           ++i;
-      t1 = type$.JSArray_bscFunction;
+      }
+      t1 = type$.JSArray_BSFunction;
       numbers = H.setRuntimeTypeInfo([], t1);
       if (number > 0)
-        C.JSArray_methods.add$1(numbers, R.Number$_(number));
+        C.JSArray_methods.add$1(numbers, R.n(number));
       else if (number < 0)
-        C.JSArray_methods.add$1(operands, R.Number$_(number));
-      for (t2 = new H.LinkedHashMapKeyIterable(namedNumbers, type$.LinkedHashMapKeyIterable_String), t2 = t2.get$iterator(t2); t2.moveNext$0();) {
-        t3 = t2.__js_helper$_current;
+        C.JSArray_methods.add$1(operands, R.n(number));
+      for (t2 = namedNumbers.get$keys(), t2 = t2.get$iterator(t2); t2.moveNext$0();) {
+        t3 = t2.get$current();
         if (namedNumbers.$index(0, t3).second !== 0) {
-          t4 = namedNumbers.$index(0, t3).second;
-          t5 = R.Number__makeName(t4);
-          C.JSInt_methods.toInt$0(t4);
-          C.JSArray_methods.add$1(numbers, S.multiply(H.setRuntimeTypeInfo([new R.Number(false, Math.abs(t4), t5, t4 < 0), new R.Number(true, namedNumbers.$index(0, t3).first, t3, false)], t1)));
+          t4 = R.n(namedNumbers.$index(0, t3).second);
+          t5 = namedNumbers.$index(0, t3).first;
+          t4.toString;
+          C.JSArray_methods.add$1(numbers, S.multiply(H.setRuntimeTypeInfo([t4, new R.Number(true, t5, t3, null)], t1)));
         }
       }
       C.JSArray_methods.insertAll$2(operands, 0, numbers);
     },
     _createMultiplications: function(operands) {
-      var t1, t2, t3, i, f, t4, t5, h, factor, j, j0, g, t6;
-      for (t1 = Math.abs(1), t2 = type$.JSArray_bscFunction, t3 = type$.bscFunction, i = 0; i < operands.length; i = j) {
+      var t1, t2, t3, i, f, _mul, t4, t5, h, factor, _f, j, j0, g, t6, _g;
+      for (t1 = type$.BSFunction, t2 = type$.Multiplication, t3 = type$.JSArray_BSFunction, i = 0; i < operands.length; i = j) {
         f = operands[i];
-        if (f instanceof S.Multiplication) {
-          t4 = f.operands;
+        _mul = X.BSFunction_extractFromNegative(f, t2);
+        if (_mul.second) {
+          t4 = _mul.first.operands;
           t5 = t4.length;
           if (t5 === 2) {
             if (0 >= t5)
@@ -3636,21 +4334,23 @@
         } else
           t4 = false;
         if (t4) {
-          t4 = f.operands;
+          t4 = _mul.first.operands;
           if (1 >= t4.length)
             return H.ioore(t4, 1);
           h = t4[1];
-          factor = t4[0];
+          t4 = R.n(_mul.third ? -1 : 1);
+          h.toString;
+          factor = S.multiply(H.setRuntimeTypeInfo([h, t4], t3));
         } else {
-          t4 = R.Number__makeName(1);
-          C.JSInt_methods.toInt$0(1);
-          factor = new R.Number(false, t1, t4, false);
-          h = f;
+          _f = X.BSFunction_extractFromNegative(f, t1);
+          h = _f.first;
+          factor = R.n(_f.third ? -1 : 1);
         }
         for (j = i + 1, t4 = J.getInterceptor$(h), j0 = j; j0 < operands.length; ++j0) {
           g = operands[j0];
-          if (g instanceof S.Multiplication) {
-            t5 = g.operands;
+          _mul = X.BSFunction_extractFromNegative(f, t2);
+          if (_mul.second) {
+            t5 = _mul.first.operands;
             t6 = t5.length;
             if (t6 === 2) {
               if (0 >= t6)
@@ -3661,7 +4361,7 @@
           } else
             t5 = false;
           if (t5) {
-            t5 = g.operands;
+            t5 = _mul.first.operands;
             if (1 >= t5.length)
               return H.ioore(t5, 1);
             if (t4.$eq(h, t5[1])) {
@@ -3669,33 +4369,35 @@
               if (0 >= t5.length)
                 return H.ioore(t5, 0);
               t5 = t5[0];
+              t6 = R.n(_mul.third ? -1 : 1);
+              t5.toString;
+              t6 = S.multiply(H.setRuntimeTypeInfo([t5, t6], t3));
               factor.toString;
-              factor = N.add(H.setRuntimeTypeInfo([factor, t3._as(t5)], t2));
+              factor = N.add(H.setRuntimeTypeInfo([factor, t6], t3));
             }
-          } else if (J.$eq$(g, h)) {
-            C.JSArray_methods.removeAt$1(operands, j0);
-            t5 = R.Number__makeName(1);
-            C.JSInt_methods.toInt$0(1);
-            factor.toString;
-            factor = N.add(H.setRuntimeTypeInfo([factor, new R.Number(false, t1, t5, false)], t2));
+          } else {
+            _g = X.BSFunction_extractFromNegative(g, t1);
+            if (J.$eq$(_g.first, h)) {
+              C.JSArray_methods.removeAt$1(operands, j0);
+              t5 = R.n(_g.third ? -1 : 1);
+              factor.toString;
+              factor = N.add(H.setRuntimeTypeInfo([factor, t5], t3));
+            }
           }
         }
-        t4 = R.Number__makeName(1);
-        C.JSInt_methods.toInt$0(1);
-        if (!J.$eq$(factor, new R.Number(false, t1, t4, false))) {
+        if (!J.$eq$(factor, R.n(1))) {
           C.JSArray_methods.removeAt$1(operands, i);
           factor.toString;
-          C.JSArray_methods.insert$2(operands, i, S.multiply(H.setRuntimeTypeInfo([factor, h], t2)));
+          C.JSArray_methods.insert$2(operands, i, S.multiply(H.setRuntimeTypeInfo([factor, h], t3)));
         }
       }
     },
     Sum: function Sum(t0, t1) {
       this.operands = t0;
-      this.negative = t1;
+      this._parameters = t1;
     },
-    Sum_call_closure: function Sum_call_closure(t0, t1) {
-      this._box_0 = t0;
-      this.p = t1;
+    Sum_evaluate_closure: function Sum_evaluate_closure(t0) {
+      this.p = t0;
     },
     _openOtherSums_closure: function _openOtherSums_closure(t0) {
       this._box_0 = t0;
@@ -3714,75 +4416,94 @@
     main_closure: function main_closure() {
     }
   },
-  Y = {
-    BSInterpreter$: function() {
-      var t1 = new Y.BSInterpreter(new D.Environment(new H.JsLinkedHashMap(type$.JsLinkedHashMap_String_Object), null), new H.JsLinkedHashMap(type$.JsLinkedHashMap_Expr_int));
-      t1.BSInterpreter$0();
-      return t1;
+  D = {
+    arcsec: function(operand) {
+      if (operand instanceof N.Sec)
+        return operand.operand;
+      else
+        return new D.ArcSec(operand, null);
     },
-    BSInterpreter__isEqual: function(a, b) {
-      var t1 = a == null;
-      if (t1 && b == null)
-        return true;
-      if (t1 || b == null)
-        return false;
-      return J.$eq$(a, b);
+    ArcSec: function ArcSec(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
     },
-    BSInterpreter__checkNumberOperands: function(token, left, right) {
-      if (!(left instanceof Z.bscFunction) || !(right instanceof Z.bscFunction))
-        throw H.wrapException(Y.RuntimeError$0(token, "Operands for " + token.lexeme + " must be numbers"));
+    Environment: function Environment(t0, t1) {
+      this.values = t0;
+      this.enclosing = t1;
     },
-    RuntimeError$0: function(token, message) {
-      return new Y.RuntimeError0(token, message);
+    exp: function(exponent, base) {
+      var t1 = J.getInterceptor$(exponent);
+      if (t1.$eq(exponent, R.n(1)))
+        return base;
+      if (t1.$eq(exponent, R.n(0)))
+        return R.n(1);
+      if (exponent instanceof R.Number && base instanceof R.Number && !exponent.isNamed && !base.isNamed)
+        return R.n(Math.pow(base.absvalue, exponent.absvalue));
+      else
+        return new D.Exponentiation(base, exponent, null);
     },
-    BSInterpreter: function BSInterpreter(t0, t1) {
-      this.globals = t0;
-      this._locals = t1;
-      this._environment = null;
-    },
-    BSInterpreter_closure: function BSInterpreter_closure() {
-    },
-    RuntimeError0: function RuntimeError0(t0, t1) {
-      this.token = t0;
-      this.message = t1;
-    },
-    Return: function Return(t0) {
-      this.value = t0;
+    Exponentiation: function Exponentiation(t0, t1, t2) {
+      this.base = t0;
+      this.exponent = t1;
+      this._parameters = t2;
     }
   },
-  R = {ParseError: function ParseError() {
-    }, BSParser: function BSParser(t0) {
-      this._tokens = t0;
-      this._BSParser$_current = null;
+  U = {BSClass: function BSClass(t0, t1, t2) {
+      this.name = t0;
+      this._superclass = t1;
+      this._methods = t2;
+    }, NativeCallable: function NativeCallable(t0, t1) {
+      this._arity = t0;
+      this._function = t1;
     },
-    Number$_: function(value) {
-      var t1;
-      if (typeof value !== "number")
-        return value.abs$0();
-      t1 = R.Number__makeName(value);
-      C.JSNumber_methods.toInt$0(value);
-      return new R.Number(false, Math.abs(value), t1, value < 0);
-    },
-    Number__makeName: function(value) {
-      if (value === C.JSNumber_methods.toInt$0(value))
-        return C.JSInt_methods.toString$0(Math.abs(C.JSNumber_methods.toInt$0(value)));
+    sin: function(operand) {
+      if (operand instanceof R.ArcSin)
+        return operand.operand;
       else
-        return C.JSNumber_methods.toString$0(Math.abs(value));
+        return new U.Sin(operand, null);
     },
-    Number: function Number(t0, t1, t2, t3) {
-      var _ = this;
-      _.isNamed = t0;
-      _.absvalue = t1;
-      _.name = t2;
-      _.negative = t3;
+    Sin: function Sin(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
     },
-    Pair: function Pair(t0, t1, t2) {
-      this.first = t0;
-      this.second = t1;
-      this.$ti = t2;
+    sinh: function(operand) {
+      if (operand instanceof E.ArSinH)
+        return operand.operand;
+      else
+        return new U.SinH(operand, null);
+    },
+    SinH: function SinH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
     }
   },
   X = {
+    BSFunction_extractFromNegative: function(f, $T) {
+      var _isInNegative, t1, t2;
+      if (f instanceof G.Negative) {
+        f = f.operand;
+        _isInNegative = true;
+      } else
+        _isInNegative = false;
+      t1 = $T._is(f);
+      t2 = t1 ? f : null;
+      return new Z.Trio(t2, t1, _isInNegative, $T._eval$1("Trio<0,bool,bool>"));
+    },
+    BetascriptFunctionError$: function(_message) {
+      return new X.BetascriptFunctionError(_message);
+    },
+    BSFunction: function BSFunction() {
+    },
+    BSFunction_call_closure: function BSFunction_call_closure() {
+    },
+    BSFunction_withParameters_closure: function BSFunction_withParameters_closure(t0) {
+      this.p = t0;
+    },
+    BSFunction_callThing_closure: function BSFunction_callThing_closure() {
+    },
+    BetascriptFunctionError: function BetascriptFunctionError(t0) {
+      this._BSFunction$_message = t0;
+    },
     BSScanner__IsDigit: function(c) {
       var t1 = c == null ? null : c.length;
       return (t1 == null ? 0 : t1) === 1 && (J._codeUnitAt$1$s(c, 0) ^ 48) <= 9;
@@ -3858,67 +4579,158 @@
     BSScanner__initializeMap_closure15: function BSScanner__initializeMap_closure15(t0) {
       this.$this = t0;
     },
-    BSScanner__initializeMap_closure16: function BSScanner__initializeMap_closure16() {
+    BSScanner__initializeMap_closure16: function BSScanner__initializeMap_closure16(t0) {
+      this.$this = t0;
     },
-    BSScanner__initializeMap_closure17: function BSScanner__initializeMap_closure17() {
+    BSScanner__initializeMap_closure17: function BSScanner__initializeMap_closure17(t0) {
+      this.$this = t0;
     },
     BSScanner__initializeMap_closure18: function BSScanner__initializeMap_closure18() {
     },
-    BSScanner__initializeMap_closure19: function BSScanner__initializeMap_closure19(t0) {
+    BSScanner__initializeMap_closure19: function BSScanner__initializeMap_closure19() {
+    },
+    BSScanner__initializeMap_closure20: function BSScanner__initializeMap_closure20() {
+    },
+    BSScanner__initializeMap_closure21: function BSScanner__initializeMap_closure21(t0) {
       this.$this = t0;
+    },
+    csch: function(operand) {
+      if (operand instanceof R.ArCscH)
+        return operand.operand;
+      else
+        return new X.CscH(operand, null);
+    },
+    CscH: function CscH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    tanh: function(operand) {
+      if (operand instanceof Y.ArTanH)
+        return operand.operand;
+      else
+        return new X.TanH(operand, null);
+    },
+    TanH: function TanH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    variable: function($name) {
+      return new X.Variable($name, null);
+    },
+    Variable: function Variable(t0, t1) {
+      this.name = t0;
+      this._parameters = t1;
     }
   },
-  Z = {
-    BetaScript_runForWeb: function(source) {
-      var t1 = {};
-      t1.output = "";
-      $.BetaScript_printCallback = new Z.BetaScript_runForWeb_closure(t1);
-      Z.BetaScript__run(source);
-      return t1.output;
+  Q = {
+    csc: function(operand) {
+      if (operand instanceof Z.ArcCsc)
+        return operand.operand;
+      else
+        return new Q.Csc(operand, null);
     },
-    BetaScript__run: function(source) {
-      var parser, statements, t1,
-        scanner = new X.BSScanner(source, H.setRuntimeTypeInfo([], type$.JSArray_Token));
-      scanner._BSScanner$_current = scanner._start = 0;
-      scanner._line = 1;
-      scanner._initializeMap$0();
-      parser = new R.BSParser(scanner.scanTokens$0());
-      parser._BSParser$_current = 0;
-      statements = parser.parse$0();
-      if ($.BetaScript_hadError)
-        return;
-      t1 = $.$get$BetaScript__interpreter();
-      new F.Resolver(t1, C.FunctionType_0, C.ClassType_0, H.setRuntimeTypeInfo([], type$.JSArray_Map_String_bool)).resolveAll$1(statements);
-      if ($.BetaScript_hadError)
-        return;
-      t1.interpret$1(statements);
+    Csc: function Csc(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
     },
-    BetaScript_error: function(value, message) {
-      var t1;
-      if (H._isInt(value))
-        Z.BetaScript__report(value, "", message);
-      else if (value instanceof V.Token) {
-        t1 = value.line;
-        if (value.type === C.TokenType_40)
-          Z.BetaScript__report(t1, " at end", message);
-        else
-          Z.BetaScript__report(t1, " at '" + value.lexeme + "'", message);
-      } else
-        Z.BetaScript__report(-1, "at unknown location: '" + J.toString$0$(value) + "'", message);
+    sech: function(operand) {
+      if (operand instanceof T.ArSecH)
+        return operand.operand;
+      else
+        return new Q.SecH(operand, null);
     },
-    BetaScript__report: function(line, where, message) {
-      $.BetaScript_printCallback.call$1("[line " + C.JSInt_methods.toString$0(line) + "] Error" + where + ": " + message);
-      $.BetaScript_hadError = true;
+    SecH: function SecH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    }
+  },
+  L = {
+    ctg: function(operand) {
+      if (operand instanceof N.ArcCtg)
+        return operand.operand;
+      else
+        return new L.Ctg(operand, null);
     },
-    BetaScript_runForWeb_closure: function BetaScript_runForWeb_closure(t0) {
-      this._box_0 = t0;
+    Ctg: function Ctg(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
     },
-    bscFunction: function bscFunction() {
+    Stmt: function Stmt() {
+    },
+    ExpressionStmt: function ExpressionStmt(t0) {
+      this.expression = t0;
+    },
+    PrintStmt: function PrintStmt(t0) {
+      this.expression = t0;
+    },
+    VarStmt: function VarStmt(t0, t1, t2) {
+      this.name = t0;
+      this.parameters = t1;
+      this.initializer = t2;
+    },
+    BlockStmt: function BlockStmt(t0) {
+      this.statements = t0;
+    },
+    IfStmt: function IfStmt(t0, t1, t2) {
+      this.condition = t0;
+      this.thenBranch = t1;
+      this.elseBranch = t2;
+    },
+    RoutineStmt: function RoutineStmt(t0, t1, t2) {
+      this.name = t0;
+      this.parameters = t1;
+      this.body = t2;
+    },
+    WhileStmt: function WhileStmt(t0, t1) {
+      this.condition = t0;
+      this.body = t1;
+    },
+    ReturnStmt: function ReturnStmt(t0, t1) {
+      this.keyword = t0;
+      this.value = t1;
+    },
+    ClassStmt: function ClassStmt(t0, t1, t2) {
+      this.name = t0;
+      this.superclass = t1;
+      this.methods = t2;
+    },
+    closure: function closure() {
+    },
+    singleOperandFunction: function singleOperandFunction() {
+    }
+  },
+  G = {
+    ctgh: function(operand) {
+      if (operand instanceof Z.ArCtgH)
+        return operand.operand;
+      else
+        return new G.CtgH(operand, null);
+    },
+    CtgH: function CtgH(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    negative: function(op) {
+      if (op instanceof G.Negative)
+        return op.operand;
+      if (J.$eq$(op, R.n(0)))
+        return op;
+      else
+        return new G.Negative(op, null);
+    },
+    Negative: function Negative(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    },
+    UserRoutine: function UserRoutine(t0, t1, t2) {
+      this._UserRoutine$_declaration = t0;
+      this._closure = t1;
+      this._isInitializer = t2;
     }
   },
   K = {
     divide: function(numeratorList, denominatorList) {
-      var numerator, denominator;
+      var numerator, denominator, t1, t2, t3, div;
       K._openMultiplicationsAndDivisions(numeratorList, denominatorList);
       K._createExponents(numeratorList);
       K._createExponents(denominatorList);
@@ -3927,54 +4739,62 @@
       if (denominatorList.length === 0)
         return numerator;
       denominator = S.multiply(denominatorList);
-      if (numerator.$eq(0, denominator))
-        return R.Number$_(1);
-      if (numerator.$eq(0, R.Number$_(0)))
-        return R.Number$_(0);
-      return new K.Division(numerator, denominator, false);
+      t1 = J.getInterceptor$(numerator);
+      if (t1.$eq(numerator, denominator))
+        return R.n(1);
+      if (t1.$eq(numerator, R.n(0)))
+        return R.n(0);
+      t1 = numerator instanceof G.Negative;
+      t2 = t1 ? numerator.operand : numerator;
+      t3 = denominator instanceof G.Negative;
+      div = new K.Division(t2, t3 ? denominator.operand : denominator, null);
+      if (!(t1 && !t3))
+        t1 = !t1 && t3;
+      else
+        t1 = true;
+      return t1 ? G.negative(div) : div;
     },
     _eliminateDuplicates: function(numeratorList, denominatorList) {
-      var t1, t2, i, t3, f, base, exponent, j, g;
-      for (t1 = Math.abs(1), t2 = type$.JSArray_bscFunction, i = 0; t3 = numeratorList.length, i < t3; ++i) {
+      var t1, i, t2, f, base, exponent, j, g;
+      for (t1 = type$.JSArray_BSFunction, i = 0; t2 = numeratorList.length, i < t2; ++i) {
         f = numeratorList[i];
         if (f instanceof D.Exponentiation) {
           base = f.base;
           exponent = f.exponent;
         } else {
-          t3 = R.Number__makeName(1);
-          C.JSInt_methods.toInt$0(1);
-          exponent = new R.Number(false, t1, t3, false);
+          exponent = R.n(1);
           base = f;
         }
         for (j = 0; j < denominatorList.length; ++j) {
           g = denominatorList[j];
           if (g instanceof D.Exponentiation) {
-            if (g.base.$eq(0, base)) {
+            if (J.$eq$(g.base, base)) {
               C.JSArray_methods.removeAt$1(denominatorList, j);
-              t3 = g.exponent;
+              t2 = g.exponent;
               exponent.toString;
-              exponent = N.add(H.setRuntimeTypeInfo([exponent, t3.withSign$1(!t3.negative)], t2));
+              t2.toString;
+              exponent = N.add(H.setRuntimeTypeInfo([exponent, G.negative(t2)], t1));
             }
           } else if (J.$eq$(g, base)) {
             C.JSArray_methods.removeAt$1(denominatorList, j);
-            t3 = R.Number__makeName(1);
-            C.JSInt_methods.toInt$0(1);
+            t2 = R.n(1);
             exponent.toString;
-            exponent = N.add(H.setRuntimeTypeInfo([exponent, new R.Number(false, t1, t3, false).withSign$1(true)], t2));
+            t2.toString;
+            exponent = N.add(H.setRuntimeTypeInfo([exponent, G.negative(t2)], t1));
           }
         }
         C.JSArray_methods.removeAt$1(numeratorList, i);
-        if (exponent instanceof R.Number && exponent.negative) {
-          t3 = exponent.withSign$1(!exponent.negative);
+        if (exponent instanceof G.Negative && exponent.operand instanceof R.Number) {
+          t2 = G.negative(exponent);
           base.toString;
-          C.JSArray_methods.add$1(denominatorList, D.exp(t3, base));
+          C.JSArray_methods.add$1(denominatorList, D.exp(t2, base));
         } else {
           base.toString;
           C.JSArray_methods.insert$2(numeratorList, i, D.exp(exponent, base));
         }
       }
-      if (t3 === 0)
-        C.JSArray_methods.add$1(numeratorList, R.Number$_(1));
+      if (t2 === 0)
+        C.JSArray_methods.add$1(numeratorList, R.n(1));
     },
     _openMultiplicationsAndDivisions: function(numeratorList, denominatorList) {
       var i, f, numerator, denominator;
@@ -4020,38 +4840,33 @@
       }
     },
     _createExponents: function(operands) {
-      var t1, t2, i, f, base, exponent, t3, j, j0, g;
-      for (t1 = Math.abs(1), t2 = type$.JSArray_bscFunction, i = 0; i < operands.length; i = j) {
+      var t1, i, f, base, exponent, j, j0, g, t2;
+      for (t1 = type$.JSArray_BSFunction, i = 0; i < operands.length; i = j) {
         f = operands[i];
         if (f instanceof D.Exponentiation) {
           base = f.base;
           exponent = f.exponent;
         } else {
-          t3 = R.Number__makeName(1);
-          C.JSInt_methods.toInt$0(1);
-          exponent = new R.Number(false, t1, t3, false);
+          exponent = R.n(1);
           base = f;
         }
         for (j = i + 1, j0 = j; j0 < operands.length; ++j0) {
           g = operands[j0];
           if (g instanceof D.Exponentiation) {
-            if (g.base.$eq(0, base)) {
+            if (J.$eq$(g.base, base)) {
               C.JSArray_methods.removeAt$1(operands, j0);
-              t3 = g.exponent;
+              t2 = g.exponent;
               exponent.toString;
-              exponent = N.add(H.setRuntimeTypeInfo([exponent, t3], t2));
+              exponent = N.add(H.setRuntimeTypeInfo([exponent, t2], t1));
             }
           } else if (J.$eq$(g, base)) {
             C.JSArray_methods.removeAt$1(operands, j0);
-            t3 = R.Number__makeName(1);
-            C.JSInt_methods.toInt$0(1);
+            t2 = R.n(1);
             exponent.toString;
-            exponent = N.add(H.setRuntimeTypeInfo([exponent, new R.Number(false, t1, t3, false)], t2));
+            exponent = N.add(H.setRuntimeTypeInfo([exponent, t2], t1));
           }
         }
-        t3 = R.Number__makeName(1);
-        C.JSInt_methods.toInt$0(1);
-        if (!J.$eq$(exponent, new R.Number(false, t1, t3, false))) {
+        if (!J.$eq$(exponent, R.n(1))) {
           C.JSArray_methods.removeAt$1(operands, i);
           base.toString;
           C.JSArray_methods.insert$2(operands, i, D.exp(exponent, base));
@@ -4061,227 +4876,53 @@
     Division: function Division(t0, t1, t2) {
       this.numerator = t0;
       this.denominator = t1;
-      this.negative = t2;
-    },
-    UserFunction: function UserFunction(t0, t1, t2) {
-      this._UserFunction$_declaration = t0;
-      this._closure = t1;
-      this._isInitializer = t2;
+      this._parameters = t2;
     }
   },
-  S = {
-    multiply: function(operands) {
-      var i, divisions, i0, nums, dens, t2, _i, f, num, den, negativeForNumbers, negativeOthers, negative,
-        t1 = operands.length;
-      if (t1 === 0)
-        return R.Number$_(0);
-      S._openOtherMultiplications(operands);
-      for (t1 = type$.JSArray_bscFunction, i = 0; i < operands.length; ++i) {
-        divisions = H.setRuntimeTypeInfo([], t1);
-        for (i0 = 0; i0 < operands.length;)
-          if (operands[i0] instanceof K.Division)
-            C.JSArray_methods.add$1(divisions, C.JSArray_methods.removeAt$1(operands, i0));
-          else
-            ++i0;
-        if (divisions.length !== 0) {
-          nums = H.setRuntimeTypeInfo([], t1);
-          dens = H.setRuntimeTypeInfo([], t1);
-          C.JSArray_methods.addAll$1(nums, operands);
-          for (t1 = divisions.length, t2 = type$.Division, _i = 0; _i < divisions.length; divisions.length === t1 || (0, H.throwConcurrentModificationError)(divisions), ++_i) {
-            f = t2._as(divisions[_i]);
-            num = f.numerator;
-            if (num instanceof S.Multiplication)
-              C.JSArray_methods.addAll$1(nums, num.operands);
-            else
-              C.JSArray_methods.add$1(nums, num);
-            den = f.denominator;
-            if (den instanceof S.Multiplication)
-              C.JSArray_methods.addAll$1(dens, den.operands);
-            else
-              C.JSArray_methods.add$1(dens, den);
-          }
-          return K.divide(nums, dens);
-        }
-      }
-      negativeForNumbers = S._multiplyNumbers(operands);
-      negativeOthers = S._consolidateNegatives(operands);
-      if (!(negativeForNumbers && !negativeOthers))
-        negative = !negativeForNumbers && negativeOthers;
+  F = {
+    log: function(operand, base) {
+      var t1 = J.getInterceptor$(operand);
+      if (t1.$eq(operand, R.n(1)))
+        return R.n(0);
+      else if (t1.$eq(operand, base))
+        return R.n(1);
       else
-        negative = true;
-      S._createExponents0(operands);
-      t1 = operands.length;
-      if (t1 === 0)
-        return R.Number$_(0);
-      if (t1 === 1) {
-        if (0 >= t1)
-          return H.ioore(operands, 0);
-        t1 = operands[0];
-        t2 = t1.negative;
-        return t1.withSign$1(negative ? !t2 : t2);
-      } else
-        return new S.Multiplication(operands, negative);
+        return new F.Log(base, operand, null);
     },
-    _openOtherMultiplications: function(operands) {
-      var t1, t2, i, m, t3;
-      for (t1 = type$.Multiplication, t2 = Math.abs(-1), i = 0; i < operands.length;)
-        if (operands[i] instanceof S.Multiplication) {
-          m = t1._as(C.JSArray_methods.removeAt$1(operands, i));
-          C.JSArray_methods.insertAll$2(operands, i, m.operands);
-          if (m.negative) {
-            t3 = R.Number__makeName(-1);
-            C.JSInt_methods.toInt$0(-1);
-            C.JSArray_methods.add$1(operands, new R.Number(false, t2, t3, true));
-          }
-        } else
-          ++i;
+    Log: function Log(t0, t1, t2) {
+      this.base = t0;
+      this.operand = t1;
+      this._parameters = t2;
     },
-    _multiplyNumbers: function(operands) {
-      var t1, t2, number, i, n, t3, negative, numbers, t4, t5, t6,
-        namedNumbers = new H.JsLinkedHashMap(type$.JsLinkedHashMap_of_String_and_Pair_double_int);
-      for (t1 = type$.Number, t2 = type$.Pair_double_int, number = 1, i = 0; i < operands.length;)
-        if (operands[i] instanceof R.Number) {
-          n = t1._as(C.JSArray_methods.removeAt$1(operands, i));
-          if (!n.isNamed) {
-            t3 = n.absvalue;
-            number *= t3 * (n.negative ? -1 : 1);
-          } else {
-            t3 = n.name;
-            if (!namedNumbers.containsKey$1(t3))
-              namedNumbers.$indexSet(0, t3, new R.Pair(n.absvalue, 0, t2));
-            t3 = namedNumbers.$index(0, t3);
-            t3.set$second(t3.second + 1);
-            if (n.negative)
-              number *= -1;
-          }
-        } else
-          ++i;
-      if (number === 0) {
-        C.JSArray_methods.set$length(operands, 0);
-        negative = false;
-      } else {
-        numbers = H.setRuntimeTypeInfo([], type$.JSArray_bscFunction);
-        negative = number < 0 && true;
-        t1 = Math.abs(number);
-        t2 = t1 === 1;
-        if (!t2)
-          C.JSArray_methods.add$1(numbers, R.Number$_(t1));
-        for (t1 = new H.LinkedHashMapKeyIterable(namedNumbers, type$.LinkedHashMapKeyIterable_String), t1 = t1.get$iterator(t1); t1.moveNext$0();) {
-          t3 = t1.__js_helper$_current;
-          if (namedNumbers.$index(0, t3).second !== 0) {
-            t4 = namedNumbers.$index(0, t3).first;
-            t5 = namedNumbers.$index(0, t3).second;
-            t6 = R.Number__makeName(t5);
-            C.JSInt_methods.toInt$0(t5);
-            C.JSArray_methods.add$1(numbers, D.exp(new R.Number(false, Math.abs(t5), t6, t5 < 0), new R.Number(true, t4, t3, false)));
-          }
-        }
-        C.JSArray_methods.insertAll$2(operands, 0, numbers);
-        if (t2 && operands.length === 0)
-          C.JSArray_methods.add$1(operands, R.Number$_(1));
-      }
-      return negative;
-    },
-    _consolidateNegatives: function(operands) {
-      var t2, newOperands, t1 = {};
-      t1.negative = false;
-      t2 = H._arrayInstanceType(operands);
-      newOperands = new H.MappedListIterable(operands, t2._eval$1("bscFunction(1)")._as(new S._consolidateNegatives_closure(t1)), t2._eval$1("MappedListIterable<1,bscFunction>")).toList$0(0);
-      C.JSArray_methods.set$length(operands, 0);
-      C.JSArray_methods.insertAll$2(operands, 0, newOperands);
-      return t1.negative;
-    },
-    _createExponents0: function(operands) {
-      var t1, t2, i, f, base, exponent, t3, j, j0, g;
-      for (t1 = Math.abs(1), t2 = type$.JSArray_bscFunction, i = 0; i < operands.length; i = j) {
-        f = operands[i];
-        if (f instanceof D.Exponentiation) {
-          base = f.base;
-          exponent = f.exponent;
-        } else {
-          t3 = R.Number__makeName(1);
-          C.JSInt_methods.toInt$0(1);
-          exponent = new R.Number(false, t1, t3, false);
-          base = f;
-        }
-        for (j = i + 1, j0 = j; j0 < operands.length; ++j0) {
-          g = operands[j0];
-          if (g instanceof D.Exponentiation) {
-            if (g.base.$eq(0, base)) {
-              C.JSArray_methods.removeAt$1(operands, j0);
-              t3 = g.exponent;
-              exponent.toString;
-              exponent = N.add(H.setRuntimeTypeInfo([exponent, t3], t2));
-            }
-          } else if (J.$eq$(g, base)) {
-            C.JSArray_methods.removeAt$1(operands, j0);
-            t3 = R.Number__makeName(1);
-            C.JSInt_methods.toInt$0(1);
-            exponent.toString;
-            exponent = N.add(H.setRuntimeTypeInfo([exponent, new R.Number(false, t1, t3, false)], t2));
-          }
-        }
-        t3 = R.Number__makeName(1);
-        C.JSInt_methods.toInt$0(1);
-        if (!J.$eq$(exponent, new R.Number(false, t1, t3, false))) {
-          C.JSArray_methods.removeAt$1(operands, i);
-          base.toString;
-          C.JSArray_methods.insert$2(operands, i, D.exp(exponent, base));
-        }
-      }
-    },
-    Multiplication: function Multiplication(t0, t1) {
-      this.operands = t0;
-      this.negative = t1;
-    },
-    Multiplication_call_closure: function Multiplication_call_closure(t0, t1) {
-      this._box_0 = t0;
-      this.p = t1;
-    },
-    _consolidateNegatives_closure: function _consolidateNegatives_closure(t0) {
-      this._box_0 = t0;
-    }
-  },
-  F = {FunctionType: function FunctionType(t0) {
+    RoutineType: function RoutineType(t0) {
       this._Resolver$_name = t0;
-    }, ClassType: function ClassType(t0) {
+    },
+    ClassType: function ClassType(t0) {
       this._Resolver$_name = t0;
-    }, Resolver: function Resolver(t0, t1, t2, t3) {
+    },
+    Resolver: function Resolver(t0, t1, t2, t3, t4) {
       var _ = this;
       _._interpreter = t0;
-      _._currentFunction = t1;
+      _._currentRoutine = t1;
       _._currentClass = t2;
       _._scopes = t3;
-    }},
-  L = {Stmt: function Stmt() {
-    }, ExpressionStmt: function ExpressionStmt(t0) {
-      this.expression = t0;
-    }, PrintStmt: function PrintStmt(t0) {
-      this.expression = t0;
-    }, VarStmt: function VarStmt(t0, t1) {
-      this.name = t0;
-      this.initializer = t1;
-    }, BlockStmt: function BlockStmt(t0) {
-      this.statements = t0;
-    }, IfStmt: function IfStmt(t0, t1, t2) {
-      this.condition = t0;
-      this.thenBranch = t1;
-      this.elseBranch = t2;
-    }, FunctionStmt: function FunctionStmt(t0, t1, t2) {
-      this.name = t0;
-      this.parameters = t1;
-      this.body = t2;
-    }, WhileStmt: function WhileStmt(t0, t1) {
-      this.condition = t0;
-      this.body = t1;
-    }, ReturnStmt: function ReturnStmt(t0, t1) {
-      this.keyword = t0;
-      this.value = t1;
-    }, ClassStmt: function ClassStmt(t0, t1, t2) {
-      this.name = t0;
-      this.superclass = t1;
-      this.methods = t2;
-    }},
+      _._globals = t4;
+    },
+    Resolver_closure: function Resolver_closure() {
+    }
+  },
+  M = {
+    tan: function(operand) {
+      if (operand instanceof E.ArcTan)
+        return operand.operand;
+      else
+        return new M.Tan(operand, null);
+    },
+    Tan: function Tan(t0, t1) {
+      this.operand = t0;
+      this._parameters = t1;
+    }
+  },
   V = {TokenType: function TokenType(t0) {
       this._Token$_name = t0;
     }, Token: function Token(t0, t1, t2, t3) {
@@ -4291,7 +4932,7 @@
       _.literal = t2;
       _.line = t3;
     }};
-  var holders = [C, H, J, P, W, U, D, N, Y, R, X, Z, K, S, F, L, V];
+  var holders = [C, H, J, P, W, S, Z, R, T, E, Y, O, N, D, U, X, Q, L, G, K, F, M, V];
   hunkHelpers.setFunctionNamesIfNecessary(holders);
   var $ = {};
   H.JS_CONST.prototype = {};
@@ -4304,11 +4945,20 @@
     },
     toString$0: function(receiver) {
       return "Instance of '" + H.S(H.Primitives_objectTypeName(receiver)) + "'";
+    },
+    get$runtimeType: function(receiver) {
+      return H.getRuntimeType(receiver);
     }
   };
   J.JSBool.prototype = {
     toString$0: function(receiver) {
       return String(receiver);
+    },
+    $xor: function(receiver, other) {
+      H._asBoolNullable(other);
+      if (!H._isBool(other))
+        H.throwExpression(H.argumentErrorValue(other));
+      return receiver !== other;
     },
     get$hashCode: function(receiver) {
       return receiver ? 519018 : 218159;
@@ -4324,6 +4974,9 @@
     },
     get$hashCode: function(receiver) {
       return 0;
+    },
+    get$runtimeType: function(receiver) {
+      return C.Type_Null_Yyn;
     },
     $isNull: 1
   };
@@ -4448,6 +5101,9 @@
     toString$0: function(receiver) {
       return P.IterableBase_iterableToFullString(receiver, "[", "]");
     },
+    get$iterator: function(receiver) {
+      return new J.ArrayIterator(receiver, receiver.length, H._arrayInstanceType(receiver)._eval$1("ArrayIterator<1>"));
+    },
     get$hashCode: function(receiver) {
       return H.Primitives_objectHashCode(receiver);
     },
@@ -4485,6 +5141,9 @@
   };
   J.JSUnmodifiableArray.prototype = {};
   J.ArrayIterator.prototype = {
+    get$current: function() {
+      return this._current;
+    },
     moveNext$0: function() {
       var t2, _this = this,
         t1 = _this._iterable,
@@ -4502,9 +5161,39 @@
     },
     set$_current: function(_current) {
       this._current = this.$ti._precomputed1._as(_current);
-    }
+    },
+    $isIterator: 1
   };
   J.JSNumber.prototype = {
+    compareTo$1: function(receiver, b) {
+      var bIsNegative;
+      H._asNumNullable(b);
+      if (typeof b != "number")
+        throw H.wrapException(H.argumentErrorValue(b));
+      if (receiver < b)
+        return -1;
+      else if (receiver > b)
+        return 1;
+      else if (receiver === b) {
+        if (receiver === 0) {
+          bIsNegative = this.get$isNegative(b);
+          if (this.get$isNegative(receiver) === bIsNegative)
+            return 0;
+          if (this.get$isNegative(receiver))
+            return -1;
+          return 1;
+        }
+        return 0;
+      } else if (isNaN(receiver)) {
+        if (isNaN(b))
+          return 0;
+        return 1;
+      } else
+        return -1;
+    },
+    get$isNegative: function(receiver) {
+      return receiver === 0 ? 1 / receiver < 0 : receiver < 0;
+    },
     toInt$0: function(receiver) {
       var t1;
       if (receiver >= -2147483648 && receiver <= 2147483647)
@@ -4572,6 +5261,12 @@
     _shrBothPositive$1: function(receiver, other) {
       return other > 31 ? 0 : receiver >>> other;
     },
+    $xor: function(receiver, other) {
+      H._asNumNullable(other);
+      if (typeof other != "number")
+        throw H.wrapException(H.argumentErrorValue(other));
+      return (receiver ^ other) >>> 0;
+    },
     $lt: function(receiver, other) {
       H._asNumNullable(other);
       if (typeof other != "number")
@@ -4596,6 +5291,10 @@
         throw H.wrapException(H.argumentErrorValue(other));
       return receiver >= other;
     },
+    get$runtimeType: function(receiver) {
+      return C.Type_num_cv7;
+    },
+    $isComparable: 1,
     $isdouble: 1,
     $isnum: 1
   };
@@ -4603,9 +5302,16 @@
     $negate: function(receiver) {
       return -receiver;
     },
+    get$runtimeType: function(receiver) {
+      return C.Type_int_tHn;
+    },
     $isint: 1
   };
-  J.JSDouble.prototype = {};
+  J.JSDouble.prototype = {
+    get$runtimeType: function(receiver) {
+      return C.Type_double_K1J;
+    }
+  };
   J.JSString.prototype = {
     codeUnitAt$1: function(receiver, index) {
       if (index < 0)
@@ -4625,13 +5331,6 @@
         throw H.wrapException(P.ArgumentError$value(other, null, null));
       return receiver + other;
     },
-    endsWith$1: function(receiver, other) {
-      var otherLength = other.length,
-        t1 = receiver.length;
-      if (otherLength > t1)
-        return false;
-      return other === this.substring$1(receiver, t1 - otherLength);
-    },
     substring$2: function(receiver, startIndex, endIndex) {
       if (endIndex == null)
         endIndex = receiver.length;
@@ -4642,9 +5341,6 @@
       if (endIndex > receiver.length)
         throw H.wrapException(P.RangeError$value(endIndex, null));
       return receiver.substring(startIndex, endIndex);
-    },
-    substring$1: function($receiver, startIndex) {
-      return this.substring$2($receiver, startIndex, null);
     },
     trim$0: function(receiver) {
       var startIndex, t1, endIndex0,
@@ -4687,6 +5383,7 @@
     },
     compareTo$1: function(receiver, other) {
       var t1;
+      H._asStringNullable(other);
       if (typeof other != "string")
         throw H.wrapException(H.argumentErrorValue(other));
       if (receiver === other)
@@ -4709,9 +5406,13 @@
       hash ^= hash >> 11;
       return 536870911 & hash + ((16383 & hash) << 15);
     },
+    get$runtimeType: function(receiver) {
+      return C.Type_String_k8F;
+    },
     get$length: function(receiver) {
       return receiver.length;
     },
+    $isComparable: 1,
     $isString: 1
   };
   H.EfficientLengthIterable.prototype = {};
@@ -4753,6 +5454,37 @@
     },
     set$__internal$_current: function(_current) {
       this.__internal$_current = this.$ti._precomputed1._as(_current);
+    },
+    $isIterator: 1
+  };
+  H.MappedIterable.prototype = {
+    get$iterator: function(_) {
+      var t1 = this.__internal$_iterable,
+        t2 = H._instanceType(this);
+      return new H.MappedIterator(t1.get$iterator(t1), this._f, t2._eval$1("@<1>")._bind$1(t2._rest[1])._eval$1("MappedIterator<1,2>"));
+    },
+    get$length: function(_) {
+      var t1 = this.__internal$_iterable;
+      return t1.get$length(t1);
+    }
+  };
+  H.EfficientLengthMappedIterable.prototype = {};
+  H.MappedIterator.prototype = {
+    moveNext$0: function() {
+      var _this = this,
+        t1 = _this._iterator;
+      if (t1.moveNext$0()) {
+        _this.set$__internal$_current(_this._f.call$1(t1.get$current()));
+        return true;
+      }
+      _this.set$__internal$_current(null);
+      return false;
+    },
+    get$current: function() {
+      return this.__internal$_current;
+    },
+    set$__internal$_current: function(_current) {
+      this.__internal$_current = this.$ti._rest[1]._as(_current);
     }
   };
   H.MappedListIterable.prototype = {
@@ -4777,6 +5509,8 @@
       return this.__js_helper$_length;
     },
     containsKey$1: function(key) {
+      if (typeof key != "string")
+        return false;
       if ("__proto__" === key)
         return false;
       return this._jsObject.hasOwnProperty(key);
@@ -4798,6 +5532,18 @@
         key = keys[i];
         f.call$2(key, t1._as(this._fetch$1(key)));
       }
+    },
+    get$keys: function() {
+      return new H._ConstantMapKeyIterable(this, H._instanceType(this)._eval$1("_ConstantMapKeyIterable<1>"));
+    }
+  };
+  H._ConstantMapKeyIterable.prototype = {
+    get$iterator: function(_) {
+      var t1 = this._map._keys;
+      return new J.ArrayIterator(t1, t1.length, H._arrayInstanceType(t1)._eval$1("ArrayIterator<1>"));
+    },
+    get$length: function(_) {
+      return this._map._keys.length;
     }
   };
   H.TypeErrorDecoder.prototype = {
@@ -4859,7 +5605,7 @@
           error.$thrownJsError = this.ex;
       return error;
     },
-    $signature: 5
+    $signature: 4
   };
   H._StackTrace.prototype = {
     toString$0: function(_) {
@@ -4937,6 +5683,9 @@
     get$length: function(_) {
       return this.__js_helper$_length;
     },
+    get$keys: function() {
+      return new H.LinkedHashMapKeyIterable(this, H._instanceType(this)._eval$1("LinkedHashMapKeyIterable<1>"));
+    },
     containsKey$1: function(key) {
       var strings, t1;
       if (typeof key == "string") {
@@ -4950,10 +5699,11 @@
       }
     },
     internalContainsKey$1: function(key) {
-      var rest = this.__js_helper$_rest;
+      var _this = this,
+        rest = _this.__js_helper$_rest;
       if (rest == null)
         return false;
-      return this.internalFindBucketIndex$2(this._getTableBucket$2(rest, J.get$hashCode$(key) & 0x3ffffff), key) >= 0;
+      return _this.internalFindBucketIndex$2(_this._getTableBucket$2(rest, _this.internalComputeHashCode$1(key)), key) >= 0;
     },
     $index: function(_, key) {
       var strings, cell, t1, nums, _this = this, _null = null;
@@ -4975,18 +5725,18 @@
         return _this.internalGet$1(key);
     },
     internalGet$1: function(key) {
-      var bucket, index,
-        rest = this.__js_helper$_rest;
+      var bucket, index, _this = this,
+        rest = _this.__js_helper$_rest;
       if (rest == null)
         return null;
-      bucket = this._getTableBucket$2(rest, J.get$hashCode$(key) & 0x3ffffff);
-      index = this.internalFindBucketIndex$2(bucket, key);
+      bucket = _this._getTableBucket$2(rest, _this.internalComputeHashCode$1(key));
+      index = _this.internalFindBucketIndex$2(bucket, key);
       if (index < 0)
         return null;
       return bucket[index].hashMapCellValue;
     },
     $indexSet: function(_, key, value) {
-      var strings, nums, rest, hash, bucket, index, _this = this,
+      var strings, nums, _this = this,
         t1 = H._instanceType(_this);
       t1._precomputed1._as(key);
       t1._rest[1]._as(value);
@@ -4996,21 +5746,27 @@
       } else if (typeof key == "number" && (key & 0x3ffffff) === key) {
         nums = _this._nums;
         _this._addHashTableEntry$3(nums == null ? _this._nums = _this._newHashTable$0() : nums, key, value);
-      } else {
-        rest = _this.__js_helper$_rest;
-        if (rest == null)
-          rest = _this.__js_helper$_rest = _this._newHashTable$0();
-        hash = J.get$hashCode$(key) & 0x3ffffff;
-        bucket = _this._getTableBucket$2(rest, hash);
-        if (bucket == null)
-          _this._setTableEntry$3(rest, hash, [_this._newLinkedCell$2(key, value)]);
-        else {
-          index = _this.internalFindBucketIndex$2(bucket, key);
-          if (index >= 0)
-            bucket[index].hashMapCellValue = value;
-          else
-            bucket.push(_this._newLinkedCell$2(key, value));
-        }
+      } else
+        _this.internalSet$2(key, value);
+    },
+    internalSet$2: function(key, value) {
+      var rest, hash, bucket, index, _this = this,
+        t1 = H._instanceType(_this);
+      t1._precomputed1._as(key);
+      t1._rest[1]._as(value);
+      rest = _this.__js_helper$_rest;
+      if (rest == null)
+        rest = _this.__js_helper$_rest = _this._newHashTable$0();
+      hash = _this.internalComputeHashCode$1(key);
+      bucket = _this._getTableBucket$2(rest, hash);
+      if (bucket == null)
+        _this._setTableEntry$3(rest, hash, [_this._newLinkedCell$2(key, value)]);
+      else {
+        index = _this.internalFindBucketIndex$2(bucket, key);
+        if (index >= 0)
+          bucket[index].hashMapCellValue = value;
+        else
+          bucket.push(_this._newLinkedCell$2(key, value));
       }
     },
     forEach$1: function(_, action) {
@@ -5047,6 +5803,9 @@
       ++_this.__js_helper$_length;
       _this._modifications = _this._modifications + 1 & 67108863;
       return cell;
+    },
+    internalComputeHashCode$1: function(key) {
+      return J.get$hashCode$(key) & 0x3ffffff;
     },
     internalFindBucketIndex$2: function(bucket, key) {
       var $length, i;
@@ -5120,25 +5879,26 @@
     },
     set$__js_helper$_current: function(_current) {
       this.__js_helper$_current = this.$ti._precomputed1._as(_current);
-    }
+    },
+    $isIterator: 1
   };
   H.initHooks_closure.prototype = {
     call$1: function(o) {
       return this.getTag(o);
     },
-    $signature: 5
+    $signature: 4
   };
   H.initHooks_closure0.prototype = {
     call$2: function(o, tag) {
       return this.getUnknownTag(o, tag);
     },
-    $signature: 6
+    $signature: 8
   };
   H.initHooks_closure1.prototype = {
     call$1: function(tag) {
       return this.prototypeForTag(H._asStringNullable(tag));
     },
-    $signature: 7
+    $signature: 9
   };
   H.Rti.prototype = {
     _eval$1: function(recipe) {
@@ -5149,6 +5909,11 @@
     }
   };
   H._FunctionParameters.prototype = {};
+  H._Type.prototype = {
+    toString$0: function(_) {
+      return H._rtiToString(this._rti, null);
+    }
+  };
   H._Error.prototype = {
     toString$0: function(_) {
       return this.__rti$_message;
@@ -5172,7 +5937,7 @@
       t2 = this.span;
       t1.firstChild ? t1.removeChild(t2) : t1.appendChild(t2);
     },
-    $signature: 8
+    $signature: 10
   };
   P._AsyncRun__scheduleImmediateJsOverride_internalCallback.prototype = {
     call$0: function() {
@@ -5355,7 +6120,7 @@
     call$1: function(error) {
       return this.call$2(error, null);
     },
-    $signature: 9
+    $signature: 11
   };
   P._Future__chainForeignFuture_closure1.prototype = {
     call$0: function() {
@@ -5408,7 +6173,7 @@
     call$1: function(_) {
       return this.originalSource;
     },
-    $signature: 10
+    $signature: 12
   };
   P._Future__propagateToListeners_handleValueCallback.prototype = {
     call$0: function() {
@@ -5594,6 +6359,128 @@
       return this.T._eval$1("~(0)");
     }
   };
+  P._LinkedHashSet.prototype = {
+    get$iterator: function(_) {
+      var _this = this,
+        t1 = new P._LinkedHashSetIterator(_this, _this._collection$_modifications, H._instanceType(_this)._eval$1("_LinkedHashSetIterator<1>"));
+      t1._collection$_cell = _this._collection$_first;
+      return t1;
+    },
+    get$length: function(_) {
+      return this._collection$_length;
+    },
+    contains$1: function(_, object) {
+      var t1 = this._contains$1(object);
+      return t1;
+    },
+    _contains$1: function(object) {
+      var rest = this._collection$_rest;
+      if (rest == null)
+        return false;
+      return this._findBucketIndex$2(rest[this._computeHashCode$1(object)], object) >= 0;
+    },
+    add$1: function(_, element) {
+      var strings, nums, _this = this;
+      H._instanceType(_this)._precomputed1._as(element);
+      if (typeof element == "string" && element !== "__proto__") {
+        strings = _this._collection$_strings;
+        return _this._collection$_addHashTableEntry$2(strings == null ? _this._collection$_strings = P._LinkedHashSet__newHashTable() : strings, element);
+      } else if (typeof element == "number" && (element & 1073741823) === element) {
+        nums = _this._collection$_nums;
+        return _this._collection$_addHashTableEntry$2(nums == null ? _this._collection$_nums = P._LinkedHashSet__newHashTable() : nums, element);
+      } else
+        return _this._add$1(element);
+    },
+    _add$1: function(element) {
+      var rest, hash, bucket, _this = this;
+      H._instanceType(_this)._precomputed1._as(element);
+      rest = _this._collection$_rest;
+      if (rest == null)
+        rest = _this._collection$_rest = P._LinkedHashSet__newHashTable();
+      hash = _this._computeHashCode$1(element);
+      bucket = rest[hash];
+      if (bucket == null)
+        rest[hash] = [_this._collection$_newLinkedCell$1(element)];
+      else {
+        if (_this._findBucketIndex$2(bucket, element) >= 0)
+          return false;
+        bucket.push(_this._collection$_newLinkedCell$1(element));
+      }
+      return true;
+    },
+    _collection$_addHashTableEntry$2: function(table, element) {
+      H._instanceType(this)._precomputed1._as(element);
+      if (type$._LinkedHashSetCell._as(table[element]) != null)
+        return false;
+      table[element] = this._collection$_newLinkedCell$1(element);
+      return true;
+    },
+    _collection$_newLinkedCell$1: function(element) {
+      var _this = this,
+        cell = new P._LinkedHashSetCell(H._instanceType(_this)._precomputed1._as(element));
+      if (_this._collection$_first == null)
+        _this._collection$_first = _this._collection$_last = cell;
+      else
+        _this._collection$_last = _this._collection$_last._collection$_next = cell;
+      ++_this._collection$_length;
+      _this._collection$_modifications = 1073741823 & _this._collection$_modifications + 1;
+      return cell;
+    },
+    _computeHashCode$1: function(element) {
+      return J.get$hashCode$(element) & 1073741823;
+    },
+    _findBucketIndex$2: function(bucket, element) {
+      var $length, i;
+      if (bucket == null)
+        return -1;
+      $length = bucket.length;
+      for (i = 0; i < $length; ++i)
+        if (J.$eq$(bucket[i]._element, element))
+          return i;
+      return -1;
+    }
+  };
+  P._LinkedHashSetCell.prototype = {};
+  P._LinkedHashSetIterator.prototype = {
+    get$current: function() {
+      return this._collection$_current;
+    },
+    moveNext$0: function() {
+      var _this = this,
+        t1 = _this._set;
+      if (_this._collection$_modifications !== t1._collection$_modifications)
+        throw H.wrapException(P.ConcurrentModificationError$(t1));
+      else {
+        t1 = _this._collection$_cell;
+        if (t1 == null) {
+          _this.set$_collection$_current(null);
+          return false;
+        } else {
+          _this.set$_collection$_current(_this.$ti._precomputed1._as(t1._element));
+          _this._collection$_cell = _this._collection$_cell._collection$_next;
+          return true;
+        }
+      }
+    },
+    set$_collection$_current: function(_current) {
+      this._collection$_current = this.$ti._precomputed1._as(_current);
+    },
+    $isIterator: 1
+  };
+  P.IterableMixin.prototype = {
+    get$length: function(_) {
+      var count, _this = this,
+        t1 = _this.$ti,
+        it = new P._SplayTreeKeyIterator(_this, H.setRuntimeTypeInfo([], t1._eval$1("JSArray<_SplayTreeNode<1>>")), _this._modificationCount, _this._splayCount, t1._eval$1("_SplayTreeKeyIterator<1>"));
+      it._findLeftMostDescendent$1(_this._root);
+      for (count = 0; it.moveNext$0();)
+        ++count;
+      return count;
+    },
+    toString$0: function(_) {
+      return P.IterableBase_iterableToShortString(this, "(", ")");
+    }
+  };
   P.MapBase.prototype = {};
   P.MapBase_mapToString_closure.prototype = {
     call$2: function(k, v) {
@@ -5607,18 +6494,265 @@
       t1._contents = t2 + ": ";
       t1._contents += H.S(v);
     },
-    $signature: 11
+    $signature: 13
   };
   P.MapMixin.prototype = {
     get$length: function(_) {
-      return this.__js_helper$_length;
+      var t1 = this.get$keys();
+      return t1.get$length(t1);
     },
     toString$0: function(_) {
       return P.MapBase_mapToString(this);
     },
     $isMap: 1
   };
+  P.SetMixin.prototype = {
+    map$1$1: function(_, f, $T) {
+      var t1 = this.$ti;
+      return new H.EfficientLengthMappedIterable(this, t1._bind$1($T)._eval$1("1(2)")._as(f), t1._eval$1("@<1>")._bind$1($T)._eval$1("EfficientLengthMappedIterable<1,2>"));
+    },
+    toString$0: function(_) {
+      return P.IterableBase_iterableToFullString(this, "{", "}");
+    },
+    forEach$1: function(_, f) {
+      var _this = this,
+        t1 = _this.$ti;
+      t1._eval$1("~(1)")._as(f);
+      for (t1 = new P._SplayTreeKeyIterator(_this, H.setRuntimeTypeInfo([], t1._eval$1("JSArray<_SplayTreeNode<1>>")), _this._modificationCount, _this._splayCount, t1._eval$1("_SplayTreeKeyIterator<1>")), t1._findLeftMostDescendent$1(_this._root); t1.moveNext$0();)
+        f.call$1(t1.get$current());
+    }
+  };
+  P._SetBase.prototype = {
+    addAll$1: function(_, elements) {
+      var t1;
+      H._instanceType(this)._eval$1("Iterable<1>")._as(elements);
+      for (t1 = elements.get$iterator(elements); t1.moveNext$0();)
+        this.add$1(0, t1.get$current());
+    },
+    map$1$1: function(_, f, $T) {
+      var t1 = H._instanceType(this);
+      return new H.EfficientLengthMappedIterable(this, t1._bind$1($T)._eval$1("1(2)")._as(f), t1._eval$1("@<1>")._bind$1($T)._eval$1("EfficientLengthMappedIterable<1,2>"));
+    },
+    toString$0: function(_) {
+      return P.IterableBase_iterableToFullString(this, "{", "}");
+    },
+    $isIterable: 1,
+    $isSet: 1
+  };
+  P._SplayTreeNode.prototype = {
+    set$left: function(left) {
+      this.left = this.$ti._as(left);
+    },
+    set$right: function(right) {
+      this.right = this.$ti._as(right);
+    }
+  };
+  P._SplayTree.prototype = {
+    _splay$1: function(key) {
+      var current, left, t2, right, left0, comp, t3, t4, t5, tmp, current0, _this = this,
+        t1 = _this.$ti;
+      t1._eval$1("_SplayTree.K")._as(key);
+      current = _this._root;
+      if (current == null)
+        return -1;
+      left = _this._dummy;
+      for (t2 = t1._eval$1("_SplayTree.1"), t1 = t1._precomputed1, right = left, left0 = right, comp = null; true;) {
+        t3 = t1._as(current.key);
+        t1._as(key);
+        t4 = _this._comparator;
+        t3 = t4.call$2(t3, key);
+        if (typeof t3 !== "number")
+          return t3.$gt();
+        if (t3 > 0) {
+          t5 = current.left;
+          if (t5 == null) {
+            comp = t3;
+            break;
+          }
+          t3 = t4.call$2(t1._as(t5.key), key);
+          if (typeof t3 !== "number")
+            return t3.$gt();
+          if (t3 > 0) {
+            tmp = current.left;
+            current.set$left(tmp.right);
+            tmp.set$right(current);
+            t2._as(tmp);
+            if (tmp.left == null) {
+              comp = t3;
+              current = tmp;
+              break;
+            }
+            current = tmp;
+          }
+          right.set$left(current);
+          current0 = t2._as(current.left);
+          comp = t3;
+          right = current;
+          current = current0;
+        } else {
+          if (t3 < 0) {
+            t5 = current.right;
+            if (t5 == null) {
+              comp = t3;
+              break;
+            }
+            t3 = t4.call$2(t1._as(t5.key), key);
+            if (typeof t3 !== "number")
+              return t3.$lt();
+            if (t3 < 0) {
+              tmp = t2._as(current.right);
+              current.set$right(tmp.left);
+              tmp.set$left(current);
+              if (tmp.right == null) {
+                comp = t3;
+                current = tmp;
+                break;
+              }
+              current = tmp;
+            }
+            left0.set$right(current);
+            current0 = t2._as(current.right);
+          } else {
+            comp = t3;
+            break;
+          }
+          comp = t3;
+          left0 = current;
+          current = current0;
+        }
+      }
+      left0.set$right(current.left);
+      right.set$left(current.right);
+      current.set$left(left.right);
+      current.set$right(left.left);
+      _this.set$_root(current);
+      left.set$right(null);
+      left.set$left(null);
+      ++_this._splayCount;
+      return comp;
+    },
+    _addNewRoot$2: function(node, comp) {
+      var t1, _this = this;
+      _this.$ti._eval$1("_SplayTree.1")._as(node);
+      ++_this._count;
+      ++_this._modificationCount;
+      t1 = _this._root;
+      if (t1 == null) {
+        _this.set$_root(node);
+        return;
+      }
+      if (typeof comp !== "number")
+        return comp.$lt();
+      if (comp < 0) {
+        node.set$left(t1);
+        node.set$right(_this._root.right);
+        _this._root.set$right(null);
+      } else {
+        node.set$right(t1);
+        node.set$left(_this._root.left);
+        _this._root.set$left(null);
+      }
+      _this.set$_root(node);
+    }
+  };
+  P._SplayTreeIterator.prototype = {
+    get$current: function() {
+      var t1 = this._currentNode;
+      if (t1 == null)
+        return null;
+      return this.$ti._eval$1("_SplayTreeNode<1>")._as(t1).key;
+    },
+    _findLeftMostDescendent$1: function(node) {
+      var t1;
+      this.$ti._eval$1("_SplayTreeNode<_SplayTreeIterator.K>")._as(node);
+      for (t1 = this._workList; node != null;) {
+        C.JSArray_methods.add$1(t1, node);
+        node = node.left;
+      }
+    },
+    moveNext$0: function() {
+      var t2, t3, _this = this,
+        t1 = _this._tree;
+      if (_this._modificationCount !== t1._modificationCount)
+        throw H.wrapException(P.ConcurrentModificationError$(t1));
+      t2 = _this._workList;
+      if (t2.length === 0) {
+        _this.set$_currentNode(null);
+        return false;
+      }
+      if (t1._splayCount !== _this._splayCount && _this._currentNode != null) {
+        t3 = _this.$ti._eval$1("_SplayTreeNode<_SplayTreeIterator.K>")._as(_this._currentNode);
+        C.JSArray_methods.set$length(t2, 0);
+        if (t3 == null)
+          _this._findLeftMostDescendent$1(t1._root);
+        else {
+          t1._splay$1(t3.key);
+          _this._findLeftMostDescendent$1(t1._root.right);
+        }
+      }
+      if (0 >= t2.length)
+        return H.ioore(t2, -1);
+      _this.set$_currentNode(t2.pop());
+      _this._findLeftMostDescendent$1(_this._currentNode.right);
+      return true;
+    },
+    set$_currentNode: function(_currentNode) {
+      this._currentNode = this.$ti._eval$1("_SplayTreeNode<_SplayTreeIterator.K>")._as(_currentNode);
+    },
+    $isIterator: 1
+  };
+  P._SplayTreeKeyIterator.prototype = {};
+  P.SplayTreeSet.prototype = {
+    get$iterator: function(_) {
+      var _this = this,
+        t1 = _this.$ti;
+      t1 = new P._SplayTreeKeyIterator(_this, H.setRuntimeTypeInfo([], t1._eval$1("JSArray<_SplayTreeNode<1>>")), _this._modificationCount, _this._splayCount, t1._eval$1("_SplayTreeKeyIterator<1>"));
+      t1._findLeftMostDescendent$1(_this._root);
+      return t1;
+    },
+    get$length: function(_) {
+      return this._count;
+    },
+    add$1: function(_, element) {
+      var compare,
+        t1 = this.$ti;
+      t1._precomputed1._as(element);
+      compare = this._splay$1(element);
+      if (compare === 0)
+        return false;
+      this._addNewRoot$2(new P._SplayTreeNode(element, t1._eval$1("_SplayTreeNode<1>")), compare);
+      return true;
+    },
+    addAll$1: function(_, elements) {
+      var t2, element, compare,
+        t1 = this.$ti;
+      t1._eval$1("Iterable<1>")._as(elements);
+      for (t2 = elements.get$iterator(elements), t1 = t1._eval$1("_SplayTreeNode<1>"); t2.moveNext$0();) {
+        element = t2.get$current();
+        compare = this._splay$1(element);
+        if (compare !== 0)
+          this._addNewRoot$2(new P._SplayTreeNode(element, t1), compare);
+      }
+    },
+    toString$0: function(_) {
+      return P.IterableBase_iterableToFullString(this, "{", "}");
+    },
+    set$_root: function(_root) {
+      this._root = this.$ti._eval$1("_SplayTreeNode<1>")._as(_root);
+    },
+    $isIterable: 1,
+    $isSet: 1
+  };
+  P.SplayTreeSet_closure.prototype = {
+    call$1: function(v) {
+      return this.E._is(v);
+    },
+    $signature: 5
+  };
+  P._SplayTreeSet__SplayTree_IterableMixin.prototype = {};
+  P._SplayTreeSet__SplayTree_IterableMixin_SetMixin.prototype = {};
   P.bool.prototype = {};
+  P.Comparable.prototype = {};
   P.double.prototype = {};
   P.Error.prototype = {
     get$stackTrace: function() {
@@ -5789,6 +6923,7 @@
       return P.IterableBase_iterableToShortString(this, "(", ")");
     }
   };
+  P.Iterator.prototype = {};
   P.List.prototype = {$isIterable: 1};
   P.Map.prototype = {};
   P.Null.prototype = {
@@ -5799,7 +6934,7 @@
       return "null";
     }
   };
-  P.num.prototype = {};
+  P.num.prototype = {$isComparable: 1};
   P.Object.prototype = {constructor: P.Object, $isObject: 1,
     $eq: function(_, other) {
       return this === other;
@@ -5809,6 +6944,9 @@
     },
     toString$0: function(_) {
       return "Instance of '" + H.S(H.Primitives_objectTypeName(this)) + "'";
+    },
+    get$runtimeType: function(_) {
+      return H.getRuntimeType(this);
     },
     toString: function() {
       return this.toString$0(this);
@@ -5821,7 +6959,7 @@
     },
     $isStackTrace: 1
   };
-  P.String.prototype = {};
+  P.String.prototype = {$isComparable: 1};
   P.StringBuffer.prototype = {
     get$length: function(_) {
       return this._contents.length;
@@ -5943,11 +7081,133 @@
     call$1: function(e) {
       return this.onData.call$1(type$.Event._as(e));
     },
-    $signature: 12
+    $signature: 14
   };
   P.SvgElement.prototype = {
     get$onClick: function(receiver) {
       return new W._ElementEventStreamImpl(receiver, "click", false, type$._ElementEventStreamImpl_MouseEvent);
+    }
+  };
+  S.AbsoluteValue.prototype = {
+    evaluate$1: function(p) {
+      return S.abs(this.operand.evaluate$1(type$.Map_String_BSFunction._as(p)));
+    },
+    toString$0: function(_) {
+      return "|" + H.S(this.operand) + "|";
+    },
+    copy$1: function(params) {
+      return new S.AbsoluteValue(this.operand, type$.Set_Variable._as(params));
+    },
+    get$defaultParameters: function() {
+      return this.operand.get$defaultParameters();
+    }
+  };
+  Z.ArCosH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return Z.arcosh(op);
+    },
+    copy$1: function(params) {
+      return new Z.ArCosH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  R.ArCscH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return R.arcsch(op);
+    },
+    copy$1: function(params) {
+      return new R.ArCscH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  Z.ArCtgH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return Z.arctgh(op);
+    },
+    copy$1: function(params) {
+      return new Z.ArCtgH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  T.ArSecH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return T.arsech(op);
+    },
+    copy$1: function(params) {
+      return new T.ArSecH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  E.ArSinH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return E.arsinh(op);
+    },
+    copy$1: function(params) {
+      return new E.ArSinH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  Y.ArTanH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return Y.artanh(op);
+    },
+    copy$1: function(params) {
+      return new Y.ArTanH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  O.ArcCos.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return O.arccos(op);
+    },
+    copy$1: function(params) {
+      return new O.ArcCos(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  Z.ArcCsc.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return Z.arccsc(op);
+    },
+    copy$1: function(params) {
+      return new Z.ArcCsc(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  N.ArcCtg.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return N.arcctg(op);
+    },
+    copy$1: function(params) {
+      return new N.ArcCtg(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  D.ArcSec.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return D.arcsec(op);
+    },
+    copy$1: function(params) {
+      return new D.ArcSec(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  R.ArcSin.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return R.arcsin(op);
+    },
+    copy$1: function(params) {
+      return new R.ArcSin(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  E.ArcTan.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return E.arctan(op);
+    },
+    copy$1: function(params) {
+      return new E.ArcTan(this.operand, type$.Set_Variable._as(params));
     }
   };
   U.BSClass.prototype = {
@@ -5956,17 +7216,16 @@
     },
     get$arity: function() {
       var t1 = this.findMethod$1(this.name);
-      t1 = t1 == null ? null : t1._UserFunction$_declaration.parameters.length;
+      t1 = t1 == null ? null : t1._UserRoutine$_declaration.parameters.length;
       return t1 == null ? 0 : t1;
     },
-    call$2: function(interpreter, $arguments) {
+    callThing$2: function(interpreter, $arguments) {
       var instance, initializer;
-      type$.BSInterpreter._as(interpreter);
       type$.List_Object._as($arguments);
       instance = new N.BSInstance(this, new H.JsLinkedHashMap(type$.JsLinkedHashMap_String_Object));
       initializer = this.findMethod$1(this.name);
       if (initializer != null)
-        initializer.bind$1(instance).call$2(interpreter, $arguments);
+        initializer.bind$1(instance).callThing$2(interpreter, $arguments);
       return instance;
     },
     findMethod$1: function($name) {
@@ -5993,7 +7252,17 @@
       t1 = this.enclosing;
       if (t1 != null)
         return t1.$get$1($name);
-      throw H.wrapException(Y.RuntimeError$0($name, "Undefined variable '" + t2 + "'."));
+      throw H.wrapException(Y.RuntimeError$0($name, "Undefined variable '" + t2 + "'"));
+    },
+    search$1: function(_, $name) {
+      var t1 = this.values,
+        t2 = $name.lexeme;
+      if (t1.containsKey$1(t2))
+        return t1.$index(0, t2);
+      t1 = this.enclosing;
+      if (t1 != null)
+        return t1.search$1(0, $name);
+      return null;
     },
     assign$2: function($name, value) {
       var t1 = this.values,
@@ -6005,7 +7274,7 @@
         if (t1 != null)
           t1.assign$2($name, value);
         else
-          throw H.wrapException(Y.RuntimeError$0($name, "Undefined variable '" + t2 + "'."));
+          throw H.wrapException(Y.RuntimeError$0($name, "Undefined variable '" + t2 + "'"));
       }
     },
     _ancestor$1: function(distance) {
@@ -6017,6 +7286,95 @@
       for (; i < distance; ++i)
         e = e.enclosing;
       return e;
+    }
+  };
+  X.BSFunction.prototype = {
+    call$1: function(parameters) {
+      var _p, t1, t2, map;
+      type$.List_BSFunction._as(parameters);
+      _p = this.get$parameters();
+      if (parameters.length !== _p.get$length(_p))
+        throw H.wrapException(X.BetascriptFunctionError$("Error! Missing parameters in function call!"));
+      t1 = type$.String;
+      t2 = this.get$parameters().map$1$1(0, new X.BSFunction_call_closure(), t1);
+      map = P.LinkedHashMap_LinkedHashMap(t1, type$.BSFunction);
+      P.MapBase__fillMapWithIterables(map, t2, parameters);
+      return this.evaluate$1(map);
+    },
+    get$parameters: function() {
+      var t1 = this._parameters;
+      return t1 == null ? this.get$defaultParameters() : t1;
+    },
+    withParameters$1: function(p) {
+      type$.Set_Variable._as(p);
+      this.get$defaultParameters().forEach$1(0, new X.BSFunction_withParameters_closure(p));
+      return this.copy$1(p);
+    },
+    $negate: function(_) {
+      return G.negative(this);
+    },
+    $add: function(_, other) {
+      return N.add(H.setRuntimeTypeInfo([this, type$.BSFunction._as(other)], type$.JSArray_BSFunction));
+    },
+    $sub: function(_, other) {
+      type$.BSFunction._as(other);
+      other.toString;
+      return N.add(H.setRuntimeTypeInfo([this, G.negative(other)], type$.JSArray_BSFunction));
+    },
+    $mul: function(_, other) {
+      return S.multiply(H.setRuntimeTypeInfo([this, type$.BSFunction._as(other)], type$.JSArray_BSFunction));
+    },
+    $xor: function(_, other) {
+      return D.exp(type$.BSFunction._as(other), this);
+    },
+    $div: function(_, other) {
+      var t1;
+      type$.BSFunction._as(other);
+      t1 = type$.JSArray_BSFunction;
+      return K.divide(H.setRuntimeTypeInfo([this], t1), H.setRuntimeTypeInfo([other], t1));
+    },
+    $eq: function(_, other) {
+      if (other == null)
+        return false;
+      return other instanceof X.BSFunction && this.toString$0(0) == other.toString$0(0);
+    },
+    toString$0: function(_) {
+      return H.throwExpression(P.UnimplementedError$(null));
+    },
+    get$arity: function() {
+      var t1 = this.get$parameters();
+      return t1.get$length(t1);
+    },
+    callThing$2: function(interpreter, $arguments) {
+      var t1;
+      type$.List_Object._as($arguments);
+      t1 = H._arrayInstanceType($arguments);
+      return this.call$1(new H.MappedListIterable($arguments, t1._eval$1("BSFunction(1)")._as(new X.BSFunction_callThing_closure()), t1._eval$1("MappedListIterable<1,BSFunction>")).toList$0(0));
+    },
+    $isBSCallable: 1
+  };
+  X.BSFunction_call_closure.prototype = {
+    call$1: function(e) {
+      return type$.Variable._as(e).name;
+    },
+    $signature: 15
+  };
+  X.BSFunction_withParameters_closure.prototype = {
+    call$1: function(element) {
+      if (!this.p.contains$1(0, type$.Variable._as(element)))
+        throw H.wrapException(X.BetascriptFunctionError$("Error! Function parameters not sufficient to evaluate this function!"));
+    },
+    $signature: 16
+  };
+  X.BSFunction_callThing_closure.prototype = {
+    call$1: function(object) {
+      return type$.BSFunction._as(object);
+    },
+    $signature: 17
+  };
+  X.BetascriptFunctionError.prototype = {
+    toString$0: function(_) {
+      return this._BSFunction$_message;
     }
   };
   N.BSInstance.prototype = {
@@ -6032,14 +7390,17 @@
       method = this._class.findMethod$1(t2);
       if (method != null)
         return method.bind$1(this);
-      throw H.wrapException(Y.RuntimeError$0($name, "Undefined property '" + t2 + "."));
+      throw H.wrapException(Y.RuntimeError$0($name, "Undefined property '" + t2 + "'."));
     }
   };
   Y.BSInterpreter.prototype = {
     BSInterpreter$0: function() {
-      var t1 = this.globals;
-      t1.define$2("clock", new U.NativeCallable(0, new Y.BSInterpreter_closure()));
-      this._environment = t1;
+      var t1, t2, t3, t4, t5;
+      for (t1 = $.$get$nativeGlobals(), t2 = t1.get$keys(), t2 = t2.get$iterator(t2), t3 = this.globals, t4 = t3.values; t2.moveNext$0();) {
+        t5 = t2.get$current();
+        t4.$indexSet(0, t5, t1.$index(0, t5));
+      }
+      this._environment = t3;
     },
     interpret$1: function(statements) {
       var stmt, e, t1, t2, t3, _i, exception;
@@ -6058,16 +7419,6 @@
           throw exception;
       }
     },
-    _stringify$1: function(object) {
-      var text;
-      if (object == null)
-        return "nil";
-      if (typeof object == "number") {
-        text = C.JSNumber_methods.toString$0(object);
-        return C.JSString_methods.endsWith$1(text, ".0") ? C.JSString_methods.substring$2(text, 0, text.length - 2) : text;
-      }
-      return J.toString$0$(object);
-    },
     visitBinaryExpr$1: function(e) {
       var leftOperand = e.left.accept$1(0, this),
         rightOperand = e.right.accept$1(0, this),
@@ -6082,18 +7433,21 @@
         case C.TokenType_12:
           Y.BSInterpreter__checkNumberOperands(t1, leftOperand, rightOperand);
           return J.$mul$ns(leftOperand, rightOperand);
+        case C.TokenType_15:
+          Y.BSInterpreter__checkNumberOperands(t1, leftOperand, rightOperand);
+          return J.$xor$bn(leftOperand, rightOperand);
         case C.TokenType_9:
           this._checkStringOrNumberOperands$3(t1, leftOperand, rightOperand);
           return J.$add$ans(leftOperand, rightOperand);
-        case C.TokenType_16:
-          return J.$gt$n(leftOperand, rightOperand);
-        case C.TokenType_17:
-          return J.$ge$n(leftOperand, rightOperand);
         case C.TokenType_18:
-          return J.$lt$n(leftOperand, rightOperand);
+          return J.$gt$n(leftOperand, rightOperand);
         case C.TokenType_19:
+          return J.$ge$n(leftOperand, rightOperand);
+        case C.TokenType_20:
+          return J.$lt$n(leftOperand, rightOperand);
+        case C.TokenType_21:
           return J.$le$n(leftOperand, rightOperand);
-        case C.TokenType_15:
+        case C.TokenType_17:
           return Y.BSInterpreter__isEqual(leftOperand, rightOperand);
       }
       return null;
@@ -6109,10 +7463,10 @@
         t1 = e.op;
       switch (t1.type) {
         case C.TokenType_8:
-          if (!(operand instanceof Z.bscFunction))
-            H.throwExpression(Y.RuntimeError$0(type$.Token._as(operand), "Operand for " + t1.lexeme + " must be a number"));
+          if (!(operand instanceof X.BSFunction))
+            H.throwExpression(Y.RuntimeError$0(type$.Token._as(operand), "Operand for " + t1.lexeme + " must be function"));
           return J.$negate$in(operand);
-        case C.TokenType_31:
+        case C.TokenType_33:
           if (H._isBool(operand))
             t1 = operand;
           else {
@@ -6130,7 +7484,7 @@
       } catch (exception) {
         if (H.unwrapException(exception) instanceof Y.RuntimeError0) {
           if (typeof left != "string" || typeof right != "string")
-            throw H.wrapException(Y.RuntimeError$0(token, "Operands for " + token.lexeme + " must be numbers or strings"));
+            throw H.wrapException(Y.RuntimeError$0(token, "Operands for " + token.lexeme + " must be functions or strings"));
         } else
           throw exception;
       }
@@ -6139,13 +7493,50 @@
       return stmt.expression.accept$1(0, this);
     },
     visitPrintStmt$1: function(stmt) {
-      var value = stmt.expression.accept$1(0, this);
-      $.BetaScript_printCallback.call$1(this._stringify$1(value));
+      var value = stmt.expression.accept$1(0, this),
+        t1 = $.BetaScript_printCallback,
+        t2 = value == null ? null : J.toString$0$(value);
+      t1.call$1(t2 == null ? "nil" : t2);
     },
     visitVarStmt$1: function(s) {
-      var t1 = s.initializer,
-        value = t1 != null ? t1.accept$1(0, this) : null;
-      this._environment.define$2(s.name.lexeme, value);
+      var _variables, t2, _i, parameter, _variable, t3, i, j, j0, value, _this = this,
+        t1 = s.parameters;
+      if (t1 != null) {
+        _variables = H.setRuntimeTypeInfo([], type$.JSArray_Variable);
+        for (t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
+          parameter = t1[_i];
+          _variable = _this._environment.search$1(0, parameter);
+          if (_variable == null) {
+            t3 = parameter.lexeme;
+            _variable = new X.Variable(t3, null);
+            _this._environment.values.$indexSet(0, t3, _variable);
+          } else if (!(_variable instanceof X.Variable))
+            throw H.wrapException(Y.RuntimeError$0(parameter, "Parameters to a function must always be Variables"));
+          C.JSArray_methods.add$1(_variables, _variable);
+        }
+        for (i = 0; i < _variables.length; i = j)
+          for (j = i + 1, j0 = j; t1 = _variables.length, j0 < t1; ++j0) {
+            if (i >= t1)
+              return H.ioore(_variables, i);
+            t1 = _variables[i];
+            t2 = _variables[j0];
+            t1 = t1.toString$0(0);
+            t2 = t2.toString$0(0);
+            if (t1 === t2)
+              throw H.wrapException(Y.RuntimeError$0(s.name, "Duplicate parameters not allowed in function variables"));
+          }
+      } else
+        _variables = null;
+      t1 = s.initializer;
+      value = t1 != null ? t1.accept$1(0, _this) : null;
+      t1 = _variables != null;
+      if (t1 && value == null)
+        throw H.wrapException(Y.RuntimeError$0(s.name, "Function variable declarations with explicit parameter lists must always be initialized"));
+      else if (t1 && !(value instanceof X.BSFunction))
+        throw H.wrapException(Y.RuntimeError$0(s.name, "Only function variable declarations may include parameters"));
+      else if (t1 && value instanceof X.BSFunction)
+        value = value.withParameters$1(P.LinkedHashSet_LinkedHashSet$from(_variables, type$.Variable));
+      _this._environment.define$2(s.name.lexeme, value);
     },
     visitVariableExpr$1: function(e) {
       return this._lookUpVariable$2(e.name, e);
@@ -6196,7 +7587,7 @@
     visitlogicBinaryExpr$1: function(e) {
       var t1,
         left = e.left.accept$1(0, this);
-      if (e.op.type === C.TokenType_32) {
+      if (e.op.type === C.TokenType_34) {
         if (H._isBool(left))
           t1 = left;
         else {
@@ -6233,20 +7624,24 @@
       }
     },
     visitCallExpr$1: function(e) {
-      var t1, t2, _i,
-        callee = e.callee.accept$1(0, this),
-        $arguments = [];
+      var $arguments, t1, t2, _i,
+        callee = e.callee.accept$1(0, this);
+      if (!type$.BSCallable._is(callee))
+        throw H.wrapException(Y.RuntimeError$0(e.paren, "Can only call routines, functions and classes."));
+      $arguments = [];
       for (t1 = e.$arguments, t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i)
         $arguments.push(t1[_i].accept$1(0, this));
-      if (!type$.BSCallable._is(callee))
-        throw H.wrapException(Y.RuntimeError$0(e.paren, "Can only call functions and classes"));
       if ($arguments.length !== callee.get$arity())
         throw H.wrapException(Y.RuntimeError$0(e.paren, "Expected " + C.JSInt_methods.toString$0(callee.get$arity()) + " paramenters, but got " + C.JSInt_methods.toString$0($arguments.length) + "."));
-      return callee.call$2(this, $arguments);
+      if (callee instanceof X.BSFunction)
+        for (t1 = $arguments.length, _i = 0; _i < t1; ++_i)
+          if (!($arguments[_i] instanceof X.BSFunction))
+            throw H.wrapException(Y.RuntimeError$0(e.paren, "functions only support other functions as parameters."));
+      return callee.callThing$2(this, $arguments);
     },
-    visitFunctionStmt$1: function(s) {
+    visitRoutineStmt$1: function(s) {
       var t1 = this._environment;
-      t1.define$2(s.name.lexeme, new K.UserFunction(s, t1, false));
+      t1.define$2(s.name.lexeme, new G.UserRoutine(s, t1, false));
     },
     visitReturnStmt$1: function(s) {
       var t1 = s.value;
@@ -6279,11 +7674,11 @@
         _this._environment = t1;
         t1.define$2("super", superclass);
       }
-      methods = new H.JsLinkedHashMap(type$.JsLinkedHashMap_String_UserFunction);
+      methods = new H.JsLinkedHashMap(type$.JsLinkedHashMap_String_UserRoutine);
       for (t1 = s.methods, t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
         method = t1[_i];
         t5 = method.name.lexeme;
-        methods.$indexSet(0, t5, new K.UserFunction(method, _this._environment, t5 === t4));
+        methods.$indexSet(0, t5, new G.UserRoutine(method, _this._environment, t5 === t4));
       }
       if (superclass != null)
         _this._environment = _this._environment.enclosing;
@@ -6299,7 +7694,7 @@
       var value,
         object = e.object.accept$1(0, this);
       if (!(object instanceof N.BSInstance))
-        throw H.wrapException(Y.RuntimeError$0(e.name, "Only instances have field"));
+        throw H.wrapException(Y.RuntimeError$0(e.name, "Only instances have fields"));
       value = e.value.accept$1(0, this);
       object._fields.$indexSet(0, e.name.lexeme, value);
       return value;
@@ -6328,17 +7723,9 @@
     $isExprVisitor: 1,
     $isStmtVisitor: 1
   };
-  Y.BSInterpreter_closure.prototype = {
-    call$2: function(interpreter, $arguments) {
-      type$.BSInterpreter._as(interpreter);
-      type$.List_Object._as($arguments);
-      return Date.now();
-    },
-    $signature: 13
-  };
   Y.RuntimeError0.prototype = {
     toString$0: function(_) {
-      return "Runtime Error: '" + this.message + "' at line " + C.JSInt_methods.toString$0(this.token.line);
+      return "Runtime Error: '" + this.message + "' at line " + this.token.line;
     }
   };
   Y.Return.prototype = {
@@ -6356,7 +7743,7 @@
         t2 = this._BSParser$_current;
         if (t2 >= t1.length)
           return H.ioore(t1, t2);
-        if (!(t1[t2].type !== C.TokenType_40))
+        if (!(t1[t2].type !== C.TokenType_42))
           break;
         C.JSArray_methods.add$1(statements, this._declaration$0());
       }
@@ -6365,15 +7752,15 @@
     _declaration$0: function() {
       var t1, exception, _this = this;
       try {
-        if (_this._match$1(C.TokenType_24)) {
+        if (_this._match$1(C.TokenType_26)) {
           t1 = _this._classDeclaration$0();
           return t1;
         }
-        if (_this._match$1(C.TokenType_27)) {
-          t1 = _this._BSParser$_function$1("function");
+        if (_this._match$1(C.TokenType_29)) {
+          t1 = _this._routine$1("routine");
           return t1;
         }
-        if (_this._match$1(C.TokenType_38)) {
+        if (_this._match$1(C.TokenType_40)) {
           t1 = _this._varDeclaration$0();
           return t1;
         }
@@ -6389,9 +7776,9 @@
     },
     _classDeclaration$0: function() {
       var t1, t2, superclass, methods, _this = this,
-        $name = _this._consume$2(C.TokenType_20, "Expect class name");
-      if (_this._match$1(C.TokenType_18)) {
-        _this._consume$2(C.TokenType_20, "Expect superclass name.");
+        $name = _this._consume$2(C.TokenType_22, "Expect class name");
+      if (_this._match$1(C.TokenType_20)) {
+        _this._consume$2(C.TokenType_22, "Expect superclass name.");
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
@@ -6400,53 +7787,63 @@
       } else
         superclass = null;
       _this._consume$2(C.TokenType_2, "Expect '{' before class body");
-      methods = H.setRuntimeTypeInfo([], type$.JSArray_FunctionStmt);
+      methods = H.setRuntimeTypeInfo([], type$.JSArray_RoutineStmt);
       t1 = _this._tokens;
       while (true) {
         if (!_this._check$1(C.TokenType_3)) {
           t2 = _this._BSParser$_current;
           if (t2 >= t1.length)
             return H.ioore(t1, t2);
-          t2 = t1[t2].type !== C.TokenType_40;
+          t2 = t1[t2].type !== C.TokenType_42;
         } else
           t2 = false;
         if (!t2)
           break;
-        C.JSArray_methods.add$1(methods, _this._BSParser$_function$1("method"));
+        C.JSArray_methods.add$1(methods, _this._routine$1("method"));
       }
       _this._consume$2(C.TokenType_3, "Expect '}' after class body");
       return new L.ClassStmt($name, superclass, methods);
     },
-    _BSParser$_function$1: function(kind) {
+    _routine$1: function(kind) {
       var parameters, _this = this,
-        $name = _this._consume$2(C.TokenType_20, "Expect " + kind + " name.");
+        $name = _this._consume$2(C.TokenType_22, "Expect " + kind + " name.");
       _this._consume$2(C.TokenType_0, "Expect '(' after " + kind + " name;");
       parameters = H.setRuntimeTypeInfo([], type$.JSArray_Token);
       if (!_this._check$1(C.TokenType_1))
         do
-          C.JSArray_methods.add$1(parameters, _this._consume$2(C.TokenType_20, "Expect parameter name"));
+          C.JSArray_methods.add$1(parameters, _this._consume$2(C.TokenType_22, "Expect parameter name"));
         while (_this._match$1(C.TokenType_6));
       _this._consume$2(C.TokenType_1, "Expect ')' after parameters.");
-      _this._consume$2(C.TokenType_2, "Expect '{' after function parameters");
-      return new L.FunctionStmt($name, parameters, _this._block$0());
+      _this._consume$2(C.TokenType_2, "Expect '{' after routine parameters");
+      return new L.RoutineStmt($name, parameters, _this._block$0());
     },
     _varDeclaration$0: function() {
-      var _this = this,
-        $name = _this._consume$2(C.TokenType_20, "Expect variable name"),
-        initializer = _this._match$1(C.TokenType_14) ? _this._assigment$0() : null;
+      var parameters, initializer, _this = this,
+        $name = _this._consume$2(C.TokenType_22, "Expect variable name");
+      if (_this._match$1(C.TokenType_0)) {
+        parameters = H.setRuntimeTypeInfo([], type$.JSArray_Token);
+        do {
+          if (_this._check$1(C.TokenType_1))
+            break;
+          C.JSArray_methods.add$1(parameters, _this._consume$2(C.TokenType_22, "Expect parameter name"));
+        } while (_this._match$1(C.TokenType_6));
+        _this._consume$2(C.TokenType_1, "Expect ')' after parameters.");
+      } else
+        parameters = null;
+      initializer = _this._match$1(C.TokenType_16) ? _this._assigment$0() : null;
       _this._consume$2(C.TokenType_10, "Expect ';' after variable declaration");
-      return new L.VarStmt($name, initializer);
+      return new L.VarStmt($name, parameters, initializer);
     },
     _statement$0: function() {
       var initializer, condition, increment, body, thenBranch, value, t1, t2, keyword, _this = this, _null = null,
         _s22_ = "Expect '(' after 'if'.",
         _s30_ = "Expect ')' after if condition.";
-      if (_this._match$1(C.TokenType_28)) {
+      if (_this._match$1(C.TokenType_30)) {
         _this._consume$2(C.TokenType_0, "Expect '(' after 'for'.");
         if (_this._match$1(C.TokenType_10))
           initializer = _null;
         else
-          initializer = _this._match$1(C.TokenType_38) ? _this._varDeclaration$0() : _this._expressionStatement$0();
+          initializer = _this._match$1(C.TokenType_40) ? _this._varDeclaration$0() : _this._expressionStatement$0();
         condition = _this._check$1(C.TokenType_10) ? _null : _this._assigment$0();
         _this._consume$2(C.TokenType_10, "Expect ';' after loop condition.");
         increment = _this._check$1(C.TokenType_1) ? _null : _this._assigment$0();
@@ -6457,19 +7854,19 @@
         body = new L.WhileStmt(condition == null ? new N.LiteralExpr(true) : condition, body);
         return initializer != null ? new L.BlockStmt(H.setRuntimeTypeInfo([initializer, body], type$.JSArray_Stmt)) : body;
       }
-      if (_this._match$1(C.TokenType_29)) {
+      if (_this._match$1(C.TokenType_31)) {
         _this._consume$2(C.TokenType_0, _s22_);
         condition = _this._assigment$0();
         _this._consume$2(C.TokenType_1, _s30_);
         thenBranch = _this._statement$0();
-        return new L.IfStmt(condition, thenBranch, _this._match$1(C.TokenType_25) ? _this._statement$0() : _null);
+        return new L.IfStmt(condition, thenBranch, _this._match$1(C.TokenType_27) ? _this._statement$0() : _null);
       }
-      if (_this._match$1(C.TokenType_33)) {
+      if (_this._match$1(C.TokenType_35)) {
         value = _this._assigment$0();
         _this._consume$2(C.TokenType_10, "Expect ';' after value.");
         return new L.PrintStmt(value);
       }
-      if (_this._match$1(C.TokenType_34)) {
+      if (_this._match$1(C.TokenType_36)) {
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
@@ -6479,7 +7876,7 @@
         _this._consume$2(C.TokenType_10, "Expect ';' after return value.");
         return new L.ReturnStmt(keyword, value);
       }
-      if (_this._match$1(C.TokenType_39)) {
+      if (_this._match$1(C.TokenType_41)) {
         _this._consume$2(C.TokenType_0, _s22_);
         condition = _this._assigment$0();
         _this._consume$2(C.TokenType_1, _s30_);
@@ -6503,7 +7900,7 @@
           t2 = _this._BSParser$_current;
           if (t2 >= t1.length)
             return H.ioore(t1, t2);
-          t2 = t1[t2].type !== C.TokenType_40;
+          t2 = t1[t2].type !== C.TokenType_42;
         } else
           t2 = false;
         if (!t2)
@@ -6516,7 +7913,7 @@
     _assigment$0: function() {
       var t1, t2, equals, value, _this = this,
         expr = _this._or$0();
-      if (_this._match$1(C.TokenType_14)) {
+      if (_this._match$1(C.TokenType_16)) {
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
@@ -6534,7 +7931,7 @@
     _or$0: function() {
       var t1, t2, _this = this,
         expr = _this._and$0();
-      for (t1 = _this._tokens; _this._match$1(C.TokenType_32);) {
+      for (t1 = _this._tokens; _this._match$1(C.TokenType_34);) {
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
           return H.ioore(t1, t2);
@@ -6545,7 +7942,7 @@
     _and$0: function() {
       var t1, t2, _this = this,
         expr = _this._equality$0();
-      for (t1 = _this._tokens; _this._match$1(C.TokenType_23);) {
+      for (t1 = _this._tokens; _this._match$1(C.TokenType_25);) {
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
           return H.ioore(t1, t2);
@@ -6556,7 +7953,7 @@
     _equality$0: function() {
       var t1, t2, _this = this,
         expr = _this._comparison$0();
-      for (t1 = _this._tokens; _this._match$1(C.TokenType_15);) {
+      for (t1 = _this._tokens; _this._match$1(C.TokenType_17);) {
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
           return H.ioore(t1, t2);
@@ -6567,7 +7964,7 @@
     _comparison$0: function() {
       var t1, t2, t3, _this = this,
         expr = _this._addition$0();
-      for (t1 = type$.JSArray_TokenType, t2 = _this._tokens; _this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_16, C.TokenType_17, C.TokenType_18, C.TokenType_19], t1));) {
+      for (t1 = type$.JSArray_TokenType, t2 = _this._tokens; _this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_18, C.TokenType_19, C.TokenType_20, C.TokenType_21], t1));) {
         t3 = _this._BSParser$_current - 1;
         if (t3 < 0 || t3 >= t2.length)
           return H.ioore(t2, t3);
@@ -6588,18 +7985,29 @@
     },
     _multiplication$0: function() {
       var t1, t2, t3, _this = this,
-        expr = _this._unary$0();
+        expr = _this._exponentiation$0();
       for (t1 = type$.JSArray_TokenType, t2 = _this._tokens; _this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_11, C.TokenType_12], t1));) {
         t3 = _this._BSParser$_current - 1;
         if (t3 < 0 || t3 >= t2.length)
           return H.ioore(t2, t3);
-        expr = new N.BinaryExpr(expr, t2[t3], _this._unary$0());
+        expr = new N.BinaryExpr(expr, t2[t3], _this._exponentiation$0());
+      }
+      return expr;
+    },
+    _exponentiation$0: function() {
+      var t1, t2, _this = this,
+        expr = _this._unary$0();
+      for (t1 = _this._tokens; _this._match$1(C.TokenType_15);) {
+        t2 = _this._BSParser$_current - 1;
+        if (t2 < 0 || t2 >= t1.length)
+          return H.ioore(t1, t2);
+        expr = new N.BinaryExpr(expr, t1[t2], _this._unary$0());
       }
       return expr;
     },
     _unary$0: function() {
       var t1, t2, _this = this;
-      if (_this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_8, C.TokenType_13, C.TokenType_31], type$.JSArray_TokenType))) {
+      if (_this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_8, C.TokenType_13, C.TokenType_33], type$.JSArray_TokenType))) {
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
@@ -6615,7 +8023,7 @@
         if (_this._match$1(C.TokenType_0))
           expr = _this._finishCall$1(expr);
         else if (_this._match$1(C.TokenType_7))
-          expr = new N.GetExpr(expr, _this._consume$2(C.TokenType_20, "Expect property name after '.'"));
+          expr = new N.GetExpr(expr, _this._consume$2(C.TokenType_22, "Expect property name after '.'"));
         else
           break;
       return expr;
@@ -6631,46 +8039,46 @@
     },
     _BSParser$_primary$0: function() {
       var t1, t2, expr, keyword, _this = this;
-      if (_this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_22, C.TokenType_21], type$.JSArray_TokenType))) {
+      if (_this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_24, C.TokenType_23], type$.JSArray_TokenType))) {
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
           return H.ioore(t1, t2);
         return new N.LiteralExpr(t1[t2].literal);
       }
-      if (_this._match$1(C.TokenType_26))
+      if (_this._match$1(C.TokenType_28))
         return new N.LiteralExpr(false);
-      if (_this._match$1(C.TokenType_37))
+      if (_this._match$1(C.TokenType_39))
         return new N.LiteralExpr(true);
-      if (_this._match$1(C.TokenType_30))
+      if (_this._match$1(C.TokenType_32))
         return new N.LiteralExpr(null);
       if (_this._match$1(C.TokenType_0)) {
         expr = _this._assigment$0();
         _this._consume$2(C.TokenType_1, "Expect ')' after expression");
         return new N.GroupingExpr(expr);
       }
-      if (_this._match$1(C.TokenType_20)) {
+      if (_this._match$1(C.TokenType_22)) {
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
           return H.ioore(t1, t2);
         return new N.VariableExpr(t1[t2]);
       }
-      if (_this._match$1(C.TokenType_36)) {
+      if (_this._match$1(C.TokenType_38)) {
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
           return H.ioore(t1, t2);
         return new N.ThisExpr(t1[t2]);
       }
-      if (_this._match$1(C.TokenType_35)) {
+      if (_this._match$1(C.TokenType_37)) {
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
           return H.ioore(t1, t2);
         keyword = t1[t2];
         _this._consume$2(C.TokenType_7, "Expect '.' after 'super'");
-        return new N.SuperExpr(keyword, _this._consume$2(C.TokenType_20, "Expect superclass method name"));
+        return new N.SuperExpr(keyword, _this._consume$2(C.TokenType_22, "Expect superclass method name"));
       }
       throw H.wrapException(_this._error$2(_this._peek$0(), "Expect expression."));
     },
@@ -6695,7 +8103,7 @@
       if (t2 >= t1.length)
         return H.ioore(t1, t2);
       t2 = t1[t2].type;
-      if (t2 === C.TokenType_40)
+      if (t2 === C.TokenType_42)
         return false;
       return t2 == type;
     },
@@ -6705,7 +8113,7 @@
         t3 = t1.length;
       if (t2 >= t3)
         return H.ioore(t1, t2);
-      t2 = (t1[t2].type !== C.TokenType_40 ? this._BSParser$_current = t2 + 1 : t2) - 1;
+      t2 = (t1[t2].type !== C.TokenType_42 ? this._BSParser$_current = t2 + 1 : t2) - 1;
       if (t2 < 0 || t2 >= t3)
         return H.ioore(t1, t2);
       return t1[t2];
@@ -6742,7 +8150,7 @@
         if (t2 >= t3)
           return H.ioore(t1, t2);
         t4 = t1[t2].type;
-        t5 = t4 !== C.TokenType_40;
+        t5 = t4 !== C.TokenType_42;
         if (!t5)
           break;
         t6 = t2 - 1;
@@ -6751,14 +8159,14 @@
         if (t1[t6].type === C.TokenType_10)
           return;
         switch (t4) {
-          case C.TokenType_24:
-          case C.TokenType_27:
-          case C.TokenType_38:
-          case C.TokenType_28:
+          case C.TokenType_26:
           case C.TokenType_29:
-          case C.TokenType_39:
-          case C.TokenType_33:
-          case C.TokenType_34:
+          case C.TokenType_40:
+          case C.TokenType_30:
+          case C.TokenType_31:
+          case C.TokenType_41:
+          case C.TokenType_35:
+          case C.TokenType_36:
             return;
         }
         t2 = (t5 ? _this._BSParser$_current = t2 + 1 : t2) - 1;
@@ -6769,7 +8177,7 @@
   };
   X.BSScanner.prototype = {
     scanTokens$0: function() {
-      var t1, t2, t3, c, _this = this;
+      var t1, t2, t3, c, t4, _this = this;
       for (t1 = _this._source, t2 = t1.length; t3 = _this._BSScanner$_current, t3 < t2;) {
         _this._start = t3;
         _this._BSScanner$_current = t3 + 1;
@@ -6782,16 +8190,20 @@
           _this._number$0();
         else if (X.BSScanner__isAlpha(c))
           _this._identifier$0();
-        else
-          Z.BetaScript_error(_this._line, "Error: Unexpected character " + c);
+        else {
+          t3 = _this._line;
+          t4 = "Error: Unexpected character " + c;
+          $.BetaScript_printCallback.call$1("[Line " + t3 + "] Error : " + t4);
+          $.BetaScript_hadError = true;
+        }
       }
       t1 = _this._BSScanner$_tokens;
-      C.JSArray_methods.add$1(t1, new V.Token(C.TokenType_40, "", null, _this._line));
+      C.JSArray_methods.add$1(t1, new V.Token(C.TokenType_42, "", null, _this._line));
       return t1;
     },
     _initializeMap$0: function() {
       var _this = this;
-      _this.set$_charToLexeme(P.LinkedHashMap_LinkedHashMap$_literal(["(", new X.BSScanner__initializeMap_closure(_this), ")", new X.BSScanner__initializeMap_closure0(_this), "{", new X.BSScanner__initializeMap_closure1(_this), "}", new X.BSScanner__initializeMap_closure2(_this), "[", new X.BSScanner__initializeMap_closure3(_this), "]", new X.BSScanner__initializeMap_closure4(_this), ",", new X.BSScanner__initializeMap_closure5(_this), "-", new X.BSScanner__initializeMap_closure6(_this), "+", new X.BSScanner__initializeMap_closure7(_this), ";", new X.BSScanner__initializeMap_closure8(_this), "*", new X.BSScanner__initializeMap_closure9(_this), "!", new X.BSScanner__initializeMap_closure10(_this), ".", new X.BSScanner__initializeMap_closure11(_this), "=", new X.BSScanner__initializeMap_closure12(_this), "<", new X.BSScanner__initializeMap_closure13(_this), ">", new X.BSScanner__initializeMap_closure14(_this), "/", new X.BSScanner__initializeMap_closure15(_this), " ", new X.BSScanner__initializeMap_closure16(), "\r", new X.BSScanner__initializeMap_closure17(), "\t", new X.BSScanner__initializeMap_closure18(), "\n", new X.BSScanner__initializeMap_closure19(_this), '"', _this.get$_string()], type$.String, type$.Function));
+      _this.set$_charToLexeme(P.LinkedHashMap_LinkedHashMap$_literal(["(", new X.BSScanner__initializeMap_closure(_this), ")", new X.BSScanner__initializeMap_closure0(_this), "{", new X.BSScanner__initializeMap_closure1(_this), "}", new X.BSScanner__initializeMap_closure2(_this), "[", new X.BSScanner__initializeMap_closure3(_this), "]", new X.BSScanner__initializeMap_closure4(_this), ",", new X.BSScanner__initializeMap_closure5(_this), "-", new X.BSScanner__initializeMap_closure6(_this), "~", new X.BSScanner__initializeMap_closure7(_this), "+", new X.BSScanner__initializeMap_closure8(_this), ";", new X.BSScanner__initializeMap_closure9(_this), "*", new X.BSScanner__initializeMap_closure10(_this), "!", new X.BSScanner__initializeMap_closure11(_this), "^", new X.BSScanner__initializeMap_closure12(_this), ".", new X.BSScanner__initializeMap_closure13(_this), "=", new X.BSScanner__initializeMap_closure14(_this), "<", new X.BSScanner__initializeMap_closure15(_this), ">", new X.BSScanner__initializeMap_closure16(_this), "/", new X.BSScanner__initializeMap_closure17(_this), " ", new X.BSScanner__initializeMap_closure18(), "\r", new X.BSScanner__initializeMap_closure19(), "\t", new X.BSScanner__initializeMap_closure20(), "\n", new X.BSScanner__initializeMap_closure21(_this), '"', _this.get$_string()], type$.String, type$.Function));
     },
     _BSScanner$_advance$0: function() {
       var t1 = this._source,
@@ -6841,7 +8253,7 @@
         Z.BetaScript_error(_this._line, "Unterminated String.");
       else {
         _this._BSScanner$_advance$0();
-        _this._addToken$2(C.TokenType_21, J.substring$2$s(t1, _this._start + 1, _this._BSScanner$_current - 1));
+        _this._addToken$2(C.TokenType_23, J.substring$2$s(t1, _this._start + 1, _this._BSScanner$_current - 1));
       }
     },
     _number$0: function() {
@@ -6861,7 +8273,7 @@
           t1[t2];
         }
       }
-      _this._addToken$2(C.TokenType_22, R.Number$_(P.double_parse(J.substring$2$s(t1, _this._start, _this._BSScanner$_current))));
+      _this._addToken$2(C.TokenType_24, R.n(P.double_parse(J.substring$2$s(t1, _this._start, _this._BSScanner$_current))));
     },
     _peekNext$0: function() {
       var t1 = this._BSScanner$_current,
@@ -6884,7 +8296,7 @@
         t1[t2];
       }
       text = J.substring$2$s(t1, _this._start, _this._BSScanner$_current);
-      _this._addToken$1(C.Map_4Q0V1.containsKey$1(text) ? C.Map_4Q0V1.$index(0, text) : C.TokenType_20);
+      _this._addToken$1(C.Map_woxwA.containsKey$1(text) ? C.Map_woxwA.$index(0, text) : C.TokenType_22);
     },
     set$_charToLexeme: function(_charToLexeme) {
       this._charToLexeme = type$.Map_String_Function._as(_charToLexeme);
@@ -6940,29 +8352,41 @@
   };
   X.BSScanner__initializeMap_closure7.prototype = {
     call$0: function() {
-      return this.$this._addToken$1(C.TokenType_9);
+      return this.$this._addToken$1(C.TokenType_14);
     },
     $signature: 0
   };
   X.BSScanner__initializeMap_closure8.prototype = {
     call$0: function() {
-      return this.$this._addToken$1(C.TokenType_10);
+      return this.$this._addToken$1(C.TokenType_9);
     },
     $signature: 0
   };
   X.BSScanner__initializeMap_closure9.prototype = {
     call$0: function() {
-      return this.$this._addToken$1(C.TokenType_12);
+      return this.$this._addToken$1(C.TokenType_10);
     },
     $signature: 0
   };
   X.BSScanner__initializeMap_closure10.prototype = {
     call$0: function() {
-      return this.$this._addToken$1(C.TokenType_13);
+      return this.$this._addToken$1(C.TokenType_12);
     },
     $signature: 0
   };
   X.BSScanner__initializeMap_closure11.prototype = {
+    call$0: function() {
+      return this.$this._addToken$1(C.TokenType_13);
+    },
+    $signature: 0
+  };
+  X.BSScanner__initializeMap_closure12.prototype = {
+    call$0: function() {
+      return this.$this._addToken$1(C.TokenType_15);
+    },
+    $signature: 0
+  };
+  X.BSScanner__initializeMap_closure13.prototype = {
     call$0: function() {
       var t1 = this.$this;
       if (X.BSScanner__IsDigit(t1._BSScanner$_peek$0()))
@@ -6972,20 +8396,6 @@
     },
     $signature: 1
   };
-  X.BSScanner__initializeMap_closure12.prototype = {
-    call$0: function() {
-      var t1 = this.$this;
-      return t1._addToken$1(t1._BSScanner$_match$1("=") ? C.TokenType_15 : C.TokenType_14);
-    },
-    $signature: 0
-  };
-  X.BSScanner__initializeMap_closure13.prototype = {
-    call$0: function() {
-      var t1 = this.$this;
-      return t1._addToken$1(t1._BSScanner$_match$1("=") ? C.TokenType_19 : C.TokenType_18);
-    },
-    $signature: 0
-  };
   X.BSScanner__initializeMap_closure14.prototype = {
     call$0: function() {
       var t1 = this.$this;
@@ -6994,6 +8404,20 @@
     $signature: 0
   };
   X.BSScanner__initializeMap_closure15.prototype = {
+    call$0: function() {
+      var t1 = this.$this;
+      return t1._addToken$1(t1._BSScanner$_match$1("=") ? C.TokenType_21 : C.TokenType_20);
+    },
+    $signature: 0
+  };
+  X.BSScanner__initializeMap_closure16.prototype = {
+    call$0: function() {
+      var t1 = this.$this;
+      return t1._addToken$1(t1._BSScanner$_match$1("=") ? C.TokenType_19 : C.TokenType_18);
+    },
+    $signature: 0
+  };
+  X.BSScanner__initializeMap_closure17.prototype = {
     call$0: function() {
       var t2, t3,
         t1 = this.$this;
@@ -7012,16 +8436,6 @@
     },
     $signature: 1
   };
-  X.BSScanner__initializeMap_closure16.prototype = {
-    call$0: function() {
-    },
-    $signature: 1
-  };
-  X.BSScanner__initializeMap_closure17.prototype = {
-    call$0: function() {
-    },
-    $signature: 1
-  };
   X.BSScanner__initializeMap_closure18.prototype = {
     call$0: function() {
     },
@@ -7029,59 +8443,172 @@
   };
   X.BSScanner__initializeMap_closure19.prototype = {
     call$0: function() {
+    },
+    $signature: 1
+  };
+  X.BSScanner__initializeMap_closure20.prototype = {
+    call$0: function() {
+    },
+    $signature: 1
+  };
+  X.BSScanner__initializeMap_closure21.prototype = {
+    call$0: function() {
       return this.$this._line++;
     },
-    $signature: 14
+    $signature: 18
   };
   Z.BetaScript_runForWeb_closure.prototype = {
     call$1: function(object) {
       var t2,
         t1 = J.getInterceptor$(object);
-      H.printString(t1.toString$0(object));
+      P.print(t1.toString$0(object));
       t2 = this._box_0;
       t2.output = t2.output + (t1.toString$0(object) + "\n");
     },
     $signature: 2
   };
+  O.Cos.prototype = {
+    evaluate$1: function(p) {
+      var v,
+        op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      if (op instanceof R.Number) {
+        v = Math.cos(op.absvalue);
+        if (v === C.JSNumber_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return O.cos(op);
+    },
+    copy$1: function(params) {
+      return new O.Cos(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  Z.CosH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return Z.cosh(op);
+    },
+    copy$1: function(params) {
+      return new Z.CosH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  Q.Csc.prototype = {
+    evaluate$1: function(p) {
+      var v,
+        op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      if (op instanceof R.Number) {
+        v = 1 / Math.sin(op.absvalue);
+        if (v === C.JSDouble_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return Q.csc(op);
+    },
+    copy$1: function(params) {
+      return new Q.Csc(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  X.CscH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return X.csch(op);
+    },
+    copy$1: function(params) {
+      return new X.CscH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  L.Ctg.prototype = {
+    evaluate$1: function(p) {
+      var v,
+        op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      if (op instanceof R.Number) {
+        v = 1 / Math.tan(op.absvalue);
+        if (v === C.JSDouble_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return L.ctg(op);
+    },
+    copy$1: function(params) {
+      return new L.Ctg(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  G.CtgH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return G.ctgh(op);
+    },
+    copy$1: function(params) {
+      return new G.CtgH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
   K.Division.prototype = {
-    call$1: function(p) {
-      var t1, t2;
-      type$.Map_String_double._as(p);
-      t1 = J.$div$n(this.numerator.call$1(p), this.denominator.call$1(p));
-      t2 = this.negative ? -1 : 1;
-      if (typeof t1 !== "number")
-        return t1.$mul();
-      return t1 * t2;
+    evaluate$1: function(p) {
+      var _n, _d, t1, _numNumber, _denNumber, v, t2, _num, _den, t3, t4;
+      type$.Map_String_BSFunction._as(p);
+      _n = this.numerator.evaluate$1(p);
+      _d = this.denominator.evaluate$1(p);
+      t1 = type$.Number;
+      _numNumber = X.BSFunction_extractFromNegative(_n, t1);
+      _denNumber = X.BSFunction_extractFromNegative(_d, t1);
+      if (_numNumber.second && _denNumber.second) {
+        v = _numNumber.first.absvalue / _denNumber.first.absvalue;
+        if (v === C.JSDouble_methods.toInt$0(v)) {
+          t1 = _numNumber.third;
+          t2 = _denNumber.third;
+          if (!(t1 && !t2))
+            t1 = !t1 && t2;
+          else
+            t1 = true;
+          return R.n(v * (t1 ? -1 : 1));
+        }
+      }
+      t1 = type$.BSFunction;
+      _num = X.BSFunction_extractFromNegative(_n, t1);
+      _den = X.BSFunction_extractFromNegative(_d, t1);
+      t1 = _num.third;
+      t2 = _den.third;
+      if (!(t1 && !t2))
+        t1 = !t1 && t2;
+      else
+        t1 = true;
+      t2 = type$.JSArray_BSFunction;
+      t3 = _num.first;
+      t4 = _den.first;
+      return t1 ? G.negative(K.divide(H.setRuntimeTypeInfo([t3], t2), H.setRuntimeTypeInfo([t4], t2))) : K.divide(H.setRuntimeTypeInfo([t3], t2), H.setRuntimeTypeInfo([t4], t2));
     },
-    toString$1: function(_, handleMinus) {
-      return (handleMinus && this.negative ? "-" : "") + "((" + this.numerator.toString$0(0) + ")/(" + this.denominator.toString$0(0) + "))";
+    toString$0: function(_) {
+      return "((" + H.S(this.numerator) + ")/(" + H.S(this.denominator) + "))";
     },
-    toString$0: function($receiver) {
-      return this.toString$1($receiver, true);
+    copy$1: function(params) {
+      return new K.Division(this.numerator, this.denominator, type$.Set_Variable._as(params));
     },
-    withSign$1: function(negative) {
-      return new K.Division(this.numerator, this.denominator, negative);
+    get$defaultParameters: function() {
+      var params = this.numerator.get$parameters();
+      params.addAll$1(0, this.denominator.get$parameters());
+      return type$.SplayTreeSet_Variable._as(params);
     }
   };
   D.Exponentiation.prototype = {
-    call$1: function(p) {
-      var t1, t2;
-      type$.Map_String_double._as(p);
-      t1 = this.base.call$1(p);
-      t2 = this.exponent.call$1(p);
-      H.checkNum(t1);
-      H.checkNum(t2);
-      t2 = Math.pow(t1, t2);
-      return t2 * (this.negative ? -1 : 1);
+    evaluate$1: function(p) {
+      var b, expo, v;
+      type$.Map_String_BSFunction._as(p);
+      b = this.base.evaluate$1(p);
+      expo = this.exponent.evaluate$1(p);
+      if (b instanceof R.Number && expo instanceof R.Number) {
+        v = Math.pow(b.absvalue, expo.absvalue);
+        if (v === C.JSNumber_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return D.exp(b, expo);
     },
-    toString$1: function(_, handleMinus) {
-      return (handleMinus && this.negative ? "-" : "") + "((" + this.base.toString$0(0) + ")^(" + J.toString$0$(this.exponent) + "))";
+    toString$0: function(_) {
+      return "((" + H.S(this.base) + ")^(" + H.S(this.exponent) + "))";
     },
-    toString$0: function($receiver) {
-      return this.toString$1($receiver, true);
+    copy$1: function(params) {
+      return new D.Exponentiation(this.base, this.exponent, type$.Set_Variable._as(params));
     },
-    withSign$1: function(negative) {
-      return new D.Exponentiation(this.base, this.exponent, negative);
+    get$defaultParameters: function() {
+      var params = this.base.get$parameters();
+      params.addAll$1(0, this.exponent.get$parameters());
+      return type$.SplayTreeSet_Variable._as(params);
     }
   };
   N.Expr.prototype = {};
@@ -7154,135 +8681,166 @@
       return v.visitSuperExpr$1(this);
     }
   };
-  S.Multiplication.prototype = {
-    call$1: function(p) {
-      var t1 = {};
-      type$.Map_String_double._as(p);
-      t1.value = this.negative ? -1 : 1;
-      C.JSArray_methods.forEach$1(this.operands, new S.Multiplication_call_closure(t1, p));
-      return t1.value;
+  F.Log.prototype = {
+    evaluate$1: function(p) {
+      var b, op, v;
+      type$.Map_String_BSFunction._as(p);
+      b = this.base.evaluate$1(p);
+      op = this.operand.evaluate$1(p);
+      if (b instanceof R.Number && op instanceof R.Number) {
+        v = Math.log(op.absvalue) / Math.log(b.absvalue);
+        if (v === C.JSDouble_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return F.log(op, b);
     },
-    toString$1: function(_, handleMinus) {
-      var i,
-        s = (this.negative && handleMinus ? "-" : "") + "(",
+    toString$0: function(_) {
+      var t1 = this.base,
+        t2 = this.operand;
+      if (J.$eq$(t1, C.Number_oNt))
+        return "ln(" + H.S(t2) + ")";
+      else
+        return "log(" + H.S(t1) + ")(" + H.S(t2) + ")";
+    },
+    copy$1: function(params) {
+      return new F.Log(this.base, this.operand, type$.Set_Variable._as(params));
+    },
+    get$defaultParameters: function() {
+      var params = this.base.get$parameters();
+      params.addAll$1(0, this.operand.get$parameters());
+      return type$.SplayTreeSet_Variable._as(params);
+    }
+  };
+  S.Multiplication.prototype = {
+    evaluate$1: function(p) {
+      var ops;
+      type$.Map_String_BSFunction._as(p);
+      ops = H.setRuntimeTypeInfo([], type$.JSArray_BSFunction);
+      C.JSArray_methods.forEach$1(this.operands, new S.Multiplication_evaluate_closure(ops, p));
+      return S.multiply(ops);
+    },
+    toString$0: function(_) {
+      var s, i,
         t1 = this.operands;
       if (0 >= t1.length)
         return H.ioore(t1, 0);
-      s += J.toString$1$(t1[0], true);
+      s = C.JSString_methods.$add("(", J.toString$0$(t1[0]));
       for (i = 1; i < t1.length; ++i)
-        s += "*" + J.toString$1$(t1[i], true);
+        s += C.JSString_methods.$add("*", J.toString$0$(t1[i]));
       return s + ")";
     },
-    toString$0: function($receiver) {
-      return this.toString$1($receiver, true);
+    copy$1: function(params) {
+      return new S.Multiplication(this.operands, type$.Set_Variable._as(params));
     },
-    withSign$1: function(negative) {
-      return new S.Multiplication(this.operands, negative);
+    get$defaultParameters: function() {
+      var t1, t2, _i, operand, t3,
+        params = P.SplayTreeSet$(null, null, type$.Variable);
+      for (t1 = this.operands, t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
+        operand = t1[_i];
+        t3 = operand._parameters;
+        params.addAll$1(0, t3 == null ? operand.get$defaultParameters() : t3);
+      }
+      return params;
     }
   };
-  S.Multiplication_call_closure.prototype = {
+  S.Multiplication_evaluate_closure.prototype = {
     call$1: function(f) {
-      var t1, t2, t3;
-      type$.bscFunction._as(f);
-      t1 = this._box_0;
-      t2 = t1.value;
-      t3 = f.call$1(this.p);
-      if (typeof t3 !== "number")
-        return H.iae(t3);
-      t1.value = t2 * t3;
+      C.JSArray_methods.add$1(this.ops, type$.BSFunction._as(f).evaluate$1(this.p));
     },
-    $signature: 3
+    $signature: 6
   };
   S._consolidateNegatives_closure.prototype = {
     call$1: function(f) {
-      var t1;
-      type$.bscFunction._as(f);
-      if (f.negative) {
+      var t1 = type$.BSFunction,
+        _op = X.BSFunction_extractFromNegative(t1._as(f), t1);
+      if (_op.third) {
         t1 = this._box_0;
-        t1.negative = !t1.negative;
+        t1._negative = !t1._negative;
       }
-      return f.withSign$1(false);
+      return _op.first;
     },
-    $signature: 15
+    $signature: 7
   };
   U.NativeCallable.prototype = {
     get$arity: function() {
       return this._arity;
     },
-    call$2: function(interpreter, $arguments) {
-      return this._function.call$2(type$.BSInterpreter._as(interpreter), type$.List_Object._as($arguments));
+    callThing$2: function(interpreter, $arguments) {
+      return this._function.call$2(interpreter, type$.List_Object._as($arguments));
     },
     toString$0: function(_) {
       return "Native function";
     },
     $isBSCallable: 1
   };
+  G.Negative.prototype = {
+    copy$1: function(parameters) {
+      return new G.Negative(this.operand, type$.Set_Variable._as(parameters));
+    },
+    get$defaultParameters: function() {
+      return type$.SplayTreeSet_Variable._as(this.operand.get$parameters());
+    },
+    toString$0: function(_) {
+      return "-" + H.S(this.operand);
+    },
+    evaluate$1: function(p) {
+      return G.negative(this.operand.evaluate$1(type$.Map_String_BSFunction._as(p)));
+    }
+  };
   R.Number.prototype = {
-    toString$1: function(_, handleMinus) {
-      var t1 = handleMinus && this.negative ? "-" : "";
-      return C.JSString_methods.$add(t1, this.name);
+    toString$0: function(_) {
+      return this.name;
     },
-    toString$0: function($receiver) {
-      return this.toString$1($receiver, true);
-    },
-    call$1: function(p) {
-      type$.Map_String_double._as(p);
-      return this.get$value(this);
+    evaluate$1: function(p) {
+      type$.Map_String_BSFunction._as(p);
+      return this;
     },
     get$value: function(_) {
-      var t1 = this.negative ? -1 : 1;
-      return this.absvalue * t1;
+      return this.absvalue;
     },
-    withSign$1: function(negative) {
-      var t1 = this.absvalue;
+    copy$1: function(params) {
+      var t1;
+      type$.Set_Variable._as(params);
+      t1 = this.absvalue;
       if (this.isNamed)
-        return new R.Number(true, t1, this.name, negative);
+        return new R.Number(true, t1, this.name, params);
       else
-        return R.Number$_(t1 * (negative ? -1 : 1));
+        return R.Number$_(t1, params);
+    },
+    get$defaultParameters: function() {
+      return P.SplayTreeSet$(null, null, type$.Variable);
     },
     $eq: function(_, other) {
       if (other == null)
         return false;
-      return other instanceof R.Number && this.get$value(this) === other.get$value(other);
+      return other instanceof R.Number && this.absvalue === other.absvalue;
     },
     $le: function(_, other) {
-      var t1 = this.get$value(this),
-        t2 = H._asNumNullable(J.get$value$x(other));
-      if (typeof t2 !== "number")
-        return H.iae(t2);
-      return t1 <= t2;
+      var t1 = H._asNumNullable(J.get$value$x(other));
+      if (typeof t1 !== "number")
+        return H.iae(t1);
+      return this.absvalue <= t1;
     },
     $lt: function(_, other) {
-      var t1 = this.get$value(this),
-        t2 = H._asNumNullable(J.get$value$x(other));
-      if (typeof t2 !== "number")
-        return H.iae(t2);
-      return t1 < t2;
+      var t1 = H._asNumNullable(J.get$value$x(other));
+      if (typeof t1 !== "number")
+        return H.iae(t1);
+      return this.absvalue < t1;
     },
     $ge: function(_, other) {
-      var t1 = this.get$value(this),
-        t2 = H._asNumNullable(J.get$value$x(other));
-      if (typeof t2 !== "number")
-        return H.iae(t2);
-      return t1 >= t2;
+      var t1 = H._asNumNullable(J.get$value$x(other));
+      if (typeof t1 !== "number")
+        return H.iae(t1);
+      return this.absvalue >= t1;
     },
     $gt: function(_, other) {
-      var t1 = this.get$value(this),
-        t2 = H._asNumNullable(J.get$value$x(other));
-      if (typeof t2 !== "number")
-        return H.iae(t2);
-      return t1 > t2;
+      var t1 = H._asNumNullable(J.get$value$x(other));
+      if (typeof t1 !== "number")
+        return H.iae(t1);
+      return this.absvalue > t1;
     }
   };
-  R.Pair.prototype = {
-    toString$0: function(_) {
-      return "(" + C.JSNumber_methods.toString$0(this.first) + " , " + C.JSInt_methods.toString$0(this.second) + ")";
-    },
-    set$second: function(second) {
-      this.second = this.$ti._rest[1]._as(second);
-    }
-  };
-  F.FunctionType.prototype = {
+  F.RoutineType.prototype = {
     toString$0: function(_) {
       return this._Resolver$_name;
     }
@@ -7318,11 +8876,11 @@
     visitExpressionStmt$1: function(s) {
       s.expression.accept$1(0, this);
     },
-    visitFunctionStmt$1: function(s) {
+    visitRoutineStmt$1: function(s) {
       var t1 = s.name;
       this._declare$1(t1);
       this._define$1(t1);
-      this._resolveFunction$2(s, C.FunctionType_1);
+      this._resolveRoutine$2(s, C.RoutineType_1);
     },
     visitGroupingExpr$1: function(e) {
       e.expression.accept$1(0, this);
@@ -7341,9 +8899,9 @@
       s.expression.accept$1(0, this);
     },
     visitReturnStmt$1: function(s) {
-      if (this._currentFunction === C.FunctionType_0)
+      if (this._currentRoutine === C.RoutineType_0)
         Z.BetaScript_error(s.keyword, "Cannot return from top-level code.");
-      if (this._currentFunction === C.FunctionType_2)
+      if (this._currentRoutine === C.RoutineType_2)
         Z.BetaScript_error(s.keyword, "Cannot return a value from a constructor");
       s.value.accept$1(0, this);
     },
@@ -7351,23 +8909,45 @@
       e.right.accept$1(0, this);
     },
     visitVarStmt$1: function(s) {
-      var t2,
+      var t2, t3, t4, t5, _i, parameter, _this = this,
         t1 = s.name;
-      this._declare$1(t1);
+      _this._declare$1(t1);
+      t2 = s.parameters;
+      if (t2 != null)
+        for (t3 = t2.length, t4 = _this._scopes, t5 = _this._globals, _i = 0; _i < t2.length; t2.length === t3 || (0, H.throwConcurrentModificationError)(t2), ++_i) {
+          parameter = t2[_i];
+          if (!(t4.length !== 0 && C.JSArray_methods.get$last(t4).containsKey$1(parameter.lexeme)) && !t5.containsKey$1(parameter.lexeme)) {
+            _this._declare$1(parameter);
+            if (t4.length !== 0)
+              C.JSArray_methods.get$last(t4).$indexSet(0, parameter.lexeme, true);
+            else
+              t5.$indexSet(0, parameter.lexeme, true);
+          }
+        }
       t2 = s.initializer;
       if (t2 != null)
-        t2.accept$1(0, this);
-      this._define$1(t1);
+        t2.accept$1(0, _this);
+      _this._define$1(t1);
     },
     visitVariableExpr$1: function(e) {
-      var t1 = this._scopes;
-      if (t1.length !== 0 && J.$eq$(C.JSArray_methods.get$last(t1).$index(0, e.name.lexeme), false))
-        Z.BetaScript_error(e.name, "Cannot read local variable in its own initializer");
-      this._resolveLocal$2(e, e.name);
-      return null;
+      var t2,
+        _s43_ = "Cannot read variable in its own initializer",
+        t1 = this._scopes;
+      if (t1.length !== 0) {
+        t2 = e.name;
+        if (J.$eq$(C.JSArray_methods.get$last(t1).$index(0, t2.lexeme), false))
+          Z.BetaScript_error(t2, _s43_);
+        t1 = t2;
+      } else {
+        t1 = e.name;
+        if (!H.boolConversionCheck(this._globals.$index(0, t1.lexeme)))
+          Z.BetaScript_error(t1, _s43_);
+      }
+      this._resolveLocal$2(e, t1);
     },
     visitWhileStmt$1: function(s) {
-      throw H.wrapException(P.UnimplementedError$(null));
+      s.condition.accept$1(0, this);
+      s.body.accept$1(0, this);
     },
     visitlogicBinaryExpr$1: function(e) {
       e.left.accept$1(0, this);
@@ -7386,14 +8966,22 @@
         t2 = C.JSArray_methods.get$last(t1);
         t3 = $name.lexeme;
         if (t2.containsKey$1(t3))
-          Z.BetaScript_error($name, "Variable wit this name already declared in this scope.");
+          Z.BetaScript_error($name, "Variable with this name already declared in this scope.");
         C.JSArray_methods.get$last(t1).$indexSet(0, t3, false);
+      } else {
+        t1 = this._globals;
+        t2 = $name.lexeme;
+        if (t1.containsKey$1(t2))
+          Z.BetaScript_error($name, "Variable with this name already declared in global scope (might be shadowing native declaration).");
+        t1.$indexSet(0, t2, false);
       }
     },
     _define$1: function($name) {
       var t1 = this._scopes;
       if (t1.length !== 0)
         C.JSArray_methods.get$last(t1).$indexSet(0, $name.lexeme, true);
+      else
+        this._globals.$indexSet(0, $name.lexeme, true);
     },
     _resolveLocal$2: function(e, $name) {
       var t1, i, t2;
@@ -7407,23 +8995,25 @@
         }
       }
     },
-    _resolveFunction$2: function(s, type) {
-      var t1, t2, t3, _i, param, _this = this,
-        enclosingFunction = _this._currentFunction;
-      _this._currentFunction = type;
+    _resolveRoutine$2: function(s, type) {
+      var t1, t2, t3, t4, _i, param, _this = this,
+        enclosingRoutine = _this._currentRoutine;
+      _this._currentRoutine = type;
       t1 = _this._scopes;
       C.JSArray_methods.add$1(t1, new H.JsLinkedHashMap(type$.JsLinkedHashMap_String_bool));
-      for (t2 = s.parameters, t3 = t2.length, _i = 0; _i < t2.length; t2.length === t3 || (0, H.throwConcurrentModificationError)(t2), ++_i) {
+      for (t2 = s.parameters, t3 = t2.length, t4 = _this._globals, _i = 0; _i < t2.length; t2.length === t3 || (0, H.throwConcurrentModificationError)(t2), ++_i) {
         param = t2[_i];
         _this._declare$1(param);
         if (t1.length !== 0)
           C.JSArray_methods.get$last(t1).$indexSet(0, param.lexeme, true);
+        else
+          t4.$indexSet(0, param.lexeme, true);
       }
       _this.resolveAll$1(s.body);
       if (0 >= t1.length)
         return H.ioore(t1, -1);
       t1.pop();
-      _this._currentFunction = enclosingFunction;
+      _this._currentRoutine = enclosingRoutine;
     },
     visitClassStmt$1: function(s) {
       var t1, t2, t3, t4, t5, _i, method, _this = this,
@@ -7450,7 +9040,7 @@
       C.JSArray_methods.get$last(t2).$indexSet(0, "this", true);
       for (t4 = s.methods, t5 = t4.length, _i = 0; _i < t4.length; t4.length === t5 || (0, H.throwConcurrentModificationError)(t4), ++_i) {
         method = t4[_i];
-        _this._resolveFunction$2(method, method.name.lexeme === t1.lexeme ? C.FunctionType_2 : C.FunctionType_3);
+        _this._resolveRoutine$2(method, method.name.lexeme === t1.lexeme ? C.RoutineType_2 : C.RoutineType_3);
       }
       if (0 >= t2.length)
         return H.ioore(t2, -1);
@@ -7485,6 +9075,95 @@
     $isExprVisitor: 1,
     $isStmtVisitor: 1
   };
+  F.Resolver_closure.prototype = {
+    call$1: function(_) {
+      return true;
+    },
+    $signature: 5
+  };
+  R.Root.prototype = {
+    evaluate$1: function(p) {
+      var v,
+        opvalue = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      if (opvalue instanceof R.Number) {
+        v = Math.sqrt(opvalue.absvalue);
+        if (v === C.JSNumber_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return R.root(opvalue);
+    },
+    toString$0: function(_) {
+      return "sqrt(" + H.S(this.operand) + ")";
+    },
+    copy$1: function(params) {
+      return new R.Root(this.operand, type$.Set_Variable._as(params));
+    },
+    get$defaultParameters: function() {
+      return type$.SplayTreeSet_Variable._as(this.operand.get$parameters());
+    }
+  };
+  N.Sec.prototype = {
+    evaluate$1: function(p) {
+      var v,
+        op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      if (op instanceof R.Number) {
+        v = 1 / Math.cos(op.absvalue);
+        if (v === C.JSDouble_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return N.sec(op);
+    },
+    copy$1: function(params) {
+      return new N.Sec(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  Q.SecH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return Q.sech(op);
+    },
+    copy$1: function(params) {
+      return new Q.SecH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  T.Signum.prototype = {
+    evaluate$1: function(p) {
+      return T.sgn(this.operand.evaluate$1(type$.Map_String_BSFunction._as(p)));
+    },
+    toString$0: function(_) {
+      return "sign(" + H.S(this.operand) + ")";
+    },
+    copy$1: function(params) {
+      return new T.Signum(this.operand, type$.Set_Variable._as(params));
+    },
+    get$defaultParameters: function() {
+      return type$.SplayTreeSet_Variable._as(this.operand.get$parameters());
+    }
+  };
+  U.Sin.prototype = {
+    evaluate$1: function(p) {
+      var v,
+        op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      if (op instanceof R.Number) {
+        v = Math.sin(op.absvalue);
+        if (v === C.JSNumber_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return U.sin(op);
+    },
+    copy$1: function(params) {
+      return new U.Sin(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  U.SinH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return U.sinh(op);
+    },
+    copy$1: function(params) {
+      return new U.SinH(this.operand, type$.Set_Variable._as(params));
+    }
+  };
   L.Stmt.prototype = {};
   L.ExpressionStmt.prototype = {
     accept$1: function(_, v) {
@@ -7511,9 +9190,9 @@
       return v.visitIfStmt$1(this);
     }
   };
-  L.FunctionStmt.prototype = {
+  L.RoutineStmt.prototype = {
     accept$1: function(_, v) {
-      return v.visitFunctionStmt$1(this);
+      return v.visitRoutineStmt$1(this);
     }
   };
   L.WhileStmt.prototype = {
@@ -7535,54 +9214,81 @@
     }
   };
   N.Sum.prototype = {
-    call$1: function(p) {
-      var t1 = {};
-      type$.Map_String_double._as(p);
-      t1.value = 0;
-      C.JSArray_methods.forEach$1(this.operands, new N.Sum_call_closure(t1, p));
-      t1 = t1.value;
-      return t1 * (this.negative ? -1 : 1);
+    evaluate$1: function(p) {
+      var t1 = this.operands,
+        t2 = H._arrayInstanceType(t1);
+      return N.add(new H.MappedListIterable(t1, t2._eval$1("BSFunction(1)")._as(new N.Sum_evaluate_closure(type$.Map_String_BSFunction._as(p))), t2._eval$1("MappedListIterable<1,BSFunction>")).toList$0(0));
     },
-    toString$1: function(_, handleMinus) {
-      var i, t2, t3,
-        s = (this.negative && handleMinus ? "-" : "") + "(",
+    toString$0: function(_) {
+      var s, i, _op,
         t1 = this.operands;
       if (0 >= t1.length)
         return H.ioore(t1, 0);
-      s += J.toString$1$(t1[0], true);
+      s = C.JSString_methods.$add("(", J.toString$0$(t1[0]));
       for (i = 1; i < t1.length; ++i) {
-        t2 = t1[i];
-        t3 = t2.negative ? " - " : " + ";
-        s += t3 + J.toString$1$(t2, false);
+        _op = t1[i];
+        if (_op instanceof G.Negative) {
+          s += " - ";
+          _op = _op.operand;
+        } else
+          s += " + ";
+        s = C.JSString_methods.$add(s, J.toString$0$(_op));
       }
       return s + ")";
     },
-    toString$0: function($receiver) {
-      return this.toString$1($receiver, true);
+    copy$1: function(params) {
+      return new N.Sum(this.operands, type$.Set_Variable._as(params));
     },
-    withSign$1: function(negative) {
-      return new N.Sum(this.operands, negative);
+    get$defaultParameters: function() {
+      var t1, t2, _i, operand, t3,
+        params = P.SplayTreeSet$(null, null, type$.Variable);
+      for (t1 = this.operands, t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
+        operand = t1[_i];
+        t3 = operand._parameters;
+        params.addAll$1(0, t3 == null ? operand.get$defaultParameters() : t3);
+      }
+      return params;
     }
   };
-  N.Sum_call_closure.prototype = {
+  N.Sum_evaluate_closure.prototype = {
     call$1: function(f) {
-      var t1, t2, t3;
-      type$.bscFunction._as(f);
-      t1 = this._box_0;
-      t2 = t1.value;
-      t3 = f.call$1(this.p);
-      if (typeof t3 !== "number")
-        return H.iae(t3);
-      t1.value = t2 + t3;
+      return type$.BSFunction._as(f).evaluate$1(this.p);
     },
-    $signature: 3
+    $signature: 7
   };
   N._openOtherSums_closure.prototype = {
     call$1: function(f) {
-      type$.bscFunction._as(f);
-      C.JSArray_methods.add$1(this._box_0.newOperands, f.withSign$1(!f.negative));
+      var t1;
+      type$.BSFunction._as(f);
+      t1 = this._box_0.newOperands;
+      f.toString;
+      C.JSArray_methods.add$1(t1, G.negative(f));
     },
-    $signature: 3
+    $signature: 6
+  };
+  M.Tan.prototype = {
+    evaluate$1: function(p) {
+      var v,
+        op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      if (op instanceof R.Number) {
+        v = Math.tan(op.absvalue);
+        if (v === C.JSNumber_methods.toInt$0(v))
+          return R.n(v);
+      }
+      return M.tan(op);
+    },
+    copy$1: function(params) {
+      return new M.Tan(this.operand, type$.Set_Variable._as(params));
+    }
+  };
+  X.TanH.prototype = {
+    evaluate$1: function(p) {
+      var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
+      return X.tanh(op);
+    },
+    copy$1: function(params) {
+      return new X.TanH(this.operand, type$.Set_Variable._as(params));
+    }
   };
   V.TokenType.prototype = {
     toString$0: function(_) {
@@ -7591,22 +9297,32 @@
   };
   V.Token.prototype = {
     toString$0: function(_) {
-      var t1 = this.type,
-        t2 = J.toString$0$(t1) + ' "' + this.lexeme + '" ';
-      return t2 + (t1 === C.TokenType_22 ? J.toString$0$(this.literal) : "");
+      return H.S(this.type) + " '" + this.lexeme + "' " + H.S(this.literal);
     }
   };
-  K.UserFunction.prototype = {
-    get$arity: function() {
-      return this._UserFunction$_declaration.parameters.length;
+  Z.Pair.prototype = {
+    toString$0: function(_) {
+      return "(" + H.S(this.first) + " , " + this.second + ")";
     },
-    call$2: function(interpreter, $arguments) {
+    set$second: function(second) {
+      this.second = this.$ti._rest[1]._as(second);
+    }
+  };
+  Z.Trio.prototype = {
+    toString$0: function(_) {
+      return "(" + H.S(this.first) + " , " + this.second + ", " + this.third + ")";
+    }
+  };
+  G.UserRoutine.prototype = {
+    get$arity: function() {
+      return this._UserRoutine$_declaration.parameters.length;
+    },
+    callThing$2: function(interpreter, $arguments) {
       var environment, r, t1, t2, t3, i, t4, t5, exception, _this = this;
-      type$.BSInterpreter._as(interpreter);
       type$.List_Object._as($arguments);
       t1 = _this._closure;
       environment = new D.Environment(new H.JsLinkedHashMap(type$.JsLinkedHashMap_String_Object), t1);
-      for (t2 = _this._UserFunction$_declaration, t3 = t2.parameters, i = 0; i < t3.length; ++i) {
+      for (t2 = _this._UserRoutine$_declaration, t3 = t2.parameters, i = 0; i < t3.length; ++i) {
         t4 = t3[i].lexeme;
         if (i >= $arguments.length)
           return H.ioore($arguments, i);
@@ -7628,39 +9344,59 @@
       return _this._isInitializer ? t1._ancestor$1(0).values.$index(0, "this") : null;
     },
     toString$0: function(_) {
-      return "<fn " + this._UserFunction$_declaration.name.lexeme + ">";
+      return "<fn " + this._UserRoutine$_declaration.name.lexeme + ">";
     },
     bind$1: function(instance) {
       var environment = new D.Environment(new H.JsLinkedHashMap(type$.JsLinkedHashMap_String_Object), this._closure);
       environment.define$2("this", instance);
-      return new K.UserFunction(this._UserFunction$_declaration, environment, this._isInitializer);
+      return new G.UserRoutine(this._UserRoutine$_declaration, environment, this._isInitializer);
     },
     $isBSCallable: 1
   };
-  Z.bscFunction.prototype = {
-    $negate: function(_) {
-      return this.withSign$1(!this.negative);
-    },
-    $add: function(_, other) {
-      return N.add(H.setRuntimeTypeInfo([this, type$.bscFunction._as(other)], type$.JSArray_bscFunction));
-    },
-    $sub: function(_, other) {
-      type$.bscFunction._as(other);
-      return N.add(H.setRuntimeTypeInfo([this, other.withSign$1(!other.negative)], type$.JSArray_bscFunction));
-    },
-    $mul: function(_, other) {
-      return S.multiply(H.setRuntimeTypeInfo([this, type$.bscFunction._as(other)], type$.JSArray_bscFunction));
-    },
-    $div: function(_, other) {
+  X.Variable.prototype = {
+    evaluate$1: function(p) {
       var t1;
-      type$.bscFunction._as(other);
-      t1 = type$.JSArray_bscFunction;
-      return K.divide(H.setRuntimeTypeInfo([this], t1), H.setRuntimeTypeInfo([other], t1));
+      type$.Map_String_BSFunction._as(p);
+      t1 = this.name;
+      if (!p.containsKey$1(t1)) {
+        P.print("Error! Missing arguments in call call: " + t1 + " not defined");
+        P.ArgumentError_checkNotNull(1, "code", type$.int);
+        P._ProcessUtils__exit(1);
+      }
+      return p.$index(0, t1);
     },
-    $eq: function(_, other) {
-      if (other == null)
-        return false;
-      return other instanceof Z.bscFunction && this.toString$0(0) === other.toString$0(0);
+    toString$0: function(_) {
+      return this.name;
+    },
+    copy$1: function(params) {
+      type$.Set_Variable._as(params);
+      return new X.Variable(this.name, this.get$parameters());
+    },
+    get$defaultParameters: function() {
+      return P.SplayTreeSet_SplayTreeSet$from([this], type$.Variable);
+    },
+    compareTo$1: function(_, other) {
+      if (other instanceof X.Variable)
+        return C.JSString_methods.compareTo$1(this.name, other.name);
+      else
+        throw H.wrapException(P.Exception_Exception("Can't compare Variable with " + J.get$runtimeType$(other).toString$0(0) + "!"));
+    },
+    $isComparable: 1
+  };
+  L.closure.prototype = {
+    call$2: function(interpreter, $arguments) {
+      type$.BSInterpreter._as(interpreter);
+      type$.List_Object._as($arguments);
+      return Date.now();
+    },
+    $signature: 19
+  };
+  L.singleOperandFunction.prototype = {
+    toString$0: function(_) {
+      return H.getRuntimeType(this).toString$0(0).toLowerCase() + "(" + H.S(this.operand) + ")";
+    },
+    get$defaultParameters: function() {
+      return type$.SplayTreeSet_Variable._as(this.operand.get$parameters());
     }
   };
   N.main_closure.prototype = {
@@ -7671,7 +9407,7 @@
       t2 = type$.TextAreaElement;
       t2._as(t1.getElementById("output")).value = Z.BetaScript_runForWeb(t2._as(t1.getElementById("source")).value);
     },
-    $signature: 16
+    $signature: 20
   };
   (function aliases() {
     var _ = J.Interceptor.prototype;
@@ -7682,34 +9418,45 @@
   (function installTearOffs() {
     var _static_1 = hunkHelpers._static_1,
       _static_0 = hunkHelpers._static_0,
+      _static_2 = hunkHelpers._static_2,
       _instance_0_u = hunkHelpers._instance_0u;
-    _static_1(P, "async__AsyncRun__scheduleImmediateJsOverride$closure", "_AsyncRun__scheduleImmediateJsOverride", 4);
-    _static_1(P, "async__AsyncRun__scheduleImmediateWithSetImmediate$closure", "_AsyncRun__scheduleImmediateWithSetImmediate", 4);
-    _static_1(P, "async__AsyncRun__scheduleImmediateWithTimer$closure", "_AsyncRun__scheduleImmediateWithTimer", 4);
+    _static_1(P, "async__AsyncRun__scheduleImmediateJsOverride$closure", "_AsyncRun__scheduleImmediateJsOverride", 3);
+    _static_1(P, "async__AsyncRun__scheduleImmediateWithSetImmediate$closure", "_AsyncRun__scheduleImmediateWithSetImmediate", 3);
+    _static_1(P, "async__AsyncRun__scheduleImmediateWithTimer$closure", "_AsyncRun__scheduleImmediateWithTimer", 3);
     _static_0(P, "async___startMicrotaskLoop$closure", "_startMicrotaskLoop", 0);
+    _static_2(P, "collection___dynamicCompare$closure", "_dynamicCompare", 21);
+    _static_2(P, "core_Comparable_compare$closure", "Comparable_compare", 22);
     _instance_0_u(X.BSScanner.prototype, "get$_string", "_string$0", 0);
   })();
   (function inheritance() {
-    var _inherit = hunkHelpers.inherit,
+    var _mixin = hunkHelpers.mixin,
+      _inherit = hunkHelpers.inherit,
       _inheritMany = hunkHelpers.inheritMany;
     _inherit(P.Object, null);
-    _inheritMany(P.Object, [H.JS_CONST, J.Interceptor, J.ArrayIterator, P.Iterable, H.ListIterator, H.ConstantMap, H.TypeErrorDecoder, P.Error, H.Closure, H._StackTrace, P.MapMixin, H.LinkedHashMapCell, H.LinkedHashMapKeyIterator, H.Rti, H._FunctionParameters, P._TimerImpl, P._FutureListener, P._Future, P._AsyncCallbackEntry, P.Stream, P.StreamSubscription, P.AsyncError, P._Zone, P.bool, P.num, P.OutOfMemoryError, P.StackOverflowError, P._Exception, P.FormatException, P.Function, P.List, P.Map, P.Null, P.StackTrace, P._StringStackTrace, P.String, P.StringBuffer, W.EventStreamProvider, U.BSClass, D.Environment, N.BSInstance, Y.BSInterpreter, Y.RuntimeError0, Y.Return, R.ParseError, R.BSParser, X.BSScanner, Z.bscFunction, N.Expr, U.NativeCallable, R.Pair, F.FunctionType, F.ClassType, F.Resolver, L.Stmt, V.TokenType, V.Token, K.UserFunction]);
+    _inheritMany(P.Object, [H.JS_CONST, J.Interceptor, J.ArrayIterator, P.Iterable, H.ListIterator, P.Iterator, H.ConstantMap, H.TypeErrorDecoder, P.Error, H.Closure, H._StackTrace, P.MapMixin, H.LinkedHashMapCell, H.LinkedHashMapKeyIterator, H.Rti, H._FunctionParameters, H._Type, P._TimerImpl, P._FutureListener, P._Future, P._AsyncCallbackEntry, P.Stream, P.StreamSubscription, P.AsyncError, P._Zone, P._SetBase, P._LinkedHashSetCell, P._LinkedHashSetIterator, P.IterableMixin, P.SetMixin, P._SplayTreeNode, P._SplayTree, P._SplayTreeIterator, P.bool, P.Comparable, P.num, P.OutOfMemoryError, P.StackOverflowError, P._Exception, P.FormatException, P.Function, P.List, P.Map, P.Null, P.StackTrace, P._StringStackTrace, P.String, P.StringBuffer, W.EventStreamProvider, X.BSFunction, U.BSClass, D.Environment, X.BetascriptFunctionError, N.BSInstance, Y.BSInterpreter, Y.RuntimeError0, Y.Return, R.ParseError, R.BSParser, X.BSScanner, N.Expr, U.NativeCallable, F.RoutineType, F.ClassType, F.Resolver, L.Stmt, V.TokenType, V.Token, Z.Pair, Z.Trio, G.UserRoutine]);
     _inheritMany(J.Interceptor, [J.JSBool, J.JSNull, J.JavaScriptObject, J.JSArray, J.JSNumber, J.JSString, W.EventTarget, W.DomException, W.Event]);
     _inheritMany(J.JavaScriptObject, [J.PlainJavaScriptObject, J.UnknownJavaScriptObject, J.JavaScriptFunction]);
     _inherit(J.JSUnmodifiableArray, J.JSArray);
     _inheritMany(J.JSNumber, [J.JSInt, J.JSDouble]);
-    _inherit(H.EfficientLengthIterable, P.Iterable);
+    _inheritMany(P.Iterable, [H.EfficientLengthIterable, H.MappedIterable, H._ConstantMapKeyIterable]);
     _inheritMany(H.EfficientLengthIterable, [H.ListIterable, H.LinkedHashMapKeyIterable]);
+    _inherit(H.EfficientLengthMappedIterable, H.MappedIterable);
+    _inherit(H.MappedIterator, P.Iterator);
     _inherit(H.MappedListIterable, H.ListIterable);
     _inherit(H.ConstantStringMap, H.ConstantMap);
     _inheritMany(P.Error, [H.NullError, H.JsNoSuchMethodError, H.UnknownJsTypeError, H.RuntimeError, P.AssertionError, H._Error, P.NullThrownError, P.ArgumentError, P.UnsupportedError, P.UnimplementedError, P.StateError, P.ConcurrentModificationError, P.CyclicInitializationError]);
-    _inheritMany(H.Closure, [H.unwrapException_saveStackTrace, H.TearOffClosure, H.initHooks_closure, H.initHooks_closure0, H.initHooks_closure1, P._AsyncRun__initializeScheduleImmediate_internalCallback, P._AsyncRun__initializeScheduleImmediate_closure, P._AsyncRun__scheduleImmediateJsOverride_internalCallback, P._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback, P._TimerImpl_internalCallback, P._Future__addListener_closure, P._Future__prependListeners_closure, P._Future__chainForeignFuture_closure, P._Future__chainForeignFuture_closure0, P._Future__chainForeignFuture_closure1, P._Future__propagateToListeners_handleWhenCompleteCallback, P._Future__propagateToListeners_handleWhenCompleteCallback_closure, P._Future__propagateToListeners_handleValueCallback, P._Future__propagateToListeners_handleError, P.Stream_length_closure, P.Stream_length_closure0, P._rootHandleUncaughtError_closure, P._RootZone_bindCallback_closure, P._RootZone_bindCallbackGuarded_closure, P._RootZone_bindUnaryCallbackGuarded_closure, P.MapBase_mapToString_closure, W._EventStreamSubscription_closure, Y.BSInterpreter_closure, X.BSScanner__initializeMap_closure, X.BSScanner__initializeMap_closure0, X.BSScanner__initializeMap_closure1, X.BSScanner__initializeMap_closure2, X.BSScanner__initializeMap_closure3, X.BSScanner__initializeMap_closure4, X.BSScanner__initializeMap_closure5, X.BSScanner__initializeMap_closure6, X.BSScanner__initializeMap_closure7, X.BSScanner__initializeMap_closure8, X.BSScanner__initializeMap_closure9, X.BSScanner__initializeMap_closure10, X.BSScanner__initializeMap_closure11, X.BSScanner__initializeMap_closure12, X.BSScanner__initializeMap_closure13, X.BSScanner__initializeMap_closure14, X.BSScanner__initializeMap_closure15, X.BSScanner__initializeMap_closure16, X.BSScanner__initializeMap_closure17, X.BSScanner__initializeMap_closure18, X.BSScanner__initializeMap_closure19, Z.BetaScript_runForWeb_closure, S.Multiplication_call_closure, S._consolidateNegatives_closure, N.Sum_call_closure, N._openOtherSums_closure, N.main_closure]);
+    _inheritMany(H.Closure, [H.unwrapException_saveStackTrace, H.TearOffClosure, H.initHooks_closure, H.initHooks_closure0, H.initHooks_closure1, P._AsyncRun__initializeScheduleImmediate_internalCallback, P._AsyncRun__initializeScheduleImmediate_closure, P._AsyncRun__scheduleImmediateJsOverride_internalCallback, P._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback, P._TimerImpl_internalCallback, P._Future__addListener_closure, P._Future__prependListeners_closure, P._Future__chainForeignFuture_closure, P._Future__chainForeignFuture_closure0, P._Future__chainForeignFuture_closure1, P._Future__propagateToListeners_handleWhenCompleteCallback, P._Future__propagateToListeners_handleWhenCompleteCallback_closure, P._Future__propagateToListeners_handleValueCallback, P._Future__propagateToListeners_handleError, P.Stream_length_closure, P.Stream_length_closure0, P._rootHandleUncaughtError_closure, P._RootZone_bindCallback_closure, P._RootZone_bindCallbackGuarded_closure, P._RootZone_bindUnaryCallbackGuarded_closure, P.MapBase_mapToString_closure, P.SplayTreeSet_closure, W._EventStreamSubscription_closure, X.BSFunction_call_closure, X.BSFunction_withParameters_closure, X.BSFunction_callThing_closure, X.BSScanner__initializeMap_closure, X.BSScanner__initializeMap_closure0, X.BSScanner__initializeMap_closure1, X.BSScanner__initializeMap_closure2, X.BSScanner__initializeMap_closure3, X.BSScanner__initializeMap_closure4, X.BSScanner__initializeMap_closure5, X.BSScanner__initializeMap_closure6, X.BSScanner__initializeMap_closure7, X.BSScanner__initializeMap_closure8, X.BSScanner__initializeMap_closure9, X.BSScanner__initializeMap_closure10, X.BSScanner__initializeMap_closure11, X.BSScanner__initializeMap_closure12, X.BSScanner__initializeMap_closure13, X.BSScanner__initializeMap_closure14, X.BSScanner__initializeMap_closure15, X.BSScanner__initializeMap_closure16, X.BSScanner__initializeMap_closure17, X.BSScanner__initializeMap_closure18, X.BSScanner__initializeMap_closure19, X.BSScanner__initializeMap_closure20, X.BSScanner__initializeMap_closure21, Z.BetaScript_runForWeb_closure, S.Multiplication_evaluate_closure, S._consolidateNegatives_closure, F.Resolver_closure, N.Sum_evaluate_closure, N._openOtherSums_closure, L.closure, N.main_closure]);
     _inheritMany(H.TearOffClosure, [H.StaticClosure, H.BoundClosure]);
     _inherit(H._AssertionError, P.AssertionError);
     _inherit(P.MapBase, P.MapMixin);
     _inherit(H.JsLinkedHashMap, P.MapBase);
     _inherit(H._TypeError, H._Error);
     _inherit(P._RootZone, P._Zone);
+    _inherit(P._LinkedHashSet, P._SetBase);
+    _inherit(P._SplayTreeKeyIterator, P._SplayTreeIterator);
+    _inherit(P._SplayTreeSet__SplayTree_IterableMixin, P._SplayTree);
+    _inherit(P._SplayTreeSet__SplayTree_IterableMixin_SetMixin, P._SplayTreeSet__SplayTree_IterableMixin);
+    _inherit(P.SplayTreeSet, P._SplayTreeSet__SplayTree_IterableMixin_SetMixin);
     _inheritMany(P.num, [P.double, P.int]);
     _inheritMany(P.ArgumentError, [P.RangeError, P.IndexError]);
     _inherit(W.Node, W.EventTarget);
@@ -7721,9 +9468,12 @@
     _inherit(W._EventStream, P.Stream);
     _inherit(W._ElementEventStreamImpl, W._EventStream);
     _inherit(W._EventStreamSubscription, P.StreamSubscription);
-    _inheritMany(Z.bscFunction, [K.Division, D.Exponentiation, S.Multiplication, R.Number, N.Sum]);
+    _inheritMany(X.BSFunction, [S.AbsoluteValue, L.singleOperandFunction, K.Division, D.Exponentiation, F.Log, S.Multiplication, G.Negative, R.Number, R.Root, T.Signum, N.Sum, X.Variable]);
+    _inheritMany(L.singleOperandFunction, [Z.ArCosH, R.ArCscH, Z.ArCtgH, T.ArSecH, E.ArSinH, Y.ArTanH, O.ArcCos, Z.ArcCsc, N.ArcCtg, D.ArcSec, R.ArcSin, E.ArcTan, O.Cos, Z.CosH, Q.Csc, X.CscH, L.Ctg, G.CtgH, N.Sec, Q.SecH, U.Sin, U.SinH, M.Tan, X.TanH]);
     _inheritMany(N.Expr, [N.BinaryExpr, N.CallExpr, N.GetExpr, N.GroupingExpr, N.LiteralExpr, N.UnaryExpr, N.VariableExpr, N.AssignExpr, N.logicBinaryExpr, N.SetExpr, N.ThisExpr, N.SuperExpr]);
-    _inheritMany(L.Stmt, [L.ExpressionStmt, L.PrintStmt, L.VarStmt, L.BlockStmt, L.IfStmt, L.FunctionStmt, L.WhileStmt, L.ReturnStmt, L.ClassStmt]);
+    _inheritMany(L.Stmt, [L.ExpressionStmt, L.PrintStmt, L.VarStmt, L.BlockStmt, L.IfStmt, L.RoutineStmt, L.WhileStmt, L.ReturnStmt, L.ClassStmt]);
+    _mixin(P._SplayTreeSet__SplayTree_IterableMixin, P.IterableMixin);
+    _mixin(P._SplayTreeSet__SplayTree_IterableMixin_SetMixin, P.SetMixin);
   })();
   var init = {
     typeUniverse: {eC: new Map(), tR: {}, eT: {}, tPV: {}, sEA: []},
@@ -7731,21 +9481,24 @@
     mangledNames: {},
     getTypeFromName: getGlobalFromName,
     metadata: [],
-    types: ["~()", "Null()", "Null(@)", "Null(bscFunction)", "~(~())", "@(@)", "@(@,String)", "@(String)", "Null(~())", "Null(@[StackTrace])", "_Future<@>(@)", "Null(@,@)", "@(Event)", "int(BSInterpreter,List<Object>)", "int()", "bscFunction(bscFunction)", "Null(MouseEvent)"],
+    types: ["~()", "Null()", "Null(@)", "~(~())", "@(@)", "bool(@)", "Null(BSFunction)", "BSFunction(BSFunction)", "@(@,String)", "@(String)", "Null(~())", "Null(@[StackTrace])", "_Future<@>(@)", "Null(@,@)", "@(Event)", "String(Variable)", "Null(Variable)", "BSFunction(Object)", "int()", "int(BSInterpreter,List<Object>)", "Null(MouseEvent)", "int(@,@)", "int(Comparable<@>,Comparable<@>)"],
     interceptorsByTag: null,
     leafTags: null,
     arrayRti: typeof Symbol == "function" && typeof Symbol() == "symbol" ? Symbol("$ti") : "$ti"
   };
-  H._Universe_addRules(init.typeUniverse, JSON.parse('{"JavaScriptFunction":"JavaScriptObject","PlainJavaScriptObject":"JavaScriptObject","UnknownJavaScriptObject":"JavaScriptObject","AbortPaymentEvent":"Event","ExtendableEvent":"Event","AElement":"SvgElement","GraphicsElement":"SvgElement","AudioElement":"HtmlElement","MediaElement":"HtmlElement","PointerEvent":"MouseEvent","CompositionEvent":"UIEvent","HtmlDocument":"Node","Document":"Node","JSBool":{"bool":[]},"JSNull":{"Null":[]},"JavaScriptObject":{"Function":[]},"JSArray":{"List":["1"],"Iterable":["1"]},"JSUnmodifiableArray":{"JSArray":["1"],"List":["1"],"Iterable":["1"]},"JSNumber":{"double":[],"num":[]},"JSInt":{"int":[],"double":[],"num":[]},"JSDouble":{"double":[],"num":[]},"JSString":{"String":[]},"EfficientLengthIterable":{"Iterable":["1"]},"ListIterable":{"Iterable":["1"]},"MappedListIterable":{"ListIterable":["2"],"Iterable":["2"],"ListIterable.E":"2"},"ConstantMap":{"Map":["1","2"]},"ConstantStringMap":{"ConstantMap":["1","2"],"Map":["1","2"]},"NullError":{"Error":[]},"JsNoSuchMethodError":{"Error":[]},"UnknownJsTypeError":{"Error":[]},"_StackTrace":{"StackTrace":[]},"Closure":{"Function":[]},"TearOffClosure":{"Function":[]},"StaticClosure":{"Function":[]},"BoundClosure":{"Function":[]},"RuntimeError":{"Error":[]},"_AssertionError":{"Error":[]},"JsLinkedHashMap":{"LinkedHashMap":["1","2"],"MapMixin":["1","2"],"Map":["1","2"]},"LinkedHashMapKeyIterable":{"Iterable":["1"]},"_Error":{"Error":[]},"_TypeError":{"Error":[]},"_Future":{"Future":["1"]},"AsyncError":{"Error":[]},"_Zone":{"Zone":[]},"_RootZone":{"Zone":[]},"MapBase":{"MapMixin":["1","2"],"Map":["1","2"]},"MapMixin":{"Map":["1","2"]},"double":{"num":[]},"AssertionError":{"Error":[]},"NullThrownError":{"Error":[]},"ArgumentError":{"Error":[]},"RangeError":{"Error":[]},"IndexError":{"Error":[]},"UnsupportedError":{"Error":[]},"UnimplementedError":{"Error":[]},"StateError":{"Error":[]},"ConcurrentModificationError":{"Error":[]},"OutOfMemoryError":{"Error":[]},"StackOverflowError":{"Error":[]},"CyclicInitializationError":{"Error":[]},"int":{"num":[]},"List":{"Iterable":["1"]},"_StringStackTrace":{"StackTrace":[]},"HtmlElement":{"Element":[],"EventTarget":[]},"AnchorElement":{"Element":[],"EventTarget":[]},"AreaElement":{"Element":[],"EventTarget":[]},"ButtonElement":{"Element":[],"EventTarget":[]},"DataElement":{"Element":[],"EventTarget":[]},"Element":{"EventTarget":[]},"FormElement":{"Element":[],"EventTarget":[]},"InputElement":{"Element":[],"EventTarget":[]},"LIElement":{"Element":[],"EventTarget":[]},"MeterElement":{"Element":[],"EventTarget":[]},"MouseEvent":{"Event":[]},"Node":{"EventTarget":[]},"OptionElement":{"Element":[],"EventTarget":[]},"OutputElement":{"Element":[],"EventTarget":[]},"ParamElement":{"Element":[],"EventTarget":[]},"ProgressElement":{"Element":[],"EventTarget":[]},"SelectElement":{"Element":[],"EventTarget":[]},"TextAreaElement":{"Element":[],"EventTarget":[]},"UIEvent":{"Event":[]},"_EventStream":{"Stream":["1"]},"_ElementEventStreamImpl":{"_EventStream":["1"],"Stream":["1"]},"SvgElement":{"Element":[],"EventTarget":[]},"BSClass":{"BSCallable":[]},"BSInterpreter":{"StmtVisitor":[],"ExprVisitor":[]},"Division":{"bscFunction":[]},"Exponentiation":{"bscFunction":[]},"BinaryExpr":{"Expr":[]},"CallExpr":{"Expr":[]},"GetExpr":{"Expr":[]},"GroupingExpr":{"Expr":[]},"LiteralExpr":{"Expr":[]},"UnaryExpr":{"Expr":[]},"VariableExpr":{"Expr":[]},"AssignExpr":{"Expr":[]},"logicBinaryExpr":{"Expr":[]},"SetExpr":{"Expr":[]},"ThisExpr":{"Expr":[]},"SuperExpr":{"Expr":[]},"Multiplication":{"bscFunction":[]},"NativeCallable":{"BSCallable":[]},"Number":{"bscFunction":[]},"Resolver":{"StmtVisitor":[],"ExprVisitor":[]},"ExpressionStmt":{"Stmt":[]},"PrintStmt":{"Stmt":[]},"VarStmt":{"Stmt":[]},"BlockStmt":{"Stmt":[]},"IfStmt":{"Stmt":[]},"FunctionStmt":{"Stmt":[]},"WhileStmt":{"Stmt":[]},"ReturnStmt":{"Stmt":[]},"ClassStmt":{"Stmt":[]},"Sum":{"bscFunction":[]},"UserFunction":{"BSCallable":[]}}'));
-  H._Universe_addErasedTypes(init.typeUniverse, JSON.parse('{"EfficientLengthIterable":1,"StreamSubscription":1,"MapBase":2}'));
+  H._Universe_addRules(init.typeUniverse, JSON.parse('{"JavaScriptFunction":"JavaScriptObject","PlainJavaScriptObject":"JavaScriptObject","UnknownJavaScriptObject":"JavaScriptObject","AbortPaymentEvent":"Event","ExtendableEvent":"Event","AElement":"SvgElement","GraphicsElement":"SvgElement","AudioElement":"HtmlElement","MediaElement":"HtmlElement","PointerEvent":"MouseEvent","CompositionEvent":"UIEvent","HtmlDocument":"Node","Document":"Node","JSBool":{"bool":[]},"JSNull":{"Null":[]},"JavaScriptObject":{"Function":[]},"JSArray":{"List":["1"],"Iterable":["1"]},"JSUnmodifiableArray":{"JSArray":["1"],"List":["1"],"Iterable":["1"]},"ArrayIterator":{"Iterator":["1"]},"JSNumber":{"double":[],"num":[],"Comparable":["num"]},"JSInt":{"int":[],"double":[],"num":[],"Comparable":["num"]},"JSDouble":{"double":[],"num":[],"Comparable":["num"]},"JSString":{"String":[],"Comparable":["String"]},"EfficientLengthIterable":{"Iterable":["1"]},"ListIterable":{"Iterable":["1"]},"ListIterator":{"Iterator":["1"]},"MappedIterable":{"Iterable":["2"]},"EfficientLengthMappedIterable":{"MappedIterable":["1","2"],"Iterable":["2"]},"MappedIterator":{"Iterator":["2"]},"MappedListIterable":{"ListIterable":["2"],"Iterable":["2"],"ListIterable.E":"2"},"ConstantMap":{"Map":["1","2"]},"ConstantStringMap":{"ConstantMap":["1","2"],"Map":["1","2"]},"_ConstantMapKeyIterable":{"Iterable":["1"]},"NullError":{"Error":[]},"JsNoSuchMethodError":{"Error":[]},"UnknownJsTypeError":{"Error":[]},"_StackTrace":{"StackTrace":[]},"Closure":{"Function":[]},"TearOffClosure":{"Function":[]},"StaticClosure":{"Function":[]},"BoundClosure":{"Function":[]},"RuntimeError":{"Error":[]},"_AssertionError":{"Error":[]},"JsLinkedHashMap":{"LinkedHashMap":["1","2"],"MapMixin":["1","2"],"Map":["1","2"]},"LinkedHashMapKeyIterable":{"Iterable":["1"]},"LinkedHashMapKeyIterator":{"Iterator":["1"]},"_Error":{"Error":[]},"_TypeError":{"Error":[]},"_Future":{"Future":["1"]},"AsyncError":{"Error":[]},"_Zone":{"Zone":[]},"_RootZone":{"Zone":[]},"_LinkedHashSet":{"_SetBase":["1"],"Set":["1"],"Iterable":["1"]},"_LinkedHashSetIterator":{"Iterator":["1"]},"MapBase":{"MapMixin":["1","2"],"Map":["1","2"]},"MapMixin":{"Map":["1","2"]},"_SetBase":{"Set":["1"],"Iterable":["1"]},"_SplayTreeIterator":{"Iterator":["2"]},"_SplayTreeKeyIterator":{"_SplayTreeIterator":["1","1"],"Iterator":["1"],"_SplayTreeIterator.K":"1"},"SplayTreeSet":{"SetMixin":["1"],"Set":["1"],"IterableMixin":["1"],"_SplayTree":["1","_SplayTreeNode<1>"],"Iterable":["1"],"_SplayTree.K":"1","_SplayTree.1":"_SplayTreeNode<1>"},"double":{"num":[],"Comparable":["num"]},"AssertionError":{"Error":[]},"NullThrownError":{"Error":[]},"ArgumentError":{"Error":[]},"RangeError":{"Error":[]},"IndexError":{"Error":[]},"UnsupportedError":{"Error":[]},"UnimplementedError":{"Error":[]},"StateError":{"Error":[]},"ConcurrentModificationError":{"Error":[]},"OutOfMemoryError":{"Error":[]},"StackOverflowError":{"Error":[]},"CyclicInitializationError":{"Error":[]},"int":{"num":[],"Comparable":["num"]},"List":{"Iterable":["1"]},"num":{"Comparable":["num"]},"_StringStackTrace":{"StackTrace":[]},"String":{"Comparable":["String"]},"HtmlElement":{"Element":[],"EventTarget":[]},"AnchorElement":{"Element":[],"EventTarget":[]},"AreaElement":{"Element":[],"EventTarget":[]},"ButtonElement":{"Element":[],"EventTarget":[]},"DataElement":{"Element":[],"EventTarget":[]},"Element":{"EventTarget":[]},"FormElement":{"Element":[],"EventTarget":[]},"InputElement":{"Element":[],"EventTarget":[]},"LIElement":{"Element":[],"EventTarget":[]},"MeterElement":{"Element":[],"EventTarget":[]},"MouseEvent":{"Event":[]},"Node":{"EventTarget":[]},"OptionElement":{"Element":[],"EventTarget":[]},"OutputElement":{"Element":[],"EventTarget":[]},"ParamElement":{"Element":[],"EventTarget":[]},"ProgressElement":{"Element":[],"EventTarget":[]},"SelectElement":{"Element":[],"EventTarget":[]},"TextAreaElement":{"Element":[],"EventTarget":[]},"UIEvent":{"Event":[]},"_EventStream":{"Stream":["1"]},"_ElementEventStreamImpl":{"_EventStream":["1"],"Stream":["1"]},"SvgElement":{"Element":[],"EventTarget":[]},"AbsoluteValue":{"BSFunction":[],"BSCallable":[]},"ArCosH":{"BSFunction":[],"BSCallable":[]},"ArCscH":{"BSFunction":[],"BSCallable":[]},"ArCtgH":{"BSFunction":[],"BSCallable":[]},"ArSecH":{"BSFunction":[],"BSCallable":[]},"ArSinH":{"BSFunction":[],"BSCallable":[]},"ArTanH":{"BSFunction":[],"BSCallable":[]},"ArcCos":{"BSFunction":[],"BSCallable":[]},"ArcCsc":{"BSFunction":[],"BSCallable":[]},"ArcCtg":{"BSFunction":[],"BSCallable":[]},"ArcSec":{"BSFunction":[],"BSCallable":[]},"ArcSin":{"BSFunction":[],"BSCallable":[]},"ArcTan":{"BSFunction":[],"BSCallable":[]},"BSClass":{"BSCallable":[]},"BSFunction":{"BSCallable":[]},"BSInterpreter":{"StmtVisitor":[],"ExprVisitor":[]},"Cos":{"BSFunction":[],"BSCallable":[]},"CosH":{"BSFunction":[],"BSCallable":[]},"Csc":{"BSFunction":[],"BSCallable":[]},"CscH":{"BSFunction":[],"BSCallable":[]},"Ctg":{"BSFunction":[],"BSCallable":[]},"CtgH":{"BSFunction":[],"BSCallable":[]},"Division":{"BSFunction":[],"BSCallable":[]},"Exponentiation":{"BSFunction":[],"BSCallable":[]},"BinaryExpr":{"Expr":[]},"CallExpr":{"Expr":[]},"GetExpr":{"Expr":[]},"GroupingExpr":{"Expr":[]},"LiteralExpr":{"Expr":[]},"UnaryExpr":{"Expr":[]},"VariableExpr":{"Expr":[]},"AssignExpr":{"Expr":[]},"logicBinaryExpr":{"Expr":[]},"SetExpr":{"Expr":[]},"ThisExpr":{"Expr":[]},"SuperExpr":{"Expr":[]},"Log":{"BSFunction":[],"BSCallable":[]},"Multiplication":{"BSFunction":[],"BSCallable":[]},"NativeCallable":{"BSCallable":[]},"Negative":{"BSFunction":[],"BSCallable":[]},"Number":{"BSFunction":[],"BSCallable":[]},"Resolver":{"StmtVisitor":[],"ExprVisitor":[]},"Root":{"BSFunction":[],"BSCallable":[]},"Sec":{"BSFunction":[],"BSCallable":[]},"SecH":{"BSFunction":[],"BSCallable":[]},"Signum":{"BSFunction":[],"BSCallable":[]},"Sin":{"BSFunction":[],"BSCallable":[]},"SinH":{"BSFunction":[],"BSCallable":[]},"ExpressionStmt":{"Stmt":[]},"PrintStmt":{"Stmt":[]},"VarStmt":{"Stmt":[]},"BlockStmt":{"Stmt":[]},"IfStmt":{"Stmt":[]},"RoutineStmt":{"Stmt":[]},"WhileStmt":{"Stmt":[]},"ReturnStmt":{"Stmt":[]},"ClassStmt":{"Stmt":[]},"Sum":{"BSFunction":[],"BSCallable":[]},"Tan":{"BSFunction":[],"BSCallable":[]},"TanH":{"BSFunction":[],"BSCallable":[]},"UserRoutine":{"BSCallable":[]},"Variable":{"BSFunction":[],"Comparable":["@"],"BSCallable":[]},"singleOperandFunction":{"BSFunction":[],"BSCallable":[]}}'));
+  H._Universe_addErasedTypes(init.typeUniverse, JSON.parse('{"EfficientLengthIterable":1,"StreamSubscription":1,"MapBase":2,"_SplayTreeSet__SplayTree_IterableMixin":1,"_SplayTreeSet__SplayTree_IterableMixin_SetMixin":1,"Comparable":1}'));
   var type$ = (function rtii() {
     var findType = H.findType;
     return {
+      AbsoluteValue: findType("AbsoluteValue"),
       AsyncError: findType("AsyncError"),
       BSCallable: findType("BSCallable"),
       BSClass: findType("BSClass"),
+      BSFunction: findType("BSFunction"),
       BSInstance: findType("BSInstance"),
       BSInterpreter: findType("BSInterpreter"),
+      Comparable_dynamic: findType("Comparable<@>"),
       Division: findType("Division"),
       Environment: findType("Environment"),
       Error: findType("Error"),
@@ -7754,27 +9507,28 @@
       Future_Null: findType("Future<Null>"),
       Future_dynamic: findType("Future<@>"),
       Iterable_dynamic: findType("Iterable<@>"),
+      JSArray_BSFunction: findType("JSArray<BSFunction>"),
       JSArray_Expr: findType("JSArray<Expr>"),
-      JSArray_FunctionStmt: findType("JSArray<FunctionStmt>"),
       JSArray_Map_String_bool: findType("JSArray<Map<String,bool>>"),
+      JSArray_RoutineStmt: findType("JSArray<RoutineStmt>"),
       JSArray_Stmt: findType("JSArray<Stmt>"),
       JSArray_String: findType("JSArray<String>"),
       JSArray_Token: findType("JSArray<Token>"),
       JSArray_TokenType: findType("JSArray<TokenType>"),
-      JSArray_bscFunction: findType("JSArray<bscFunction>"),
+      JSArray_Variable: findType("JSArray<Variable>"),
       JSArray_dynamic: findType("JSArray<@>"),
       JavaScriptFunction: findType("JavaScriptFunction"),
       JsLinkedHashMap_Expr_int: findType("JsLinkedHashMap<Expr,int>"),
       JsLinkedHashMap_String_Object: findType("JsLinkedHashMap<String,Object>"),
-      JsLinkedHashMap_String_UserFunction: findType("JsLinkedHashMap<String,UserFunction>"),
+      JsLinkedHashMap_String_UserRoutine: findType("JsLinkedHashMap<String,UserRoutine>"),
       JsLinkedHashMap_String_bool: findType("JsLinkedHashMap<String,bool>"),
       JsLinkedHashMap_of_String_and_Pair_double_int: findType("JsLinkedHashMap<String,Pair<double,int>>"),
-      LinkedHashMapKeyIterable_String: findType("LinkedHashMapKeyIterable<String>"),
+      List_BSFunction: findType("List<BSFunction>"),
       List_Object: findType("List<Object>"),
       List_Stmt: findType("List<Stmt>"),
       List_TokenType: findType("List<TokenType>"),
+      Map_String_BSFunction: findType("Map<String,BSFunction>"),
       Map_String_Function: findType("Map<String,Function>"),
-      Map_String_double: findType("Map<String,double>"),
       MouseEvent: findType("MouseEvent"),
       Multiplication: findType("Multiplication"),
       Null: findType("Null"),
@@ -7782,6 +9536,8 @@
       Object: findType("Object"),
       Pair_double_int: findType("Pair<double,int>"),
       Rti: findType("Rti"),
+      Set_Variable: findType("Set<Variable>"),
+      SplayTreeSet_Variable: findType("SplayTreeSet<Variable>"),
       StackTrace: findType("StackTrace"),
       Stmt: findType("Stmt"),
       String: findType("String"),
@@ -7789,13 +9545,14 @@
       TextAreaElement: findType("TextAreaElement"),
       Token: findType("Token"),
       UnknownJavaScriptObject: findType("UnknownJavaScriptObject"),
+      Variable: findType("Variable"),
       _ElementEventStreamImpl_MouseEvent: findType("_ElementEventStreamImpl<MouseEvent>"),
       _FutureListener_dynamic_dynamic: findType("_FutureListener<@,@>"),
       _Future_dynamic: findType("_Future<@>"),
       _Future_int: findType("_Future<int>"),
+      _LinkedHashSetCell: findType("_LinkedHashSetCell"),
       bool: findType("bool"),
       bool_Function_Object: findType("bool(Object)"),
-      bscFunction: findType("bscFunction"),
       double: findType("double"),
       dynamic: findType("@"),
       dynamic_Function: findType("@()"),
@@ -7812,6 +9569,7 @@
     var makeConstList = hunkHelpers.makeConstList;
     C.Interceptor_methods = J.Interceptor.prototype;
     C.JSArray_methods = J.JSArray.prototype;
+    C.JSDouble_methods = J.JSDouble.prototype;
     C.JSInt_methods = J.JSInt.prototype;
     C.JSNumber_methods = J.JSNumber.prototype;
     C.JSString_methods = J.JSString.prototype;
@@ -7944,54 +9702,62 @@
     C.ClassType_0 = new F.ClassType("ClassType.NONE");
     C.ClassType_1 = new F.ClassType("ClassType.CLASS");
     C.ClassType_2 = new F.ClassType("ClassType.SUBCLASS");
-    C.FunctionType_0 = new F.FunctionType("FunctionType.NONE");
-    C.FunctionType_1 = new F.FunctionType("FunctionType.FUNCTION");
-    C.FunctionType_2 = new F.FunctionType("FunctionType.INITIALIZER");
-    C.FunctionType_3 = new F.FunctionType("FunctionType.METHOD");
-    C.List_4QF = H.setRuntimeTypeInfo(makeConstList(["and", "class", "else", "false", "function", "for", "if", "nil", "not", "or", "print", "return", "super", "this", "true", "var", "while"]), type$.JSArray_String);
-    C.TokenType_23 = new V.TokenType("TokenType.AND");
-    C.TokenType_24 = new V.TokenType("TokenType.CLASS");
-    C.TokenType_25 = new V.TokenType("TokenType.ELSE");
-    C.TokenType_26 = new V.TokenType("TokenType.FALSE");
-    C.TokenType_27 = new V.TokenType("TokenType.FUNCTION");
-    C.TokenType_28 = new V.TokenType("TokenType.FOR");
-    C.TokenType_29 = new V.TokenType("TokenType.IF");
-    C.TokenType_30 = new V.TokenType("TokenType.NIL");
-    C.TokenType_31 = new V.TokenType("TokenType.NOT");
-    C.TokenType_32 = new V.TokenType("TokenType.OR");
-    C.TokenType_33 = new V.TokenType("TokenType.PRINT");
-    C.TokenType_34 = new V.TokenType("TokenType.RETURN");
-    C.TokenType_35 = new V.TokenType("TokenType.SUPER");
-    C.TokenType_36 = new V.TokenType("TokenType.THIS");
-    C.TokenType_37 = new V.TokenType("TokenType.TRUE");
-    C.TokenType_38 = new V.TokenType("TokenType.VAR");
-    C.TokenType_39 = new V.TokenType("TokenType.WHILE");
-    C.Map_4Q0V1 = new H.ConstantStringMap(17, {and: C.TokenType_23, class: C.TokenType_24, else: C.TokenType_25, false: C.TokenType_26, function: C.TokenType_27, for: C.TokenType_28, if: C.TokenType_29, nil: C.TokenType_30, not: C.TokenType_31, or: C.TokenType_32, print: C.TokenType_33, return: C.TokenType_34, "super": C.TokenType_35, this: C.TokenType_36, true: C.TokenType_37, var: C.TokenType_38, while: C.TokenType_39}, C.List_4QF, H.findType("ConstantStringMap<String,TokenType>"));
-    C.Number_oNt = new R.Number(true, 2.718281828459045, "e", false);
+    C.List_woc = H.setRuntimeTypeInfo(makeConstList(["and", "class", "else", "false", "routine", "for", "if", "nil", "not", "or", "print", "return", "super", "this", "true", "let", "while"]), type$.JSArray_String);
+    C.TokenType_25 = new V.TokenType("TokenType.AND");
+    C.TokenType_26 = new V.TokenType("TokenType.CLASS");
+    C.TokenType_27 = new V.TokenType("TokenType.ELSE");
+    C.TokenType_28 = new V.TokenType("TokenType.FALSE");
+    C.TokenType_29 = new V.TokenType("TokenType.ROUTINE");
+    C.TokenType_30 = new V.TokenType("TokenType.FOR");
+    C.TokenType_31 = new V.TokenType("TokenType.IF");
+    C.TokenType_32 = new V.TokenType("TokenType.NIL");
+    C.TokenType_33 = new V.TokenType("TokenType.NOT");
+    C.TokenType_34 = new V.TokenType("TokenType.OR");
+    C.TokenType_35 = new V.TokenType("TokenType.PRINT");
+    C.TokenType_36 = new V.TokenType("TokenType.RETURN");
+    C.TokenType_37 = new V.TokenType("TokenType.SUPER");
+    C.TokenType_38 = new V.TokenType("TokenType.THIS");
+    C.TokenType_39 = new V.TokenType("TokenType.TRUE");
+    C.TokenType_40 = new V.TokenType("TokenType.LET");
+    C.TokenType_41 = new V.TokenType("TokenType.WHILE");
+    C.Map_woxwA = new H.ConstantStringMap(17, {and: C.TokenType_25, class: C.TokenType_26, else: C.TokenType_27, false: C.TokenType_28, routine: C.TokenType_29, for: C.TokenType_30, if: C.TokenType_31, nil: C.TokenType_32, not: C.TokenType_33, or: C.TokenType_34, print: C.TokenType_35, return: C.TokenType_36, "super": C.TokenType_37, this: C.TokenType_38, true: C.TokenType_39, let: C.TokenType_40, while: C.TokenType_41}, C.List_woc, H.findType("ConstantStringMap<String,TokenType>"));
+    C.Number_oNt = new R.Number(true, 2.718281828459045, "e", null);
+    C.Number_oqK = new R.Number(true, 3.141592653589793, "\u03c0", null);
+    C.RoutineType_0 = new F.RoutineType("RoutineType.NONE");
+    C.RoutineType_1 = new F.RoutineType("RoutineType.ROUTINE");
+    C.RoutineType_2 = new F.RoutineType("RoutineType.INITIALIZER");
+    C.RoutineType_3 = new F.RoutineType("RoutineType.METHOD");
     C.TokenType_0 = new V.TokenType("TokenType.LEFT_PARENTHESES");
     C.TokenType_1 = new V.TokenType("TokenType.RIGHT_PARENTHESES");
     C.TokenType_10 = new V.TokenType("TokenType.SEMICOLON");
     C.TokenType_11 = new V.TokenType("TokenType.SLASH");
     C.TokenType_12 = new V.TokenType("TokenType.STAR");
     C.TokenType_13 = new V.TokenType("TokenType.FACTORIAL");
-    C.TokenType_14 = new V.TokenType("TokenType.EQUAL");
-    C.TokenType_15 = new V.TokenType("TokenType.EQUAL_EQUAL");
-    C.TokenType_16 = new V.TokenType("TokenType.GREATER");
-    C.TokenType_17 = new V.TokenType("TokenType.GREATER_EQUAL");
-    C.TokenType_18 = new V.TokenType("TokenType.LESS");
-    C.TokenType_19 = new V.TokenType("TokenType.LESS_EQUAL");
+    C.TokenType_14 = new V.TokenType("TokenType.APPROX");
+    C.TokenType_15 = new V.TokenType("TokenType.EXP");
+    C.TokenType_16 = new V.TokenType("TokenType.EQUAL");
+    C.TokenType_17 = new V.TokenType("TokenType.EQUAL_EQUAL");
+    C.TokenType_18 = new V.TokenType("TokenType.GREATER");
+    C.TokenType_19 = new V.TokenType("TokenType.GREATER_EQUAL");
     C.TokenType_2 = new V.TokenType("TokenType.LEFT_BRACE");
-    C.TokenType_20 = new V.TokenType("TokenType.IDENTIFIER");
-    C.TokenType_21 = new V.TokenType("TokenType.STRING");
-    C.TokenType_22 = new V.TokenType("TokenType.NUMBER");
+    C.TokenType_20 = new V.TokenType("TokenType.LESS");
+    C.TokenType_21 = new V.TokenType("TokenType.LESS_EQUAL");
+    C.TokenType_22 = new V.TokenType("TokenType.IDENTIFIER");
+    C.TokenType_23 = new V.TokenType("TokenType.STRING");
+    C.TokenType_24 = new V.TokenType("TokenType.NUMBER");
     C.TokenType_3 = new V.TokenType("TokenType.RIGHT_BRACE");
     C.TokenType_4 = new V.TokenType("TokenType.LEFT_SQUARE");
-    C.TokenType_40 = new V.TokenType("TokenType.EOF");
+    C.TokenType_42 = new V.TokenType("TokenType.EOF");
     C.TokenType_5 = new V.TokenType("TokenType.RIGHT_SQUARE");
     C.TokenType_6 = new V.TokenType("TokenType.COMMA");
     C.TokenType_7 = new V.TokenType("TokenType.DOT");
     C.TokenType_8 = new V.TokenType("TokenType.MINUS");
     C.TokenType_9 = new V.TokenType("TokenType.PLUS");
+    C.Type_Null_Yyn = H.typeLiteral("Null");
+    C.Type_String_k8F = H.typeLiteral("String");
+    C.Type_double_K1J = H.typeLiteral("double");
+    C.Type_int_tHn = H.typeLiteral("int");
+    C.Type_num_cv7 = H.typeLiteral("num");
   })();
   (function staticFields() {
     $.Closure_functionCounter = 0;
@@ -8092,6 +9858,16 @@
     });
     _lazy($, "BetaScript__interpreter", "$get$BetaScript__interpreter", function() {
       return Y.BSInterpreter$();
+    });
+    _lazy($, "_x", "$get$_x", function() {
+      return X.variable("x");
+    });
+    _lazy($, "_b", "$get$_b", function() {
+      return X.variable("b");
+    });
+    _lazy($, "nativeGlobals", "$get$nativeGlobals", function() {
+      var t1 = $.$get$_x();
+      return P.LinkedHashMap_LinkedHashMap$_literal(["clock", new U.NativeCallable(0, new L.closure()), "abs", S.abs(t1), "sgn", T.sgn(t1), "sqrt", R.root(t1), "log", F.log($.$get$_b(), t1), "ln", F.log(t1, C.Number_oNt), "sin", U.sin(t1), "cos", O.cos(t1), "tan", M.tan(t1), "sec", N.sec(t1), "csc", Q.csc(t1), "ctg", L.ctg(t1), "arcsin", R.arcsin(t1), "arccos", O.arccos(t1), "arctan", E.arctan(t1), "arcsec", D.arcsec(t1), "arccsc", Z.arccsc(t1), "arcctg", N.arcctg(t1), "sinh", U.sinh(t1), "cosh", Z.cosh(t1), "tanh", X.tanh(t1), "sech", Q.sech(t1), "csch", X.csch(t1), "ctgh", G.ctgh(t1), "arsinh", E.arsinh(t1), "arcosh", Z.arcosh(t1), "artanh", Y.artanh(t1), "arsech", T.arsech(t1), "arcsch", R.arcsch(t1), "arctgh", Z.arctgh(t1), "e", C.Number_oNt, "pi", C.Number_oqK], type$.String, type$.Object);
     });
   })();
   (function nativeSupport() {
