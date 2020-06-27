@@ -4,11 +4,12 @@ import 'BSEnvironment.dart';
 import 'BSInstance.dart';
 import 'BetaScript.dart';
 import 'Expr.dart';
-import 'NativeCallable.dart';
 import 'Stmt.dart';
 import 'Token.dart';
 import 'BSClass.dart';
 import 'UserRoutine.dart';
+import 'nativeGlobals.dart';
+
 
 class BSInterpreter implements ExprVisitor, StmtVisitor {
   final Environment globals = new Environment(); //Global scope
@@ -17,13 +18,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   Environment _environment; //Current scope
 
   BSInterpreter() {
-    globals.define(
-        "clock",
-        new NativeCallable(
-            0,
-            (BSInterpreter interpreter, List<Object> arguments) =>
-                DateTime.now().millisecondsSinceEpoch));
-
+    for (String _name in nativeGlobals.keys) globals.define("_name", nativeGlobals[_name]);
     _environment = globals;
   }
 
@@ -217,12 +212,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   Object visitCallExpr(CallExpr e) {
     Object callee = _evaluate(e.callee);
 
+    if (!(callee is BSCallable))
+      throw new RuntimeError(
+          e.paren, "Can only call routines, functions and classes");
+
     List<Object> arguments = new List();
 
     for (Expr argument in e.arguments) arguments.add(_evaluate(argument));
-
-    if (!(callee is BSCallable))
-      throw new RuntimeError(e.paren, "Can only call routines, functions and classes");
 
     BSCallable function = callee;
 
@@ -230,7 +226,14 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       throw new RuntimeError(e.paren,
           "Expected ${function.arity.toString()} paramenters, but got ${arguments.length.toString()}.");
     }
-    return function(this, arguments);
+    if (callee is BSFunction) {
+      for (Object a in arguments)
+        if (!(a is BSFunction))
+          throw new RuntimeError(
+              e.paren, "functions only support other functions as parameters!");
+    }
+
+    return function.callThing(this, arguments);
   }
 
   @override

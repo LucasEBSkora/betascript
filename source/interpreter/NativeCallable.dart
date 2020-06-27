@@ -12,7 +12,7 @@ class NativeCallable implements BSCallable {
   int get arity => _arity;
 
   @override
-  Object call(BSInterpreter interpreter, List<Object> arguments) =>
+  Object callThing(BSInterpreter interpreter, List<Object> arguments) =>
       _function(interpreter, arguments);
 
   @override

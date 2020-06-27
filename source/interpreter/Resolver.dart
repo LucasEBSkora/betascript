@@ -3,6 +3,7 @@ import 'BetaScript.dart';
 import 'Expr.dart';
 import 'Stmt.dart';
 import 'Token.dart';
+import 'nativeGlobals.dart';
 
 enum RoutineType { NONE, ROUTINE, INITIALIZER, METHOD }
 
@@ -17,9 +18,15 @@ class Resolver implements ExprVisitor, StmtVisitor {
   RoutineType _currentRoutine = RoutineType.NONE;
   ClassType _currentClass = ClassType.NONE;
 
-  ///A stack representing Scopes, where the key is the identifier name and the value is wheter it is ready to be referenced
+  ///A stack representing Scopes, where the key is the identifier name and the value is whether it is ready to be referenced
   ///because things like var a = a; should cause compile errors
   final List<Map<String, bool>> _scopes = new List();
+
+  ///Represents all the global values. Used to check if a global is being redefined (to avoid overriding native functions and routines)
+  ///Since all native things are already define, they are added to the map from the start
+  final Map<String, bool> _globals =
+      new Map.fromIterable(nativeGlobals.keys, value: (_) => true);
+
   Resolver(this._interpreter);
 
   //It actually has to do things only in a few cases:
@@ -124,10 +131,14 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitVariableExpr(VariableExpr e) {
-    if (!_scopes.isEmpty && _scopes.last[e.name.lexeme] == false) {
+    //makes sure a variable isn't trying to read itself in its own initialization
+    if (!_scopes.isEmpty) {
+      if (_scopes.last[e.name.lexeme] == false)
+        BetaScript.error(
+            e.name, "Cannot read variable in its own initializer");
+    } else if (!_globals[e.name.lexeme])
       BetaScript.error(
-          e.name, "Cannot read local variable in its own initializer");
-    }
+          e.name, "Cannot read variable in its own initializer");
 
     _resolveLocal(e, e.name);
   }
@@ -161,16 +172,22 @@ class Resolver implements ExprVisitor, StmtVisitor {
       if (_scopes.last.containsKey(name.lexeme))
         BetaScript.error(
             name, "Variable with this name already declared in this scope.");
-      Map<String, bool> scope = _scopes.last;
-      scope[name.lexeme] = false;
+
+      _scopes.last[name.lexeme] = false;
+    } else {
+      if (_globals.containsKey(name.lexeme))
+        BetaScript.error(name,
+            "Variable with this name already declared in global scope (might be shadowing native declaration).");
+      _globals[name.lexeme] = false;
     }
-  } 
+  }
 
   //Marks a variable as ready to be referenced
   void _define(Token name) {
     if (!_scopes.isEmpty) {
       _scopes.last[name.lexeme] = true;
-    }
+    } else
+      _globals[name.lexeme] = true;
   }
 
   void _resolveLocal(Expr e, Token name) {

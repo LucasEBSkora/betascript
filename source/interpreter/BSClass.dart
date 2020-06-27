@@ -19,14 +19,14 @@ class BSClass implements BSCallable {
       0); //if there is a constructor, the arity is the constructors arity. If there isn't, the arity is 0 (empty constructor)
 
   @override
-  Object call(BSInterpreter interpreter, List<Object> arguments) {
+  Object callThing(BSInterpreter interpreter, List<Object> arguments) {
     //Crates a new instance
     BSInstance instance = new BSInstance(this);
     //finds the constructor method
     UserRoutine initializer = findMethod(this.name);
     //returns the constructor method bound to the empty instance so that 'this' is valid
     if (initializer != null)
-      initializer.bind(instance).call(interpreter, arguments);
+      initializer.bind(instance).callThing(interpreter, arguments);
     return instance;
   }
 

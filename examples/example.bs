@@ -33,3 +33,6 @@ let thing = C(printStuff);
 thing.test();
 thing.method();
 thing.callCallback();
+
+let banan = banan;
+let banan = "nan";

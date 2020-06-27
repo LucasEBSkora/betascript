@@ -11,7 +11,11 @@ import 'Variable.dart';
 
 import '../Utils/Tuples.dart';
 
-abstract class BSFunction {
+import '../interpreter/BSCallable.dart';
+import '../interpreter/BSInterpreter.dart';
+
+
+abstract class BSFunction implements BSCallable {
   ///set of parameters the function is defined in ( the previous function NEEDS x, y and z to be evaluated, but we could define it in x,y,z and w if we wanted to)
   final Set<Variable> _parameters;
 
@@ -105,6 +109,13 @@ abstract class BSFunction {
 
     return Trio((f is T) ? f : null, f is T, _isInNegative);
   }
+
+  @override
+  int get arity => parameters.length;
+
+  
+  Object callThing(BSInterpreter interpreter, List<Object> arguments) => call(arguments);
+
 }
 
 class BetascriptFunctionError implements Exception {

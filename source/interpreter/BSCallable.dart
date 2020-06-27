@@ -7,6 +7,6 @@ abstract class BSCallable {
   ///Number of parameters arguments needs to have
   int get arity;
   
-  Object call(BSInterpreter interpreter, List<Object> arguments);
+  Object callThing(BSInterpreter interpreter, List<Object> arguments);
 }
 
