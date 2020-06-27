@@ -5,23 +5,22 @@ abstract class StmtVisitor {
   dynamic visitVarStmt(VarStmt s);
   dynamic visitBlockStmt(BlockStmt s);
   dynamic visitIfStmt(IfStmt s);
-  dynamic visitFunctionStmt(FunctionStmt s);
+  dynamic visitRoutineStmt(RoutineStmt s);
   dynamic visitWhileStmt(WhileStmt s);
   dynamic visitReturnStmt(ReturnStmt s);
   dynamic visitClassStmt(ClassStmt s);
 
 }
 
-abstract class Stmt  {
-  dynamic accept(StmtVisitor v);
-
+abstract class Stmt {
+ dynamic accept(StmtVisitor v);
 }
 
 class ExpressionStmt extends Stmt {
   ///Expression statements are basically wrappers for Expressions
   final Expr expression;
   ExpressionStmt(Expr this.expression);
-  dynamic accept(StmtVisitor v) => v.visitExpressionStmt(this);
+ dynamic accept(StmtVisitor v) => v.visitExpressionStmt(this);
 
 }
 
@@ -29,7 +28,7 @@ class PrintStmt extends Stmt {
   ///print statements evaluate and then print their expressions
   final Expr expression;
   PrintStmt(Expr this.expression);
-  dynamic accept(StmtVisitor v) => v.visitPrintStmt(this);
+ dynamic accept(StmtVisitor v) => v.visitPrintStmt(this);
 
 }
 
@@ -39,7 +38,7 @@ class VarStmt extends Stmt {
   ///If the variable is initialized on declaration, the inicializer is stored here
   final Expr initializer;
   VarStmt(Token this.name, Expr this.initializer);
-  dynamic accept(StmtVisitor v) => v.visitVarStmt(this);
+ dynamic accept(StmtVisitor v) => v.visitVarStmt(this);
 
 }
 
@@ -47,7 +46,7 @@ class BlockStmt extends Stmt {
   ///A block contains a sequence of Statements, being basically a region of code with specific scope
   final List<Stmt> statements;
   BlockStmt(List<Stmt> this.statements);
-  dynamic accept(StmtVisitor v) => v.visitBlockStmt(this);
+ dynamic accept(StmtVisitor v) => v.visitBlockStmt(this);
 
 }
 
@@ -59,19 +58,19 @@ class IfStmt extends Stmt {
   ///
   final Stmt elseBranch;
   IfStmt(Expr this.condition, Stmt this.thenBranch, Stmt this.elseBranch);
-  dynamic accept(StmtVisitor v) => v.visitIfStmt(this);
+ dynamic accept(StmtVisitor v) => v.visitIfStmt(this);
 
 }
 
-class FunctionStmt extends Stmt {
-  ///The function's name
+class RoutineStmt extends Stmt {
+  ///The routine's name
   final Token name;
-  ///The parameters the function takes
+  ///The parameters the routine takes
   final List<Token> parameters;
-  ///The function body
+  ///The routine body
   final List<Stmt> body;
-  FunctionStmt(Token this.name, List<Token> this.parameters, List<Stmt> this.body);
-  dynamic accept(StmtVisitor v) => v.visitFunctionStmt(this);
+  RoutineStmt(Token this.name, List<Token> this.parameters, List<Stmt> this.body);
+ dynamic accept(StmtVisitor v) => v.visitRoutineStmt(this);
 
 }
 
@@ -81,7 +80,7 @@ class WhileStmt extends Stmt {
   ///
   final Stmt body;
   WhileStmt(Expr this.condition, Stmt this.body);
-  dynamic accept(StmtVisitor v) => v.visitWhileStmt(this);
+ dynamic accept(StmtVisitor v) => v.visitWhileStmt(this);
 
 }
 
@@ -91,7 +90,7 @@ class ReturnStmt extends Stmt {
   ///The expression whose value should be returned
   final Expr value;
   ReturnStmt(Token this.keyword, Expr this.value);
-  dynamic accept(StmtVisitor v) => v.visitReturnStmt(this);
+ dynamic accept(StmtVisitor v) => v.visitReturnStmt(this);
 
 }
 
@@ -101,9 +100,9 @@ class ClassStmt extends Stmt {
   ///A variable containing a reference to the superclass
   final VariableExpr superclass;
   ///A list of the class' methods
-  final List<FunctionStmt> methods;
-  ClassStmt(Token this.name, VariableExpr this.superclass, List<FunctionStmt> this.methods);
-  dynamic accept(StmtVisitor v) => v.visitClassStmt(this);
+  final List<RoutineStmt> methods;
+  ClassStmt(Token this.name, VariableExpr this.superclass, List<RoutineStmt> this.methods);
+ dynamic accept(StmtVisitor v) => v.visitClassStmt(this);
 
 }
 

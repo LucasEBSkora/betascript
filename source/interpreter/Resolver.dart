@@ -4,17 +4,17 @@ import 'Expr.dart';
 import 'Stmt.dart';
 import 'Token.dart';
 
-enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD }
+enum RoutineType { NONE, ROUTINE, INITIALIZER, METHOD }
 
 enum ClassType { NONE, CLASS, SUBCLASS }
 
 ///This class is used for variable resolution, running between the parser and the intepreter to determine exactly which variable a name refers to
 ///It does so by determining how many Environments it needs to traverse in order to find the variable to use
-///Also used to report semantic errors (such as return statements outside of functions)
+///Also used to report semantic errors (such as return statements outside of routines)
 class Resolver implements ExprVisitor, StmtVisitor {
   final BSInterpreter _interpreter;
-  //Used to see if we're currently traversing a function, which is important to check if a return statement is valid
-  FunctionType _currentFunction = FunctionType.NONE;
+  //Used to see if we're currently traversing a routine, which is important to check if a return statement is valid
+  RoutineType _currentRoutine = RoutineType.NONE;
   ClassType _currentClass = ClassType.NONE;
 
   ///A stack representing Scopes, where the key is the identifier name and the value is wheter it is ready to be referenced
@@ -63,11 +63,11 @@ class Resolver implements ExprVisitor, StmtVisitor {
   }
 
   @override
-  void visitFunctionStmt(FunctionStmt s) {
+  void visitRoutineStmt(RoutineStmt s) {
     //Declares it in current scope, also allowing it to be referenced inside itself for recursiveness
     _declare(s.name);
     _define(s.name);
-    _resolveFunction(s, FunctionType.FUNCTION);
+    _resolveRoutine(s, RoutineType.ROUTINE);
   }
 
   @override
@@ -93,9 +93,9 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitReturnStmt(ReturnStmt s) {
-    if (_currentFunction == FunctionType.NONE)
+    if (_currentRoutine == RoutineType.NONE)
       BetaScript.error(s.keyword, "Cannot return from top-level code.");
-    if (_currentFunction == FunctionType.INITIALIZER)
+    if (_currentRoutine == RoutineType.INITIALIZER)
       BetaScript.error(s.keyword, "Cannot return a value from a constructor");
     _resolveExpr(s.value);
   }
@@ -157,14 +157,14 @@ class Resolver implements ExprVisitor, StmtVisitor {
   //Creates a variable in current scope without saying it is ready to be referenced
   void _declare(Token name) {
     if (!_scopes.isEmpty) {
-      //Variable declared twice - error in functions (honestly should always be error, or variables shouldn't need declaration)
+      //Variable declared twice - error in routines (honestly should always be error, or variables shouldn't need declaration)
       if (_scopes.last.containsKey(name.lexeme))
         BetaScript.error(
-            name, "Variable wit this name already declared in this scope.");
+            name, "Variable with this name already declared in this scope.");
       Map<String, bool> scope = _scopes.last;
       scope[name.lexeme] = false;
     }
-  }
+  } 
 
   //Marks a variable as ready to be referenced
   void _define(Token name) {
@@ -184,11 +184,11 @@ class Resolver implements ExprVisitor, StmtVisitor {
     //if the name can't be resolved, it is assumed to be global
   }
 
-  ///Resolves both functions and methods
-  void _resolveFunction(FunctionStmt s, FunctionType type) {
-    //Stores the last function type, because functions can call other functions (or methods)
-    FunctionType enclosingFunction = _currentFunction;
-    _currentFunction = type;
+  ///Resolves both routines and methods
+  void _resolveRoutine(RoutineStmt s, RoutineType type) {
+    //Stores the last routine type, because routines can call other routines (or methods)
+    RoutineType enclosingRoutine = _currentRoutine;
+    _currentRoutine = type;
 
     _beginScope();
     for (Token param in s.parameters) {
@@ -197,8 +197,8 @@ class Resolver implements ExprVisitor, StmtVisitor {
     }
     resolveAll(s.body);
     _endScope();
-    //Restores the last function type (basically piggybacks on the call stack to simulate a stack)
-    _currentFunction = enclosingFunction;
+    //Restores the last routine type (basically piggybacks on the call stack to simulate a stack)
+    _currentRoutine = enclosingRoutine;
   }
 
   @override
@@ -224,11 +224,11 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
     _beginScope();
     _scopes.last["this"] = true;
-    for (FunctionStmt method in s.methods) {
-      FunctionType declaration = (method.name.lexeme == s.name.lexeme)
-          ? FunctionType.INITIALIZER
-          : FunctionType.METHOD;
-      _resolveFunction(method, declaration);
+    for (RoutineStmt method in s.methods) {
+      RoutineType declaration = (method.name.lexeme == s.name.lexeme)
+          ? RoutineType.INITIALIZER
+          : RoutineType.METHOD;
+      _resolveRoutine(method, declaration);
     }
 
     _endScope();

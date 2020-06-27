@@ -1,15 +1,15 @@
 import 'BSCallable.dart';
 import 'BSInstance.dart';
 import 'BSInterpreter.dart';
-import 'UserFunction.dart';
+import 'UserRoutine.dart';
 
 class BSClass implements BSCallable {
   final String name;
   final BSClass _superclass;
-  final Map<String, UserFunction> _methods;
+  final Map<String, UserRoutine> _methods;
 
   BSClass(String this.name, BSClass this._superclass,
-      Map<String, UserFunction> this._methods);
+      Map<String, UserRoutine> this._methods);
 
   @override
   String toString() => name;
@@ -23,7 +23,7 @@ class BSClass implements BSCallable {
     //Crates a new instance
     BSInstance instance = new BSInstance(this);
     //finds the constructor method
-    UserFunction initializer = findMethod(this.name);
+    UserRoutine initializer = findMethod(this.name);
     //returns the constructor method bound to the empty instance so that 'this' is valid
     if (initializer != null)
       initializer.bind(instance).call(interpreter, arguments);
@@ -31,7 +31,7 @@ class BSClass implements BSCallable {
   }
 
   ///Looks for methods in the class, and them in the superclass
-  UserFunction findMethod(String name) {
+  UserRoutine findMethod(String name) {
     if (_methods.containsKey(name)) return _methods[name];
     if (_superclass != null) return _superclass.findMethod(name);
     return null;

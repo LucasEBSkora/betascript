@@ -24,11 +24,11 @@ class C < B {
   }
 }
 
-function printStuff() {
+routine printStuff() {
   print "stu" + "ff";
 }
 
-var thing = C(printStuff);
+let thing = C(printStuff);
 
 thing.test();
 thing.method();

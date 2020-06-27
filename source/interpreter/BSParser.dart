@@ -31,14 +31,14 @@ class BSParser {
     return statements;
   }
 
-  ///declaration -> classDecl | funDecl | varDecl | statement
+  ///declaration -> classDecl | rou Decl | varDecl | statement
   Stmt _declaration() {
     try {
       if (_match(TokenType.CLASS)) return _classDeclaration();
 
-      ///funDecl -> "function" function
-      if (_match(TokenType.FUNCTION)) return _function("function");
-      if (_match(TokenType.VAR)) return _varDeclaration();
+      ///funDecl -> "routine" routine
+      if (_match(TokenType.ROUTINE)) return _routine("routine");
+      if (_match(TokenType.LET)) return _varDeclaration();
       return _statement();
     } on ParseError {
       _synchronize();
@@ -46,7 +46,7 @@ class BSParser {
     }
   }
 
-  ///classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER) "{" function "}"
+  ///classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER) "{" routine "}"
   Stmt _classDeclaration() {
     Token name = _consume(TokenType.IDENTIFIER, "Expect class name");
 
@@ -59,19 +59,19 @@ class BSParser {
 
     _consume(TokenType.LEFT_BRACE, "Expect '{' before class body");
 
-    List<FunctionStmt> methods = new List();
+    List<RoutineStmt> methods = new List();
 
     while (!_check(TokenType.RIGHT_BRACE) && !_isAtEnd())
-      methods.add(_function("method"));
+      methods.add(_routine("method"));
 
     _consume(TokenType.RIGHT_BRACE, "Expect '}' after class body");
 
     return new ClassStmt(name, superclass, methods);
   }
 
-  ///kind is either 'function' or 'method'
-  ///function -> IDENTIFIER "(" parameters? ")" block
-  FunctionStmt _function(String kind) {
+  ///kind is either 'routine' or 'method'
+  ///routine -> IDENTIFIER "(" parameters? ")" block
+  RoutineStmt _routine(String kind) {
     Token name = _consume(TokenType.IDENTIFIER, "Expect $kind name.");
 
     _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after $kind name;");
@@ -86,12 +86,12 @@ class BSParser {
     }
 
     _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after parameters.");
-    _consume(TokenType.LEFT_BRACE, "Expect '{' after function parameters");
+    _consume(TokenType.LEFT_BRACE, "Expect '{' after routine parameters");
     List<Stmt> body = _block();
-    return new FunctionStmt(name, parameters, body);
+    return new RoutineStmt(name, parameters, body);
   }
 
-  ///varDecl -> "var" IDENTIFIER ( "=" expression): ";"
+  ///varDecl -> "let" IDENTIFIER ( "=" expression): ";"
   Stmt _varDeclaration() {
     Token name = _consume(TokenType.IDENTIFIER, "Expect variable name");
 
@@ -124,7 +124,7 @@ class BSParser {
     //the initializer may be empty, a variable declaration or any other expression
     if (_match(TokenType.SEMICOLON))
       initializer = null;
-    else if (_match(TokenType.VAR))
+    else if (_match(TokenType.LET))
       initializer = _varDeclaration();
     else
       initializer = _expressionStatement();
@@ -168,7 +168,7 @@ class BSParser {
 
   ///block -> "{" declaration* "}"
   List<Stmt> _block() {
-    //The left brace was already consumed in _statement or _function
+    //The left brace was already consumed in _statement or _routine
     List<Stmt> statements = new List();
 
     while (!_check(TokenType.RIGHT_BRACE) && !_isAtEnd())
@@ -500,8 +500,8 @@ class BSParser {
 
       switch (_peek().type) {
         case TokenType.CLASS:
-        case TokenType.FUNCTION:
-        case TokenType.VAR:
+        case TokenType.ROUTINE:
+        case TokenType.LET:
         case TokenType.FOR:
         case TokenType.IF:
         case TokenType.WHILE:

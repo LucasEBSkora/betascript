@@ -1,7 +1,7 @@
 import 'BSClass.dart';
 import 'Token.dart';
 import 'BSInterpreter.dart' show RuntimeError;
-import 'UserFunction.dart';
+import 'UserRoutine.dart';
 
 class BSInstance {
   final BSClass _class;
@@ -16,7 +16,7 @@ class BSInstance {
     if (_fields.containsKey(name.lexeme))
       return _fields[name.lexeme];
     
-    UserFunction method = _class.findMethod(name.lexeme);
+    UserRoutine method = _class.findMethod(name.lexeme);
     if (method != null) return method.bind(this);
 
     throw new RuntimeError(name, "Undefined property '${name.lexeme}'."); 

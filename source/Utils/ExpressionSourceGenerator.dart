@@ -2,7 +2,7 @@ import 'dart:io';
 
 //a helper program that generates valid dart files with the classes representing each type of Expression and Statement, for use in ASTs.
 int main() {
-  defineAst("..", "Expr", [
+  defineAst("../interpreter", "Expr", [
     NodeType(
       "Binary",
       [
@@ -12,7 +12,7 @@ int main() {
       ],
     ),
     NodeType( "Call", [
-      ["Expr", "callee", "The function being called"],
+      ["Expr", "callee", "The routine/function/method being called"],
       ["Token", "paren", "The parentheses token"],
       ["List<Expr>", "arguments", "The list of arguments being passed"],
     ]
@@ -75,7 +75,7 @@ int main() {
     'Token'
   ]);
 
-  defineAst("..", "Stmt", [
+  defineAst("../interpreter", "Stmt", [
     NodeType("Expression", [
       [
         "Expr",
@@ -114,10 +114,10 @@ int main() {
       ["Stmt", "thenBranch", ""],
       ["Stmt", "elseBranch", ""],
     ]),
-    NodeType("Function", [
-      ["Token", "name", "The function's name"],
-      ["List<Token>", "parameters", "The parameters the function takes"],
-      ["List<Stmt>", "body", "The function body"],
+    NodeType("Routine", [
+      ["Token", "name", "The routine's name"],
+      ["List<Token>", "parameters", "The parameters the routine takes"],
+      ["List<Stmt>", "body", "The routine body"],
     ]),
     NodeType("While", [
       [
@@ -134,7 +134,7 @@ int main() {
     NodeType("Class", [
       ["Token", "name", "Token containing the class' name"],
       ["VariableExpr", "superclass", "A variable containing a reference to the superclass"],
-      ["List<FunctionStmt>", "methods", "A list of the class' methods"],
+      ["List<RoutineStmt>", "methods", "A list of the class' methods"],
     ]),
   ], [
     'Expr',
@@ -168,7 +168,7 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
 
   for (NodeType e in types) {
     String className = e.name + fileName;
-    source += "  dynami visit$className($className ${fileName[0].toLowerCase()});\n";
+    source += "  dynamic visit$className($className ${fileName[0].toLowerCase()});\n";
   }
 
   source += "\n}\n";

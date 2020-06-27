@@ -8,7 +8,7 @@ import 'NativeCallable.dart';
 import 'Stmt.dart';
 import 'Token.dart';
 import 'BSClass.dart';
-import 'UserFunction.dart';
+import 'UserRoutine.dart';
 
 class BSInterpreter implements ExprVisitor, StmtVisitor {
   final Environment globals = new Environment(); //Global scope
@@ -39,22 +39,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   void _execute(Stmt stmt) => stmt.accept(this);
 
-  String _stringify(dynamic object) {
-    if (object == null) return 'nil';
-
-    //Temporary botch - won't be needed when everything is a BSFunction
-    if (object is double) {
-      String text = object.toString();
-
-      if (text.endsWith(".0")) {
-        text = text.substring(0, text.length - 2);
-      }
-
-      return text;
-    }
-
-    return object.toString();
-  }
+  String _stringify(dynamic object) => object?.toString() ?? 'nil';
 
   @override
   Object visitBinaryExpr(BinaryExpr e) {
@@ -237,7 +222,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     for (Expr argument in e.arguments) arguments.add(_evaluate(argument));
 
     if (!(callee is BSCallable))
-      throw new RuntimeError(e.paren, "Can only call functions and classes");
+      throw new RuntimeError(e.paren, "Can only call routines, functions and classes");
 
     BSCallable function = callee;
 
@@ -249,9 +234,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   }
 
   @override
-  void visitFunctionStmt(FunctionStmt s) {
-    UserFunction function = new UserFunction(s, _environment, false);
-    _environment.define(s.name.lexeme, function);
+  void visitRoutineStmt(RoutineStmt s) {
+    UserRoutine routine = new UserRoutine(s, _environment, false);
+    _environment.define(s.name.lexeme, routine);
   }
 
   @override
@@ -293,10 +278,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       _environment.define("super", superclass);
     }
 
-    Map<String, UserFunction> methods = new Map();
+    Map<String, UserRoutine> methods = new Map();
 
-    for (FunctionStmt method in s.methods)
-      methods[method.name.lexeme] = new UserFunction(
+    for (RoutineStmt method in s.methods)
+      methods[method.name.lexeme] = new UserRoutine(
           method, _environment, method.name.lexeme == s.name.lexeme);
 
     BSClass bsclass = new BSClass(s.name.lexeme, superclass, methods);
@@ -339,7 +324,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     BSInstance object = _environment.getAt(distance - 1, "this");
 
     //finds the method in the superclass and binds it to 'this'
-    UserFunction method = superclass.findMethod(e.method.lexeme);
+    UserRoutine method = superclass.findMethod(e.method.lexeme);
 
     if (method == null)
       throw new RuntimeError(

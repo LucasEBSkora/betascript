@@ -2,11 +2,11 @@ import '../BSFunction/Number.dart';
 import 'BetaScript.dart';
 import 'Token.dart';
 
-///Scans the source for tokens, returning a list of them on a call to scanTokens, the only public function in this class.
+///Scans the source for tokens, returning a list of them on a call to scanTokens, the only public routine in this class.
 class BSScanner {
   final String _source;
   final List<Token> _tokens = new List();
-  Map<String, Function> _charToLexeme;
+  Map<String, Function> _charToLexeme; //see _initializeMap
 
   //_start is the start of the lexeme currently being read, and _current the current value being processed.
   int _start;
@@ -48,6 +48,7 @@ class BSScanner {
       ']': () => _addToken(TokenType.RIGHT_SQUARE),
       ',': () => _addToken(TokenType.COMMA),
       '-': () => _addToken(TokenType.MINUS),
+      '~': () => _addToken(TokenType.APPROX),
       '+': () => _addToken(TokenType.PLUS),
       ';': () => _addToken(TokenType.SEMICOLON),
       '*': () => _addToken(TokenType.STAR),
@@ -115,7 +116,7 @@ class BSScanner {
     "class": TokenType.CLASS,
     "else": TokenType.ELSE,
     "false": TokenType.FALSE,
-    "function": TokenType.FUNCTION,
+    "routine": TokenType.ROUTINE,
     "for": TokenType.FOR,
     "if": TokenType.IF,
     "nil": TokenType.NIL,
@@ -126,7 +127,7 @@ class BSScanner {
     "super": TokenType.SUPER,
     "this": TokenType.THIS,
     "true": TokenType.TRUE,
-    "var": TokenType.VAR,
+    "let": TokenType.LET,
     "while": TokenType.WHILE,
   };
 

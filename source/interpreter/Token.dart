@@ -13,6 +13,7 @@ enum TokenType {
   SLASH, // /
   STAR, // *
   FACTORIAL, // !
+  APPROX, //~
 
   EQUAL, // =
   EQUAL_EQUAL, // ==
@@ -30,7 +31,7 @@ enum TokenType {
   CLASS,
   ELSE,
   FALSE,
-  FUNCTION,
+  ROUTINE,
   FOR,
   IF,
   NIL,
@@ -41,7 +42,7 @@ enum TokenType {
   SUPER,
   THIS,
   TRUE,
-  VAR,
+  LET,
   WHILE,
 
   EOF
