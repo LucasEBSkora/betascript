@@ -91,10 +91,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       case TokenType.NOT:
         return !_istruthy(operand);
       //"not" (!) would be here, but i decided to use it for factorials and use the "not" keyword explicitly
+      case TokenType.APPROX:
+        if (operand is BSFunction) return operand.approx;
+        throw new RuntimeError(e.op, "The approximation (~) operator may only be applied to functions");
       default:
+        return null;
     }
 
-    return null;
   }
 
   dynamic _evaluate(Expr e) => e.accept(this);

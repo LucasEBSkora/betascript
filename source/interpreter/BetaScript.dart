@@ -10,7 +10,7 @@ import 'Token.dart';
 class BetaScript {
   static bool hadError = false;
   static bool hadRuntimeError = false;
-  static final BSInterpreter _interpreter = new BSInterpreter();
+  static BSInterpreter _interpreter = new BSInterpreter();
 
   ///The callback used when the function 'print' is called. Might print to a string (web version), to a file (not yet implemented) or to the console
   static Function printCallback;
@@ -36,6 +36,11 @@ class BetaScript {
 
   static String runForWeb(String source) {
     String output = "";
+
+    //resets everything so it always interprets from a fresh start
+    hadError = false;
+    hadRuntimeError = false;
+    _interpreter = new BSInterpreter();
 
     //all print statements redirect to this function, allowing the results to be printed in the 'output' field
     printCallback = (dynamic object) {

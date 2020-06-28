@@ -3868,6 +3868,9 @@
       this.ops = t0;
       this.p = t1;
     },
+    Multiplication_approx_closure: function Multiplication_approx_closure(t0) {
+      this.ops = t0;
+    },
     _consolidateNegatives_closure: function _consolidateNegatives_closure(t0) {
       this._box_0 = t0;
     }
@@ -3906,6 +3909,8 @@
     BetaScript_runForWeb: function(source) {
       var t1 = {};
       t1.output = "";
+      $.BetaScript_hadError = false;
+      $.BetaScript__interpreter = Y.BSInterpreter$();
       $.BetaScript_printCallback = new Z.BetaScript_runForWeb_closure(t1);
       Z.BetaScript__run(source);
       return t1.output;
@@ -3929,7 +3934,7 @@
       new F.Resolver(t1, C.RoutineType_0, C.ClassType_0, t2, map).resolveAll$1(statements);
       if ($.BetaScript_hadError)
         return;
-      t1.interpret$1(statements);
+      $.$get$BetaScript__interpreter().interpret$1(statements);
     },
     BetaScript_error: function(value, message) {
       var t1, t2, t3;
@@ -4399,13 +4404,16 @@
     Sum_evaluate_closure: function Sum_evaluate_closure(t0) {
       this.p = t0;
     },
+    Sum_approx_closure: function Sum_approx_closure(t0) {
+      this.ops = t0;
+    },
     _openOtherSums_closure: function _openOtherSums_closure(t0) {
       this._box_0 = t0;
     },
     main: function() {
       var t2, t3,
         t1 = document;
-      type$.TextAreaElement._as(t1.getElementById("source")).value = 'class A {\n  method() {\n    print "a method";\n  }\n}\n\nclass B < A {\n  method() {\n    print "B method";\n  }\n\n  test() {\n    super.method();\n  }\n}\n\nclass C < B {\n  C(callback) {\n    this.callback = callback;\n  }\n\n  callCallback() {\n    this.callback();\n  }\n}\n\nfunction printStuff() {\n  print "stu" + "ff";\n}\n\nvar thing = C(printStuff);\n\nthing.test();\nthing.method();\nthing.callCallback();';
+      type$.TextAreaElement._as(t1.getElementById("source")).value = "let f(x) = sin(x);\n\nlet g = f(cos(x));\n\nprint g;\n\nprint f + g;\n\nprint e^x;\n\nlet h(x, y, z) = 0;\n\nprint h(1, 2, arcosh(z));\n\nlet i(y,x) = pi + 2 - log(y, 33)*sec(y/x);\nprint i(11, 2);";
       t1 = J.get$onClick$x(t1.getElementById("interpretButton"));
       t2 = t1.$ti;
       t3 = t2._eval$1("~(1)")._as(new N.main_closure());
@@ -5605,7 +5613,7 @@
           error.$thrownJsError = this.ex;
       return error;
     },
-    $signature: 4
+    $signature: 5
   };
   H._StackTrace.prototype = {
     toString$0: function(_) {
@@ -5886,7 +5894,7 @@
     call$1: function(o) {
       return this.getTag(o);
     },
-    $signature: 4
+    $signature: 5
   };
   H.initHooks_closure0.prototype = {
     call$2: function(o, tag) {
@@ -5927,7 +5935,7 @@
       t1.storedCallback = null;
       f.call$0();
     },
-    $signature: 2
+    $signature: 3
   };
   P._AsyncRun__initializeScheduleImmediate_closure.prototype = {
     call$1: function(callback) {
@@ -6110,7 +6118,7 @@
       t1._state = 0;
       t1._complete$1(value);
     },
-    $signature: 2
+    $signature: 3
   };
   P._Future__chainForeignFuture_closure0.prototype = {
     call$2: function(error, stackTrace) {
@@ -6747,7 +6755,7 @@
     call$1: function(v) {
       return this.E._is(v);
     },
-    $signature: 5
+    $signature: 6
   };
   P._SplayTreeSet__SplayTree_IterableMixin.prototype = {};
   P._SplayTreeSet__SplayTree_IterableMixin_SetMixin.prototype = {};
@@ -7100,12 +7108,24 @@
     },
     get$defaultParameters: function() {
       return this.operand.get$defaultParameters();
+    },
+    get$approx: function() {
+      return S.abs(this.operand.get$approx());
     }
   };
   Z.ArCosH.prototype = {
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return Z.arcosh(op);
+    },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n(Math.log(t1 + Math.sqrt(Math.pow(t1, 2) - 1)));
+      } else
+        return Z.arcosh(op);
     },
     copy$1: function(params) {
       return new Z.ArCosH(this.operand, type$.Set_Variable._as(params));
@@ -7116,6 +7136,15 @@
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return R.arcsch(op);
     },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n(Math.log(Math.sqrt(1 + Math.pow(t1, 2)) / t1));
+      } else
+        return R.arcsch(op);
+    },
     copy$1: function(params) {
       return new R.ArCscH(this.operand, type$.Set_Variable._as(params));
     }
@@ -7124,6 +7153,15 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return Z.arctgh(op);
+    },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n(0.5 * Math.log((t1 + 1) / (t1 - 1)));
+      } else
+        return Z.arctgh(op);
     },
     copy$1: function(params) {
       return new Z.ArCtgH(this.operand, type$.Set_Variable._as(params));
@@ -7134,6 +7172,15 @@
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return T.arsech(op);
     },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n(Math.log((1 + Math.sqrt(1 - Math.pow(t1, 2))) / t1));
+      } else
+        return T.arsech(op);
+    },
     copy$1: function(params) {
       return new T.ArSecH(this.operand, type$.Set_Variable._as(params));
     }
@@ -7142,6 +7189,15 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return E.arsinh(op);
+    },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n(Math.log(t1 + Math.sqrt(1 + Math.pow(t1, 2))));
+      } else
+        return E.arsinh(op);
     },
     copy$1: function(params) {
       return new E.ArSinH(this.operand, type$.Set_Variable._as(params));
@@ -7152,6 +7208,15 @@
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return Y.artanh(op);
     },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n(0.5 * Math.log((1 + t1) / (1 - t1)));
+      } else
+        return Y.artanh(op);
+    },
     copy$1: function(params) {
       return new Y.ArTanH(this.operand, type$.Set_Variable._as(params));
     }
@@ -7160,6 +7225,13 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return O.arccos(op);
+    },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.acos(op.absvalue));
+      else
+        return O.arccos(op);
     },
     copy$1: function(params) {
       return new O.ArcCos(this.operand, type$.Set_Variable._as(params));
@@ -7170,6 +7242,13 @@
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return Z.arccsc(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.asin(1 / op.absvalue));
+      else
+        return Z.arccsc(op);
+    },
     copy$1: function(params) {
       return new Z.ArcCsc(this.operand, type$.Set_Variable._as(params));
     }
@@ -7178,6 +7257,13 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return N.arcctg(op);
+    },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.atan(1 / op.absvalue));
+      else
+        return N.arcctg(op);
     },
     copy$1: function(params) {
       return new N.ArcCtg(this.operand, type$.Set_Variable._as(params));
@@ -7188,6 +7274,13 @@
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return D.arcsec(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.acos(1 / op.absvalue));
+      else
+        return D.arcsec(op);
+    },
     copy$1: function(params) {
       return new D.ArcSec(this.operand, type$.Set_Variable._as(params));
     }
@@ -7197,6 +7290,13 @@
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return R.arcsin(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.asin(op.absvalue));
+      else
+        return R.arcsin(op);
+    },
     copy$1: function(params) {
       return new R.ArcSin(this.operand, type$.Set_Variable._as(params));
     }
@@ -7205,6 +7305,13 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return E.arctan(op);
+    },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.atan(op.absvalue));
+      else
+        return E.arctan(op);
     },
     copy$1: function(params) {
       return new E.ArcTan(this.operand, type$.Set_Variable._as(params));
@@ -7474,8 +7581,13 @@
             t1 = false;
           }
           return !t1;
+        case C.TokenType_14:
+          if (operand instanceof X.BSFunction)
+            return operand.get$approx();
+          throw H.wrapException(Y.RuntimeError$0(t1, "The approximation (~) operator may only be applied to functions"));
+        default:
+          return null;
       }
-      return null;
     },
     _checkStringOrNumberOperands$3: function(token, left, right) {
       var exception;
@@ -8007,7 +8119,7 @@
     },
     _unary$0: function() {
       var t1, t2, _this = this;
-      if (_this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_8, C.TokenType_13, C.TokenType_33], type$.JSArray_TokenType))) {
+      if (_this._matchAny$1(H.setRuntimeTypeInfo([C.TokenType_8, C.TokenType_13, C.TokenType_33, C.TokenType_14], type$.JSArray_TokenType))) {
         t1 = _this._tokens;
         t2 = _this._BSParser$_current - 1;
         if (t2 < 0 || t2 >= t1.length)
@@ -8465,7 +8577,7 @@
       t2 = this._box_0;
       t2.output = t2.output + (t1.toString$0(object) + "\n");
     },
-    $signature: 2
+    $signature: 3
   };
   O.Cos.prototype = {
     evaluate$1: function(p) {
@@ -8478,6 +8590,12 @@
       }
       return O.cos(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.cos(op.absvalue));
+      return O.cos(op);
+    },
     copy$1: function(params) {
       return new O.Cos(this.operand, type$.Set_Variable._as(params));
     }
@@ -8486,6 +8604,15 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return Z.cosh(op);
+    },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n((Math.exp(t1) + Math.exp(-t1)) / 2);
+      } else
+        return Z.cosh(op);
     },
     copy$1: function(params) {
       return new Z.CosH(this.operand, type$.Set_Variable._as(params));
@@ -8502,6 +8629,12 @@
       }
       return Q.csc(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(1 / Math.sin(op.absvalue));
+      return Q.csc(op);
+    },
     copy$1: function(params) {
       return new Q.Csc(this.operand, type$.Set_Variable._as(params));
     }
@@ -8510,6 +8643,15 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return X.csch(op);
+    },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n(2 / (Math.exp(t1) - Math.exp(-t1)));
+      } else
+        return X.csch(op);
     },
     copy$1: function(params) {
       return new X.CscH(this.operand, type$.Set_Variable._as(params));
@@ -8526,6 +8668,12 @@
       }
       return L.ctg(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(1 / Math.tan(op.absvalue));
+      return L.ctg(op);
+    },
     copy$1: function(params) {
       return new L.Ctg(this.operand, type$.Set_Variable._as(params));
     }
@@ -8534,6 +8682,16 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return G.ctgh(op);
+    },
+    get$approx: function() {
+      var t1, t2,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        t2 = -t1;
+        return R.n((Math.exp(t1) + Math.exp(t2)) / (Math.exp(t1) - Math.exp(t2)));
+      } else
+        return G.ctgh(op);
     },
     copy$1: function(params) {
       return new G.CtgH(this.operand, type$.Set_Variable._as(params));
@@ -8584,6 +8742,39 @@
       var params = this.numerator.get$parameters();
       params.addAll$1(0, this.denominator.get$parameters());
       return type$.SplayTreeSet_Variable._as(params);
+    },
+    get$approx: function() {
+      var t2, t3, t4, _num, _den,
+        _n = this.numerator.get$approx(),
+        _d = this.denominator.get$approx(),
+        t1 = type$.Number,
+        _numNumber = X.BSFunction_extractFromNegative(_n, t1),
+        _denNumber = X.BSFunction_extractFromNegative(_d, t1);
+      if (_numNumber.second && _denNumber.second) {
+        t1 = _numNumber.first.absvalue;
+        t2 = _denNumber.first.absvalue;
+        t3 = _numNumber.third;
+        t4 = _denNumber.third;
+        if (!(t3 && !t4))
+          t3 = !t3 && t4;
+        else
+          t3 = true;
+        t3 = t3 ? -1 : 1;
+        return R.n(t1 / t2 * t3);
+      }
+      t1 = type$.BSFunction;
+      _num = X.BSFunction_extractFromNegative(_n, t1);
+      _den = X.BSFunction_extractFromNegative(_d, t1);
+      t1 = _num.third;
+      t2 = _den.third;
+      if (!(t1 && !t2))
+        t1 = !t1 && t2;
+      else
+        t1 = true;
+      t2 = type$.JSArray_BSFunction;
+      t3 = _num.first;
+      t4 = _den.first;
+      return t1 ? G.negative(K.divide(H.setRuntimeTypeInfo([t3], t2), H.setRuntimeTypeInfo([t4], t2))) : K.divide(H.setRuntimeTypeInfo([t3], t2), H.setRuntimeTypeInfo([t4], t2));
     }
   };
   D.Exponentiation.prototype = {
@@ -8609,6 +8800,13 @@
       var params = this.base.get$parameters();
       params.addAll$1(0, this.exponent.get$parameters());
       return type$.SplayTreeSet_Variable._as(params);
+    },
+    get$approx: function() {
+      var b = this.base.get$approx(),
+        expo = this.exponent.get$approx();
+      if (b instanceof R.Number && expo instanceof R.Number)
+        return R.n(Math.pow(b.absvalue, expo.absvalue));
+      return D.exp(b, expo);
     }
   };
   N.Expr.prototype = {};
@@ -8709,6 +8907,13 @@
       var params = this.base.get$parameters();
       params.addAll$1(0, this.operand.get$parameters());
       return type$.SplayTreeSet_Variable._as(params);
+    },
+    get$approx: function() {
+      var b = this.base.get$approx(),
+        op = this.operand.get$approx();
+      if (b instanceof R.Number && op instanceof R.Number)
+        return R.n(Math.log(op.absvalue) / Math.log(b.absvalue));
+      return F.log(op, b);
     }
   };
   S.Multiplication.prototype = {
@@ -8741,13 +8946,24 @@
         params.addAll$1(0, t3 == null ? operand.get$defaultParameters() : t3);
       }
       return params;
+    },
+    get$approx: function() {
+      var ops = H.setRuntimeTypeInfo([], type$.JSArray_BSFunction);
+      C.JSArray_methods.forEach$1(this.operands, new S.Multiplication_approx_closure(ops));
+      return S.multiply(ops);
     }
   };
   S.Multiplication_evaluate_closure.prototype = {
     call$1: function(f) {
       C.JSArray_methods.add$1(this.ops, type$.BSFunction._as(f).evaluate$1(this.p));
     },
-    $signature: 6
+    $signature: 2
+  };
+  S.Multiplication_approx_closure.prototype = {
+    call$1: function(f) {
+      C.JSArray_methods.add$1(this.ops, type$.BSFunction._as(f).get$approx());
+    },
+    $signature: 2
   };
   S._consolidateNegatives_closure.prototype = {
     call$1: function(f) {
@@ -8774,6 +8990,9 @@
     $isBSCallable: 1
   };
   G.Negative.prototype = {
+    get$approx: function() {
+      return G.negative(this.operand.get$approx());
+    },
     copy$1: function(parameters) {
       return new G.Negative(this.operand, type$.Set_Variable._as(parameters));
     },
@@ -8838,6 +9057,9 @@
       if (typeof t1 !== "number")
         return H.iae(t1);
       return this.absvalue > t1;
+    },
+    get$approx: function() {
+      return R.n(this.absvalue);
     }
   };
   F.RoutineType.prototype = {
@@ -9079,7 +9301,7 @@
     call$1: function(_) {
       return true;
     },
-    $signature: 5
+    $signature: 6
   };
   R.Root.prototype = {
     evaluate$1: function(p) {
@@ -9100,6 +9322,13 @@
     },
     get$defaultParameters: function() {
       return type$.SplayTreeSet_Variable._as(this.operand.get$parameters());
+    },
+    get$approx: function() {
+      var opvalue = this.operand.get$approx();
+      if (opvalue instanceof R.Number)
+        return R.n(Math.sqrt(opvalue.absvalue));
+      else
+        return R.root(opvalue);
     }
   };
   N.Sec.prototype = {
@@ -9113,6 +9342,12 @@
       }
       return N.sec(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(1 / Math.cos(op.absvalue));
+      return N.sec(op);
+    },
     copy$1: function(params) {
       return new N.Sec(this.operand, type$.Set_Variable._as(params));
     }
@@ -9121,6 +9356,15 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return Q.sech(op);
+    },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n(2 / (Math.exp(t1) + Math.exp(-t1)));
+      } else
+        return Q.sech(op);
     },
     copy$1: function(params) {
       return new Q.SecH(this.operand, type$.Set_Variable._as(params));
@@ -9138,6 +9382,9 @@
     },
     get$defaultParameters: function() {
       return type$.SplayTreeSet_Variable._as(this.operand.get$parameters());
+    },
+    get$approx: function() {
+      return T.sgn(this.operand.get$approx());
     }
   };
   U.Sin.prototype = {
@@ -9151,6 +9398,12 @@
       }
       return U.sin(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.sin(op.absvalue));
+      return U.sin(op);
+    },
     copy$1: function(params) {
       return new U.Sin(this.operand, type$.Set_Variable._as(params));
     }
@@ -9159,6 +9412,15 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return U.sinh(op);
+    },
+    get$approx: function() {
+      var t1,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        return R.n((Math.exp(t1) - Math.exp(-t1)) / 2);
+      } else
+        return U.sinh(op);
     },
     copy$1: function(params) {
       return new U.SinH(this.operand, type$.Set_Variable._as(params));
@@ -9248,6 +9510,11 @@
         params.addAll$1(0, t3 == null ? operand.get$defaultParameters() : t3);
       }
       return params;
+    },
+    get$approx: function() {
+      var ops = H.setRuntimeTypeInfo([], type$.JSArray_BSFunction);
+      C.JSArray_methods.forEach$1(this.operands, new N.Sum_approx_closure(ops));
+      return N.add(ops);
     }
   };
   N.Sum_evaluate_closure.prototype = {
@@ -9255,6 +9522,12 @@
       return type$.BSFunction._as(f).evaluate$1(this.p);
     },
     $signature: 7
+  };
+  N.Sum_approx_closure.prototype = {
+    call$1: function(f) {
+      C.JSArray_methods.add$1(this.ops, type$.BSFunction._as(f).get$approx());
+    },
+    $signature: 2
   };
   N._openOtherSums_closure.prototype = {
     call$1: function(f) {
@@ -9264,7 +9537,7 @@
       f.toString;
       C.JSArray_methods.add$1(t1, G.negative(f));
     },
-    $signature: 6
+    $signature: 2
   };
   M.Tan.prototype = {
     evaluate$1: function(p) {
@@ -9277,6 +9550,12 @@
       }
       return M.tan(op);
     },
+    get$approx: function() {
+      var op = this.operand.get$approx();
+      if (op instanceof R.Number)
+        return R.n(Math.tan(op.absvalue));
+      return M.tan(op);
+    },
     copy$1: function(params) {
       return new M.Tan(this.operand, type$.Set_Variable._as(params));
     }
@@ -9285,6 +9564,16 @@
     evaluate$1: function(p) {
       var op = this.operand.evaluate$1(type$.Map_String_BSFunction._as(p));
       return X.tanh(op);
+    },
+    get$approx: function() {
+      var t1, t2,
+        op = this.operand.get$approx();
+      if (op instanceof R.Number) {
+        t1 = op.absvalue;
+        t2 = -t1;
+        return R.n((Math.exp(t1) - Math.exp(t2)) / (Math.exp(t1) + Math.exp(t2)));
+      } else
+        return X.tanh(op);
     },
     copy$1: function(params) {
       return new X.TanH(this.operand, type$.Set_Variable._as(params));
@@ -9375,6 +9664,9 @@
     get$defaultParameters: function() {
       return P.SplayTreeSet_SplayTreeSet$from([this], type$.Variable);
     },
+    get$approx: function() {
+      return this;
+    },
     compareTo$1: function(_, other) {
       if (other instanceof X.Variable)
         return C.JSString_methods.compareTo$1(this.name, other.name);
@@ -9420,9 +9712,9 @@
       _static_0 = hunkHelpers._static_0,
       _static_2 = hunkHelpers._static_2,
       _instance_0_u = hunkHelpers._instance_0u;
-    _static_1(P, "async__AsyncRun__scheduleImmediateJsOverride$closure", "_AsyncRun__scheduleImmediateJsOverride", 3);
-    _static_1(P, "async__AsyncRun__scheduleImmediateWithSetImmediate$closure", "_AsyncRun__scheduleImmediateWithSetImmediate", 3);
-    _static_1(P, "async__AsyncRun__scheduleImmediateWithTimer$closure", "_AsyncRun__scheduleImmediateWithTimer", 3);
+    _static_1(P, "async__AsyncRun__scheduleImmediateJsOverride$closure", "_AsyncRun__scheduleImmediateJsOverride", 4);
+    _static_1(P, "async__AsyncRun__scheduleImmediateWithSetImmediate$closure", "_AsyncRun__scheduleImmediateWithSetImmediate", 4);
+    _static_1(P, "async__AsyncRun__scheduleImmediateWithTimer$closure", "_AsyncRun__scheduleImmediateWithTimer", 4);
     _static_0(P, "async___startMicrotaskLoop$closure", "_startMicrotaskLoop", 0);
     _static_2(P, "collection___dynamicCompare$closure", "_dynamicCompare", 21);
     _static_2(P, "core_Comparable_compare$closure", "Comparable_compare", 22);
@@ -9445,7 +9737,7 @@
     _inherit(H.MappedListIterable, H.ListIterable);
     _inherit(H.ConstantStringMap, H.ConstantMap);
     _inheritMany(P.Error, [H.NullError, H.JsNoSuchMethodError, H.UnknownJsTypeError, H.RuntimeError, P.AssertionError, H._Error, P.NullThrownError, P.ArgumentError, P.UnsupportedError, P.UnimplementedError, P.StateError, P.ConcurrentModificationError, P.CyclicInitializationError]);
-    _inheritMany(H.Closure, [H.unwrapException_saveStackTrace, H.TearOffClosure, H.initHooks_closure, H.initHooks_closure0, H.initHooks_closure1, P._AsyncRun__initializeScheduleImmediate_internalCallback, P._AsyncRun__initializeScheduleImmediate_closure, P._AsyncRun__scheduleImmediateJsOverride_internalCallback, P._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback, P._TimerImpl_internalCallback, P._Future__addListener_closure, P._Future__prependListeners_closure, P._Future__chainForeignFuture_closure, P._Future__chainForeignFuture_closure0, P._Future__chainForeignFuture_closure1, P._Future__propagateToListeners_handleWhenCompleteCallback, P._Future__propagateToListeners_handleWhenCompleteCallback_closure, P._Future__propagateToListeners_handleValueCallback, P._Future__propagateToListeners_handleError, P.Stream_length_closure, P.Stream_length_closure0, P._rootHandleUncaughtError_closure, P._RootZone_bindCallback_closure, P._RootZone_bindCallbackGuarded_closure, P._RootZone_bindUnaryCallbackGuarded_closure, P.MapBase_mapToString_closure, P.SplayTreeSet_closure, W._EventStreamSubscription_closure, X.BSFunction_call_closure, X.BSFunction_withParameters_closure, X.BSFunction_callThing_closure, X.BSScanner__initializeMap_closure, X.BSScanner__initializeMap_closure0, X.BSScanner__initializeMap_closure1, X.BSScanner__initializeMap_closure2, X.BSScanner__initializeMap_closure3, X.BSScanner__initializeMap_closure4, X.BSScanner__initializeMap_closure5, X.BSScanner__initializeMap_closure6, X.BSScanner__initializeMap_closure7, X.BSScanner__initializeMap_closure8, X.BSScanner__initializeMap_closure9, X.BSScanner__initializeMap_closure10, X.BSScanner__initializeMap_closure11, X.BSScanner__initializeMap_closure12, X.BSScanner__initializeMap_closure13, X.BSScanner__initializeMap_closure14, X.BSScanner__initializeMap_closure15, X.BSScanner__initializeMap_closure16, X.BSScanner__initializeMap_closure17, X.BSScanner__initializeMap_closure18, X.BSScanner__initializeMap_closure19, X.BSScanner__initializeMap_closure20, X.BSScanner__initializeMap_closure21, Z.BetaScript_runForWeb_closure, S.Multiplication_evaluate_closure, S._consolidateNegatives_closure, F.Resolver_closure, N.Sum_evaluate_closure, N._openOtherSums_closure, L.closure, N.main_closure]);
+    _inheritMany(H.Closure, [H.unwrapException_saveStackTrace, H.TearOffClosure, H.initHooks_closure, H.initHooks_closure0, H.initHooks_closure1, P._AsyncRun__initializeScheduleImmediate_internalCallback, P._AsyncRun__initializeScheduleImmediate_closure, P._AsyncRun__scheduleImmediateJsOverride_internalCallback, P._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback, P._TimerImpl_internalCallback, P._Future__addListener_closure, P._Future__prependListeners_closure, P._Future__chainForeignFuture_closure, P._Future__chainForeignFuture_closure0, P._Future__chainForeignFuture_closure1, P._Future__propagateToListeners_handleWhenCompleteCallback, P._Future__propagateToListeners_handleWhenCompleteCallback_closure, P._Future__propagateToListeners_handleValueCallback, P._Future__propagateToListeners_handleError, P.Stream_length_closure, P.Stream_length_closure0, P._rootHandleUncaughtError_closure, P._RootZone_bindCallback_closure, P._RootZone_bindCallbackGuarded_closure, P._RootZone_bindUnaryCallbackGuarded_closure, P.MapBase_mapToString_closure, P.SplayTreeSet_closure, W._EventStreamSubscription_closure, X.BSFunction_call_closure, X.BSFunction_withParameters_closure, X.BSFunction_callThing_closure, X.BSScanner__initializeMap_closure, X.BSScanner__initializeMap_closure0, X.BSScanner__initializeMap_closure1, X.BSScanner__initializeMap_closure2, X.BSScanner__initializeMap_closure3, X.BSScanner__initializeMap_closure4, X.BSScanner__initializeMap_closure5, X.BSScanner__initializeMap_closure6, X.BSScanner__initializeMap_closure7, X.BSScanner__initializeMap_closure8, X.BSScanner__initializeMap_closure9, X.BSScanner__initializeMap_closure10, X.BSScanner__initializeMap_closure11, X.BSScanner__initializeMap_closure12, X.BSScanner__initializeMap_closure13, X.BSScanner__initializeMap_closure14, X.BSScanner__initializeMap_closure15, X.BSScanner__initializeMap_closure16, X.BSScanner__initializeMap_closure17, X.BSScanner__initializeMap_closure18, X.BSScanner__initializeMap_closure19, X.BSScanner__initializeMap_closure20, X.BSScanner__initializeMap_closure21, Z.BetaScript_runForWeb_closure, S.Multiplication_evaluate_closure, S.Multiplication_approx_closure, S._consolidateNegatives_closure, F.Resolver_closure, N.Sum_evaluate_closure, N.Sum_approx_closure, N._openOtherSums_closure, L.closure, N.main_closure]);
     _inheritMany(H.TearOffClosure, [H.StaticClosure, H.BoundClosure]);
     _inherit(H._AssertionError, P.AssertionError);
     _inherit(P.MapBase, P.MapMixin);
@@ -9481,7 +9773,7 @@
     mangledNames: {},
     getTypeFromName: getGlobalFromName,
     metadata: [],
-    types: ["~()", "Null()", "Null(@)", "~(~())", "@(@)", "bool(@)", "Null(BSFunction)", "BSFunction(BSFunction)", "@(@,String)", "@(String)", "Null(~())", "Null(@[StackTrace])", "_Future<@>(@)", "Null(@,@)", "@(Event)", "String(Variable)", "Null(Variable)", "BSFunction(Object)", "int()", "int(BSInterpreter,List<Object>)", "Null(MouseEvent)", "int(@,@)", "int(Comparable<@>,Comparable<@>)"],
+    types: ["~()", "Null()", "Null(BSFunction)", "Null(@)", "~(~())", "@(@)", "bool(@)", "BSFunction(BSFunction)", "@(@,String)", "@(String)", "Null(~())", "Null(@[StackTrace])", "_Future<@>(@)", "Null(@,@)", "@(Event)", "String(Variable)", "Null(Variable)", "BSFunction(Object)", "int()", "int(BSInterpreter,List<Object>)", "Null(MouseEvent)", "int(@,@)", "int(Comparable<@>,Comparable<@>)"],
     interceptorsByTag: null,
     leafTags: null,
     arrayRti: typeof Symbol == "function" && typeof Symbol() == "symbol" ? Symbol("$ti") : "$ti"
@@ -9867,7 +10159,7 @@
     });
     _lazy($, "nativeGlobals", "$get$nativeGlobals", function() {
       var t1 = $.$get$_x();
-      return P.LinkedHashMap_LinkedHashMap$_literal(["clock", new U.NativeCallable(0, new L.closure()), "abs", S.abs(t1), "sgn", T.sgn(t1), "sqrt", R.root(t1), "log", F.log($.$get$_b(), t1), "ln", F.log(t1, C.Number_oNt), "sin", U.sin(t1), "cos", O.cos(t1), "tan", M.tan(t1), "sec", N.sec(t1), "csc", Q.csc(t1), "ctg", L.ctg(t1), "arcsin", R.arcsin(t1), "arccos", O.arccos(t1), "arctan", E.arctan(t1), "arcsec", D.arcsec(t1), "arccsc", Z.arccsc(t1), "arcctg", N.arcctg(t1), "sinh", U.sinh(t1), "cosh", Z.cosh(t1), "tanh", X.tanh(t1), "sech", Q.sech(t1), "csch", X.csch(t1), "ctgh", G.ctgh(t1), "arsinh", E.arsinh(t1), "arcosh", Z.arcosh(t1), "artanh", Y.artanh(t1), "arsech", T.arsech(t1), "arcsch", R.arcsch(t1), "arctgh", Z.arctgh(t1), "e", C.Number_oNt, "pi", C.Number_oqK], type$.String, type$.Object);
+      return P.LinkedHashMap_LinkedHashMap$_literal(["clock", new U.NativeCallable(0, new L.closure()), "abs", S.abs(t1), "sgn", T.sgn(t1), "sqrt", R.root(t1), "log", F.log(t1, $.$get$_b()), "ln", F.log(t1, C.Number_oNt), "sin", U.sin(t1), "cos", O.cos(t1), "tan", M.tan(t1), "sec", N.sec(t1), "csc", Q.csc(t1), "ctg", L.ctg(t1), "arcsin", R.arcsin(t1), "arccos", O.arccos(t1), "arctan", E.arctan(t1), "arcsec", D.arcsec(t1), "arccsc", Z.arccsc(t1), "arcctg", N.arcctg(t1), "sinh", U.sinh(t1), "cosh", Z.cosh(t1), "tanh", X.tanh(t1), "sech", Q.sech(t1), "csch", X.csch(t1), "ctgh", G.ctgh(t1), "arsinh", E.arsinh(t1), "arcosh", Z.arcosh(t1), "artanh", Y.artanh(t1), "arsech", T.arsech(t1), "arcsch", R.arcsch(t1), "arctgh", Z.arctgh(t1), "e", C.Number_oNt, "pi", C.Number_oqK], type$.String, type$.Object);
     });
   })();
   (function nativeSupport() {

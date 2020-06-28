@@ -358,14 +358,14 @@ class BSParser {
     return expr;
   }
 
-  ///unary -> ( "!" | "-") unary | call
+  ///unary -> ( "!" | "-" | "~") unary | call
   Expr _unary() {
     //TODO: fix factorial, which is actually to the right of the operand
 
-    //this rule is a little different, and actually uses recursion. When you reach this rule, if you immediately find  '!' or '-',
+    //this rule is a little different, and actually uses recursion. When you reach this rule, if you immediately find  '!', '-' or '~',
     //go back to the 'unary' rule
 
-    if (_matchAny([TokenType.MINUS, TokenType.FACTORIAL, TokenType.NOT])) {
+    if (_matchAny([TokenType.MINUS, TokenType.FACTORIAL, TokenType.NOT, TokenType.APPROX])) {
       Token op = _previous();
       Expr right = _unary();
       return new UnaryExpr(op, right);

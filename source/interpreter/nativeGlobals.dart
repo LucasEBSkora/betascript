@@ -15,7 +15,7 @@ final Map<String, Object> nativeGlobals = {
   "abs": abs(_x),
   "sgn": sgn(_x),
   "sqrt": root(_x),
-  "log": log(_b, _x),
+  "log": log(_x, _b),
   "ln": log(_x),
 
   //trig

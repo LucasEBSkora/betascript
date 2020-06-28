@@ -15,3 +15,4 @@ print h(1, 2, arcosh(z));
 
 let i(y,x) = pi + 2 - log(y, 33)*sec(y/x);
 print i(11, 2);
+print ~i(11, 2);

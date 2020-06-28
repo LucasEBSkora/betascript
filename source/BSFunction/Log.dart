@@ -68,7 +68,7 @@ class Log extends BSFunction {
     BSFunction b = base.approx;
     BSFunction op = operand.approx;
     if (b is Number && op is Number)
-      return n(math.log(b.value) / math.log(b.value));
-    return log(b, op);
+      return n(math.log(op.value) / math.log(b.value));
+    return log(op, b);
   }
 }
