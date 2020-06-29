@@ -12,9 +12,7 @@ BSFunction add(List<BSFunction> operands) {
 
   _openOtherSums(operands);
   _SumNumbers(operands);
-
   _createMultiplications(operands);
-
   if (operands.length == 0)
     return n(0);
   else if (operands.length == 1)
@@ -152,11 +150,14 @@ void _SumNumbers(List<BSFunction> operands) {
 
 //Sums up equal functions so that things like x + x become 2*x
 void _createMultiplications(List<BSFunction> operands) {
+  //doing everything below without having enough operands to actually do anything is dumb
+  if (operands.length < 2) return;
   for (int i = 0; i < operands.length; ++i) {
     //for each operand, divides it into numeric factor and function
     BSFunction f = operands[i];
 
     BSFunction h;
+    BSFunction originalFactor;
     BSFunction factor;
     Trio<Multiplication, bool, bool> _mul =
         BSFunction.extractFromNegative<Multiplication>(f);
@@ -165,11 +166,11 @@ void _createMultiplications(List<BSFunction> operands) {
         _mul.first.operands.length == 2 &&
         _mul.first.operands[0] is Number) {
       h = _mul.first.operands[1];
-      factor = _mul.first.operands[1] * n(_mul.third ? -1 : 1);
+      factor = _mul.first.operands[0] * n(_mul.third ? -1 : 1);
     } else {
       Trio<BSFunction, bool, bool> _f = BSFunction.extractFromNegative(f);
       h = _f.first;
-      factor = n((_f.third ? -1 : 1));
+      factor = originalFactor = n((_f.third ? -1 : 1));
     }
 
     for (int j = i + 1; j < operands.length; ++j) {
@@ -194,7 +195,7 @@ void _createMultiplications(List<BSFunction> operands) {
       }
     }
 
-    if (factor != n(1)) {
+    if (factor != originalFactor) {
       operands.removeAt(i);
       operands.insert(i, factor * h);
     }

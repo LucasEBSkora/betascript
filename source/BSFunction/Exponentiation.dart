@@ -28,6 +28,7 @@ class Exponentiation extends BSFunction {
 
   @override
   BSFunction derivativeInternal(Variable v) {
+
     return ((base ^ exponent) *
         (exponent * (log(base).derivativeInternal(v)) +
             exponent.derivativeInternal(v) * log(base)));

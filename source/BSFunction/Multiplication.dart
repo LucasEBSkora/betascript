@@ -83,31 +83,23 @@ BSFunction multiply(List<BSFunction> operands) {
 class Multiplication extends BSFunction {
   final List<BSFunction> operands;
 
-  Multiplication._(List<BSFunction> this.operands, [Set<Variable> params = null])
+  Multiplication._(List<BSFunction> this.operands,
+      [Set<Variable> params = null])
       : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) {
     List<BSFunction> ops = List<BSFunction>();
-
     for (int i = 0; i < operands.length; ++i) {
       //copies list
-      List<BSFunction> term = [...operands];
+      List<BSFunction> term = List.from(operands);
 
+      term.insert(i, term.removeAt(i).derivative(v));
       //removes "current" operand (which isn't derivated)
-      BSFunction current = term.removeAt(i);
 
-      //Derivates the others
-      List<BSFunction> termExpression = term.map((f) {
-        return f.derivativeInternal(v);
-      }).toList();
-
-      //includes the current element again
-      termExpression.insert(i, current);
-
-      //adds to the list of elements to sum
-      ops.add(multiply(termExpression));
+      ops.add(multiply(term));
     }
+
     return add(ops);
   }
 

@@ -35,7 +35,7 @@ abstract class BSFunction implements BSCallable {
   BSFunction get approx;
 
   //Returns the partial derivative of this in relation to v
-  BSFunction derivative(Variable v) => _merge(this.derivative(v), this);
+  BSFunction derivative(Variable v) => _merge(this.derivativeInternal(v), this);
 
   //If there is a custom set of parameters, returns it. If there isn't, returns the default one
   Set<Variable> get parameters => (_parameters ?? defaultParameters);

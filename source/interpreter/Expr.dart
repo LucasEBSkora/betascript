@@ -1,5 +1,6 @@
 import 'Token.dart';
 abstract class ExprVisitor {
+  dynamic visitAssignExpr(AssignExpr e);
   dynamic visitBinaryExpr(BinaryExpr e);
   dynamic visitCallExpr(CallExpr e);
   dynamic visitGetExpr(GetExpr e);
@@ -7,16 +8,26 @@ abstract class ExprVisitor {
   dynamic visitLiteralExpr(LiteralExpr e);
   dynamic visitUnaryExpr(UnaryExpr e);
   dynamic visitVariableExpr(VariableExpr e);
-  dynamic visitAssignExpr(AssignExpr e);
   dynamic visitlogicBinaryExpr(logicBinaryExpr e);
   dynamic visitSetExpr(SetExpr e);
   dynamic visitThisExpr(ThisExpr e);
   dynamic visitSuperExpr(SuperExpr e);
+  dynamic visitDerivativeExpr(DerivativeExpr e);
 
 }
 
 abstract class Expr {
  dynamic accept(ExprVisitor v);
+}
+
+class AssignExpr extends Expr {
+  ///The name of the variable being assigned to
+  final Token name;
+  ///The expression whose result should be assigned to the variable
+  final Expr value;
+  AssignExpr(Token this.name, Expr this.value);
+ dynamic accept(ExprVisitor v) => v.visitAssignExpr(this);
+
 }
 
 class BinaryExpr extends Expr {
@@ -87,16 +98,6 @@ class VariableExpr extends Expr {
 
 }
 
-class AssignExpr extends Expr {
-  ///The name of the variable being assigned to
-  final Token name;
-  ///The expression whose result should be assigned to the variable
-  final Expr value;
-  AssignExpr(Token this.name, Expr this.value);
- dynamic accept(ExprVisitor v) => v.visitAssignExpr(this);
-
-}
-
 class logicBinaryExpr extends Expr {
   ///operand to the left of the operator
   final Expr left;
@@ -136,6 +137,18 @@ class SuperExpr extends Expr {
   final Token method;
   SuperExpr(Token this.keyword, Token this.method);
  dynamic accept(ExprVisitor v) => v.visitSuperExpr(this);
+
+}
+
+class DerivativeExpr extends Expr {
+  ///The token containing the first 'del' keyword
+  final Token keyword;
+  ///The function whose derivative is being calculated
+  final Expr derivand;
+  ///Variables this function is being derivated in
+  final List<Expr> variables;
+  DerivativeExpr(Token this.keyword, Expr this.derivand, List<Expr> this.variables);
+ dynamic accept(ExprVisitor v) => v.visitDerivativeExpr(this);
 
 }
 

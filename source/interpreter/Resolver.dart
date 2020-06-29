@@ -292,4 +292,10 @@ class Resolver implements ExprVisitor, StmtVisitor {
           e.keyword, "Cannot use 'super' in a class with no superclass");
     _resolveLocal(e, e.keyword);
   }
+
+  @override
+  void visitDerivativeExpr(DerivativeExpr e) {
+    _resolveExpr(e.derivand);
+    for (Expr exp in e.variables) _resolveExpr(exp);
+  }
 }

@@ -115,20 +115,21 @@ class BSScanner {
   static const Map<String, TokenType> _keywords = {
     "and": TokenType.AND,
     "class": TokenType.CLASS,
+    "del": TokenType.DEL,
     "else": TokenType.ELSE,
     "false": TokenType.FALSE,
-    "routine": TokenType.ROUTINE,
     "for": TokenType.FOR,
     "if": TokenType.IF,
+    "let": TokenType.LET,
     "nil": TokenType.NIL,
     "not": TokenType.NOT,
     "or": TokenType.OR,
     "print": TokenType.PRINT,
     "return": TokenType.RETURN,
+    "routine": TokenType.ROUTINE,
     "super": TokenType.SUPER,
     "this": TokenType.THIS,
     "true": TokenType.TRUE,
-    "let": TokenType.LET,
     "while": TokenType.WHILE,
   };
 
@@ -172,7 +173,6 @@ class BSScanner {
     }
   }
 
-
   //https://stackoverflow.com/a/25886695
   //^ is the bitwise XOR operand for integers
   //since 0 to 9 are 0x30 to 0x39 in UTF-16 where 0x30 is 0b110000 and 0x39 is 111001
@@ -205,7 +205,6 @@ class BSScanner {
         TokenType.NUMBER, n(double.parse(_source.substring(_start, _current))));
   }
 
-
   ///checks the character after current, returning null if it is after the end of the source.
   String _peekNext() {
     if (_current + 1 >= _source.length) return null;
@@ -215,16 +214,14 @@ class BSScanner {
 
   ///having found the start of a identifier, reads the rest of it and adds it to _tokens.
   void _identifier() {
-  
     //keeps going while it finds numbers (even though it can't start with a number)
     while (_isAlphaNumeric(_peek())) _advance();
 
     String text = _source.substring(_start, _current);
 
     //if the identifier is a keyword, adds a token of the appropriate type.
-    TokenType type =
-        (_keywords.containsKey(text)) ? _keywords[text] : TokenType.IDENTIFIER;
-    _addToken(type);
+    _addToken(
+        (_keywords.containsKey(text)) ? _keywords[text] : TokenType.IDENTIFIER);
   }
 
   ///returns whether the character c is a underscore or a letter.

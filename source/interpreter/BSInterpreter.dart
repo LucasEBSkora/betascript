@@ -371,6 +371,21 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
     return method.bind(object);
   }
+
+  @override
+  visitDerivativeExpr(DerivativeExpr e) {
+    Object f = _evaluate(e.derivand);
+    if (!(f is BSFunction)) throw new RuntimeError(e.keyword, "target of derivative must be function");
+    List<Variable> _variables = List();
+    for (Expr exp in e.variables) {
+      Object v = _evaluate(exp);
+      if (v is Variable) _variables.add(v);
+      else throw RuntimeError(e.keyword, "Functions may only be derivated in variables");
+    }
+    BSFunction _value = f;
+    for (Variable v in _variables) _value = _value.derivative(v);
+    return _value;
+  }
 }
 
 class RuntimeError implements Exception {

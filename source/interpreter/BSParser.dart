@@ -358,7 +358,7 @@ class BSParser {
     return expr;
   }
 
-  ///unary -> ( "!" | "-" | "~") unary | call
+  ///unary -> ( "!" | "-" | "~") unary | call | derivative
   Expr _unary() {
     //TODO: fix factorial, which is actually to the right of the operand
 
@@ -371,7 +371,10 @@ class BSParser {
       return new UnaryExpr(op, right);
     }
 
-    //in any other case, go to the 'primary' rule
+    //if it finds a 'del' token, parses a derivative
+    if (_match(TokenType.DEL)) return _derivative();
+    
+    //in any other case, go to the 'call' rule
     return _call();
   }
 
@@ -413,6 +416,27 @@ class BSParser {
         _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after arguments.");
 
     return new CallExpr(callee, paren, arguments);
+  }
+
+
+  ///derivative -> "del" "(" expression ")" "/" "del" "(" arguments ")"
+  Expr _derivative() {
+    Token keyword = _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after del keyword");
+    Expr derivand = _expression();    
+    _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after derivand");
+    _consume(TokenType.SLASH, "expect '/' after derivand");
+    _consume(TokenType.DEL, "expect second 'del' after derivand");
+    _consume(TokenType.LEFT_PARENTHESES, "expect '(' after second del keyword");
+    List<Expr> variables = List();
+    if (_check(TokenType.RIGHT_PARENTHESES)) _error(_previous(), "at least one variable is necessary in derivative expression");
+    do {
+      variables.add(_expression());
+    } while(_match(TokenType.COMMA));
+
+    _consume(TokenType.RIGHT_PARENTHESES, "expect ')' after derivative variables");
+
+    return new DerivativeExpr(keyword, derivand, variables);
+    
   }
 
   ///primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER | "super" "." IDENTIFIER

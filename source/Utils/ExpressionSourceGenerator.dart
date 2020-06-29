@@ -3,6 +3,14 @@ import 'dart:io';
 //a helper program that generates valid dart files with the classes representing each type of Expression and Statement, for use in ASTs.
 int main() {
   defineAst("../interpreter", "Expr", [
+    NodeType("Assign", [
+      ["Token", "name", "The name of the variable being assigned to"],
+      [
+        "Expr",
+        "value",
+        "The expression whose result should be assigned to the variable"
+      ],
+    ]),
     NodeType(
       "Binary",
       [
@@ -42,14 +50,7 @@ int main() {
     NodeType("Variable", [
       ["Token", "name", "The token containing the variable's name"],
     ]),
-    NodeType("Assign", [
-      ["Token", "name", "The name of the variable being assigned to"],
-      [
-        "Expr",
-        "value",
-        "The expression whose result should be assigned to the variable"
-      ],
-    ]),
+
     NodeType(
       "logicBinary",
       [
@@ -69,6 +70,11 @@ int main() {
     NodeType("Super", [
       ["Token", "keyword", "The token containing the keyword 'super'"],
       ["Token", "method", "The method being accessed"],
+    ]),
+    NodeType("Derivative", [
+      ["Token", "keyword","The token containing the first 'del' keyword"],
+      ["Expr", "derivand", "The function whose derivative is being calculated"], 
+      ["List<Expr>", "variables", "Variables this function is being derivated in"],
     ]),
   ], [
     'Token'

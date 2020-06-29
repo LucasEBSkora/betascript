@@ -27,23 +27,24 @@ enum TokenType {
   STRING, //String literals
   NUMBER, //Numeric literals (ints and floating-points)
 
-  //reserved keywords (not all are actually going to be implemented)
+  //reserved keywords
   AND,
   CLASS,
+  DEL,
   ELSE,
   FALSE,
-  ROUTINE,
   FOR,
   IF,
+  LET,
   NIL,
   NOT,
   OR,
   PRINT,
   RETURN,
+  ROUTINE,
   SUPER,
   THIS,
   TRUE,
-  LET,
   WHILE,
 
   EOF
