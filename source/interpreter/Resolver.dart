@@ -142,10 +142,10 @@ class Resolver implements ExprVisitor, StmtVisitor {
   void visitVariableExpr(VariableExpr e) {
     //makes sure a variable isn't trying to read itself in its own initialization
     if (!_scopes.isEmpty) {
-      if (_scopes.last[e.name.lexeme] == false)
+      if (_scopes.last.containsKey(e.name.lexeme) && _scopes.last[e.name.lexeme] == false)
         BetaScript.error(
             e.name, "Cannot read variable in its own initializer");
-    } else if (!_globals[e.name.lexeme])
+    } else if (_globals.containsKey(e.name.lexeme) && !_globals[e.name.lexeme])
       BetaScript.error(
           e.name, "Cannot read variable in its own initializer");
 

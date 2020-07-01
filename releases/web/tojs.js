@@ -9538,18 +9538,22 @@
       _this._define$1(t1);
     },
     visitVariableExpr$1: function(e) {
-      var t2,
+      var t2, t3,
         _s43_ = "Cannot read variable in its own initializer",
         t1 = this._scopes;
       if (t1.length !== 0) {
         t2 = e.name;
-        if (J.$eq$(C.JSArray_methods.get$last(t1).$index(0, t2.lexeme), false))
+        t3 = t2.lexeme;
+        if (C.JSArray_methods.get$last(t1).containsKey$1(t3) && J.$eq$(C.JSArray_methods.get$last(t1).$index(0, t3), false))
           Z.BetaScript_error(t2, _s43_);
         t1 = t2;
       } else {
-        t1 = e.name;
-        if (!H.boolConversionCheck(this._globals.$index(0, t1.lexeme)))
-          Z.BetaScript_error(t1, _s43_);
+        t1 = this._globals;
+        t2 = e.name;
+        t3 = t2.lexeme;
+        if (t1.containsKey$1(t3) && !H.boolConversionCheck(t1.$index(0, t3)))
+          Z.BetaScript_error(t2, _s43_);
+        t1 = t2;
       }
       this._resolveLocal$2(e, t1);
     },
@@ -9593,6 +9597,7 @@
     },
     _resolveLocal$2: function(e, $name) {
       var t1, i, t2;
+      type$.Expr._as(e);
       for (t1 = this._scopes, i = t1.length - 1, t2 = $name.lexeme; i >= 0; --i) {
         if (i >= t1.length)
           return H.ioore(t1, i);
@@ -10278,6 +10283,7 @@
       Environment: findType("Environment"),
       Error: findType("Error"),
       Event: findType("Event"),
+      Expr: findType("Expr"),
       Function: findType("Function"),
       Future_Null: findType("Future<Null>"),
       Future_dynamic: findType("Future<@>"),

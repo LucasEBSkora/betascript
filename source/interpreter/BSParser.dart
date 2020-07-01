@@ -528,7 +528,7 @@ class BSParser {
     if (_check(type)) return _advance();
 
     //doesn't actually throw the error
-    //TODO: maybe a bad idea
+    //So that it keeps parsing
     _error(_peek(), message);
     return null;
   }
