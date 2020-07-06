@@ -3,7 +3,7 @@ import 'Number.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
 import 'dart:math' as math;
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 //TODO: Implement roots that aren't square roots
 
 BSFunction root(BSFunction operand) {
@@ -23,7 +23,7 @@ class Root extends BSFunction {
       (n(1 / 2) * (operand ^ n(-1 / 2)) * operand.derivativeInternal(v));
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction opvalue = operand.evaluate(p);
     if (opvalue is Number) {
       double v = math.sqrt(opvalue.value);

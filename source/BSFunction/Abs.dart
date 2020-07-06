@@ -1,4 +1,4 @@
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 
 import 'Negative.dart';
 import 'Number.dart';
@@ -23,7 +23,7 @@ class AbsoluteValue extends BSFunction {
       : super(params);
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) => abs(operand.evaluate(p));
+  BSFunction evaluate(HashMap<String, BSFunction> p) => abs(operand.evaluate(p));
 
   @override
   BSFunction derivativeInternal(Variable v) =>

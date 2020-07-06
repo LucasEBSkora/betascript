@@ -1,3 +1,4 @@
+import 'dart:collection' show HashMap;
 import '../Number.dart';
 import '../Variable.dart';
 import '../BSFunction.dart';
@@ -22,7 +23,7 @@ class CscH extends singleOperandFunction {
       (-csch(operand) * ctgh(operand) * operand.derivativeInternal(v));
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here

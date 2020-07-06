@@ -21,7 +21,7 @@ abstract class singleOperandFunction extends BSFunction {
   // @override
   // BSFunction derivativeInternal(Variable v);
   // @override
-  // BSFunction evaluate(Map<String, BSFunction> p);
+  // BSFunction evaluate(HashMap<String, BSFunction> p);
 
   // unfortunately can't define this one either, because we must call the correct constructor
   // @override

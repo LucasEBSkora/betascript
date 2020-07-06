@@ -1,7 +1,9 @@
+import 'dart:collection' show HashMap;
+import 'dart:math' as math;
+
 import '../Number.dart';
 import '../Variable.dart';
 import '../BSFunction.dart';
-import 'dart:math' as math;
 
 import '../inverseHyperbolic/ArSinH.dart';
 import '../singleOperandFunction.dart';
@@ -15,14 +17,14 @@ BSFunction sinh(BSFunction operand) {
 }
 
 class SinH extends singleOperandFunction {
-  SinH._(BSFunction operand,  [Set<Variable> params = null])
+  SinH._(BSFunction operand, [Set<Variable> params = null])
       : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
       (cosh(operand) * (operand.derivativeInternal(v)));
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
@@ -38,6 +40,7 @@ class SinH extends singleOperandFunction {
     else
       return sinh(op);
   }
+
   @override
   BSFunction copy([Set<Variable> params = null]) => SinH._(operand, params);
 }

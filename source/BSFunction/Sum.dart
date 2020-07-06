@@ -5,7 +5,7 @@ import 'Variable.dart';
 import 'BSFunction.dart';
 
 import '../Utils/Tuples.dart';
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 
 BSFunction add(List<BSFunction> operands) {
   if (operands == null || operands.length == 0) return n(0);
@@ -31,7 +31,7 @@ class Sum extends BSFunction {
       add(operands.map((BSFunction f) => f.derivativeInternal(v)).toList());
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) =>
+  BSFunction evaluate(HashMap<String, BSFunction> p) =>
       add(operands.map((BSFunction f) => f.evaluate(p)).toList());
 
   @override
@@ -109,8 +109,8 @@ void _openOtherSums(List<BSFunction> operands) {
 void _SumNumbers(List<BSFunction> operands) {
   double number = 0;
 
-  Map<String, Pair<double, int>> namedNumbers =
-      Map<String, Pair<double, int>>();
+  HashMap<String, Pair<double, int>> namedNumbers =
+      HashMap<String, Pair<double, int>>();
 
   int i = 0;
   while (i < operands.length) {

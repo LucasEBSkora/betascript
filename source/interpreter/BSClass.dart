@@ -1,3 +1,5 @@
+import 'dart:collection' show HashMap;
+
 import 'BSCallable.dart';
 import 'BSInstance.dart';
 import 'BSInterpreter.dart';
@@ -6,10 +8,10 @@ import 'UserRoutine.dart';
 class BSClass implements BSCallable {
   final String name;
   final BSClass _superclass;
-  final Map<String, UserRoutine> _methods;
+  final HashMap<String, UserRoutine> _methods;
 
   BSClass(String this.name, BSClass this._superclass,
-      Map<String, UserRoutine> this._methods);
+      HashMap<String, UserRoutine> this._methods);
 
   @override
   String toString() => name;

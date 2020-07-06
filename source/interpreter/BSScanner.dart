@@ -1,3 +1,5 @@
+import 'dart:collection' show HashMap;
+
 import '../BSFunction/Number.dart';
 import 'BetaScript.dart';
 import 'Token.dart';
@@ -6,7 +8,7 @@ import 'Token.dart';
 class BSScanner {
   final String _source;
   final List<Token> _tokens = new List();
-  Map<String, Function> _charToLexeme; //see _initializeMap
+  HashMap<String, Function> _charToLexeme; //see _initializeMap
 
   //_start is the start of the lexeme currently being read, and _current the current value being processed.
   int _start;
@@ -38,7 +40,7 @@ class BSScanner {
 
   ///initializes the map used to replace a big ugly switch-case block in _scanToken
   void _initializeMap() {
-    _charToLexeme = {
+    _charToLexeme = HashMap.from({
       //these lexemes are always single character, and can be initialized with ease
       '(': () => _addToken(TokenType.LEFT_PARENTHESES),
       ')': () => _addToken(TokenType.RIGHT_PARENTHESES),
@@ -84,7 +86,7 @@ class BSScanner {
       '\n': () => _line++,
       //since the _string function takes no parameters, it can be passed directly.
       '"': _string,
-    };
+    });
   }
 
   ///scans a single token.

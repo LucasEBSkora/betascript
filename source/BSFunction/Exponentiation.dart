@@ -3,7 +3,7 @@ import 'Variable.dart';
 import 'BSFunction.dart';
 import 'dart:math';
 import 'Number.dart';
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 
 BSFunction exp(BSFunction exponent,
     [BSFunction base = constants.e]) {
@@ -35,7 +35,7 @@ class Exponentiation extends BSFunction {
   }
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction b = base.evaluate(p);
     BSFunction expo = exponent.evaluate(p);
     if (b is Number && expo is Number) {

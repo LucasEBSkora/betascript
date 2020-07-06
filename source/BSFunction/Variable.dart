@@ -2,7 +2,7 @@ import 'dart:io';
 import 'BSCalculus.dart';
 import 'BSFunction.dart';
 import 'Number.dart';
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 
 BSFunction variable(String name, [Set<Variable> params = null]) =>
     Variable._(name, params);
@@ -13,7 +13,7 @@ class Variable extends BSFunction implements Comparable {
   Variable._(String this.name, Set<Variable> params) : super(params);
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     if (!p.containsKey(name)) {
       print("Error! Missing arguments in call call: " + name + " not defined");
       exit(1);

@@ -9,7 +9,7 @@ import 'Variable.dart';
 
 import '../Utils/xor.dart';
 
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 
 BSFunction multiply(List<BSFunction> operands) {
   if (operands == null || operands.length == 0) return (n(0));
@@ -104,7 +104,7 @@ class Multiplication extends BSFunction {
   }
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     List<BSFunction> ops = new List();
     operands.forEach((BSFunction f) {
       ops.add(f.evaluate(p));
@@ -175,7 +175,7 @@ bool _multiplyNumbers(List<BSFunction> operands) {
   //used to store named numbers, because they shouldn't be multiplied with the others
   //the key is the name of the number, the double is its value, and the int is the power
   //to which it should be raised
-  Map<String, Pair<double, int>> namedNumbers = Map();
+  HashMap<String, Pair<double, int>> namedNumbers = HashMap();
 
   int i = 0;
   while (i < operands.length) {

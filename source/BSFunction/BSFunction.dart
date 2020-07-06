@@ -1,4 +1,4 @@
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 import 'package:meta/meta.dart';
 
 import 'BSCalculus.dart';
@@ -28,7 +28,7 @@ abstract class BSFunction implements BSCallable {
           "Error! Missing parameters in function call!");
 
     return evaluate(
-        Map.fromIterables(this.parameters.map((e) => e.name), parameters));
+        HashMap.fromIterables(this.parameters.map((e) => e.name), parameters));
   }
 
   ///Returns the function with all possible aproximations made.
@@ -107,9 +107,9 @@ abstract class BSFunction implements BSCallable {
     return (v.first > v.second) ? x : y;
   }
 
-  ///calculates the partial derivative of this in relation to v without merging. Is called by 'derivative', which also merges the
-  ///functions
-  @protected
+  ///calculates the partial derivative of this in relation to v without merging. 
+  ///Is called by 'derivative', which also merges the functions.
+  @visibleForOverriding
   BSFunction derivativeInternal(Variable v);
 
   @protected
@@ -121,7 +121,7 @@ abstract class BSFunction implements BSCallable {
   ///Will always return an exact value, and it is not guaranteed to be as simplified as possible. This means that sin(0.5) will return Sin(0.5).
   ///for approximations, use the approx getter
   @protected
-  BSFunction evaluate(Map<String, BSFunction> p);
+  BSFunction evaluate(HashMap<String, BSFunction> p);
 
   String toString() => throw UnimplementedError();
 

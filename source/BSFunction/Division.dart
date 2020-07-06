@@ -4,7 +4,7 @@ import 'Negative.dart';
 import 'Number.dart';
 import 'BSFunction.dart';
 import 'Variable.dart';
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 import '../Utils/xor.dart';
 import '../Utils/Tuples.dart';
 
@@ -49,7 +49,7 @@ class Division extends BSFunction {
   }
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction _n = numerator.evaluate(p);
     BSFunction _d = denominator.evaluate(p);
     Trio<Number, bool, bool> _numNumber =

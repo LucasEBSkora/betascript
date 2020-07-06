@@ -1,9 +1,11 @@
+import 'dart:collection' show HashMap;
+import 'dart:math' as math;
+
 import '../Abs.dart';
 import '../Number.dart';
 import '../Root.dart';
 import '../Variable.dart';
 import '../BSFunction.dart';
-import 'dart:math' as math;
 
 import '../singleOperandFunction.dart';
 import '../trig/Csc.dart';
@@ -20,7 +22,7 @@ class ArcCsc extends singleOperandFunction {
       : super(operand, params);
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here

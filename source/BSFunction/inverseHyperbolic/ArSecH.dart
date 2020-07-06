@@ -1,9 +1,11 @@
+import 'dart:collection' show HashMap;
+import 'dart:math' as math;
+
 import '../BSCalculus.dart';
 import '../Number.dart';
 import '../Root.dart';
 import '../Variable.dart';
 import '../BSFunction.dart';
-import 'dart:math' as math;
 
 import '../hyperbolic/SecH.dart';
 import '../singleOperandFunction.dart';
@@ -19,7 +21,7 @@ class ArSecH extends singleOperandFunction {
   ArSecH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here

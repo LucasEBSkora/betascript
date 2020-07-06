@@ -19,4 +19,10 @@ void main() {
   BSFunction j = x/y + (-x)/y + x/(-y) + (-x)/(-y);
   print(j);
 
+
+  Type t = BSFunction;
+  print(j.runtimeType.toString());
+
+  print(t == j.runtimeType);
+
 }

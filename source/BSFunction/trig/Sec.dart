@@ -1,10 +1,12 @@
+import 'dart:collection' show HashMap;
+import 'dart:math' as math;
+
 import '../Number.dart';
 import '../Variable.dart';
 import '../BSFunction.dart';
 import '../inverseTrig/ArcSec.dart';
 import '../singleOperandFunction.dart';
 import 'Tan.dart';
-import 'dart:math' as math;
 
 BSFunction sec(BSFunction operand) {
   if (operand is ArcSec)
@@ -22,7 +24,7 @@ class Sec extends singleOperandFunction {
       (sec(operand) * tan(operand) * operand.derivativeInternal(v));
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
       double v = 1 / math.cos(op.value);

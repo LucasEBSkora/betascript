@@ -1,3 +1,5 @@
+import 'dart:collection' show HashMap;
+
 import 'BSInterpreter.dart';
 import 'BetaScript.dart';
 import 'Expr.dart';
@@ -20,12 +22,12 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   ///A stack representing Scopes, where the key is the identifier name and the value is whether it is ready to be referenced
   ///because things like var a = a; should cause compile errors
-  final List<Map<String, bool>> _scopes = new List();
+  final List<HashMap<String, bool>> _scopes = new List();
 
   ///Represents all the global values. Used to check if a global is being redefined (to avoid overriding native functions and routines)
   ///Since all native things are already define, they are added to the map from the start
-  final Map<String, bool> _globals =
-      new Map.fromIterable(nativeGlobals.keys, value: (_) => true);
+  final HashMap<String, bool> _globals =
+      new HashMap.fromIterable(nativeGlobals.keys, value: (_) => true);
 
   Resolver(this._interpreter);
 
@@ -171,7 +173,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
   void _resolveStmt(Stmt s) => s.accept(this);
   void _resolveExpr(Expr e) => e.accept(this);
 
-  void _beginScope() => _scopes.add(new Map());
+  void _beginScope() => _scopes.add(new HashMap());
   void _endScope() => _scopes.removeLast();
 
   //Creates a variable in current scope without saying it is ready to be referenced

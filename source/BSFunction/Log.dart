@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 
 import 'Number.dart';
 import 'Variable.dart';
@@ -32,7 +32,7 @@ class Log extends BSFunction {
   }
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction b = base.evaluate(p);
     BSFunction op = operand.evaluate(p);
     if (b is Number && op is Number) {

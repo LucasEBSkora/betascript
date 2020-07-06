@@ -1,10 +1,12 @@
+import 'dart:collection' show HashMap;
+import 'dart:math' as math;
+
 import '../Number.dart';
 import '../Variable.dart';
 import '../BSFunction.dart';
 import '../inverseTrig/ArcCsc.dart';
 import '../singleOperandFunction.dart';
 import 'Ctg.dart';
-import 'dart:math' as math;
 
 BSFunction csc(BSFunction operand) {
   if (operand is ArcCsc)
@@ -21,7 +23,7 @@ class Csc extends singleOperandFunction {
   BSFunction derivativeInternal(Variable v) =>
       (-csc(operand) * ctg(operand) * operand.derivativeInternal(v));
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
       double v = 1 / math.sin(op.value);

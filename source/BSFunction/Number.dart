@@ -2,7 +2,7 @@ import 'BSFunction.dart';
 import 'Negative.dart';
 import 'Variable.dart';
 import 'dart:math' as math;
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 
 BSFunction n(num value) {
   if (value < 0) return negative(Number._(value.abs(), null));
@@ -53,7 +53,7 @@ class Number extends BSFunction {
   BSFunction derivativeInternal(Variable v) => n(0);
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) => this;
+  BSFunction evaluate(HashMap<String, BSFunction> p) => this;
 
   num get value => absvalue;
 

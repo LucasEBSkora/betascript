@@ -1,10 +1,12 @@
+import 'dart:collection' show HashMap;
+import 'dart:math' as math;
+
 import '../Number.dart';
 import '../Variable.dart';
 import '../BSFunction.dart';
 import '../inverseTrig/ArcSin.dart';
 import '../singleOperandFunction.dart';
 import 'Cos.dart';
-import 'dart:math' as math;
 
 BSFunction sin(BSFunction operand) {
   if (operand is ArcSin)
@@ -22,7 +24,7 @@ class Sin extends singleOperandFunction {
       (cos(operand) * (operand.derivativeInternal(v)));
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
       double v = math.sin(op.value);

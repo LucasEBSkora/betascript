@@ -2,7 +2,7 @@ import 'Abs.dart';
 import 'Variable.dart';
 import 'BSFunction.dart';
 import 'Number.dart';
-import 'dart:collection' show SplayTreeSet;
+import 'dart:collection' show HashMap, SplayTreeSet;
 import '../Utils/Tuples.dart';
 
 BSFunction sgn(BSFunction operand) {
@@ -28,7 +28,7 @@ class Signum extends BSFunction {
       : super(params);
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) => sgn(operand.evaluate(p));
+  BSFunction evaluate(HashMap<String, BSFunction> p) => sgn(operand.evaluate(p));
 
   //The derivative of the sign function is either 0 or undefined.
   @override

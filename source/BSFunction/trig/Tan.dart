@@ -1,7 +1,9 @@
+import 'dart:collection' show HashMap;
+import 'dart:math' as math;
+
 import '../Number.dart';
 import '../Variable.dart';
 import '../BSFunction.dart';
-import 'dart:math' as math;
 
 import '../inverseTrig/ArcTan.dart';
 import '../singleOperandFunction.dart';
@@ -23,7 +25,7 @@ class Tan extends singleOperandFunction {
       ((sec(operand) ^ n(2)) * operand.derivativeInternal(v));
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) {
+  BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction op = operand.evaluate(p);
     if (op is Number) {
       double v = math.tan(op.value);

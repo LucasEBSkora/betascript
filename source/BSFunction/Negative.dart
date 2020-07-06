@@ -1,4 +1,4 @@
-import 'dart:collection';
+import 'dart:collection' show HashMap, SplayTreeSet;
 
 import 'BSFunction.dart';
 import 'Number.dart';
@@ -37,7 +37,7 @@ class Negative extends BSFunction {
   String toString([bool handleMinus = true]) => "-${operand}";
 
   @override
-  BSFunction evaluate(Map<String, BSFunction> p) => negative(operand.evaluate(p));
+  BSFunction evaluate(HashMap<String, BSFunction> p) => negative(operand.evaluate(p));
 
 
 }
