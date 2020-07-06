@@ -163,26 +163,36 @@ void _createMultiplications(List<BSFunction> operands) {
         BSFunction.extractFromNegative<Multiplication>(f);
 
     if (_mul.second &&
-        _mul.first.operands.length == 2 &&
+        _mul.first.operands.length >= 2 &&
         _mul.first.operands[0] is Number) {
-      h = _mul.first.operands[1];
-      factor = _mul.first.operands[0] * n(_mul.third ? -1 : 1);
+      //in this case, "h" must be the multiplication with all other factors excluding the number
+      List<BSFunction> otherOps = List.from(_mul.first.operands);
+      otherOps.removeAt(0);
+      h = Multiplication(otherOps);
+      factor = originalFactor = _mul.first.operands[0] * n(_mul.third ? -1 : 1);
     } else {
       Trio<BSFunction, bool, bool> _f = BSFunction.extractFromNegative(f);
       h = _f.first;
       factor = originalFactor = n((_f.third ? -1 : 1));
     }
+    print("h:$h");
+    print("factor:$factor");
+    print("originalFactor:$originalFactor");
 
     for (int j = i + 1; j < operands.length; ++j) {
       BSFunction g = operands[j];
-
+      print("g:$g");
       Trio<Multiplication, bool, bool> _mul =
-          BSFunction.extractFromNegative<Multiplication>(f);
+          BSFunction.extractFromNegative<Multiplication>(g);
 
       if (_mul.second &&
-          _mul.first.operands.length == 2 &&
+          _mul.first.operands.length >= 2 &&
           _mul.first.operands[0] is Number) {
-        if (h == _mul.first.operands[1]) {
+        //in this case, "h" must be the multiplication with all other factors excluding the number
+        List<BSFunction> otherOps = List.from(_mul.first.operands);
+        otherOps.removeAt(0);
+        g = Multiplication(otherOps);
+        if (h == g) {
           operands.removeAt(j);
           factor += _mul.first.operands[0] * n(_mul.third ? -1 : 1);
         }
@@ -195,6 +205,7 @@ void _createMultiplications(List<BSFunction> operands) {
       }
     }
 
+    print("finalFactor:$factor");
     if (factor != originalFactor) {
       operands.removeAt(i);
       operands.insert(i, factor * h);

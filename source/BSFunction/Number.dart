@@ -15,6 +15,8 @@ BSFunction namedNumber(num absValue, String name) =>
 class constants {
   static const Number e = Number._named(math.e, 'e', null);
   static const Number pi = Number._named(math.pi, 'π', null);
+  static const Number infinity = Number._named(double.infinity, '∞', null);
+  static const Negative negativeInfinity = Negative(infinity);
 }
 
 class Number extends BSFunction {
@@ -30,7 +32,8 @@ class Number extends BSFunction {
         isNamed = false,
         super(params);
 
-  const Number._named(num this.absvalue, this.name, [Set<Variable> params = null])
+  const Number._named(num this.absvalue, this.name,
+      [Set<Variable> params = null])
       : isNamed = true,
         isInt = (absvalue is int),
         super(params);
@@ -67,11 +70,6 @@ class Number extends BSFunction {
 
   bool operator ==(dynamic other) =>
       (other is Number) && this.value == other.value;
-
-  bool operator <=(dynamic other) => this.value <= other.value;
-  bool operator <(dynamic other) => this.value < other.value;
-  bool operator >=(dynamic other) => this.value >= other.value;
-  bool operator >(dynamic other) => this.value > other.value;
 
   @override
   BSFunction get approx =>

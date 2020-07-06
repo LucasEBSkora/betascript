@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 import 'BSCalculus.dart';
 import 'Multiplication.dart';
 import 'Negative.dart';
+import 'Number.dart';
 import 'Sum.dart';
 import 'Division.dart';
 import 'Exponentiation.dart';
@@ -13,7 +14,6 @@ import '../Utils/Tuples.dart';
 
 import '../interpreter/BSCallable.dart';
 import '../interpreter/BSInterpreter.dart';
-
 
 abstract class BSFunction implements BSCallable {
   ///set of parameters the function is defined in ( the previous function NEEDS x, y and z to be evaluated, but we could define it in x,y,z and w if we wanted to)
@@ -43,7 +43,7 @@ abstract class BSFunction implements BSCallable {
   ///Returns a copy of this function with the custom parameters passed in p, and checks if they include all needed parameters
   BSFunction withParameters(Set<Variable> p) {
     Set<Variable> _p = defaultParameters;
-    
+
     _p.forEach((element) {
       if (!p.contains(element))
         throw new BetascriptFunctionError(
@@ -66,6 +66,46 @@ abstract class BSFunction implements BSCallable {
 
   bool operator ==(dynamic other) =>
       (other is BSFunction) && toString() == other.toString();
+
+  static Pair<double, double> _toDoubles(BSFunction a, BSFunction b, String op) {
+    Trio<Number, bool, bool> _a = BSFunction.extractFromNegative<Number>(a);
+    Trio<Number, bool, bool> _b = BSFunction.extractFromNegative<Number>(b);
+    if (!_a.second || !_b.second)
+      throw BetascriptFunctionError("operand $op can only be used on numbers");
+
+    return Pair<double, double>(((_a.third) ? -1 : 1) * _a.first.value,
+        ((_b.third) ? -1 : 1) * _b.first.value);
+  }
+
+  bool operator <=(BSFunction other) {
+    Pair<double, double> v =  _toDoubles(this, other, "<=");
+    return v.first <= v.second;
+  }
+
+    bool operator <(BSFunction other) {
+    Pair<double, double> v =  _toDoubles(this, other, "<");
+    return v.first < v.second;
+  }
+
+    bool operator >=(BSFunction other) {
+    Pair<double, double> v =  _toDoubles(this, other, ">=");
+    return v.first >= v.second;
+  }
+
+    bool operator >(BSFunction other) {
+    Pair<double, double> v =  _toDoubles(this, other, ">");
+    return v.first > v.second;
+  }
+
+  static min(BSFunction x, BSFunction y) {
+    Pair<double, double> v =  _toDoubles(x, y, "min");
+    return (v.first < v.second) ? x : y;
+  }
+
+  static max(BSFunction x, BSFunction y) {
+    Pair<double, double> v =  _toDoubles(x, y, "max");
+    return (v.first > v.second) ? x : y;
+  }
 
   ///calculates the partial derivative of this in relation to v without merging. Is called by 'derivative', which also merges the
   ///functions
@@ -115,8 +155,8 @@ abstract class BSFunction implements BSCallable {
   int get arity => parameters.length;
 
   //Doesn't check if the cast is succesful because it assumes the interpreter did its job
-  Object callThing(BSInterpreter interpreter, List<Object> arguments) => call(arguments.map((object) => object as BSFunction).toList());
-
+  Object callThing(BSInterpreter interpreter, List<Object> arguments) =>
+      call(arguments.map((object) => object as BSFunction).toList());
 }
 
 class BetascriptFunctionError implements Exception {

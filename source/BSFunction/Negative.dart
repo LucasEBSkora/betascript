@@ -18,6 +18,8 @@ class Negative extends BSFunction {
 
   Negative._(BSFunction this.operand, [Set<Variable> params = null]) : super(params);
 
+  const Negative(BSFunction this.operand) : super(null);
+  
   @override
   BSFunction get approx => negative(operand.approx);
 
@@ -36,4 +38,6 @@ class Negative extends BSFunction {
 
   @override
   BSFunction evaluate(Map<String, BSFunction> p) => negative(operand.evaluate(p));
+
+
 }

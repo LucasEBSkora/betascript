@@ -2600,9 +2600,6 @@
     get$runtimeType$: function(receiver) {
       return J.getInterceptor$(receiver).get$runtimeType(receiver);
     },
-    get$value$x: function(receiver) {
-      return J.getInterceptor$x(receiver).get$value(receiver);
-    },
     $add$ans: function(receiver, a0) {
       if (typeof receiver == "number" && typeof a0 == "number")
         return receiver + a0;
@@ -3631,10 +3628,6 @@
     },
     AreaElement: function AreaElement() {
     },
-    ButtonElement: function ButtonElement() {
-    },
-    DataElement: function DataElement() {
-    },
     DomException: function DomException() {
     },
     Element: function Element() {
@@ -3645,23 +3638,9 @@
     },
     FormElement: function FormElement() {
     },
-    InputElement: function InputElement() {
-    },
-    LIElement: function LIElement() {
-    },
-    MeterElement: function MeterElement() {
-    },
     MouseEvent: function MouseEvent() {
     },
     Node: function Node() {
-    },
-    OptionElement: function OptionElement() {
-    },
-    OutputElement: function OutputElement() {
-    },
-    ParamElement: function ParamElement() {
-    },
-    ProgressElement: function ProgressElement() {
     },
     SelectElement: function SelectElement() {
     },
@@ -4335,7 +4314,7 @@
       C.JSArray_methods.insertAll$2(operands, 0, numbers);
     },
     _createMultiplications: function(operands) {
-      var t1, t2, t3, i, f, _mul, t4, t5, h, factor, originalFactor, _f, j, j0, g, t6, _g;
+      var t1, t2, t3, i, f, _mul, t4, otherOps, h, t5, originalFactor, factor, _f, j, j0, g, t6, _g;
       if (operands.length < 2)
         return;
       for (t1 = type$.BSFunction, t2 = type$.Multiplication, t3 = type$.JSArray_BSFunction, i = 0; i < operands.length; i = j) {
@@ -4343,50 +4322,44 @@
         _mul = X.BSFunction_extractFromNegative(f, t2);
         if (_mul.second) {
           t4 = _mul.first.operands;
-          t5 = t4.length;
-          if (t5 === 2) {
-            if (0 >= t5)
-              return H.ioore(t4, 0);
-            t4 = t4[0] instanceof R.Number;
-          } else
-            t4 = false;
+          t4 = t4.length >= 2 && t4[0] instanceof R.Number;
         } else
           t4 = false;
         if (t4) {
           t4 = _mul.first.operands;
-          if (1 >= t4.length)
-            return H.ioore(t4, 1);
-          h = t4[1];
+          otherOps = P.List_List$from(t4, true, t1);
+          C.JSArray_methods.removeAt$1(otherOps, 0);
+          h = new S.Multiplication(otherOps, null);
+          if (0 >= t4.length)
+            return H.ioore(t4, 0);
           t4 = t4[0];
           t5 = R.n(_mul.third ? -1 : 1);
           t4.toString;
-          factor = S.multiply(H.setRuntimeTypeInfo([t4, t5], t3));
-          originalFactor = null;
+          originalFactor = S.multiply(H.setRuntimeTypeInfo([t4, t5], t3));
+          factor = originalFactor;
         } else {
           _f = X.BSFunction_extractFromNegative(f, t1);
           h = _f.first;
           originalFactor = R.n(_f.third ? -1 : 1);
           factor = originalFactor;
         }
+        H.printString("h:" + H.S(h));
+        H.printString("factor:" + H.S(factor));
+        H.printString("originalFactor:" + H.S(originalFactor));
         for (j = i + 1, t4 = J.getInterceptor$(h), j0 = j; j0 < operands.length; ++j0) {
           g = operands[j0];
-          _mul = X.BSFunction_extractFromNegative(f, t2);
+          H.printString("g:" + H.S(g));
+          _mul = X.BSFunction_extractFromNegative(g, t2);
           if (_mul.second) {
             t5 = _mul.first.operands;
-            t6 = t5.length;
-            if (t6 === 2) {
-              if (0 >= t6)
-                return H.ioore(t5, 0);
-              t5 = t5[0] instanceof R.Number;
-            } else
-              t5 = false;
+            t5 = t5.length >= 2 && t5[0] instanceof R.Number;
           } else
             t5 = false;
           if (t5) {
             t5 = _mul.first.operands;
-            if (1 >= t5.length)
-              return H.ioore(t5, 1);
-            if (t4.$eq(h, t5[1])) {
+            otherOps = P.List_List$from(t5, true, t1);
+            C.JSArray_methods.removeAt$1(otherOps, 0);
+            if (t4.$eq(h, new S.Multiplication(otherOps, null))) {
               C.JSArray_methods.removeAt$1(operands, j0);
               if (0 >= t5.length)
                 return H.ioore(t5, 0);
@@ -4407,6 +4380,7 @@
             }
           }
         }
+        H.printString("finalFactor:" + H.S(factor));
         if (!J.$eq$(factor, originalFactor)) {
           C.JSArray_methods.removeAt$1(operands, i);
           factor.toString;
@@ -4506,6 +4480,18 @@
     }
   },
   X = {
+    BSFunction__toDoubles: function(a, b, op) {
+      var t2, t3,
+        t1 = type$.Number,
+        _a = X.BSFunction_extractFromNegative(a, t1),
+        _b = X.BSFunction_extractFromNegative(b, t1);
+      if (!_a.second || !_b.second)
+        throw H.wrapException(X.BetascriptFunctionError$("operand " + op + " can only be used on numbers"));
+      t1 = _a.third ? -1 : 1;
+      t2 = _a.first.absvalue;
+      t3 = _b.third ? -1 : 1;
+      return new Z.Pair(t1 * t2, t3 * _b.first.absvalue, type$.Pair_double_double);
+    },
     BSFunction_extractFromNegative: function(f, $T) {
       var _isInNegative, t1, t2;
       if (f instanceof G.Negative) {
@@ -7008,16 +6994,6 @@
       return String(receiver);
     }
   };
-  W.ButtonElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
-  W.DataElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
   W.DomException.prototype = {
     toString$0: function(receiver) {
       return String(receiver);
@@ -7044,21 +7020,6 @@
       return receiver.length;
     }
   };
-  W.InputElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
-  W.LIElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
-  W.MeterElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
   W.MouseEvent.prototype = {$isMouseEvent: 1};
   W.Node.prototype = {
     toString$0: function(receiver) {
@@ -7066,40 +7027,12 @@
       return value == null ? this.super$Interceptor$toString(receiver) : value;
     }
   };
-  W.OptionElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
-  W.OutputElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
-  W.ParamElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
-  W.ProgressElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    }
-  };
   W.SelectElement.prototype = {
     get$length: function(receiver) {
       return receiver.length;
-    },
-    get$value: function(receiver) {
-      return receiver.value;
     }
   };
-  W.TextAreaElement.prototype = {
-    get$value: function(receiver) {
-      return receiver.value;
-    },
-    $isTextAreaElement: 1
-  };
+  W.TextAreaElement.prototype = {$isTextAreaElement: 1};
   W.UIEvent.prototype = {};
   W.EventStreamProvider.prototype = {};
   W._EventStream.prototype = {};
@@ -7636,6 +7569,22 @@
         return false;
       return other instanceof X.BSFunction && this.toString$0(0) == other.toString$0(0);
     },
+    $le: function(_, other) {
+      var v = X.BSFunction__toDoubles(this, type$.BSFunction._as(other), "<=");
+      return v.first <= v.second;
+    },
+    $lt: function(_, other) {
+      var v = X.BSFunction__toDoubles(this, type$.BSFunction._as(other), "<");
+      return v.first < v.second;
+    },
+    $ge: function(_, other) {
+      var v = X.BSFunction__toDoubles(this, type$.BSFunction._as(other), ">=");
+      return v.first >= v.second;
+    },
+    $gt: function(_, other) {
+      var v = X.BSFunction__toDoubles(this, type$.BSFunction._as(other), ">");
+      return v.first > v.second;
+    },
     toString$0: function(_) {
       return H.throwExpression(P.UnimplementedError$(null));
     },
@@ -8051,11 +8000,7 @@
       return "Runtime Error: '" + this.message + "' at line " + this.token.line;
     }
   };
-  Y.Return.prototype = {
-    get$value: function(receiver) {
-      return this.value;
-    }
-  };
+  Y.Return.prototype = {};
   R.ParseError.prototype = {};
   R.BSParser.prototype = {
     parse$0: function() {
@@ -9155,9 +9100,6 @@
   N.AssignExpr.prototype = {
     accept$1: function(_, v) {
       return v.visitAssignExpr$1(this);
-    },
-    get$value: function(receiver) {
-      return this.value;
     }
   };
   N.BinaryExpr.prototype = {
@@ -9183,9 +9125,6 @@
   N.LiteralExpr.prototype = {
     accept$1: function(_, v) {
       return v.visitLiteralExpr$1(this);
-    },
-    get$value: function(receiver) {
-      return this.value;
     }
   };
   N.UnaryExpr.prototype = {
@@ -9206,9 +9145,6 @@
   N.SetExpr.prototype = {
     accept$1: function(_, v) {
       return v.visitSetExpr$1(this);
-    },
-    get$value: function(receiver) {
-      return this.value;
     }
   };
   N.ThisExpr.prototype = {
@@ -9400,9 +9336,6 @@
       type$.Map_String_BSFunction._as(p);
       return this;
     },
-    get$value: function(_) {
-      return this.absvalue;
-    },
     copy$1: function(params) {
       var t1;
       type$.Set_Variable._as(params);
@@ -9419,30 +9352,6 @@
       if (other == null)
         return false;
       return other instanceof R.Number && this.absvalue === other.absvalue;
-    },
-    $le: function(_, other) {
-      var t1 = H._asNumNullable(J.get$value$x(other));
-      if (typeof t1 !== "number")
-        return H.iae(t1);
-      return this.absvalue <= t1;
-    },
-    $lt: function(_, other) {
-      var t1 = H._asNumNullable(J.get$value$x(other));
-      if (typeof t1 !== "number")
-        return H.iae(t1);
-      return this.absvalue < t1;
-    },
-    $ge: function(_, other) {
-      var t1 = H._asNumNullable(J.get$value$x(other));
-      if (typeof t1 !== "number")
-        return H.iae(t1);
-      return this.absvalue >= t1;
-    },
-    $gt: function(_, other) {
-      var t1 = H._asNumNullable(J.get$value$x(other));
-      if (typeof t1 !== "number")
-        return H.iae(t1);
-      return this.absvalue > t1;
     },
     get$approx: function() {
       return R.n(this.absvalue);
@@ -9919,9 +9828,6 @@
   L.ReturnStmt.prototype = {
     accept$1: function(_, v) {
       return v.visitReturnStmt$1(this);
-    },
-    get$value: function(receiver) {
-      return this.value;
     }
   };
   L.ClassStmt.prototype = {
@@ -10076,7 +9982,7 @@
   };
   Z.Pair.prototype = {
     toString$0: function(_) {
-      return "(" + H.S(this.first) + " , " + this.second + ")";
+      return "(" + H.S(this.first) + " , " + H.S(this.second) + ")";
     },
     set$second: function(second) {
       this.second = this.$ti._rest[1]._as(second);
@@ -10242,7 +10148,7 @@
     _inherit(W.Node, W.EventTarget);
     _inherit(W.Element, W.Node);
     _inheritMany(W.Element, [W.HtmlElement, P.SvgElement]);
-    _inheritMany(W.HtmlElement, [W.AnchorElement, W.AreaElement, W.ButtonElement, W.DataElement, W.FormElement, W.InputElement, W.LIElement, W.MeterElement, W.OptionElement, W.OutputElement, W.ParamElement, W.ProgressElement, W.SelectElement, W.TextAreaElement]);
+    _inheritMany(W.HtmlElement, [W.AnchorElement, W.AreaElement, W.FormElement, W.SelectElement, W.TextAreaElement]);
     _inherit(W.UIEvent, W.Event);
     _inherit(W.MouseEvent, W.UIEvent);
     _inherit(W._EventStream, P.Stream);
@@ -10266,7 +10172,7 @@
     leafTags: null,
     arrayRti: typeof Symbol == "function" && typeof Symbol() == "symbol" ? Symbol("$ti") : "$ti"
   };
-  H._Universe_addRules(init.typeUniverse, JSON.parse('{"JavaScriptFunction":"JavaScriptObject","PlainJavaScriptObject":"JavaScriptObject","UnknownJavaScriptObject":"JavaScriptObject","AbortPaymentEvent":"Event","ExtendableEvent":"Event","AElement":"SvgElement","GraphicsElement":"SvgElement","AudioElement":"HtmlElement","MediaElement":"HtmlElement","PointerEvent":"MouseEvent","CompositionEvent":"UIEvent","HtmlDocument":"Node","Document":"Node","JSBool":{"bool":[]},"JSNull":{"Null":[]},"JavaScriptObject":{"Function":[]},"JSArray":{"List":["1"],"Iterable":["1"]},"JSUnmodifiableArray":{"JSArray":["1"],"List":["1"],"Iterable":["1"]},"ArrayIterator":{"Iterator":["1"]},"JSNumber":{"double":[],"num":[],"Comparable":["num"]},"JSInt":{"int":[],"double":[],"num":[],"Comparable":["num"]},"JSDouble":{"double":[],"num":[],"Comparable":["num"]},"JSString":{"String":[],"Comparable":["String"]},"EfficientLengthIterable":{"Iterable":["1"]},"ListIterable":{"Iterable":["1"]},"ListIterator":{"Iterator":["1"]},"MappedIterable":{"Iterable":["2"]},"EfficientLengthMappedIterable":{"MappedIterable":["1","2"],"Iterable":["2"]},"MappedIterator":{"Iterator":["2"]},"MappedListIterable":{"ListIterable":["2"],"Iterable":["2"],"ListIterable.E":"2"},"ConstantMap":{"Map":["1","2"]},"ConstantStringMap":{"ConstantMap":["1","2"],"Map":["1","2"]},"_ConstantMapKeyIterable":{"Iterable":["1"]},"NullError":{"Error":[]},"JsNoSuchMethodError":{"Error":[]},"UnknownJsTypeError":{"Error":[]},"_StackTrace":{"StackTrace":[]},"Closure":{"Function":[]},"TearOffClosure":{"Function":[]},"StaticClosure":{"Function":[]},"BoundClosure":{"Function":[]},"RuntimeError":{"Error":[]},"_AssertionError":{"Error":[]},"JsLinkedHashMap":{"LinkedHashMap":["1","2"],"MapMixin":["1","2"],"Map":["1","2"]},"LinkedHashMapKeyIterable":{"Iterable":["1"]},"LinkedHashMapKeyIterator":{"Iterator":["1"]},"_Error":{"Error":[]},"_TypeError":{"Error":[]},"_Future":{"Future":["1"]},"AsyncError":{"Error":[]},"_Zone":{"Zone":[]},"_RootZone":{"Zone":[]},"_LinkedHashSet":{"_SetBase":["1"],"Set":["1"],"Iterable":["1"]},"_LinkedHashSetIterator":{"Iterator":["1"]},"MapBase":{"MapMixin":["1","2"],"Map":["1","2"]},"MapMixin":{"Map":["1","2"]},"_SetBase":{"Set":["1"],"Iterable":["1"]},"_SplayTreeIterator":{"Iterator":["2"]},"_SplayTreeKeyIterator":{"_SplayTreeIterator":["1","1"],"Iterator":["1"],"_SplayTreeIterator.K":"1"},"SplayTreeSet":{"SetMixin":["1"],"Set":["1"],"IterableMixin":["1"],"_SplayTree":["1","_SplayTreeNode<1>"],"Iterable":["1"],"_SplayTree.K":"1","_SplayTree.1":"_SplayTreeNode<1>"},"double":{"num":[],"Comparable":["num"]},"AssertionError":{"Error":[]},"NullThrownError":{"Error":[]},"ArgumentError":{"Error":[]},"RangeError":{"Error":[]},"IndexError":{"Error":[]},"UnsupportedError":{"Error":[]},"UnimplementedError":{"Error":[]},"StateError":{"Error":[]},"ConcurrentModificationError":{"Error":[]},"OutOfMemoryError":{"Error":[]},"StackOverflowError":{"Error":[]},"CyclicInitializationError":{"Error":[]},"int":{"num":[],"Comparable":["num"]},"List":{"Iterable":["1"]},"num":{"Comparable":["num"]},"_StringStackTrace":{"StackTrace":[]},"String":{"Comparable":["String"]},"HtmlElement":{"Element":[],"EventTarget":[]},"AnchorElement":{"Element":[],"EventTarget":[]},"AreaElement":{"Element":[],"EventTarget":[]},"ButtonElement":{"Element":[],"EventTarget":[]},"DataElement":{"Element":[],"EventTarget":[]},"Element":{"EventTarget":[]},"FormElement":{"Element":[],"EventTarget":[]},"InputElement":{"Element":[],"EventTarget":[]},"LIElement":{"Element":[],"EventTarget":[]},"MeterElement":{"Element":[],"EventTarget":[]},"MouseEvent":{"Event":[]},"Node":{"EventTarget":[]},"OptionElement":{"Element":[],"EventTarget":[]},"OutputElement":{"Element":[],"EventTarget":[]},"ParamElement":{"Element":[],"EventTarget":[]},"ProgressElement":{"Element":[],"EventTarget":[]},"SelectElement":{"Element":[],"EventTarget":[]},"TextAreaElement":{"Element":[],"EventTarget":[]},"UIEvent":{"Event":[]},"_EventStream":{"Stream":["1"]},"_ElementEventStreamImpl":{"_EventStream":["1"],"Stream":["1"]},"SvgElement":{"Element":[],"EventTarget":[]},"AbsoluteValue":{"BSFunction":[],"BSCallable":[]},"ArCosH":{"BSFunction":[],"BSCallable":[]},"ArCscH":{"BSFunction":[],"BSCallable":[]},"ArCtgH":{"BSFunction":[],"BSCallable":[]},"ArSecH":{"BSFunction":[],"BSCallable":[]},"ArSinH":{"BSFunction":[],"BSCallable":[]},"ArTanH":{"BSFunction":[],"BSCallable":[]},"ArcCos":{"BSFunction":[],"BSCallable":[]},"ArcCsc":{"BSFunction":[],"BSCallable":[]},"ArcCtg":{"BSFunction":[],"BSCallable":[]},"ArcSec":{"BSFunction":[],"BSCallable":[]},"ArcSin":{"BSFunction":[],"BSCallable":[]},"ArcTan":{"BSFunction":[],"BSCallable":[]},"BSClass":{"BSCallable":[]},"BSFunction":{"BSCallable":[]},"BSInterpreter":{"StmtVisitor":[],"ExprVisitor":[]},"Cos":{"BSFunction":[],"BSCallable":[]},"CosH":{"BSFunction":[],"BSCallable":[]},"Csc":{"BSFunction":[],"BSCallable":[]},"CscH":{"BSFunction":[],"BSCallable":[]},"Ctg":{"BSFunction":[],"BSCallable":[]},"CtgH":{"BSFunction":[],"BSCallable":[]},"Division":{"BSFunction":[],"BSCallable":[]},"Exponentiation":{"BSFunction":[],"BSCallable":[]},"AssignExpr":{"Expr":[]},"BinaryExpr":{"Expr":[]},"CallExpr":{"Expr":[]},"GetExpr":{"Expr":[]},"GroupingExpr":{"Expr":[]},"LiteralExpr":{"Expr":[]},"UnaryExpr":{"Expr":[]},"VariableExpr":{"Expr":[]},"logicBinaryExpr":{"Expr":[]},"SetExpr":{"Expr":[]},"ThisExpr":{"Expr":[]},"SuperExpr":{"Expr":[]},"DerivativeExpr":{"Expr":[]},"Log":{"BSFunction":[],"BSCallable":[]},"Multiplication":{"BSFunction":[],"BSCallable":[]},"NativeCallable":{"BSCallable":[]},"Negative":{"BSFunction":[],"BSCallable":[]},"Number":{"BSFunction":[],"BSCallable":[]},"Resolver":{"StmtVisitor":[],"ExprVisitor":[]},"Root":{"BSFunction":[],"BSCallable":[]},"Sec":{"BSFunction":[],"BSCallable":[]},"SecH":{"BSFunction":[],"BSCallable":[]},"Signum":{"BSFunction":[],"BSCallable":[]},"Sin":{"BSFunction":[],"BSCallable":[]},"SinH":{"BSFunction":[],"BSCallable":[]},"ExpressionStmt":{"Stmt":[]},"PrintStmt":{"Stmt":[]},"VarStmt":{"Stmt":[]},"BlockStmt":{"Stmt":[]},"IfStmt":{"Stmt":[]},"RoutineStmt":{"Stmt":[]},"WhileStmt":{"Stmt":[]},"ReturnStmt":{"Stmt":[]},"ClassStmt":{"Stmt":[]},"Sum":{"BSFunction":[],"BSCallable":[]},"Tan":{"BSFunction":[],"BSCallable":[]},"TanH":{"BSFunction":[],"BSCallable":[]},"UserRoutine":{"BSCallable":[]},"Variable":{"BSFunction":[],"Comparable":["@"],"BSCallable":[]},"singleOperandFunction":{"BSFunction":[],"BSCallable":[]}}'));
+  H._Universe_addRules(init.typeUniverse, JSON.parse('{"JavaScriptFunction":"JavaScriptObject","PlainJavaScriptObject":"JavaScriptObject","UnknownJavaScriptObject":"JavaScriptObject","AbortPaymentEvent":"Event","ExtendableEvent":"Event","AElement":"SvgElement","GraphicsElement":"SvgElement","AudioElement":"HtmlElement","MediaElement":"HtmlElement","PointerEvent":"MouseEvent","CompositionEvent":"UIEvent","HtmlDocument":"Node","Document":"Node","JSBool":{"bool":[]},"JSNull":{"Null":[]},"JavaScriptObject":{"Function":[]},"JSArray":{"List":["1"],"Iterable":["1"]},"JSUnmodifiableArray":{"JSArray":["1"],"List":["1"],"Iterable":["1"]},"ArrayIterator":{"Iterator":["1"]},"JSNumber":{"double":[],"num":[],"Comparable":["num"]},"JSInt":{"int":[],"double":[],"num":[],"Comparable":["num"]},"JSDouble":{"double":[],"num":[],"Comparable":["num"]},"JSString":{"String":[],"Comparable":["String"]},"EfficientLengthIterable":{"Iterable":["1"]},"ListIterable":{"Iterable":["1"]},"ListIterator":{"Iterator":["1"]},"MappedIterable":{"Iterable":["2"]},"EfficientLengthMappedIterable":{"MappedIterable":["1","2"],"Iterable":["2"]},"MappedIterator":{"Iterator":["2"]},"MappedListIterable":{"ListIterable":["2"],"Iterable":["2"],"ListIterable.E":"2"},"ConstantMap":{"Map":["1","2"]},"ConstantStringMap":{"ConstantMap":["1","2"],"Map":["1","2"]},"_ConstantMapKeyIterable":{"Iterable":["1"]},"NullError":{"Error":[]},"JsNoSuchMethodError":{"Error":[]},"UnknownJsTypeError":{"Error":[]},"_StackTrace":{"StackTrace":[]},"Closure":{"Function":[]},"TearOffClosure":{"Function":[]},"StaticClosure":{"Function":[]},"BoundClosure":{"Function":[]},"RuntimeError":{"Error":[]},"_AssertionError":{"Error":[]},"JsLinkedHashMap":{"LinkedHashMap":["1","2"],"MapMixin":["1","2"],"Map":["1","2"]},"LinkedHashMapKeyIterable":{"Iterable":["1"]},"LinkedHashMapKeyIterator":{"Iterator":["1"]},"_Error":{"Error":[]},"_TypeError":{"Error":[]},"_Future":{"Future":["1"]},"AsyncError":{"Error":[]},"_Zone":{"Zone":[]},"_RootZone":{"Zone":[]},"_LinkedHashSet":{"_SetBase":["1"],"Set":["1"],"Iterable":["1"]},"_LinkedHashSetIterator":{"Iterator":["1"]},"MapBase":{"MapMixin":["1","2"],"Map":["1","2"]},"MapMixin":{"Map":["1","2"]},"_SetBase":{"Set":["1"],"Iterable":["1"]},"_SplayTreeIterator":{"Iterator":["2"]},"_SplayTreeKeyIterator":{"_SplayTreeIterator":["1","1"],"Iterator":["1"],"_SplayTreeIterator.K":"1"},"SplayTreeSet":{"SetMixin":["1"],"Set":["1"],"IterableMixin":["1"],"_SplayTree":["1","_SplayTreeNode<1>"],"Iterable":["1"],"_SplayTree.K":"1","_SplayTree.1":"_SplayTreeNode<1>"},"double":{"num":[],"Comparable":["num"]},"AssertionError":{"Error":[]},"NullThrownError":{"Error":[]},"ArgumentError":{"Error":[]},"RangeError":{"Error":[]},"IndexError":{"Error":[]},"UnsupportedError":{"Error":[]},"UnimplementedError":{"Error":[]},"StateError":{"Error":[]},"ConcurrentModificationError":{"Error":[]},"OutOfMemoryError":{"Error":[]},"StackOverflowError":{"Error":[]},"CyclicInitializationError":{"Error":[]},"int":{"num":[],"Comparable":["num"]},"List":{"Iterable":["1"]},"num":{"Comparable":["num"]},"_StringStackTrace":{"StackTrace":[]},"String":{"Comparable":["String"]},"HtmlElement":{"Element":[],"EventTarget":[]},"AnchorElement":{"Element":[],"EventTarget":[]},"AreaElement":{"Element":[],"EventTarget":[]},"Element":{"EventTarget":[]},"FormElement":{"Element":[],"EventTarget":[]},"MouseEvent":{"Event":[]},"Node":{"EventTarget":[]},"SelectElement":{"Element":[],"EventTarget":[]},"TextAreaElement":{"Element":[],"EventTarget":[]},"UIEvent":{"Event":[]},"_EventStream":{"Stream":["1"]},"_ElementEventStreamImpl":{"_EventStream":["1"],"Stream":["1"]},"SvgElement":{"Element":[],"EventTarget":[]},"AbsoluteValue":{"BSFunction":[],"BSCallable":[]},"ArCosH":{"BSFunction":[],"BSCallable":[]},"ArCscH":{"BSFunction":[],"BSCallable":[]},"ArCtgH":{"BSFunction":[],"BSCallable":[]},"ArSecH":{"BSFunction":[],"BSCallable":[]},"ArSinH":{"BSFunction":[],"BSCallable":[]},"ArTanH":{"BSFunction":[],"BSCallable":[]},"ArcCos":{"BSFunction":[],"BSCallable":[]},"ArcCsc":{"BSFunction":[],"BSCallable":[]},"ArcCtg":{"BSFunction":[],"BSCallable":[]},"ArcSec":{"BSFunction":[],"BSCallable":[]},"ArcSin":{"BSFunction":[],"BSCallable":[]},"ArcTan":{"BSFunction":[],"BSCallable":[]},"BSClass":{"BSCallable":[]},"BSFunction":{"BSCallable":[]},"BSInterpreter":{"StmtVisitor":[],"ExprVisitor":[]},"Cos":{"BSFunction":[],"BSCallable":[]},"CosH":{"BSFunction":[],"BSCallable":[]},"Csc":{"BSFunction":[],"BSCallable":[]},"CscH":{"BSFunction":[],"BSCallable":[]},"Ctg":{"BSFunction":[],"BSCallable":[]},"CtgH":{"BSFunction":[],"BSCallable":[]},"Division":{"BSFunction":[],"BSCallable":[]},"Exponentiation":{"BSFunction":[],"BSCallable":[]},"AssignExpr":{"Expr":[]},"BinaryExpr":{"Expr":[]},"CallExpr":{"Expr":[]},"GetExpr":{"Expr":[]},"GroupingExpr":{"Expr":[]},"LiteralExpr":{"Expr":[]},"UnaryExpr":{"Expr":[]},"VariableExpr":{"Expr":[]},"logicBinaryExpr":{"Expr":[]},"SetExpr":{"Expr":[]},"ThisExpr":{"Expr":[]},"SuperExpr":{"Expr":[]},"DerivativeExpr":{"Expr":[]},"Log":{"BSFunction":[],"BSCallable":[]},"Multiplication":{"BSFunction":[],"BSCallable":[]},"NativeCallable":{"BSCallable":[]},"Negative":{"BSFunction":[],"BSCallable":[]},"Number":{"BSFunction":[],"BSCallable":[]},"Resolver":{"StmtVisitor":[],"ExprVisitor":[]},"Root":{"BSFunction":[],"BSCallable":[]},"Sec":{"BSFunction":[],"BSCallable":[]},"SecH":{"BSFunction":[],"BSCallable":[]},"Signum":{"BSFunction":[],"BSCallable":[]},"Sin":{"BSFunction":[],"BSCallable":[]},"SinH":{"BSFunction":[],"BSCallable":[]},"ExpressionStmt":{"Stmt":[]},"PrintStmt":{"Stmt":[]},"VarStmt":{"Stmt":[]},"BlockStmt":{"Stmt":[]},"IfStmt":{"Stmt":[]},"RoutineStmt":{"Stmt":[]},"WhileStmt":{"Stmt":[]},"ReturnStmt":{"Stmt":[]},"ClassStmt":{"Stmt":[]},"Sum":{"BSFunction":[],"BSCallable":[]},"Tan":{"BSFunction":[],"BSCallable":[]},"TanH":{"BSFunction":[],"BSCallable":[]},"UserRoutine":{"BSCallable":[]},"Variable":{"BSFunction":[],"Comparable":["@"],"BSCallable":[]},"singleOperandFunction":{"BSFunction":[],"BSCallable":[]}}'));
   H._Universe_addErasedTypes(init.typeUniverse, JSON.parse('{"EfficientLengthIterable":1,"StreamSubscription":1,"MapBase":2,"_SplayTreeSet__SplayTree_IterableMixin":1,"_SplayTreeSet__SplayTree_IterableMixin_SetMixin":1,"Comparable":1}'));
   var type$ = (function rtii() {
     var findType = H.findType;
@@ -10315,6 +10221,7 @@
       Null: findType("Null"),
       Number: findType("Number"),
       Object: findType("Object"),
+      Pair_double_double: findType("Pair<double,double>"),
       Pair_double_int: findType("Pair<double,int>"),
       Rti: findType("Rti"),
       Set_Variable: findType("Set<Variable>"),
@@ -10675,8 +10582,8 @@
       }
       init.dispatchPropertyName = init.getIsolateTag("dispatch_record");
     }();
-    hunkHelpers.setOrUpdateInterceptorsByTag({DOMError: J.Interceptor, MediaError: J.Interceptor, NavigatorUserMediaError: J.Interceptor, OverconstrainedError: J.Interceptor, PositionError: J.Interceptor, SQLError: J.Interceptor, HTMLAudioElement: W.HtmlElement, HTMLBRElement: W.HtmlElement, HTMLBaseElement: W.HtmlElement, HTMLBodyElement: W.HtmlElement, HTMLCanvasElement: W.HtmlElement, HTMLContentElement: W.HtmlElement, HTMLDListElement: W.HtmlElement, HTMLDataListElement: W.HtmlElement, HTMLDetailsElement: W.HtmlElement, HTMLDialogElement: W.HtmlElement, HTMLDivElement: W.HtmlElement, HTMLEmbedElement: W.HtmlElement, HTMLFieldSetElement: W.HtmlElement, HTMLHRElement: W.HtmlElement, HTMLHeadElement: W.HtmlElement, HTMLHeadingElement: W.HtmlElement, HTMLHtmlElement: W.HtmlElement, HTMLIFrameElement: W.HtmlElement, HTMLImageElement: W.HtmlElement, HTMLLabelElement: W.HtmlElement, HTMLLegendElement: W.HtmlElement, HTMLLinkElement: W.HtmlElement, HTMLMapElement: W.HtmlElement, HTMLMediaElement: W.HtmlElement, HTMLMenuElement: W.HtmlElement, HTMLMetaElement: W.HtmlElement, HTMLModElement: W.HtmlElement, HTMLOListElement: W.HtmlElement, HTMLObjectElement: W.HtmlElement, HTMLOptGroupElement: W.HtmlElement, HTMLParagraphElement: W.HtmlElement, HTMLPictureElement: W.HtmlElement, HTMLPreElement: W.HtmlElement, HTMLQuoteElement: W.HtmlElement, HTMLScriptElement: W.HtmlElement, HTMLShadowElement: W.HtmlElement, HTMLSlotElement: W.HtmlElement, HTMLSourceElement: W.HtmlElement, HTMLSpanElement: W.HtmlElement, HTMLStyleElement: W.HtmlElement, HTMLTableCaptionElement: W.HtmlElement, HTMLTableCellElement: W.HtmlElement, HTMLTableDataCellElement: W.HtmlElement, HTMLTableHeaderCellElement: W.HtmlElement, HTMLTableColElement: W.HtmlElement, HTMLTableElement: W.HtmlElement, HTMLTableRowElement: W.HtmlElement, HTMLTableSectionElement: W.HtmlElement, HTMLTemplateElement: W.HtmlElement, HTMLTimeElement: W.HtmlElement, HTMLTitleElement: W.HtmlElement, HTMLTrackElement: W.HtmlElement, HTMLUListElement: W.HtmlElement, HTMLUnknownElement: W.HtmlElement, HTMLVideoElement: W.HtmlElement, HTMLDirectoryElement: W.HtmlElement, HTMLFontElement: W.HtmlElement, HTMLFrameElement: W.HtmlElement, HTMLFrameSetElement: W.HtmlElement, HTMLMarqueeElement: W.HtmlElement, HTMLElement: W.HtmlElement, HTMLAnchorElement: W.AnchorElement, HTMLAreaElement: W.AreaElement, HTMLButtonElement: W.ButtonElement, HTMLDataElement: W.DataElement, DOMException: W.DomException, Element: W.Element, AbortPaymentEvent: W.Event, AnimationEvent: W.Event, AnimationPlaybackEvent: W.Event, ApplicationCacheErrorEvent: W.Event, BackgroundFetchClickEvent: W.Event, BackgroundFetchEvent: W.Event, BackgroundFetchFailEvent: W.Event, BackgroundFetchedEvent: W.Event, BeforeInstallPromptEvent: W.Event, BeforeUnloadEvent: W.Event, BlobEvent: W.Event, CanMakePaymentEvent: W.Event, ClipboardEvent: W.Event, CloseEvent: W.Event, CustomEvent: W.Event, DeviceMotionEvent: W.Event, DeviceOrientationEvent: W.Event, ErrorEvent: W.Event, ExtendableEvent: W.Event, ExtendableMessageEvent: W.Event, FetchEvent: W.Event, FontFaceSetLoadEvent: W.Event, ForeignFetchEvent: W.Event, GamepadEvent: W.Event, HashChangeEvent: W.Event, InstallEvent: W.Event, MediaEncryptedEvent: W.Event, MediaKeyMessageEvent: W.Event, MediaQueryListEvent: W.Event, MediaStreamEvent: W.Event, MediaStreamTrackEvent: W.Event, MessageEvent: W.Event, MIDIConnectionEvent: W.Event, MIDIMessageEvent: W.Event, MutationEvent: W.Event, NotificationEvent: W.Event, PageTransitionEvent: W.Event, PaymentRequestEvent: W.Event, PaymentRequestUpdateEvent: W.Event, PopStateEvent: W.Event, PresentationConnectionAvailableEvent: W.Event, PresentationConnectionCloseEvent: W.Event, ProgressEvent: W.Event, PromiseRejectionEvent: W.Event, PushEvent: W.Event, RTCDataChannelEvent: W.Event, RTCDTMFToneChangeEvent: W.Event, RTCPeerConnectionIceEvent: W.Event, RTCTrackEvent: W.Event, SecurityPolicyViolationEvent: W.Event, SensorErrorEvent: W.Event, SpeechRecognitionError: W.Event, SpeechRecognitionEvent: W.Event, SpeechSynthesisEvent: W.Event, StorageEvent: W.Event, SyncEvent: W.Event, TrackEvent: W.Event, TransitionEvent: W.Event, WebKitTransitionEvent: W.Event, VRDeviceEvent: W.Event, VRDisplayEvent: W.Event, VRSessionEvent: W.Event, MojoInterfaceRequestEvent: W.Event, ResourceProgressEvent: W.Event, USBConnectionEvent: W.Event, IDBVersionChangeEvent: W.Event, AudioProcessingEvent: W.Event, OfflineAudioCompletionEvent: W.Event, WebGLContextEvent: W.Event, Event: W.Event, InputEvent: W.Event, SubmitEvent: W.Event, EventTarget: W.EventTarget, HTMLFormElement: W.FormElement, HTMLInputElement: W.InputElement, HTMLLIElement: W.LIElement, HTMLMeterElement: W.MeterElement, MouseEvent: W.MouseEvent, DragEvent: W.MouseEvent, PointerEvent: W.MouseEvent, WheelEvent: W.MouseEvent, Document: W.Node, HTMLDocument: W.Node, Node: W.Node, HTMLOptionElement: W.OptionElement, HTMLOutputElement: W.OutputElement, HTMLParamElement: W.ParamElement, HTMLProgressElement: W.ProgressElement, HTMLSelectElement: W.SelectElement, HTMLTextAreaElement: W.TextAreaElement, CompositionEvent: W.UIEvent, FocusEvent: W.UIEvent, KeyboardEvent: W.UIEvent, TextEvent: W.UIEvent, TouchEvent: W.UIEvent, UIEvent: W.UIEvent, SVGAElement: P.SvgElement, SVGAnimateElement: P.SvgElement, SVGAnimateMotionElement: P.SvgElement, SVGAnimateTransformElement: P.SvgElement, SVGAnimationElement: P.SvgElement, SVGCircleElement: P.SvgElement, SVGClipPathElement: P.SvgElement, SVGDefsElement: P.SvgElement, SVGDescElement: P.SvgElement, SVGDiscardElement: P.SvgElement, SVGEllipseElement: P.SvgElement, SVGFEBlendElement: P.SvgElement, SVGFEColorMatrixElement: P.SvgElement, SVGFEComponentTransferElement: P.SvgElement, SVGFECompositeElement: P.SvgElement, SVGFEConvolveMatrixElement: P.SvgElement, SVGFEDiffuseLightingElement: P.SvgElement, SVGFEDisplacementMapElement: P.SvgElement, SVGFEDistantLightElement: P.SvgElement, SVGFEFloodElement: P.SvgElement, SVGFEFuncAElement: P.SvgElement, SVGFEFuncBElement: P.SvgElement, SVGFEFuncGElement: P.SvgElement, SVGFEFuncRElement: P.SvgElement, SVGFEGaussianBlurElement: P.SvgElement, SVGFEImageElement: P.SvgElement, SVGFEMergeElement: P.SvgElement, SVGFEMergeNodeElement: P.SvgElement, SVGFEMorphologyElement: P.SvgElement, SVGFEOffsetElement: P.SvgElement, SVGFEPointLightElement: P.SvgElement, SVGFESpecularLightingElement: P.SvgElement, SVGFESpotLightElement: P.SvgElement, SVGFETileElement: P.SvgElement, SVGFETurbulenceElement: P.SvgElement, SVGFilterElement: P.SvgElement, SVGForeignObjectElement: P.SvgElement, SVGGElement: P.SvgElement, SVGGeometryElement: P.SvgElement, SVGGraphicsElement: P.SvgElement, SVGImageElement: P.SvgElement, SVGLineElement: P.SvgElement, SVGLinearGradientElement: P.SvgElement, SVGMarkerElement: P.SvgElement, SVGMaskElement: P.SvgElement, SVGMetadataElement: P.SvgElement, SVGPathElement: P.SvgElement, SVGPatternElement: P.SvgElement, SVGPolygonElement: P.SvgElement, SVGPolylineElement: P.SvgElement, SVGRadialGradientElement: P.SvgElement, SVGRectElement: P.SvgElement, SVGScriptElement: P.SvgElement, SVGSetElement: P.SvgElement, SVGStopElement: P.SvgElement, SVGStyleElement: P.SvgElement, SVGElement: P.SvgElement, SVGSVGElement: P.SvgElement, SVGSwitchElement: P.SvgElement, SVGSymbolElement: P.SvgElement, SVGTSpanElement: P.SvgElement, SVGTextContentElement: P.SvgElement, SVGTextElement: P.SvgElement, SVGTextPathElement: P.SvgElement, SVGTextPositioningElement: P.SvgElement, SVGTitleElement: P.SvgElement, SVGUseElement: P.SvgElement, SVGViewElement: P.SvgElement, SVGGradientElement: P.SvgElement, SVGComponentTransferFunctionElement: P.SvgElement, SVGFEDropShadowElement: P.SvgElement, SVGMPathElement: P.SvgElement});
-    hunkHelpers.setOrUpdateLeafTags({DOMError: true, MediaError: true, NavigatorUserMediaError: true, OverconstrainedError: true, PositionError: true, SQLError: true, HTMLAudioElement: true, HTMLBRElement: true, HTMLBaseElement: true, HTMLBodyElement: true, HTMLCanvasElement: true, HTMLContentElement: true, HTMLDListElement: true, HTMLDataListElement: true, HTMLDetailsElement: true, HTMLDialogElement: true, HTMLDivElement: true, HTMLEmbedElement: true, HTMLFieldSetElement: true, HTMLHRElement: true, HTMLHeadElement: true, HTMLHeadingElement: true, HTMLHtmlElement: true, HTMLIFrameElement: true, HTMLImageElement: true, HTMLLabelElement: true, HTMLLegendElement: true, HTMLLinkElement: true, HTMLMapElement: true, HTMLMediaElement: true, HTMLMenuElement: true, HTMLMetaElement: true, HTMLModElement: true, HTMLOListElement: true, HTMLObjectElement: true, HTMLOptGroupElement: true, HTMLParagraphElement: true, HTMLPictureElement: true, HTMLPreElement: true, HTMLQuoteElement: true, HTMLScriptElement: true, HTMLShadowElement: true, HTMLSlotElement: true, HTMLSourceElement: true, HTMLSpanElement: true, HTMLStyleElement: true, HTMLTableCaptionElement: true, HTMLTableCellElement: true, HTMLTableDataCellElement: true, HTMLTableHeaderCellElement: true, HTMLTableColElement: true, HTMLTableElement: true, HTMLTableRowElement: true, HTMLTableSectionElement: true, HTMLTemplateElement: true, HTMLTimeElement: true, HTMLTitleElement: true, HTMLTrackElement: true, HTMLUListElement: true, HTMLUnknownElement: true, HTMLVideoElement: true, HTMLDirectoryElement: true, HTMLFontElement: true, HTMLFrameElement: true, HTMLFrameSetElement: true, HTMLMarqueeElement: true, HTMLElement: false, HTMLAnchorElement: true, HTMLAreaElement: true, HTMLButtonElement: true, HTMLDataElement: true, DOMException: true, Element: false, AbortPaymentEvent: true, AnimationEvent: true, AnimationPlaybackEvent: true, ApplicationCacheErrorEvent: true, BackgroundFetchClickEvent: true, BackgroundFetchEvent: true, BackgroundFetchFailEvent: true, BackgroundFetchedEvent: true, BeforeInstallPromptEvent: true, BeforeUnloadEvent: true, BlobEvent: true, CanMakePaymentEvent: true, ClipboardEvent: true, CloseEvent: true, CustomEvent: true, DeviceMotionEvent: true, DeviceOrientationEvent: true, ErrorEvent: true, ExtendableEvent: true, ExtendableMessageEvent: true, FetchEvent: true, FontFaceSetLoadEvent: true, ForeignFetchEvent: true, GamepadEvent: true, HashChangeEvent: true, InstallEvent: true, MediaEncryptedEvent: true, MediaKeyMessageEvent: true, MediaQueryListEvent: true, MediaStreamEvent: true, MediaStreamTrackEvent: true, MessageEvent: true, MIDIConnectionEvent: true, MIDIMessageEvent: true, MutationEvent: true, NotificationEvent: true, PageTransitionEvent: true, PaymentRequestEvent: true, PaymentRequestUpdateEvent: true, PopStateEvent: true, PresentationConnectionAvailableEvent: true, PresentationConnectionCloseEvent: true, ProgressEvent: true, PromiseRejectionEvent: true, PushEvent: true, RTCDataChannelEvent: true, RTCDTMFToneChangeEvent: true, RTCPeerConnectionIceEvent: true, RTCTrackEvent: true, SecurityPolicyViolationEvent: true, SensorErrorEvent: true, SpeechRecognitionError: true, SpeechRecognitionEvent: true, SpeechSynthesisEvent: true, StorageEvent: true, SyncEvent: true, TrackEvent: true, TransitionEvent: true, WebKitTransitionEvent: true, VRDeviceEvent: true, VRDisplayEvent: true, VRSessionEvent: true, MojoInterfaceRequestEvent: true, ResourceProgressEvent: true, USBConnectionEvent: true, IDBVersionChangeEvent: true, AudioProcessingEvent: true, OfflineAudioCompletionEvent: true, WebGLContextEvent: true, Event: false, InputEvent: false, SubmitEvent: false, EventTarget: false, HTMLFormElement: true, HTMLInputElement: true, HTMLLIElement: true, HTMLMeterElement: true, MouseEvent: true, DragEvent: true, PointerEvent: true, WheelEvent: true, Document: true, HTMLDocument: true, Node: false, HTMLOptionElement: true, HTMLOutputElement: true, HTMLParamElement: true, HTMLProgressElement: true, HTMLSelectElement: true, HTMLTextAreaElement: true, CompositionEvent: true, FocusEvent: true, KeyboardEvent: true, TextEvent: true, TouchEvent: true, UIEvent: false, SVGAElement: true, SVGAnimateElement: true, SVGAnimateMotionElement: true, SVGAnimateTransformElement: true, SVGAnimationElement: true, SVGCircleElement: true, SVGClipPathElement: true, SVGDefsElement: true, SVGDescElement: true, SVGDiscardElement: true, SVGEllipseElement: true, SVGFEBlendElement: true, SVGFEColorMatrixElement: true, SVGFEComponentTransferElement: true, SVGFECompositeElement: true, SVGFEConvolveMatrixElement: true, SVGFEDiffuseLightingElement: true, SVGFEDisplacementMapElement: true, SVGFEDistantLightElement: true, SVGFEFloodElement: true, SVGFEFuncAElement: true, SVGFEFuncBElement: true, SVGFEFuncGElement: true, SVGFEFuncRElement: true, SVGFEGaussianBlurElement: true, SVGFEImageElement: true, SVGFEMergeElement: true, SVGFEMergeNodeElement: true, SVGFEMorphologyElement: true, SVGFEOffsetElement: true, SVGFEPointLightElement: true, SVGFESpecularLightingElement: true, SVGFESpotLightElement: true, SVGFETileElement: true, SVGFETurbulenceElement: true, SVGFilterElement: true, SVGForeignObjectElement: true, SVGGElement: true, SVGGeometryElement: true, SVGGraphicsElement: true, SVGImageElement: true, SVGLineElement: true, SVGLinearGradientElement: true, SVGMarkerElement: true, SVGMaskElement: true, SVGMetadataElement: true, SVGPathElement: true, SVGPatternElement: true, SVGPolygonElement: true, SVGPolylineElement: true, SVGRadialGradientElement: true, SVGRectElement: true, SVGScriptElement: true, SVGSetElement: true, SVGStopElement: true, SVGStyleElement: true, SVGElement: true, SVGSVGElement: true, SVGSwitchElement: true, SVGSymbolElement: true, SVGTSpanElement: true, SVGTextContentElement: true, SVGTextElement: true, SVGTextPathElement: true, SVGTextPositioningElement: true, SVGTitleElement: true, SVGUseElement: true, SVGViewElement: true, SVGGradientElement: true, SVGComponentTransferFunctionElement: true, SVGFEDropShadowElement: true, SVGMPathElement: true});
+    hunkHelpers.setOrUpdateInterceptorsByTag({DOMError: J.Interceptor, MediaError: J.Interceptor, NavigatorUserMediaError: J.Interceptor, OverconstrainedError: J.Interceptor, PositionError: J.Interceptor, SQLError: J.Interceptor, HTMLAudioElement: W.HtmlElement, HTMLBRElement: W.HtmlElement, HTMLBaseElement: W.HtmlElement, HTMLBodyElement: W.HtmlElement, HTMLButtonElement: W.HtmlElement, HTMLCanvasElement: W.HtmlElement, HTMLContentElement: W.HtmlElement, HTMLDListElement: W.HtmlElement, HTMLDataElement: W.HtmlElement, HTMLDataListElement: W.HtmlElement, HTMLDetailsElement: W.HtmlElement, HTMLDialogElement: W.HtmlElement, HTMLDivElement: W.HtmlElement, HTMLEmbedElement: W.HtmlElement, HTMLFieldSetElement: W.HtmlElement, HTMLHRElement: W.HtmlElement, HTMLHeadElement: W.HtmlElement, HTMLHeadingElement: W.HtmlElement, HTMLHtmlElement: W.HtmlElement, HTMLIFrameElement: W.HtmlElement, HTMLImageElement: W.HtmlElement, HTMLInputElement: W.HtmlElement, HTMLLIElement: W.HtmlElement, HTMLLabelElement: W.HtmlElement, HTMLLegendElement: W.HtmlElement, HTMLLinkElement: W.HtmlElement, HTMLMapElement: W.HtmlElement, HTMLMediaElement: W.HtmlElement, HTMLMenuElement: W.HtmlElement, HTMLMetaElement: W.HtmlElement, HTMLMeterElement: W.HtmlElement, HTMLModElement: W.HtmlElement, HTMLOListElement: W.HtmlElement, HTMLObjectElement: W.HtmlElement, HTMLOptGroupElement: W.HtmlElement, HTMLOptionElement: W.HtmlElement, HTMLOutputElement: W.HtmlElement, HTMLParagraphElement: W.HtmlElement, HTMLParamElement: W.HtmlElement, HTMLPictureElement: W.HtmlElement, HTMLPreElement: W.HtmlElement, HTMLProgressElement: W.HtmlElement, HTMLQuoteElement: W.HtmlElement, HTMLScriptElement: W.HtmlElement, HTMLShadowElement: W.HtmlElement, HTMLSlotElement: W.HtmlElement, HTMLSourceElement: W.HtmlElement, HTMLSpanElement: W.HtmlElement, HTMLStyleElement: W.HtmlElement, HTMLTableCaptionElement: W.HtmlElement, HTMLTableCellElement: W.HtmlElement, HTMLTableDataCellElement: W.HtmlElement, HTMLTableHeaderCellElement: W.HtmlElement, HTMLTableColElement: W.HtmlElement, HTMLTableElement: W.HtmlElement, HTMLTableRowElement: W.HtmlElement, HTMLTableSectionElement: W.HtmlElement, HTMLTemplateElement: W.HtmlElement, HTMLTimeElement: W.HtmlElement, HTMLTitleElement: W.HtmlElement, HTMLTrackElement: W.HtmlElement, HTMLUListElement: W.HtmlElement, HTMLUnknownElement: W.HtmlElement, HTMLVideoElement: W.HtmlElement, HTMLDirectoryElement: W.HtmlElement, HTMLFontElement: W.HtmlElement, HTMLFrameElement: W.HtmlElement, HTMLFrameSetElement: W.HtmlElement, HTMLMarqueeElement: W.HtmlElement, HTMLElement: W.HtmlElement, HTMLAnchorElement: W.AnchorElement, HTMLAreaElement: W.AreaElement, DOMException: W.DomException, Element: W.Element, AbortPaymentEvent: W.Event, AnimationEvent: W.Event, AnimationPlaybackEvent: W.Event, ApplicationCacheErrorEvent: W.Event, BackgroundFetchClickEvent: W.Event, BackgroundFetchEvent: W.Event, BackgroundFetchFailEvent: W.Event, BackgroundFetchedEvent: W.Event, BeforeInstallPromptEvent: W.Event, BeforeUnloadEvent: W.Event, BlobEvent: W.Event, CanMakePaymentEvent: W.Event, ClipboardEvent: W.Event, CloseEvent: W.Event, CustomEvent: W.Event, DeviceMotionEvent: W.Event, DeviceOrientationEvent: W.Event, ErrorEvent: W.Event, ExtendableEvent: W.Event, ExtendableMessageEvent: W.Event, FetchEvent: W.Event, FontFaceSetLoadEvent: W.Event, ForeignFetchEvent: W.Event, GamepadEvent: W.Event, HashChangeEvent: W.Event, InstallEvent: W.Event, MediaEncryptedEvent: W.Event, MediaKeyMessageEvent: W.Event, MediaQueryListEvent: W.Event, MediaStreamEvent: W.Event, MediaStreamTrackEvent: W.Event, MessageEvent: W.Event, MIDIConnectionEvent: W.Event, MIDIMessageEvent: W.Event, MutationEvent: W.Event, NotificationEvent: W.Event, PageTransitionEvent: W.Event, PaymentRequestEvent: W.Event, PaymentRequestUpdateEvent: W.Event, PopStateEvent: W.Event, PresentationConnectionAvailableEvent: W.Event, PresentationConnectionCloseEvent: W.Event, ProgressEvent: W.Event, PromiseRejectionEvent: W.Event, PushEvent: W.Event, RTCDataChannelEvent: W.Event, RTCDTMFToneChangeEvent: W.Event, RTCPeerConnectionIceEvent: W.Event, RTCTrackEvent: W.Event, SecurityPolicyViolationEvent: W.Event, SensorErrorEvent: W.Event, SpeechRecognitionError: W.Event, SpeechRecognitionEvent: W.Event, SpeechSynthesisEvent: W.Event, StorageEvent: W.Event, SyncEvent: W.Event, TrackEvent: W.Event, TransitionEvent: W.Event, WebKitTransitionEvent: W.Event, VRDeviceEvent: W.Event, VRDisplayEvent: W.Event, VRSessionEvent: W.Event, MojoInterfaceRequestEvent: W.Event, ResourceProgressEvent: W.Event, USBConnectionEvent: W.Event, IDBVersionChangeEvent: W.Event, AudioProcessingEvent: W.Event, OfflineAudioCompletionEvent: W.Event, WebGLContextEvent: W.Event, Event: W.Event, InputEvent: W.Event, SubmitEvent: W.Event, EventTarget: W.EventTarget, HTMLFormElement: W.FormElement, MouseEvent: W.MouseEvent, DragEvent: W.MouseEvent, PointerEvent: W.MouseEvent, WheelEvent: W.MouseEvent, Document: W.Node, HTMLDocument: W.Node, Node: W.Node, HTMLSelectElement: W.SelectElement, HTMLTextAreaElement: W.TextAreaElement, CompositionEvent: W.UIEvent, FocusEvent: W.UIEvent, KeyboardEvent: W.UIEvent, TextEvent: W.UIEvent, TouchEvent: W.UIEvent, UIEvent: W.UIEvent, SVGAElement: P.SvgElement, SVGAnimateElement: P.SvgElement, SVGAnimateMotionElement: P.SvgElement, SVGAnimateTransformElement: P.SvgElement, SVGAnimationElement: P.SvgElement, SVGCircleElement: P.SvgElement, SVGClipPathElement: P.SvgElement, SVGDefsElement: P.SvgElement, SVGDescElement: P.SvgElement, SVGDiscardElement: P.SvgElement, SVGEllipseElement: P.SvgElement, SVGFEBlendElement: P.SvgElement, SVGFEColorMatrixElement: P.SvgElement, SVGFEComponentTransferElement: P.SvgElement, SVGFECompositeElement: P.SvgElement, SVGFEConvolveMatrixElement: P.SvgElement, SVGFEDiffuseLightingElement: P.SvgElement, SVGFEDisplacementMapElement: P.SvgElement, SVGFEDistantLightElement: P.SvgElement, SVGFEFloodElement: P.SvgElement, SVGFEFuncAElement: P.SvgElement, SVGFEFuncBElement: P.SvgElement, SVGFEFuncGElement: P.SvgElement, SVGFEFuncRElement: P.SvgElement, SVGFEGaussianBlurElement: P.SvgElement, SVGFEImageElement: P.SvgElement, SVGFEMergeElement: P.SvgElement, SVGFEMergeNodeElement: P.SvgElement, SVGFEMorphologyElement: P.SvgElement, SVGFEOffsetElement: P.SvgElement, SVGFEPointLightElement: P.SvgElement, SVGFESpecularLightingElement: P.SvgElement, SVGFESpotLightElement: P.SvgElement, SVGFETileElement: P.SvgElement, SVGFETurbulenceElement: P.SvgElement, SVGFilterElement: P.SvgElement, SVGForeignObjectElement: P.SvgElement, SVGGElement: P.SvgElement, SVGGeometryElement: P.SvgElement, SVGGraphicsElement: P.SvgElement, SVGImageElement: P.SvgElement, SVGLineElement: P.SvgElement, SVGLinearGradientElement: P.SvgElement, SVGMarkerElement: P.SvgElement, SVGMaskElement: P.SvgElement, SVGMetadataElement: P.SvgElement, SVGPathElement: P.SvgElement, SVGPatternElement: P.SvgElement, SVGPolygonElement: P.SvgElement, SVGPolylineElement: P.SvgElement, SVGRadialGradientElement: P.SvgElement, SVGRectElement: P.SvgElement, SVGScriptElement: P.SvgElement, SVGSetElement: P.SvgElement, SVGStopElement: P.SvgElement, SVGStyleElement: P.SvgElement, SVGElement: P.SvgElement, SVGSVGElement: P.SvgElement, SVGSwitchElement: P.SvgElement, SVGSymbolElement: P.SvgElement, SVGTSpanElement: P.SvgElement, SVGTextContentElement: P.SvgElement, SVGTextElement: P.SvgElement, SVGTextPathElement: P.SvgElement, SVGTextPositioningElement: P.SvgElement, SVGTitleElement: P.SvgElement, SVGUseElement: P.SvgElement, SVGViewElement: P.SvgElement, SVGGradientElement: P.SvgElement, SVGComponentTransferFunctionElement: P.SvgElement, SVGFEDropShadowElement: P.SvgElement, SVGMPathElement: P.SvgElement});
+    hunkHelpers.setOrUpdateLeafTags({DOMError: true, MediaError: true, NavigatorUserMediaError: true, OverconstrainedError: true, PositionError: true, SQLError: true, HTMLAudioElement: true, HTMLBRElement: true, HTMLBaseElement: true, HTMLBodyElement: true, HTMLButtonElement: true, HTMLCanvasElement: true, HTMLContentElement: true, HTMLDListElement: true, HTMLDataElement: true, HTMLDataListElement: true, HTMLDetailsElement: true, HTMLDialogElement: true, HTMLDivElement: true, HTMLEmbedElement: true, HTMLFieldSetElement: true, HTMLHRElement: true, HTMLHeadElement: true, HTMLHeadingElement: true, HTMLHtmlElement: true, HTMLIFrameElement: true, HTMLImageElement: true, HTMLInputElement: true, HTMLLIElement: true, HTMLLabelElement: true, HTMLLegendElement: true, HTMLLinkElement: true, HTMLMapElement: true, HTMLMediaElement: true, HTMLMenuElement: true, HTMLMetaElement: true, HTMLMeterElement: true, HTMLModElement: true, HTMLOListElement: true, HTMLObjectElement: true, HTMLOptGroupElement: true, HTMLOptionElement: true, HTMLOutputElement: true, HTMLParagraphElement: true, HTMLParamElement: true, HTMLPictureElement: true, HTMLPreElement: true, HTMLProgressElement: true, HTMLQuoteElement: true, HTMLScriptElement: true, HTMLShadowElement: true, HTMLSlotElement: true, HTMLSourceElement: true, HTMLSpanElement: true, HTMLStyleElement: true, HTMLTableCaptionElement: true, HTMLTableCellElement: true, HTMLTableDataCellElement: true, HTMLTableHeaderCellElement: true, HTMLTableColElement: true, HTMLTableElement: true, HTMLTableRowElement: true, HTMLTableSectionElement: true, HTMLTemplateElement: true, HTMLTimeElement: true, HTMLTitleElement: true, HTMLTrackElement: true, HTMLUListElement: true, HTMLUnknownElement: true, HTMLVideoElement: true, HTMLDirectoryElement: true, HTMLFontElement: true, HTMLFrameElement: true, HTMLFrameSetElement: true, HTMLMarqueeElement: true, HTMLElement: false, HTMLAnchorElement: true, HTMLAreaElement: true, DOMException: true, Element: false, AbortPaymentEvent: true, AnimationEvent: true, AnimationPlaybackEvent: true, ApplicationCacheErrorEvent: true, BackgroundFetchClickEvent: true, BackgroundFetchEvent: true, BackgroundFetchFailEvent: true, BackgroundFetchedEvent: true, BeforeInstallPromptEvent: true, BeforeUnloadEvent: true, BlobEvent: true, CanMakePaymentEvent: true, ClipboardEvent: true, CloseEvent: true, CustomEvent: true, DeviceMotionEvent: true, DeviceOrientationEvent: true, ErrorEvent: true, ExtendableEvent: true, ExtendableMessageEvent: true, FetchEvent: true, FontFaceSetLoadEvent: true, ForeignFetchEvent: true, GamepadEvent: true, HashChangeEvent: true, InstallEvent: true, MediaEncryptedEvent: true, MediaKeyMessageEvent: true, MediaQueryListEvent: true, MediaStreamEvent: true, MediaStreamTrackEvent: true, MessageEvent: true, MIDIConnectionEvent: true, MIDIMessageEvent: true, MutationEvent: true, NotificationEvent: true, PageTransitionEvent: true, PaymentRequestEvent: true, PaymentRequestUpdateEvent: true, PopStateEvent: true, PresentationConnectionAvailableEvent: true, PresentationConnectionCloseEvent: true, ProgressEvent: true, PromiseRejectionEvent: true, PushEvent: true, RTCDataChannelEvent: true, RTCDTMFToneChangeEvent: true, RTCPeerConnectionIceEvent: true, RTCTrackEvent: true, SecurityPolicyViolationEvent: true, SensorErrorEvent: true, SpeechRecognitionError: true, SpeechRecognitionEvent: true, SpeechSynthesisEvent: true, StorageEvent: true, SyncEvent: true, TrackEvent: true, TransitionEvent: true, WebKitTransitionEvent: true, VRDeviceEvent: true, VRDisplayEvent: true, VRSessionEvent: true, MojoInterfaceRequestEvent: true, ResourceProgressEvent: true, USBConnectionEvent: true, IDBVersionChangeEvent: true, AudioProcessingEvent: true, OfflineAudioCompletionEvent: true, WebGLContextEvent: true, Event: false, InputEvent: false, SubmitEvent: false, EventTarget: false, HTMLFormElement: true, MouseEvent: true, DragEvent: true, PointerEvent: true, WheelEvent: true, Document: true, HTMLDocument: true, Node: false, HTMLSelectElement: true, HTMLTextAreaElement: true, CompositionEvent: true, FocusEvent: true, KeyboardEvent: true, TextEvent: true, TouchEvent: true, UIEvent: false, SVGAElement: true, SVGAnimateElement: true, SVGAnimateMotionElement: true, SVGAnimateTransformElement: true, SVGAnimationElement: true, SVGCircleElement: true, SVGClipPathElement: true, SVGDefsElement: true, SVGDescElement: true, SVGDiscardElement: true, SVGEllipseElement: true, SVGFEBlendElement: true, SVGFEColorMatrixElement: true, SVGFEComponentTransferElement: true, SVGFECompositeElement: true, SVGFEConvolveMatrixElement: true, SVGFEDiffuseLightingElement: true, SVGFEDisplacementMapElement: true, SVGFEDistantLightElement: true, SVGFEFloodElement: true, SVGFEFuncAElement: true, SVGFEFuncBElement: true, SVGFEFuncGElement: true, SVGFEFuncRElement: true, SVGFEGaussianBlurElement: true, SVGFEImageElement: true, SVGFEMergeElement: true, SVGFEMergeNodeElement: true, SVGFEMorphologyElement: true, SVGFEOffsetElement: true, SVGFEPointLightElement: true, SVGFESpecularLightingElement: true, SVGFESpotLightElement: true, SVGFETileElement: true, SVGFETurbulenceElement: true, SVGFilterElement: true, SVGForeignObjectElement: true, SVGGElement: true, SVGGeometryElement: true, SVGGraphicsElement: true, SVGImageElement: true, SVGLineElement: true, SVGLinearGradientElement: true, SVGMarkerElement: true, SVGMaskElement: true, SVGMetadataElement: true, SVGPathElement: true, SVGPatternElement: true, SVGPolygonElement: true, SVGPolylineElement: true, SVGRadialGradientElement: true, SVGRectElement: true, SVGScriptElement: true, SVGSetElement: true, SVGStopElement: true, SVGStyleElement: true, SVGElement: true, SVGSVGElement: true, SVGSwitchElement: true, SVGSymbolElement: true, SVGTSpanElement: true, SVGTextContentElement: true, SVGTextElement: true, SVGTextPathElement: true, SVGTextPositioningElement: true, SVGTitleElement: true, SVGUseElement: true, SVGViewElement: true, SVGGradientElement: true, SVGComponentTransferFunctionElement: true, SVGFEDropShadowElement: true, SVGMPathElement: true});
   })();
   convertAllToFastObject(holders);
   convertToFastObject($);
