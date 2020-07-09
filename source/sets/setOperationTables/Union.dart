@@ -1,11 +1,16 @@
+import 'dart:collection';
+
 import '../../Utils/MethodTable.dart';
 import '../sets.dart';
 import '../../BSFunction/BSCalculus.dart';
 
+//If we get to this function, we already now the sets are not disjoined
 ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
   ComutativeMethodTable<BSSet, BSSet> methods;
 
   methods.addMethod(Interval, Interval, (Interval first, Interval second) {
+    //calls constructor directly instead of builder function because we already know the sets are disjoint
+    if (first.disjoined(second)) return DisjoinedSetUnion([first, second]);
     BSFunction _a = BSFunction.min(first.a, second.a);
     BSFunction _b = BSFunction.max(first.b, second.b);
 
@@ -25,11 +30,13 @@ ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
     return interval(_a, _b, leftClosed: _leftClosed, rightClosed: _rightClosed);
   });
 
-  methods.addMethod(Interval, DisjoinedSetUnion,
-      (Interval first, DisjoinedSetUnion second) {
-    Set<BSSet> _new = Set.from(second.subsets);
+  methods
+      .addMethodsInColumn([Interval, RosterSet, BuilderSet], DisjoinedSetUnion,
+          (Interval first, DisjoinedSetUnion second) {
+    List<BSSet> _new = List.from(second.subsets);
     _new.add(first);
-    return DisjoinedSetUnion(_new);
+    //Delegates to the DisjoinedSetUnion factory function for simplifications
+    return disjoinedSetUnion(_new);
   });
 
   methods.addMethod(
@@ -40,6 +47,21 @@ ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
             RosterSet(
                 second.elements.where((element) => !first.belongs(element)))
           ]));
+
+  //Uses the native set implementation to filter out repeated elements
+  methods.addMethod(RosterSet, RosterSet, (RosterSet first, RosterSet second) {
+    SplayTreeSet<BSFunction> _new = SplayTreeSet.from(first.elements);
+    _new.addAll(second.elements);
+    RosterSet(_new);
+  });
+
+  methods.addMethod(DisjoinedSetUnion, DisjoinedSetUnion,
+      (DisjoinedSetUnion first, DisjoinedSetUnion second) {
+    List<BSSet> _new = List.from(first.subsets);
+    _new.addAll(second.subsets);
+    //Delegates to the DisjoinedSetUnion factory function for simplifications
+    return disjoinedSetUnion(_new);
+  });
 
   return methods;
 }

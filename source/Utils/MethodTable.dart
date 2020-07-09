@@ -17,6 +17,14 @@ class MethodTable<RETURN_TYPE, DATA_TYPE> {
   RETURN_TYPE call(DATA_TYPE first, DATA_TYPE second) =>
       findMethod(first.runtimeType, second.runtimeType)(first, second);
 
+  ///adds the same method for many cells in the same line
+  void addMethodsInLine(Type t1, List<Type> t2, Function method) =>
+      t2.forEach((element) => addMethod(t1, element, method));
+
+  ///adds the same method for many cells in the same column
+  void addMethodsInColumn(List<Type> t1, Type t2, Function method) =>
+      t1.forEach((element) => addMethod(element, t2, method));
+
   @protected
   Function findMethod(Type t1, Type t2) {
     try {

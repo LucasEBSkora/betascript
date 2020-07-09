@@ -4,7 +4,6 @@ import 'BSSet.dart';
 import 'DisjoinedSetUnion.dart';
 import 'EmptySet.dart';
 import 'RosterSet.dart';
-import 'sets.dart';
 
 BSSet interval(BSFunction a, BSFunction b,
     {bool leftClosed = true, bool rightClosed = true}) {
@@ -31,6 +30,9 @@ class Interval extends BSSet {
 
   const Interval(BSFunction this.a, BSFunction this.b, bool this.leftClosed,
       bool this.rightClosed);
+    
+  const Interval.closed(BSFunction this.a, BSFunction this.b,) : this.leftClosed = true, this.rightClosed = true;
+  const Interval.open(BSFunction this.a, BSFunction this.b,) : this.leftClosed = false, this.rightClosed = false;
 
   //doesn't need to check if x is number because < will do it anyway
   @override

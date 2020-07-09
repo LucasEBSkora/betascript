@@ -2,7 +2,6 @@ import '../../Utils/MethodTable.dart';
 import '../sets.dart';
 import '../../BSFunction/BSCalculus.dart';
 
-
 ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
   ComutativeMethodTable<BSSet, BSSet> methods;
 
@@ -27,13 +26,6 @@ ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
   });
 
   methods.addMethod(
-      //Depends on the simplifications to remove empty sets that remain
-      Interval,
-      DisjoinedSetUnion,
-      (Interval first, DisjoinedSetUnion second) =>
-          disjoinedSetUnion(second.subsets.map((e) => first.intersection(e))));
-
-  methods.addMethod(
       Interval,
       RosterSet,
       (Interval first, RosterSet second) => disjoinedSetUnion([
@@ -41,6 +33,30 @@ ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
             RosterSet(
                 second.elements.where((element) => !first.belongs(element)))
           ]));
+
+  methods.addMethodsInColumn(
+      //Depends on the simplifications to remove empty sets that remain
+      [Interval, RosterSet, BuilderSet],
+      DisjoinedSetUnion,
+      (Interval first, DisjoinedSetUnion second) =>
+          disjoinedSetUnion(second.subsets.map((e) => first.intersection(e))));
+
+  methods.addMethod(DisjoinedSetUnion, DisjoinedSetUnion,
+      (DisjoinedSetUnion first, DisjoinedSetUnion second) {
+    List<BSSet> _new = List();
+    //computes the union of the intersections of second
+    //with each set in first
+    first.subsets.forEach((element) => _new.add(second.intersection(element)));
+
+    return disjoinedSetUnion(_new);
+  });
+
+  
+  methods.addMethod(
+      RosterSet,
+      RosterSet,
+      (RosterSet first, RosterSet second) => RosterSet(
+          first.elements.where((element) => second.belongs((element)))));
 
   return methods;
 }

@@ -5,6 +5,7 @@ import '../BSFunction/BSCalculus.dart';
 const EmptySet emptySet = EmptySet._();
 
 class EmptySet extends BSSet {
+  
   const EmptySet._();
 
   BSSet complement() => BSSet.R;
@@ -13,4 +14,7 @@ class EmptySet extends BSSet {
 
   @override
   String toString() => "∅";
+
+  @override
+  bool operator ==(other) => other is EmptySet;
 }

@@ -1,6 +1,5 @@
 import 'package:meta/meta.dart';
 
-import 'DisjoinedSetUnion.dart';
 import 'EmptySet.dart';
 import 'Interval.dart';
 import '../BSFunction/BSCalculus.dart';
@@ -37,13 +36,16 @@ abstract class BSSet {
 
   ///returns this\other (this without the elements in other)
   @nonVirtual
-  BSSet relativeComplement(BSSet other) =>
-      (disjoined(other)) ? this : _relativeComplements.call(this, other);
+  BSSet relativeComplement(BSSet other) => (disjoined(other))
+      ? this
+      : (other.contains(this)
+          ? emptySet
+          : _relativeComplements.call(this, other));
 
+  //Doesn't check for disjoint sets here because that would decrease performance instead of increasing it
+  //(in some cases we can peform the union without checking for it, or checking would be done more than once)
   @nonVirtual
-  BSSet union(BSSet other) => (disjoined(other))
-      ? DisjoinedSetUnion(Set.from([this, other]))
-      : _unions.call(this, other);
+  BSSet union(BSSet other) => _unions.call(this, other);
 
   @nonVirtual
   BSSet intersection(BSSet other) =>
@@ -59,4 +61,13 @@ abstract class BSSet {
 
   @override
   String toString() => "Subset of R";
+}
+
+class SetDefinitionError implements Exception {
+  final String message;
+
+  SetDefinitionError(this.message);
+
+  @override
+  String toString() => "Set definition error: $message";
 }
