@@ -2,7 +2,7 @@ import '../../Utils/MethodTable.dart';
 import '../sets.dart';
 
 ComutativeMethodTable<bool, BSSet> defineDisjoinedTable() {
-  ComutativeMethodTable<bool, BSSet> methods;
+  ComutativeMethodTable<bool, BSSet> methods = ComutativeMethodTable();
 
   methods.addMethod(
       Interval,

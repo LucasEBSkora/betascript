@@ -40,26 +40,41 @@ class MethodTable<RETURN_TYPE, DATA_TYPE> {
 
 class ComutativeMethodTable<RETURN_TYPE, DATA_TYPE>
     extends MethodTable<RETURN_TYPE, DATA_TYPE> {
-  @override
-  void addMethod(Type t1, Type t2, Function method) =>
-      hashMap[_getStringConversion(t1, t2)] = method;
 
-  @protected
-  Function findMethod(Type t1, Type t2) {
-    try {
-      return hashMap[_getStringConversion(t1, t2)];
-    } catch (e) {
-      if (!hashMap.containsKey(_getStringConversion(t1, t2)))
-        throw UnimplementedError();
-      else
-        throw e;
-    }
+  @override 
+  void addMethod(Type t1, Type t2, Function method) {
+    super.addMethod(t1, t2, method);
+    super.addMethod(t2, t1, (first, second) => method(second, first));
   }
 
-  String _getStringConversion(Type t1, Type t2) {
-    if (t1.toString().compareTo(t2.toString()) <= 0)
-      return t1.toString() + t2.toString();
-    else
-      return t2.toString() + t1.toString();
-  }
+  // @override
+  // void addMethod(Type t1, Type t2, Function method) =>
+  //     hashMap[_getStringConversion(t1, t2)] = method;
+
+  // RETURN_TYPE call(DATA_TYPE first, DATA_TYPE second) =>
+  //     (_correctOrder(first.runtimeType, second.runtimeType))
+  //         ? findMethod(first.runtimeType, second.runtimeType)(first, second)
+  //         : findMethod(first.runtimeType, second.runtimeType)(second, first);
+
+  // bool _correctOrder(Type t1, Type t2) =>
+  //     t1.toString().compareTo(t2.toString()) <= 0;
+
+  // @protected
+  // Function findMethod(Type t1, Type t2) {
+  //   try {
+  //     return hashMap[_getStringConversion(t1, t2)];
+  //   } catch (e) {
+  //     if (!hashMap.containsKey(_getStringConversion(t1, t2)))
+  //       throw UnimplementedError();
+  //     else
+  //       throw e;
+  //   }
+  // }
+
+  // String _getStringConversion(Type t1, Type t2) {
+  //   if (_correctOrder(t1, t2))
+  //     return t1.toString() + t2.toString();
+  //   else
+  //     return t2.toString() + t1.toString();
+  // }
 }

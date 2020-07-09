@@ -67,43 +67,43 @@ abstract class BSFunction implements BSCallable {
   bool operator ==(dynamic other) =>
       (other is BSFunction) && toString() == other.toString();
 
-  static Pair<double, double> _toDoubles(BSFunction a, BSFunction b, String op) {
+  static Pair<num, num> toNums(BSFunction a, BSFunction b, String op) {
     Trio<Number, bool, bool> _a = BSFunction.extractFromNegative<Number>(a);
     Trio<Number, bool, bool> _b = BSFunction.extractFromNegative<Number>(b);
     if (!_a.second || !_b.second)
       throw BetascriptFunctionError("operand $op can only be used on numbers");
 
-    return Pair<double, double>(((_a.third) ? -1 : 1) * _a.first.value,
+    return Pair<num, num>(((_a.third) ? -1 : 1) * _a.first.value,
         ((_b.third) ? -1 : 1) * _b.first.value);
   }
 
   bool operator <=(BSFunction other) {
-    Pair<double, double> v =  _toDoubles(this, other, "<=");
+    Pair<num, num> v =  toNums(this, other, "<=");
     return v.first <= v.second;
   }
 
     bool operator <(BSFunction other) {
-    Pair<double, double> v =  _toDoubles(this, other, "<");
+    Pair<num, num> v =  toNums(this, other, "<");
     return v.first < v.second;
   }
 
     bool operator >=(BSFunction other) {
-    Pair<double, double> v =  _toDoubles(this, other, ">=");
+    Pair<num, num> v =  toNums(this, other, ">=");
     return v.first >= v.second;
   }
 
     bool operator >(BSFunction other) {
-    Pair<double, double> v =  _toDoubles(this, other, ">");
+    Pair<num, num> v =  toNums(this, other, ">");
     return v.first > v.second;
   }
 
   static min(BSFunction x, BSFunction y) {
-    Pair<double, double> v =  _toDoubles(x, y, "min");
+    Pair<num, num> v =  toNums(x, y, "min");
     return (v.first < v.second) ? x : y;
   }
 
   static max(BSFunction x, BSFunction y) {
-    Pair<double, double> v =  _toDoubles(x, y, "max");
+    Pair<num, num> v =  toNums(x, y, "max");
     return (v.first > v.second) ? x : y;
   }
 

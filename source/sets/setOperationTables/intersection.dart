@@ -3,7 +3,7 @@ import '../sets.dart';
 import '../../BSFunction/BSCalculus.dart';
 
 ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
-  ComutativeMethodTable<BSSet, BSSet> methods;
+  ComutativeMethodTable<BSSet, BSSet> methods = ComutativeMethodTable();
 
   methods.addMethod(Interval, Interval, (Interval first, Interval second) {
     BSFunction _a = BSFunction.max(first.a, second.a);

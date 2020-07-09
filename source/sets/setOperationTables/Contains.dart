@@ -2,7 +2,7 @@ import '../../Utils/MethodTable.dart';
 import '../sets.dart';
 
 MethodTable<bool, BSSet> defineContainsTable() {
-  MethodTable<bool, BSSet> methods;
+  MethodTable<bool, BSSet> methods = MethodTable();
 
   methods.addMethod(
       Interval,
@@ -12,7 +12,7 @@ MethodTable<bool, BSSet> defineContainsTable() {
               (first.a == second.a &&
                   (first.leftClosed || !second.leftClosed))) &&
           (first.belongs(second.b) ||
-              (first.a == second.a &&
+              (first.b == second.b &&
                   (first.rightClosed || !second.rightClosed))));
 
   //all subsets of second need to be contained in first

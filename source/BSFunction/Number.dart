@@ -72,7 +72,5 @@ class Number extends BSFunction {
       (other is Number) && this.value == other.value;
 
   @override
-  BSFunction get approx =>
-      n(value); //only difference is that it ignores named numbers
-
+  BSFunction get approx => n(value);
 }

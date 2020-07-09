@@ -5,13 +5,13 @@ import '../../BSFunction/BSCalculus.dart';
 //Remember that if we get to this method we already know the sets aren't disjoined and that the second doesn't
 //contain the first
 MethodTable<BSSet, BSSet> defineRelativeComplementTable() {
-  MethodTable<BSSet, BSSet> methods;
+  MethodTable<BSSet, BSSet> methods = MethodTable();
 
   methods.addMethod(Interval, Interval, (Interval first, Interval second) {
     if (first.contains(second)) //second is fully contained in first
-      return DisjoinedSetUnion([
-        Interval(first.a, second.a, first.leftClosed, !second.leftClosed),
-        Interval(second.b, first.b, !second.rightClosed, first.rightClosed)
+      return disjoinedSetUnion([
+        interval(first.a, second.a, leftClosed: first.leftClosed, rightClosed: !second.leftClosed),
+        interval(second.b, first.b, leftClosed: !second.rightClosed, rightClosed: first.rightClosed)
       ]);
 
     //left edge of second is in first

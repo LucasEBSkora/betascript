@@ -7,10 +7,19 @@ import 'BSSet.dart';
 import 'DisjoinedSetUnion.dart';
 import 'Interval.dart';
 
+import '../Utils/Tuples.dart';
+
 BSSet rosterSet(Iterable<BSFunction> elements) {
-  if (elements.fold(true, (previousValue, element) => previousValue && BSFunction.extractFromNegative<Number>(element).second)) 
+  if (elements.firstWhere(
+          (element) => !BSFunction.extractFromNegative<Number>(element).second,
+          orElse: () => null) !=
+      null)
     throw SetDefinitionError("Sets can only be defined in real numbers!");
-  return RosterSet(Set.from(elements));
+  return RosterSet(
+      SplayTreeSet.from(elements, (BSFunction first, BSFunction second) {
+    Pair<num, num> _nums = BSFunction.toNums(first, second, "compare");
+    return _nums.first.compareTo(_nums.second);
+  }));
 }
 
 //a class that represents a set created by enumerating its (numeric) elemments
