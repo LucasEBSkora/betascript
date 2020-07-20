@@ -31,7 +31,6 @@ class BSScanner {
     }
 
     //adds a end of file token in the end, although it isn't completely necessary
-    //TODO: check if this token is useful for something in the long run
     _tokens.add(new Token(TokenType.EOF, "", null, _line));
     return _tokens;
   }
@@ -78,12 +77,39 @@ class BSScanner {
         } else
           _addToken(TokenType.SLASH);
       },
+      //ignored, but increases the line counter.
+      '\n': () {
+        Token last = _tokens.last;
+        if (![
+          TokenType.LEFT_PARENTHESES,
+          TokenType.LEFT_BRACE,
+          TokenType.LEFT_SQUARE,
+          TokenType.COMMA,
+          TokenType.DOT,
+          TokenType.MINUS,
+          TokenType.PLUS,
+          TokenType.SEMICOLON,
+          TokenType.LINEBREAK,
+          TokenType.SLASH,
+          TokenType.STAR,
+          TokenType.APPROX,
+          TokenType.EXP,
+          TokenType.EQUAL,
+          TokenType.EQUAL_EQUAL,
+          TokenType.GREATER,
+          TokenType.GREATER_EQUAL,
+          TokenType.LESS,
+          TokenType.LESS_EQUAL,
+          TokenType.AND,
+          TokenType.OR,
+          TokenType.NOT,
+        ].contains(last)) _addToken(TokenType.LINEBREAK);
+        _line++;
+      },
       //whitespace. Ignored.
       ' ': () {},
       '\r': () {},
       '\t': () {},
-      //ignored, but increases the line counter.
-      '\n': () => _line++,
       //since the _string function takes no parameters, it can be passed directly.
       '"': _string,
     });

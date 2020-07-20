@@ -4,49 +4,51 @@ program -> declaration* EOF
 
 declaration -> classDecl | rouDecl | varDecl | statement 
 
-classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER) "{" routine "}"
+classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER)? "{" ("\n")* routine* ("\n")* "}"
 
 rouDecl -> "routine" routine
-routine -> IDENTIFIER "(" parameters? ")" block
-parameters -> IDENTIFIER ( "," IDENTIFIER)*
+routine -> IDENTIFIER "(" ("\n")* parameters? ("\n")*")" ("\n")* block
+parameters -> IDENTIFIER ( "," ("\n")* IDENTIFIER)*
 
-varDecl -> "let" IDENTIFIER ("(" parameters ")")? ( "=" expression)? ";"
+varDecl -> "let" IDENTIFIER ("(" ("\n")* parameters ("\n")* ")")? ( "=" ("\n")* expression)? delimitator
 
 statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
 
+exprStmt -> expression delimitator
 
-exprStmt -> expression ";"
+forStmt -> "for" "(" ("\n")* (varDecl | exprStmt | ";") ("\n")* expression? ";" ("\n")* expression? ("\n")*")" ("\n")* statement
+ifStmt -> "if" "(" expression ")" ("\n")* statement ("\n")* ( "else" ("\n")* statement)? 
 
-forStmt -> "for" "(" (varDecl | exprStmt | ";") expression? ";" expression? ")" statement
+printStmt -> "print" expression delimitator
 
-ifStmt -> "if" "(" expression ")" statement ( "else" statement)? 
-
-printStmt -> "print" expression ";"
-
-returnStmt -> "return" expression? ";"
+returnStmt -> "return" expression? delimitator
 
 whileStmt -> "while" "(" expression ")" statement
 
-block -> "{" declaration* "}"
+block -> "{" ("\n")* declaration* ("\n")*"}"
 
 expression -> assigment
 
-assigment -> ( call ".")? IDENTIFIER "=" assigment | logicOr
+assigment -> ( call ".")? ("\n)* IDENTIFIER "=" assigment | logicOr
 
-logicOr -> logicAnd ( "or" logicAnd)*
-logicAnd -> equality ( "and" equality)*
+logicOr -> logicAnd ( "or"  ("\n")* logicAnd)*
+logicAnd -> equality ( "and"  ("\n")* equality)*
 
 
-equality -> comparison ( "==" comparison )*
-comparison -> addition ( (">" | ">=" | "<" | "<=") addition)*
-addition -> multiplication ( ("-" | "+") multiplication)*
-multiplication -> exponentiation ( ("*" | "/") exponentiation)*
-exponentiation -> unary ("^" unary)*
-unary -> ( "!" | "-" | "~") unary | call | derivative
+equality -> comparison ( "==" ("\n")* comparison )*
+comparison -> addition ( (">" | ">=" | "<" | "<=") ("\n")* addition)*
+addition -> multiplication ( ("-" | "+") ("\n")* multiplication)*
+multiplication -> exponentiation ( ("*" | "/") ("\n")* exponentiation)*
+exponentiation -> unary ("^" ("\n")* unary)*
+unary -> (( "!" | "-" | "~") ("\n")*)*  unary | call | derivative
 derivative -> "del" "(" expression ")" "/" "del" "(" arguments ")"
 call -> primary ( "(" arguments? ")" | "." IDENTIFIER)*
 arguments -> expression ( "," expression )*
-primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER | "super" "." IDENTIFIER 
+primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ")" | IDENTIFIER | ("super" "." ("\n")* IDENTIFIER) 
+
+
+delimitator -> "\n" | ";"
+
 
 these should be interpreted the following way: in order to build a valid BetaScript expression, one starts at the expression rule, and
 them follows the rule set in order to build it, going down.

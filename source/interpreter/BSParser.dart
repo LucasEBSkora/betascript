@@ -20,7 +20,7 @@ class BSParser {
   //The parser works by implementing the rules in the language's formal grammar,
   //which are described in 'formal grammar representation.txt'
 
-  ///This function is basically the program -> statement* EOF rule
+  ///This function is basically the program -> declaration* EOF rule
   List<Stmt> parse() {
     List<Stmt> statements = new List();
 
@@ -31,7 +31,7 @@ class BSParser {
     return statements;
   }
 
-  ///declaration -> classDecl | rou Decl | varDecl | statement
+  ///declaration -> classDecl | rouDecl | varDecl | statement
   Stmt _declaration() {
     try {
       if (_match(TokenType.CLASS)) return _classDeclaration();
@@ -46,23 +46,28 @@ class BSParser {
     }
   }
 
-  ///classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER) "{" routine "}"
+  ///classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER)? "{" ("\n")* routine* ("\n")* "}"
   Stmt _classDeclaration() {
     Token name = _consume(TokenType.IDENTIFIER, "Expect class name");
 
     //( "<" IDENTIFIER)
     VariableExpr superclass = null;
     if (_match(TokenType.LESS)) {
-      _consume(TokenType.IDENTIFIER, "Expect superclass name.");
+      _consume(TokenType.IDENTIFIER, "Expect superclass name");
       superclass = new VariableExpr(_previous());
     }
 
+    //linebreaks after { dealt with by scanner
     _consume(TokenType.LEFT_BRACE, "Expect '{' before class body");
 
     List<RoutineStmt> methods = new List();
 
+    //and linebreaks between routines dealt with here
     while (!_check(TokenType.RIGHT_BRACE) && !_isAtEnd())
-      methods.add(_routine("method"));
+      if (_check(TokenType.LINEBREAK))
+        _advance();
+      else
+        methods.add(_routine("method"));
 
     _consume(TokenType.RIGHT_BRACE, "Expect '}' after class body");
 
@@ -70,47 +75,56 @@ class BSParser {
   }
 
   ///kind is either 'routine' or 'method'
-  ///routine -> IDENTIFIER "(" parameters? ")" block
+  ///routine -> IDENTIFIER "(" ("\n")* parameters? ("\n")*")" ("\n")* block
   RoutineStmt _routine(String kind) {
     Token name = _consume(TokenType.IDENTIFIER, "Expect $kind name.");
 
+    //linebreaks after this dealt with by scanner
     _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after $kind name;");
 
     List<Token> parameters = new List();
 
-    ///parameters -> IDENTIFIER ( "," IDENTIFIER)*
+    ///parameters -> IDENTIFIER ( "," ("\n")* IDENTIFIER)*
     if (!_check(TokenType.RIGHT_PARENTHESES)) {
       do {
+        if (_check(TokenType.LINEBREAK)) _advance();
         parameters.add(_consume(TokenType.IDENTIFIER, "Expect parameter name"));
       } while (_match(TokenType.COMMA));
     }
 
     _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after parameters.");
+    if (_check(TokenType.LINEBREAK)) _advance();
     _consume(TokenType.LEFT_BRACE, "Expect '{' after routine parameters");
     List<Stmt> body = _block();
     return new RoutineStmt(name, parameters, body);
   }
 
-  ///varDecl -> "let" IDENTIFIER ("(" parameters ")")? ( "=" expression)? ";"
+  ///varDecl -> "let" IDENTIFIER ("(" ("\n")* parameters? ("\n")* ")")? ( "=" ("\n")* expression)? delimitator
   Stmt _varDeclaration() {
     Token name = _consume(TokenType.IDENTIFIER, "Expect variable name");
 
     List<Token> parameters = null;
     if (_match(TokenType.LEFT_PARENTHESES)) {
       parameters = List();
+
+      ///parameters -> IDENTIFIER ( "," ("\n")* IDENTIFIER)*
       do {
         if (_check(TokenType.RIGHT_PARENTHESES)) break;
 
         parameters.add(_consume(TokenType.IDENTIFIER, "Expect parameter name"));
       } while (_match(TokenType.COMMA));
-      
+
       _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after parameters.");
     }
+    if (parameters?.isEmpty ?? true) parameters = null;
 
     Expr initializer = null;
-    if (_match(TokenType.EQUAL)) initializer = _expression();
+    if (_match(TokenType.EQUAL)) {
+      _match(TokenType.LINEBREAK);
+      initializer = _expression();
+    }
 
-    _consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
+    _consumeAny([TokenType.SEMICOLON, TokenType.LINEBREAK], "Expect ';' or line break after variable declaration");
     return new VarStmt(name, parameters, initializer);
   }
 
@@ -125,9 +139,11 @@ class BSParser {
     return _expressionStatement();
   }
 
-  ///forStmt -> "for" "(" (varDecl | exprStmt | ";") expression? ";" expression? ")" statement
+  ///forStmt -> "for" "(" ("\n")* (varDecl | exprStmt | ";") ("\n")* expression? ";" ("\n")* expression? ("\n")*")" ("\n")* statement
   Stmt _forStatement() {
     _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after 'for'.");
+    
+    _match(TokenType.LINEBREAK);
 
     Stmt initializer;
 
@@ -365,7 +381,12 @@ class BSParser {
     //this rule is a little different, and actually uses recursion. When you reach this rule, if you immediately find  '!', '-' or '~',
     //go back to the 'unary' rule
 
-    if (_matchAny([TokenType.MINUS, TokenType.FACTORIAL, TokenType.NOT, TokenType.APPROX])) {
+    if (_matchAny([
+      TokenType.MINUS,
+      TokenType.FACTORIAL,
+      TokenType.NOT,
+      TokenType.APPROX
+    ])) {
       Token op = _previous();
       Expr right = _unary();
       return new UnaryExpr(op, right);
@@ -373,7 +394,7 @@ class BSParser {
 
     //if it finds a 'del' token, parses a derivative
     if (_match(TokenType.DEL)) return _derivative();
-    
+
     //in any other case, go to the 'call' rule
     return _call();
   }
@@ -418,25 +439,27 @@ class BSParser {
     return new CallExpr(callee, paren, arguments);
   }
 
-
   ///derivative -> "del" "(" expression ")" "/" "del" "(" arguments ")"
   Expr _derivative() {
-    Token keyword = _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after del keyword");
-    Expr derivand = _expression();    
+    Token keyword =
+        _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after del keyword");
+    Expr derivand = _expression();
     _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after derivand");
     _consume(TokenType.SLASH, "expect '/' after derivand");
     _consume(TokenType.DEL, "expect second 'del' after derivand");
     _consume(TokenType.LEFT_PARENTHESES, "expect '(' after second del keyword");
     List<Expr> variables = List();
-    if (_check(TokenType.RIGHT_PARENTHESES)) _error(_previous(), "at least one variable is necessary in derivative expression");
+    if (_check(TokenType.RIGHT_PARENTHESES))
+      _error(_previous(),
+          "at least one variable is necessary in derivative expression");
     do {
       variables.add(_expression());
-    } while(_match(TokenType.COMMA));
+    } while (_match(TokenType.COMMA));
 
-    _consume(TokenType.RIGHT_PARENTHESES, "expect ')' after derivative variables");
+    _consume(
+        TokenType.RIGHT_PARENTHESES, "expect ')' after derivative variables");
 
     return new DerivativeExpr(keyword, derivand, variables);
-    
   }
 
   ///primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ") | IDENTIFIER | "super" "." IDENTIFIER
@@ -511,8 +534,6 @@ class BSParser {
     return _previous();
   }
 
-  //TODO: evaluate evidence against EOF token
-
   ///returns whether current token is the last one
   ///not adding the EOF token would simply mean checking _current >= _tokens.length
   bool _isAtEnd() => _peek().type == TokenType.EOF;
@@ -529,6 +550,15 @@ class BSParser {
 
     //doesn't actually throw the error
     //So that it keeps parsing
+    _error(_peek(), message);
+    return null;
+  }
+
+  Token _consumeAny(List<TokenType> types, String message) {
+    for (TokenType type in types) {
+      if (_check(type)) return _advance();
+    }
+
     _error(_peek(), message);
     return null;
   }

@@ -10,6 +10,8 @@ enum TokenType {
   MINUS, // -
   PLUS, // +
   SEMICOLON, // ;
+  LINEBREAK, // '\n' - when the scanner isn't able to determine on it's own that a linebreak isn't relevant
+  //mainly after the tokens detailed in diary entry 15/07/2020
   SLASH, // /
   STAR, // *
   FACTORIAL, // !
