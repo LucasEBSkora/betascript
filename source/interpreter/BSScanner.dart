@@ -30,6 +30,9 @@ class BSScanner {
       _scanToken();
     }
 
+    //if the last line of the file doesn`t end with a line break, it might come up as unterminated. To solve this, we add an extra linebreak token
+    if (_tokens.last.type != TokenType.LINEBREAK)
+      _tokens.add(new Token(TokenType.LINEBREAK, "\n", null, _line));
     //adds a end of file token in the end, although it isn't completely necessary
     _tokens.add(new Token(TokenType.EOF, "", null, _line));
     return _tokens;
@@ -79,31 +82,34 @@ class BSScanner {
       },
       //ignored, but increases the line counter.
       '\n': () {
-        Token last = _tokens.last;
-        if (![
-          TokenType.LEFT_PARENTHESES,
-          TokenType.LEFT_BRACE,
-          TokenType.LEFT_SQUARE,
-          TokenType.COMMA,
-          TokenType.DOT,
-          TokenType.MINUS,
-          TokenType.PLUS,
-          TokenType.SEMICOLON,
-          TokenType.LINEBREAK,
-          TokenType.SLASH,
-          TokenType.STAR,
-          TokenType.APPROX,
-          TokenType.EXP,
-          TokenType.EQUAL,
-          TokenType.EQUAL_EQUAL,
-          TokenType.GREATER,
-          TokenType.GREATER_EQUAL,
-          TokenType.LESS,
-          TokenType.LESS_EQUAL,
-          TokenType.AND,
-          TokenType.OR,
-          TokenType.NOT,
-        ].contains(last)) _addToken(TokenType.LINEBREAK);
+        if (!_tokens.isEmpty) {
+          TokenType last = _tokens.last.type;
+          if (![
+            TokenType.LEFT_PARENTHESES,
+            TokenType.LEFT_BRACE,
+            TokenType.LEFT_SQUARE,
+            TokenType.COMMA,
+            TokenType.DOT,
+            TokenType.MINUS,
+            TokenType.PLUS,
+            TokenType.SEMICOLON,
+            TokenType.LINEBREAK,
+            TokenType.SLASH,
+            TokenType.STAR,
+            TokenType.APPROX,
+            TokenType.EXP,
+            TokenType.EQUAL,
+            TokenType.EQUAL_EQUAL,
+            TokenType.GREATER,
+            TokenType.GREATER_EQUAL,
+            TokenType.LESS,
+            TokenType.LESS_EQUAL,
+            TokenType.AND,
+            TokenType.OR,
+            TokenType.NOT,
+            TokenType.ELSE
+          ].contains(last)) _addToken(TokenType.LINEBREAK);
+        }
         _line++;
       },
       //whitespace. Ignored.

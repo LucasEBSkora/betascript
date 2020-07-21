@@ -175,13 +175,9 @@ void _createMultiplications(List<BSFunction> operands) {
       h = _f.first;
       factor = originalFactor = n((_f.third ? -1 : 1));
     }
-    print("h:$h");
-    print("factor:$factor");
-    print("originalFactor:$originalFactor");
 
     for (int j = i + 1; j < operands.length; ++j) {
       BSFunction g = operands[j];
-      print("g:$g");
       Trio<Multiplication, bool, bool> _mul =
           BSFunction.extractFromNegative<Multiplication>(g);
 
@@ -205,7 +201,6 @@ void _createMultiplications(List<BSFunction> operands) {
       }
     }
 
-    print("finalFactor:$factor");
     if (factor != originalFactor) {
       operands.removeAt(i);
       operands.insert(i, factor * h);

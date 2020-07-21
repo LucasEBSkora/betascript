@@ -124,7 +124,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
     
         causes a compile error, because it might be masking a user mistake
     
-        */
+    */
     _declare(s.name);
     if (s.parameters != null) {
       for (Token parameter in s.parameters) {

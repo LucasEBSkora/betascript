@@ -410,7 +410,7 @@ class RuntimeError implements Exception {
   RuntimeError(Token this.token, String this.message);
 
   @override
-  String toString() => "Runtime Error: '$message' at line ${token.line}";
+  String toString() => "Runtime Error: $message at line ${token.line}";
 }
 
 class Return implements Exception {

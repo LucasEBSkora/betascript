@@ -54,8 +54,10 @@ class BetaScript {
   }
 
   static void _run(String source) {
+
     BSScanner scanner = new BSScanner(source);
     List<Token> tokens = scanner.scanTokens(); //lexical analysis
+    // print(tokens);
     BSParser parser = new BSParser(tokens);
     List<Stmt> statements = parser.parse(); //Syntax analysis
     if (hadError) return;
@@ -83,8 +85,10 @@ class BetaScript {
   static void _errorAtToken(Token token, String message) {
     if (token.type == TokenType.EOF)
       _report(token.line, " at end", message);
-    else
-      _report(token.line, " at '${token.lexeme}'", message);
+    else {
+      if (token.lexeme == '\n') _report(token.line, " at linebreak ('\\n')", message);
+      else _report(token.line, " at '${token.lexeme}'", message);
+    }
   }
 
   static void _report(int line, String where, String message) {
