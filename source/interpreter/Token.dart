@@ -29,6 +29,8 @@ enum TokenType {
   STRING, //String literals
   NUMBER, //Numeric literals (ints and floating-points)
 
+  HASH, //# - used for directives
+
   //reserved keywords
   AND,
   CLASS,

@@ -58,7 +58,7 @@ class BetaScript {
     BSScanner scanner = new BSScanner(source);
     List<Token> tokens = scanner.scanTokens(); //lexical analysis
     // print(tokens);
-    BSParser parser = new BSParser(tokens);
+    BSParser parser = new BSParser(tokens, _interpreter);
     List<Stmt> statements = parser.parse(); //Syntax analysis
     if (hadError) return;
 

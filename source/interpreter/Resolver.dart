@@ -300,4 +300,8 @@ class Resolver implements ExprVisitor, StmtVisitor {
     _resolveExpr(e.derivand);
     for (Expr exp in e.variables) _resolveExpr(exp);
   }
+
+  //at least for now, directives don't have anything to resolve
+  @override
+  visitDirectiveStmt(DirectiveStmt s) {}
 }

@@ -130,6 +130,7 @@ int main() {
       ["List<Stmt>", "body", "The routine body"],
     ]),
     NodeType("While", [
+      ["Token", "token", "The token containing the while or for keyword"],
       [
         "Expr",
         "condition",
@@ -150,6 +151,10 @@ int main() {
       ],
       ["List<RoutineStmt>", "methods", "A list of the class' methods"],
     ]),
+    NodeType("Directive", [
+      ["Token", "token", "Token containing the directive"],
+      ["String", "directive", "the directive being issued"],
+    ])
   ], [
     'Expr',
     'Token'

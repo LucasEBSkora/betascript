@@ -9,6 +9,7 @@ abstract class StmtVisitor {
   dynamic visitWhileStmt(WhileStmt s);
   dynamic visitReturnStmt(ReturnStmt s);
   dynamic visitClassStmt(ClassStmt s);
+  dynamic visitDirectiveStmt(DirectiveStmt s);
 
 }
 
@@ -77,11 +78,13 @@ class RoutineStmt extends Stmt {
 }
 
 class WhileStmt extends Stmt {
+  ///The token containing the while or for keyword
+  final Token token;
   ///while this condition evaluates to True, execute body.
   final Expr condition;
   ///
   final Stmt body;
-  WhileStmt(Expr this.condition, Stmt this.body);
+  WhileStmt(Token this.token, Expr this.condition, Stmt this.body);
  dynamic accept(StmtVisitor v) => v.visitWhileStmt(this);
 
 }
@@ -105,6 +108,16 @@ class ClassStmt extends Stmt {
   final List<RoutineStmt> methods;
   ClassStmt(Token this.name, VariableExpr this.superclass, List<RoutineStmt> this.methods);
  dynamic accept(StmtVisitor v) => v.visitClassStmt(this);
+
+}
+
+class DirectiveStmt extends Stmt {
+  ///Token containing the directive
+  final Token token;
+  ///the directive being issued
+  final String directive;
+  DirectiveStmt(Token this.token, String this.directive);
+ dynamic accept(StmtVisitor v) => v.visitDirectiveStmt(this);
 
 }
 

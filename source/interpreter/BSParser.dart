@@ -1,3 +1,4 @@
+import 'BSInterpreter.dart';
 import 'BetaScript.dart';
 import 'Expr.dart';
 import 'Stmt.dart';
@@ -9,11 +10,11 @@ class ParseError implements Exception {}
 class BSParser {
   ///The list of tokens being parsed
   final List<Token> _tokens;
-
+  final BSInterpreter _interpreter;
   //The token currently being parsed
   int _current;
 
-  BSParser(List<Token> this._tokens) {
+  BSParser(List<Token> this._tokens, this._interpreter) {
     _current = 0;
   }
 
@@ -27,7 +28,8 @@ class BSParser {
     //ignores linebreaks here so it doesn't have to go all the way down the recursion to do it
     while (!_isAtEnd()) {
       if (_match(TokenType.LINEBREAK)) continue;
-      statements.add(_declaration());
+      var declaration = _declaration();
+      if (declaration != null) statements.add(declaration);
     }
 
     return statements;
@@ -134,7 +136,7 @@ class BSParser {
     return new VarStmt(name, parameters, initializer);
   }
 
-  //statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
+  //statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block | directive
   Stmt _statement() {
     if (_match(TokenType.FOR)) return _forStatement();
     if (_match(TokenType.IF)) return _ifStatement();
@@ -142,6 +144,7 @@ class BSParser {
     if (_match(TokenType.RETURN)) return _returnStatement();
     if (_match(TokenType.WHILE)) return _whileStatement();
     if (_match(TokenType.LEFT_BRACE)) return BlockStmt(_block());
+    if (_match(TokenType.HASH)) return _directive();
     return _expressionStatement();
   }
 
@@ -155,6 +158,8 @@ class BSParser {
 
   ///forStmt -> "for" "(" linebreak? (varDecl | exprStmt | ";") linebreak? expression? ";" linebreak? expression? linebreak? ")" linebreak statement
   Stmt _forStatement() {
+    Token token = _previous();
+
     _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after 'for'.");
 
     //linebreaks after left parentheses handled by the parser
@@ -191,14 +196,14 @@ class BSParser {
       body = new BlockStmt([body, new ExpressionStmt(increment)]);
     if (condition == null) condition = new LiteralExpr(true);
 
-    body = new WhileStmt(condition, body);
+    body = new WhileStmt(token, condition, body);
 
     if (initializer != null) body = new BlockStmt([initializer, body]);
 
     return body;
   }
 
-  ///ifStmt -> "if" "(" expression ")" linebreak? statement linebreak? ( "else" linebreak? statement)?
+  ///ifStmt -> "if" "(" linebreak? expression linebreak? ")" linebreak? statement linebreak? ( "else" linebreak? statement)?
   Stmt _ifStatement() {
     _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after 'if'.");
     //linebreaks after left parentheses handled by the parser
@@ -221,6 +226,9 @@ class BSParser {
 
   ///printStmt -> "print" expression delimitator
   Stmt _printStatement() {
+    if (_match(TokenType.LINEBREAK))
+      _error(_previous(),
+          "linebreak right after 'print' keyword not allowed. Please start the target expression in the same line.");
     Expr value = _expression();
     _consumeAny([TokenType.SEMICOLON, TokenType.LINEBREAK],
         "Expect ';' or linebreak after value");
@@ -244,6 +252,7 @@ class BSParser {
 
   ///whileStmt -> "while" "(" linebreak? expression linebreak? ")" linebreak statement
   Stmt _whileStatement() {
+    Token token = _previous();
     _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after 'while'.");
 
     //linebreak after left parentheses handled by parser
@@ -258,7 +267,7 @@ class BSParser {
 
     Stmt body = _statement();
 
-    return new WhileStmt(condition, body);
+    return new WhileStmt(token, condition, body);
   }
 
   ///block -> "{" (declaration | linebreak)* "}"
@@ -563,27 +572,31 @@ class BSParser {
     }
 
     //if you get to this rule and don't find any of the above, you found a syntax error instead
-    if (_previous().type == TokenType.LINEBREAK && _checkAny([
-      TokenType.COMMA,
-      TokenType.DOT,
-      TokenType.MINUS,
-      TokenType.PLUS,
-      TokenType.SLASH,
-      TokenType.STAR,
-      TokenType.APPROX,
-      TokenType.EXP,
-      TokenType.EQUAL,
-      TokenType.EQUAL_EQUAL,
-      TokenType.GREATER,
-      TokenType.GREATER_EQUAL,
-      TokenType.LESS,
-      TokenType.LESS_EQUAL,
-      TokenType.AND,
-      TokenType.OR,
-      TokenType.NOT,
-      TokenType.ELSE
-    ])) throw _error(_peek(), "missing left argument for operator. If you wanted to break an expression into multiple lines, do it after operators");
-    else throw _error(_peek(), "Expect expression.");
+    if (_previous().type == TokenType.LINEBREAK &&
+        _checkAny([
+          TokenType.COMMA,
+          TokenType.DOT,
+          TokenType.MINUS,
+          TokenType.PLUS,
+          TokenType.SLASH,
+          TokenType.STAR,
+          TokenType.APPROX,
+          TokenType.EXP,
+          TokenType.EQUAL,
+          TokenType.EQUAL_EQUAL,
+          TokenType.GREATER,
+          TokenType.GREATER_EQUAL,
+          TokenType.LESS,
+          TokenType.LESS_EQUAL,
+          TokenType.AND,
+          TokenType.OR,
+          TokenType.NOT,
+          TokenType.ELSE
+        ]))
+      throw _error(_peek(),
+          "missing left argument for operator. If you wanted to break an expression into multiple lines, do it after operators");
+    else
+      throw _error(_peek(), "Expect expression.");
   }
 
   //Helper function corner
@@ -681,5 +694,15 @@ class BSParser {
 
       _advance();
     }
+  }
+
+  Stmt _directive() {
+    DirectiveStmt stmt = DirectiveStmt(_previous(), _previous().literal);
+    //if the directive is global, it is set directly in the global directives
+    //if they're local, the interpreter will deal with it in time
+    if (!_interpreter.directives.setIfGlobal(stmt.directive, true)) {
+      return stmt;
+    } else
+      return null;
   }
 }

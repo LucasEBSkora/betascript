@@ -58,6 +58,15 @@ class BSScanner {
       '*': () => _addToken(TokenType.STAR),
       '!': () => _addToken(TokenType.FACTORIAL),
       '^': () => _addToken(TokenType.EXP),
+      '@': () {
+        //word comments ignore everything up to the next character of whitespace (but can be used normally inside strings)
+        while (_peek() != '\n' &&
+            _peek() != ' ' &&
+            _peek() != '\r' &&
+            _peek() != '\t' &&
+            !_isAtEnd()) _advance();
+      },
+      '#': _directive,
       //since things like .01 are valid numeric literals, '.' needs to be checked to be sure it's a dot or part of a literal.
       '.': () {
         if (_IsDigit(_peek()))
@@ -72,15 +81,27 @@ class BSScanner {
           _addToken((_match('=') ? TokenType.LESS_EQUAL : TokenType.LESS)),
       '>': () => _addToken(
           (_match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER)),
-      //if the slash is followed by another slash, it's actually a comment, and the rest of the line should be ignored
-      //TODO: add multiline comments
       '/': () {
+        //if the slash is followed by another slash, it's actually a comment, and the rest of the line should be ignored
         if (_match('/')) {
           while (_peek() != '\n' && !_isAtEnd()) _advance();
-        } else
+        }
+        //if it's followed by a star, it's a multiline comment, and everything up to the next */ should be ignored
+        else if (_match('*')) {
+          while (!_match('*') || _peek() != '/') {
+            if (_isAtEnd()) {
+              BetaScript.error(_line, "unterminated multiline comment");
+              break;
+            }
+            _advance();
+          }
+          //consumes those last  '*/' characters
+          _advance();
+          _advance();
+        } else //in any other case we just have a normal slash
           _addToken(TokenType.SLASH);
       },
-      //ignored, but increases the line counter.
+      //sometimes can be ignored, sometimes used as delimitator, but always increases the line counter.
       '\n': () {
         if (!_tokens.isEmpty) {
           TokenType last = _tokens.last.type;
@@ -267,4 +288,13 @@ class BSScanner {
 
   ///returns true if the character c is a digit, letter or underscore
   static bool _isAlphaNumeric(String c) => _isAlpha(c) || _IsDigit(c);
+
+  ///does the same as _identifier, but for directives, which are basically any string of characters ending in whitespace
+  void _directive() {
+    while (!_isWhitespace(_peek()) && !_isAtEnd()) _advance();
+    _addToken(TokenType.HASH, _source.substring(_start + 1, _current));
+  }
+
+  bool _isWhitespace(String c) =>
+      c == '\n' || c == '\t' || c == '\r' || c == ' ';
 }
