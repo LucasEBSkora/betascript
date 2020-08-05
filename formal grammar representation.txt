@@ -1,50 +1,59 @@
 This isn't backus-naur, because i can't be bothered to learn it now
 
-program -> declaration* EOF
+program -> (declaration | linebreak)* EOF
+
+linebreak -> ("\n")*
 
 declaration -> classDecl | rouDecl | varDecl | statement 
 
-classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER)? "{" ("\n")* routine* ("\n")* "}"
+classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER)? "{" linebreak routine* linebreak "}"
 
 rouDecl -> "routine" routine
-routine -> IDENTIFIER "(" ("\n")* parameters? ("\n")*")" ("\n")* block
-parameters -> IDENTIFIER ( "," ("\n")* IDENTIFIER)*
+routine -> IDENTIFIER "(" linebreak? parameters? linebreak?")" linebreak? block
+parameters -> IDENTIFIER ( "," linebreak? IDENTIFIER)*
 
-varDecl -> "let" IDENTIFIER ("(" ("\n")* parameters ("\n")* ")")? ( "=" ("\n")* expression)? delimitator
+varDecl -> "let" IDENTIFIER ("(" linebreak? parameters linebreak? ")")? ( "=" linebreak? expression)? delimitator
 
-statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
+statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block| directive
+
+directive -> '#' directiveName '\n'?
+
+directiveName -> a directive name is composed of anything that isn't whitespace. There is probably a simple way of expressing this in regEx, but i unforgivably don't know how to use them.
+basically, if it can be a twitter hashtag, it counts
+
 
 exprStmt -> expression delimitator
 
-forStmt -> "for" "(" ("\n")* (varDecl | exprStmt | ";") ("\n")* expression? ";" ("\n")* expression? ("\n")*")" ("\n")* statement
-ifStmt -> "if" "(" expression ")" ("\n")* statement ("\n")* ( "else" ("\n")* statement)? 
+forStmt -> "for" "(" linebreak? (varDecl | exprStmt | ";") linebreak? expression? ";" linebreak? expression? linebreak? ")" linebreak statement
+
+ifStmt -> "if" "(" linebreak? expression linebreak? ")" linebreak? statement linebreak? ( "else" linebreak? statement)? 
 
 printStmt -> "print" expression delimitator
 
-returnStmt -> "return" expression? delimitator
+returnStmt -> "return" ((expression? ";") | (expression "\n"))
 
-whileStmt -> "while" "(" expression ")" statement
+whileStmt -> "while" "(" linebreak? expression linebreak? ")" statement
 
-block -> "{" ("\n")* declaration* ("\n")*"}"
+block -> "{" (declaration | linebreak)* "}"
 
 expression -> assigment
 
 assigment -> ( call ".")? ("\n)* IDENTIFIER "=" assigment | logicOr
 
-logicOr -> logicAnd ( "or"  ("\n")* logicAnd)*
-logicAnd -> equality ( "and"  ("\n")* equality)*
+logicOr -> logicAnd ( "or"  linebreak? logicAnd)*
+logicAnd -> equality ( "and"  linebreak? equality)*
 
-
-equality -> comparison ( "==" ("\n")* comparison )*
-comparison -> addition ( (">" | ">=" | "<" | "<=") ("\n")* addition)*
-addition -> multiplication ( ("-" | "+") ("\n")* multiplication)*
-multiplication -> exponentiation ( ("*" | "/") ("\n")* exponentiation)*
-exponentiation -> unary ("^" ("\n")* unary)*
-unary -> (( "!" | "-" | "~") ("\n")*)*  unary | call | derivative
-derivative -> "del" "(" expression ")" "/" "del" "(" arguments ")"
-call -> primary ( "(" arguments? ")" | "." IDENTIFIER)*
-arguments -> expression ( "," expression )*
-primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" expression ")" | IDENTIFIER | ("super" "." ("\n")* IDENTIFIER) 
+equality -> comparison ( "==" linebreak? comparison )*
+comparison -> addition ( (">" | ">=" | "<" | "<=") linebreak? addition)*
+addition -> multiplication ( ("-" | "+") linebreak? multiplication)*
+multiplication -> exponentiation ( ("*" | "/") linebreak? exponentiation)*
+exponentiation -> unary_left ("^" linebreak? unary_left)*
+unary_left -> (("not" | "-" | "~") linebreak?)? unary_left) | unary_right
+unary_right -> (unary_right ("!" | "'")?) | call | derivative
+call -> primary ( "(" linebreak? arguments? linebreak?")" | "." linebreak? IDENTIFIER)*
+arguments -> expression ( "," linebreak? expression )*
+derivative -> "del" "(" linebreak? expression linebreak?  ")" "/" linebreak?  "del" "(" linebreak?  arguments linebreak? ")"
+primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" linebreak? expression linebreak? ")" | IDENTIFIER | ("super" "." linebreak? IDENTIFIER)
 
 
 delimitator -> "\n" | ";"

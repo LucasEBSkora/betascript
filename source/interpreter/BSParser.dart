@@ -412,45 +412,52 @@ class BSParser {
     return expr;
   }
 
-  ///exponentiation -> unary ("^" linebreak? unary)*
+  ///exponentiation -> unary_left ("^" linebreak? unary_left)*
   Expr _exponentiation() {
     //follows the pattern in _equality
 
-    Expr expr = _unary();
+    Expr expr = _unary_left();
 
     while (_match(TokenType.EXP)) {
       Token op = _previous();
       //linebreaks after '^' operator handled by scanner
-      Expr right = _unary();
+      Expr right = _unary_left();
       expr = new BinaryExpr(expr, op, right);
     }
     return expr;
   }
 
-  ///unary -> (( "!" | "not" | "-" | "~") linebreak?) unary | call | derivative
-  Expr _unary() {
-    //TODO: fix factorial, which is actually to the right of the operand
-
+  ///unary_left -> (("not" | "-" | "~") linebreak?)? unary_left) | unary_right
+  Expr _unary_left() {
     //this rule is a little different, and actually uses recursion. When you reach this rule, if you immediately find  '!', '-' or '~',
     //go back to the 'unary' rule
 
-    if (_matchAny([
-      TokenType.MINUS,
-      TokenType.FACTORIAL,
-      TokenType.NOT,
-      TokenType.APPROX
-    ])) {
+    if (_matchAny([TokenType.MINUS, TokenType.NOT, TokenType.APPROX])) {
       Token op = _previous();
       //linebreaks after the operators listed above handled by scanner
-      Expr right = _unary();
+      Expr right = _unary_left();
       return new UnaryExpr(op, right);
     }
 
-    //if it finds a 'del' token, parses a derivative
-    if (_match(TokenType.DEL)) return _derivative();
+    //if it doesn't find any left-unary operators, looks for the right ones
+    return _unary_right();
+  }
 
-    //in any other case, go to the 'call' rule
-    return _call();
+  //unary_right -> (unary_right ("!" | "'")?) | call | derivative
+  Expr _unary_right() {
+    Expr operand;
+    //if it finds a 'del' token, parses a derivative
+    if (_match(TokenType.DEL))
+      operand = _derivative();
+    else //in any other case, go to the 'call' rule
+      operand = _call();
+    
+    //keeps composing it until it's done
+    while (_matchAny([TokenType.APOSTROPHE, TokenType.FACTORIAL])) 
+      operand = UnaryExpr(_previous(), operand);
+    
+
+    return operand;
   }
 
   ///call -> primary ( "(" linebreak? arguments? linebreak?")" | "." linebreak? IDENTIFIER)*

@@ -15,6 +15,7 @@ enum TokenType {
   SLASH, // /
   STAR, // *
   FACTORIAL, // !
+  APOSTROPHE, // '
   APPROX, //~
   EXP, //^
 

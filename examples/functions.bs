@@ -1,22 +1,31 @@
-let f(x) = sin(x);
+let f(x) = sin(x)
 
-let g = f(cos(x));
+let g = f(cos(x))
 
-print g;
+print g
 
-print f + g;
+print f + g
 
 
-print e^x;
+print e^x
 
-let h(x, y, z) = 0;
+let h(x, y, z) = 0
 
-print h(1, 2, arcosh(z));
+print h(1, 2, arcosh(z))
 
-let i(y,x) = pi + 2 - log(y, 33)*sec(y/x);
-print i(11, 2);
-print ~i(11, 2);
+let i(y,x) = pi + 2 - log(y, 33)*sec(y/x)
+print i(11, 2)
+print ~i(11, 2)
 
-let j(x, y, z) = x^2*y^3;
+let j(x, y, z) = x^2*y^3
 
-print del(j)/del(x, y, x);
+print del(j)/del(x, y, x)
+
+print f'
+
+print (f+g)'
+
+print 4'
+
+//not allowed - only works for single variable functions
+//print j'

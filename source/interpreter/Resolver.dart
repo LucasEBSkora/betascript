@@ -111,7 +111,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitUnaryExpr(UnaryExpr e) {
-    _resolveExpr(e.right);
+    _resolveExpr(e.operand);
   }
 
   @override

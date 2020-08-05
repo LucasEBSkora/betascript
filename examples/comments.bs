@@ -1,0 +1,35 @@
+//this is a single line comment
+
+/*
+  this 
+  is 
+  a
+  multiline
+  comment
+*/
+
+print @this-is-a-name-comment-so-this-won't-print "but this will, because whitespace terminates them"
+
+#bs_tt_interpret //this is a directive. It isn't really a comment, because if the commented bit of text is in a set of defined directives, it will change how the program behaves
+
+
+//e.g., the one above sets the interpreter to twitter mode, which forbids loops and routines and class definitions
+
+/*
+
+while (true) {print "see?";}
+
+routine errormaker() {
+  print "it won't let you";
+}
+
+class DontEvenTry {}
+
+clock()
+
+*/
+
+
+
+
+#this-doesn't-have-any-meaning-so-it-is-treated-as-a-normal-comment

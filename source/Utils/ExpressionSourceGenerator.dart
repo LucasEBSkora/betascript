@@ -42,10 +42,9 @@ int main() {
         "Literals are numbers, strings, booleans or null. This field holds one of them."
       ],
     ]),
-    //TODO: fix unary so it can be to the left (the factorial sign is placed after the operand.)
     NodeType("Unary", [
-      ["Token", "op", "operator"],
-      ["Expr", "right", "all Unary operators have the operand to their right."],
+      ["Token", "op", "operator (this type is used for unary operators both to the left and to the right)"],
+      ["Expr", "operand", "The operand on which the operator is applied"],
     ]),
     NodeType("Variable", [
       ["Token", "name", "The token containing the variable's name"],

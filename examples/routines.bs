@@ -1,0 +1,17 @@
+routine returnNull() {
+  return;
+}
+
+routine returnNullExplicit() {
+  return nil
+}
+
+//routine invalidSyntax() {
+//  return
+//}
+
+print returnNull()
+
+print returnNullExplicit()
+
+//print invalidSyntax()

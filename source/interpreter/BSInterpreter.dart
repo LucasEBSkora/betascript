@@ -87,7 +87,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   Object visitUnaryExpr(UnaryExpr e) {
-    dynamic operand = _evaluate(e.right);
+    dynamic operand = _evaluate(e.operand);
 
     switch (e.op.type) {
       case TokenType.MINUS:
@@ -100,6 +100,17 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
         if (operand is BSFunction) return operand.approx;
         throw new RuntimeError(e.op,
             "The approximation (~) operator may only be applied to functions");
+      case TokenType.APOSTROPHE:
+        if (operand is BSFunction) {
+          Set<Variable> params = operand.parameters;
+          if (params.length > 1) throw new RuntimeError(e.op, "the apostrophe operator may only be applied to functions defined in a single (or no) variables");
+          if (params.length == 1) return operand.derivative(params.last);
+          else return 0; //functions defined in 0 variables are always constant, so their derivative is 0
+        }
+        throw new RuntimeError(e.op,
+            "The apostrophe operator may only be applied to functions");
+      case TokenType.FACTORIAL:
+        throw new RuntimeError(e.op, "error! factorial not yet implemented");
       default:
         return null;
     }
@@ -254,7 +265,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitWhileStmt(WhileStmt s) {
-    if (directives.getDirective("bs-tt-interpret"))
+    if (directives.getDirective("bs_tt_interpret"))
       throw new RuntimeError(
           s.token, "loops are forbidden when interpreting for twitter");
     while (_istruthy(_evaluate(s.condition))) _execute(s.body);
@@ -268,7 +279,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       throw new RuntimeError(
           e.paren, "Can only call routines, functions and classes.");
 
-    if (directives.getDirective("bs-tt-interpret") &&
+    if (directives.getDirective("bs_tt_interpret") &&
         !(callee is BSFunction || callee is BSClass))
       throw new RuntimeError(e.paren,
           "when interpreting for twitter, you can only call functions and constructors");
@@ -295,9 +306,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitRoutineStmt(RoutineStmt s) {
-    if (directives.getDirective("bs-tt-interpret"))
-      throw new RuntimeError(
-          s.name, "routine definitions are forbidden when interpreting for twitter");
+    if (directives.getDirective("bs_tt_interpret"))
+      throw new RuntimeError(s.name,
+          "routine definitions are forbidden when interpreting for twitter");
     UserRoutine routine = new UserRoutine(s, _environment, false);
     _environment.define(s.name.lexeme, routine);
   }
@@ -326,9 +337,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitClassStmt(ClassStmt s) {
-    if (directives.getDirective("bs-tt-interpret"))
-      throw new RuntimeError(
-          s.name, "class definitions are forbidden when interpreting for twitter");
+    if (directives.getDirective("bs_tt_interpret"))
+      throw new RuntimeError(s.name,
+          "class definitions are forbidden when interpreting for twitter");
     Object superclass = null;
     if (s.superclass != null) {
       superclass = _evaluate(s.superclass);

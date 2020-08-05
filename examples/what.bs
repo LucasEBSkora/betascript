@@ -1,0 +1,4 @@
+print "i'm trying to figure out what happens when you make it write a tweet that is too long i might have screwed it up a bit i'm not sure"
+print pi
+print del(x^x^x^x^x^x^x^x^x^x^x^x^x)/del(x)
+print "please don't die"

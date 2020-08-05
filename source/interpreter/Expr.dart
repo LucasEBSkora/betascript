@@ -81,11 +81,11 @@ class LiteralExpr extends Expr {
 }
 
 class UnaryExpr extends Expr {
-  ///operator
+  ///operator (this type is used for unary operators both to the left and to the right)
   final Token op;
-  ///all Unary operators have the operand to their right.
-  final Expr right;
-  UnaryExpr(Token this.op, Expr this.right);
+  ///The operand on which the operator is applied
+  final Expr operand;
+  UnaryExpr(Token this.op, Expr this.operand);
  dynamic accept(ExprVisitor v) => v.visitUnaryExpr(this);
 
 }

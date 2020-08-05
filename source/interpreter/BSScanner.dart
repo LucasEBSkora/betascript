@@ -57,6 +57,7 @@ class BSScanner {
       ';': () => _addToken(TokenType.SEMICOLON),
       '*': () => _addToken(TokenType.STAR),
       '!': () => _addToken(TokenType.FACTORIAL),
+      "'": () => _addToken(TokenType.APOSTROPHE),
       '^': () => _addToken(TokenType.EXP),
       '@': () {
         //word comments ignore everything up to the next character of whitespace (but can be used normally inside strings)

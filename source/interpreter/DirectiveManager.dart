@@ -4,7 +4,7 @@ class DirectiveManager {
   final Map<String, Object> _globalDirectives = {
     //if this directive is activated, the program will run with twitter restrictions, which means while and for loops, as well as defining 
     //and calling routines and creating classes is forbidden, to avoid endless loops blocking the bot
-    "bs-tt-interpret": false,
+    "bs_tt_interpret": false,
   };
 
   final Map<String, Object> _localDirectives = Map();

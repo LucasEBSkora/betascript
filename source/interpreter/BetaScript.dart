@@ -18,7 +18,17 @@ class BetaScript {
   static void runFile(String path) {
     printCallback = print;
     File file = File(path);
-    String fileContents = file.readAsStringSync();
+    String fileContents;
+    try {
+      fileContents = file.readAsStringSync();
+    } on FileSystemException catch (e) {
+      if (e.osError.errorCode == 2) {
+        //no such file or directory
+        print("file $path not found!");
+        return;
+      }
+      throw e;
+    }
     _run(fileContents);
 
     if (hadError) exit(1);
@@ -44,7 +54,6 @@ class BetaScript {
 
     //all print statements redirect to this function, allowing the results to be printed in the 'output' field
     printCallback = (dynamic object) {
-      print(object.toString());
       output += object.toString() + '\n';
     };
 
@@ -54,7 +63,6 @@ class BetaScript {
   }
 
   static void _run(String source) {
-
     BSScanner scanner = new BSScanner(source);
     List<Token> tokens = scanner.scanTokens(); //lexical analysis
     // print(tokens);
@@ -86,8 +94,10 @@ class BetaScript {
     if (token.type == TokenType.EOF)
       _report(token.line, " at end", message);
     else {
-      if (token.lexeme == '\n') _report(token.line, " at linebreak ('\\n')", message);
-      else _report(token.line, " at '${token.lexeme}'", message);
+      if (token.lexeme == '\n')
+        _report(token.line, " at linebreak ('\\n')", message);
+      else
+        _report(token.line, " at '${token.lexeme}'", message);
     }
   }
 
