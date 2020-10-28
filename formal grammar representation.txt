@@ -43,8 +43,9 @@ assigment -> ( call ".")? ("\n)* IDENTIFIER "=" assigment | logicOr
 logicOr -> logicAnd ( "or"  linebreak? logicAnd)*
 logicAnd -> equality ( "and"  linebreak? equality)*
 
-equality -> comparison ( "==" linebreak? comparison )*
-comparison -> addition ( (">" | ">=" | "<" | "<=") linebreak? addition)*
+equality -> comparison ( ("==" | "===") linebreak? comparison )*
+comparison -> setBinary ( (">" | ">=" | "<" | "<=") linebreak? setBinary)*
+setBinary -> addition ( ("union" | "intersection" | "\" | "contained" | "disjoined" | "belongs") linebreak? addition)*
 addition -> multiplication ( ("-" | "+") linebreak? multiplication)*
 multiplication -> exponentiation ( ("*" | "/") linebreak? exponentiation)*
 exponentiation -> unary_left ("^" linebreak? unary_left)*
@@ -53,8 +54,14 @@ unary_right -> (unary_right ("!" | "'")?) | call | derivative
 call -> primary ( "(" linebreak? arguments? linebreak?")" | "." linebreak? IDENTIFIER)*
 arguments -> expression ( "," linebreak? expression )*
 derivative -> "del" "(" linebreak? expression linebreak?  ")" "/" linebreak?  "del" "(" linebreak?  arguments linebreak? ")"
-primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" linebreak? expression linebreak? ")" | IDENTIFIER | ("super" "." linebreak? IDENTIFIER)
+primary -> setDefinition | NUMBER | STRING | "false" | "true" | "nil" | "(" linebreak? expression linebreak? ")" | IDENTIFIER | ("super" "." linebreak? IDENTIFIER)
 
+
+setDefinition -> ("set" linebreak?)? intervalDefinition | rosterSetDefinition | builderSetDefinition
+
+intervalDefinition -> ("[" | "(") linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
+builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? | linebreak?  logicOr linebreak? "}"
 
 delimitator -> "\n" | ";"
 

@@ -3,6 +3,7 @@ import 'BetaScript.dart';
 import 'Expr.dart';
 import 'Stmt.dart';
 import 'Token.dart';
+import '../sets/sets.dart';
 
 class ParseError implements Exception {}
 
@@ -45,6 +46,10 @@ class BSParser {
       if (_match(TokenType.LET)) return _varDeclaration();
       return _statement();
     } on ParseError {
+      _synchronize();
+      return null;
+    } on SetDefinitionError catch (e) {
+      print(e.message);
       _synchronize();
       return null;
     }
@@ -126,7 +131,7 @@ class BSParser {
     if (parameters?.isEmpty ?? true) parameters = null;
 
     Expr initializer = null;
-    if (_match(TokenType.EQUAL)) {
+    if (_match(TokenType.ASSIGMENT)) {
       _match(TokenType.LINEBREAK);
       initializer = _expression();
     }
@@ -143,7 +148,8 @@ class BSParser {
     if (_match(TokenType.PRINT)) return _printStatement();
     if (_match(TokenType.RETURN)) return _returnStatement();
     if (_match(TokenType.WHILE)) return _whileStatement();
-    if (_match(TokenType.LEFT_BRACE)) return BlockStmt(_block());
+    //might be an expression statement with a Set definition or a block
+    if (_match(TokenType.LEFT_BRACE)) return _parseLeftBrace();
     if (_match(TokenType.HASH)) return _directive();
     return _expressionStatement();
   }
@@ -151,8 +157,13 @@ class BSParser {
   ///exprStmt -> expression delimitator
   Stmt _expressionStatement() {
     Expr expr = _expression();
-    _consumeAny([TokenType.SEMICOLON, TokenType.LINEBREAK],
-        "Expect ';' or linebreak after value");
+
+    if (!_matchAny([TokenType.SEMICOLON, TokenType.LINEBREAK]) &&
+        (!_check(TokenType.RIGHT_BRACE)) &&
+        !_check(TokenType.COMMA) &&
+        !_check(TokenType.VERTICAL_BAR))
+      _error(_peek(), "Expect ';' or linebreak after value");
+
     return new ExpressionStmt(expr);
   }
 
@@ -300,7 +311,7 @@ class BSParser {
 
     Expr expr = _or();
 
-    if (_match(TokenType.EQUAL)) {
+    if (_match(TokenType.ASSIGMENT)) {
       Token equals = _previous();
       //linebreaks here handled by scanner
       Expr value = _assigment();
@@ -347,11 +358,11 @@ class BSParser {
     return expr;
   }
 
-  ///equality -> comparison ( "==" linebreak comparison )*
+  ///equality -> comparison ( ("==" | "===") linebreak comparison )*
   Expr _equality() {
     Expr expr = _comparison();
 
-    while (_match(TokenType.EQUAL_EQUAL)) {
+    while (_matchAny([TokenType.EQUALS, TokenType.IDENTICALLY_EQUALS])) {
       Token op = _previous();
       //linebreaks after '==' operator handled by scanner
       Expr right = _comparison();
@@ -361,11 +372,11 @@ class BSParser {
     return expr;
   }
 
-  ///comparison -> addition ( (">" | ">=" | "<" | "<=") linebreak? addition)*
+  ///comparison -> setBinary ( (">" | ">=" | "<" | "<=") linebreak? setBinary)*
   Expr _comparison() {
     //follows the pattern in _equality
 
-    Expr expr = _addition();
+    Expr expr = _setBinary();
 
     while (_matchAny([
       TokenType.GREATER,
@@ -373,10 +384,26 @@ class BSParser {
       TokenType.LESS,
       TokenType.LESS_EQUAL
     ])) {
-      Token op = _previous();
       //linebreaks after the operators listed above handled by scanner
-      Expr right = _addition();
-      expr = new BinaryExpr(expr, op, right);
+      expr = new BinaryExpr(expr, _previous(), _setBinary());
+    }
+
+    return expr;
+  }
+
+  ///setBinary -> addition ( ("union" | "intersection" | "\" | "contained" | "disjoined" | "belongs") linebreak? addition)*
+  Expr _setBinary() {
+    Expr expr = _addition();
+    while (_matchAny([
+      TokenType.UNION,
+      TokenType.INTERSECTION,
+      TokenType.INVERTED_SLASH,
+      TokenType.CONTAINED,
+      TokenType.DISJOINED,
+      TokenType.BELONGS
+    ])) {
+      //linebreaks after these tokens handled by the scanner
+      expr = new SetBinaryExpr(expr, _previous(), _addition());
     }
 
     return expr;
@@ -451,11 +478,10 @@ class BSParser {
       operand = _derivative();
     else //in any other case, go to the 'call' rule
       operand = _call();
-    
+
     //keeps composing it until it's done
-    while (_matchAny([TokenType.APOSTROPHE, TokenType.FACTORIAL])) 
+    while (_matchAny([TokenType.APOSTROPHE, TokenType.FACTORIAL]))
       operand = UnaryExpr(_previous(), operand);
-    
 
     return operand;
   }
@@ -538,8 +564,23 @@ class BSParser {
     return new DerivativeExpr(keyword, derivand, variables);
   }
 
-  ///primary -> NUMBER | STRING | "false" | "true" | "nil" | "(" linebreak? expression linebreak? ")" | IDENTIFIER | ("super" "." linebreak? IDENTIFIER)
+  ///primary -> setDefinition | NUMBER | STRING | "false" | "true" | "nil" |
+  /// "(" linebreak? expression linebreak? ")" | IDENTIFIER |
+  ///  ("super" "." linebreak? IDENTIFIER)
+  ///
+  /// setDefinition -> ("set" linebreak?)? intervalDefinition | rosterSetDefinition | builderSetDefinition
+  //intervalDefinition -> ("[ " | "(") linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+  //rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
+  //builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? "|" linebreak? expression linebreak? "}"
   Expr _primary() {
+    //since some tokens may both be sets and other types of syntax
+    //(braces may be sets or blocks, parentheses may be groupings or intervals,
+    //and one day square brackets may be index access/intervals and parentheses intervals/tuples)
+    //we have to parse them assuming it can be either until we can be sure.
+
+    //the "set" keyword MUST mean a set definition follows. If it doesn't, it's an error.
+    if (_match(TokenType.SET)) return _setDefinition();
+
     //NUMBER | STRING
     if (_matchAny([TokenType.NUMBER, TokenType.STRING]))
       return new LiteralExpr(_previous().literal);
@@ -554,14 +595,19 @@ class BSParser {
     if (_match(TokenType.NIL)) return new LiteralExpr(null);
 
     //"(" linebreak? expression linebreak? ")"
-    if (_match(TokenType.LEFT_PARENTHESES)) {
-      //linebreaks after '(' handled by scanner
-      Expr expr = _expression();
-      _match(TokenType.LINEBREAK);
-      //if the ')' is not there, it's an error
-      _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after expression");
-      return new GroupingExpr(expr);
-    }
+    //OR
+    //intervalDefinition -> "(" linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+    if (_match(TokenType.LEFT_PARENTHESES)) return _parseLeftParentheses();
+
+    //rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
+    //OR
+    //builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? "|" linebreak? expression linebreak? "}"
+    //OR
+    //just a block
+    if (_match(TokenType.LEFT_BRACE)) return _parseLeftBrace(true);
+
+    //intervalDefinition -> "[" linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+    if (_match(TokenType.LEFT_SQUARE)) return _parseLeftSquare();
 
     //IDENTIFIER
     if (_match(TokenType.IDENTIFIER)) return new VariableExpr(_previous());
@@ -589,8 +635,9 @@ class BSParser {
           TokenType.STAR,
           TokenType.APPROX,
           TokenType.EXP,
-          TokenType.EQUAL,
-          TokenType.EQUAL_EQUAL,
+          TokenType.ASSIGMENT,
+          TokenType.EQUALS,
+          TokenType.IDENTICALLY_EQUALS,
           TokenType.GREATER,
           TokenType.GREATER_EQUAL,
           TokenType.LESS,
@@ -606,6 +653,167 @@ class BSParser {
       throw _error(_peek(), "Expect expression.");
   }
 
+  Expr _setDefinition() {
+    if (_match(TokenType.LEFT_PARENTHESES)) return _parseLeftParentheses(true);
+    if (_match(TokenType.LEFT_SQUARE)) return _parseLeftSquare(true);
+    if (_match(TokenType.LEFT_BRACE)) return _parseLeftBrace(true);
+    throw _error(_previous(), "Expecting Set definition after 'set' keyword");
+  }
+
+  //"(" linebreak? expression linebreak? ")"
+  //OR
+  //intervalDefinition -> ("[ " | "(") linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+  Expr _parseLeftParentheses([bool mustBeSet = false]) {
+    Token _left = _previous();
+    //linebreaks after '(' handled by scanner
+    Expr expr = _expression();
+
+    if (_match(TokenType.COMMA)) {
+      //in here we're sure that we're parsing an Interval
+      Expr _expr = _expression();
+      _match(TokenType.LINEBREAK);
+      _consumeAny([TokenType.RIGHT_BRACE, TokenType.RIGHT_PARENTHESES],
+          "Expected ] or ) ending interval definition");
+      return new IntervalDefinitionExpr(_left, expr, _expr, _previous());
+    }
+    if (mustBeSet) throw _error(_previous(), "Expecting Interval definition");
+
+    _match(TokenType.LINEBREAK);
+    //if the ')' is not there, it's an error
+    _consume(TokenType.RIGHT_PARENTHESES, "Expect ')' after expression");
+    return new GroupingExpr(expr);
+  }
+
+  //intervalDefinition -> ("[ " | "(") linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+  Expr _parseLeftSquare([bool mustBeSet = false]) {
+    Token left = _previous();
+
+    Expr expr = _expression();
+
+    _consume(TokenType.COMMA, "Expecting comma in Interval definition");
+
+    Expr _expr = _expression();
+
+    _match(TokenType.LINEBREAK);
+
+    _consumeAny([TokenType.RIGHT_BRACE, TokenType.RIGHT_PARENTHESES],
+        "Expected ] or ) ending interval definition");
+    return new IntervalDefinitionExpr(left, expr, _expr, _previous());
+  }
+
+  //rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
+  //OR
+  //builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? "|" linebreak? expression linebreak? "}"
+  //OR
+  //block -> "{" (declaration | linebreak)* "}"
+  Object _parseLeftBrace([bool expectSet = false]) {
+    Token _leftBrace = _previous();
+    Expr _setReturn = null;
+
+    //{} -> empty set
+    if (_match(TokenType.RIGHT_BRACE)) {
+      if (expectSet)
+        return LiteralExpr(emptySet);
+      else
+        return ExpressionStmt(LiteralExpr(emptySet));
+    }
+
+    //if we find a comma, we know it's a set definition
+    //if we find a vertical bar, we know it's a builder set definition
+
+    List<Expr> expressions = new List();
+
+    Stmt first;
+
+    if (!_check(TokenType.VERTICAL_BAR)) first = _declaration();
+
+    //assumes it is a block
+
+    bool isSet = false;
+
+    if (_match(TokenType.COMMA)) {
+      if (first == null) _error(_previous(), "expect token before comma");
+      if (first is ExpressionStmt)
+        expressions.add(first.expression);
+      else
+        _error(_previous(),
+            "all elements in a roster set definition must evaluate to a number");
+      isSet = true;
+      do {
+        _match(TokenType.LINEBREAK);
+        expressions.add(_expression());
+      } while (_match(TokenType.COMMA));
+    }
+
+    //is a builder set
+    if (_match(TokenType.VERTICAL_BAR)) {
+      if (first != null) {
+        if (first is ExpressionStmt)
+          expressions.add(first.expression);
+        else
+          _error(_previous(),
+              "all parameters in a builder set definition must evaluate to a variable");
+      }
+
+      //TODO: fix this whole pile of bullshit
+      Token bar = _previous();
+      Expr logic = _expression();
+      _match(TokenType.LINEBREAK);
+      _consume(
+          TokenType.RIGHT_BRACE, "Expect '}' after builder set definition");
+      List<Token> parameters;
+      if (expressions.isNotEmpty) {
+        parameters = List();
+        for (Expr parameter in expressions) {
+          if (parameter is VariableExpr)
+            parameters.add(parameter.name);
+          else
+            throw new SetDefinitionError(
+                "parameter is not explicit variable name");
+        }
+      }
+      
+      _setReturn = new BuilderDefinitionExpr(
+          _leftBrace, parameters, logic, bar, _previous());
+    } else if (isSet) {
+      //Roster set
+      _match(TokenType.LINEBREAK);
+      _consume(TokenType.RIGHT_BRACE, "Expect '}' after roster set definition");
+
+      _setReturn =
+          new RosterDefinitionExpr(_leftBrace, expressions, _previous());
+    }
+
+    // _match(TokenType.LINEBREAK);
+
+    //if there is a single element, and it is a expression statement, assumes it's a RosterSet with a single element
+    //if it isn't, assumes it is a block with a single
+    if (_match(TokenType.RIGHT_BRACE)) {
+      if (first is ExpressionStmt) {
+        _setReturn = new RosterDefinitionExpr(
+            _leftBrace, [first.expression], _previous());
+      } else
+        return new BlockStmt([first]);
+    }
+
+    if (_setReturn != null) {
+      if (expectSet)
+        return _setReturn;
+      else
+        return ExpressionStmt(_setReturn);
+    }
+
+    List<Stmt> statements = new List();
+    statements.add(first);
+
+    while (!_check(TokenType.RIGHT_BRACE) && !_isAtEnd()) {
+      if (_match(TokenType.LINEBREAK)) continue;
+      statements.add(_declaration());
+    }
+
+    _consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+    return new BlockStmt(statements);
+  }
   //Helper function corner
 
   ///returns whether the current token's type is 'type', consuming it if it is

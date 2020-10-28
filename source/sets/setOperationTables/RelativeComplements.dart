@@ -9,9 +9,11 @@ MethodTable<BSSet, BSSet> defineRelativeComplementTable() {
 
   methods.addMethod(Interval, Interval, (Interval first, Interval second) {
     if (first.contains(second)) //second is fully contained in first
-      return disjoinedSetUnion([
-        interval(first.a, second.a, leftClosed: first.leftClosed, rightClosed: !second.leftClosed),
-        interval(second.b, first.b, leftClosed: !second.rightClosed, rightClosed: first.rightClosed)
+      return SetUnion([
+        interval(first.a, second.a,
+            leftClosed: first.leftClosed, rightClosed: !second.leftClosed),
+        interval(second.b, first.b,
+            leftClosed: !second.rightClosed, rightClosed: first.rightClosed)
       ]);
 
     //left edge of second is in first
@@ -41,26 +43,60 @@ MethodTable<BSSet, BSSet> defineRelativeComplementTable() {
     complementSubsets.add(
         Interval(containedElements.last, first.a, false, first.rightClosed));
 
-    return DisjoinedSetUnion(complementSubsets);
+    return SetUnion(complementSubsets);
   });
 
   methods.addMethodsInColumn(
-      [Interval, RosterSet, BuilderSet],
-      DisjoinedSetUnion,
-      (BSSet first, DisjoinedSetUnion second) => second.subsets.fold(
+      [Interval, IntensionalSetIntersection],
+      SetUnion,
+      (BSSet first, SetUnion second) => second.subsets.fold(
           first, (previousValue, element) => first.relativeComplement(second)));
 
   methods.addMethodsInLine(
       RosterSet,
-      [Interval, RosterSet, BuilderSet, DisjoinedSetUnion],
+      [Interval, RosterSet, BuilderSet, SetUnion, IntensionalSetIntersection],
       (RosterSet first, BSSet second) => RosterSet(
           first.elements.where((element) => !second.belongs(element))));
 
   methods.addMethodsInLine(
-      DisjoinedSetUnion,
-      [Interval, RosterSet, BuilderSet, DisjoinedSetUnion],
-      (DisjoinedSetUnion first, BSSet second) => DisjoinedSetUnion(
-          first.subsets.map((e) => e.relativeComplement(second))));
+      SetUnion,
+      [Interval, RosterSet, SetUnion],
+      (SetUnion first, BSSet second) =>
+          SetUnion(first.subsets.map((e) => e.relativeComplement(second))));
+
+  //A\B = A ∩ (R\B)
+  methods.addMethodsInColumn(
+      [Interval, BuilderSet, IntensionalSetIntersection, SetUnion],
+      BuilderSet,
+      (BSSet first, BuilderSet second) =>
+          first.intersection(second.complement()));
+
+  methods.addMethodsInColumn(
+      [Interval, BuilderSet, IntensionalSetIntersection, SetUnion],
+      IntensionalSetIntersection,
+      (BSSet first, IntensionalSetIntersection second) {
+    //tries to simplifies the non-intensional part
+    if (second.first is BuilderSet)
+      return first
+          .relativeComplement(second.second)
+          .relativeComplement(second.first);
+    if (second.second is BuilderSet)
+      return first
+          .relativeComplement(second.first)
+          .relativeComplement(second.second);
+  });
+
+  methods.addMethodsInLine(
+      BuilderSet,
+      [Interval, RosterSet, SetUnion],
+      (BuilderSet first, BSSet second) =>
+          first.intersection(second.complement()));
+
+  methods.addMethodsInLine(
+      IntensionalSetIntersection,
+      [Interval, RosterSet],
+      (IntensionalSetIntersection first, BSSet second) =>
+          first.intersection(second.complement()));
 
   return methods;
 }

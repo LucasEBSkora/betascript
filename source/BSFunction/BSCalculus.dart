@@ -1,5 +1,5 @@
 export 'BSFunction.dart';
-export 'Number.dart' show n, namedNumber, constants;
+export 'Number.dart';
 export 'Variable.dart';
 export 'trig/TrigFunctions.dart';
 export 'Log.dart' show log;

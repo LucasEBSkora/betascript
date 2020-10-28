@@ -43,13 +43,16 @@ int main() {
       ],
     ]),
     NodeType("Unary", [
-      ["Token", "op", "operator (this type is used for unary operators both to the left and to the right)"],
+      [
+        "Token",
+        "op",
+        "operator (this type is used for unary operators both to the left and to the right)"
+      ],
       ["Expr", "operand", "The operand on which the operator is applied"],
     ]),
     NodeType("Variable", [
       ["Token", "name", "The token containing the variable's name"],
     ]),
-
     NodeType(
       "logicBinary",
       [
@@ -71,9 +74,36 @@ int main() {
       ["Token", "method", "The method being accessed"],
     ]),
     NodeType("Derivative", [
-      ["Token", "keyword","The token containing the first 'del' keyword"],
-      ["Expr", "derivand", "The function whose derivative is being calculated"], 
-      ["List<Expr>", "variables", "Variables this function is being derivated in"],
+      ["Token", "keyword", "The token containing the first 'del' keyword"],
+      ["Expr", "derivand", "The function whose derivative is being calculated"],
+      [
+        "List<Expr>",
+        "variables",
+        "Variables this function is being derivated in"
+      ],
+    ]),
+    NodeType("IntervalDefinition", [
+      ["Token", "left", "token containing '[' or '(' "],
+      ["Expr", "a", "left bound"],
+      ["Expr", "b", "right bound"],
+      ["Token", "right", "token containing ']' or ')' "],
+    ]),
+    NodeType("RosterDefinition", [
+      ["Token", "left", "token containing '{' "],
+      ["List<Expr>", "elements", "elements of the set"],
+      ["Token", "right", "token containing '}' "],
+    ]),
+    NodeType("BuilderDefinition", [
+      ["Token", "left", "token containing '{' "],
+      ["List<Token>", "parameters", "parameters used in the rule"],
+      ["Expr", "rule", "rule used to test for membership"],
+      ["Token", "bar", "token containing '|' "],
+      ["Token", "right", "token containing '}' "],
+    ]),
+    NodeType("SetBinary", [
+      ["Expr", "left", "left operand"],
+      ["Token", "operator", "token containing operator"],
+      ["Expr", "right", "right operand"],
     ]),
   ], [
     'Token'

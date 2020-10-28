@@ -4,13 +4,13 @@ import '../BSFunction/BSCalculus.dart';
 import 'EmptySet.dart';
 import 'RosterSet.dart';
 
-BSSet disjoinedSetUnion(Iterable<BSSet> subsets) {
-  //Checks for things which can be completely simplified
-  if (subsets.length == 0) return emptySet;
-  if (subsets.length == 1) return subsets.elementAt(0);
-
+BSSet setUnion(Iterable<BSSet> subsets) {
   List<BSSet> _subsets =
-      subsets.where((element) => !(element is EmptySet)).toList();
+      subsets.where((element) => !(element == emptySet)).toList();
+  //Checks for things which can be completely simplified
+  if (_subsets.length == 0) return emptySet;
+  if (_subsets.length == 1) return subsets.elementAt(0);
+
 
   //Checks if the elements are actually disjoined
   int i = 0;
@@ -31,7 +31,7 @@ BSSet disjoinedSetUnion(Iterable<BSSet> subsets) {
   //If any of the subsets is itself a union of disjoint sets, removes that union and adds its elements to this one
   for (int i = 0; i < _subsets.length; ++i) {
     BSSet element = _subsets[i];
-    if (element is DisjoinedSetUnion) {
+    if (element is SetUnion) {
       _subsets.removeAt(i);
       _subsets.insertAll(i, element.subsets);
     }
@@ -57,13 +57,14 @@ BSSet disjoinedSetUnion(Iterable<BSSet> subsets) {
   if (_subsets.length == 0) return emptySet;
   if (_subsets.length == 1) return _subsets.elementAt(0);
 
-  return DisjoinedSetUnion(_subsets);
+  return SetUnion(_subsets);
 }
 
-class DisjoinedSetUnion extends BSSet {
+///represents unions of sets, trying to have as little redundancy as possible
+class SetUnion extends BSSet {
   final List<BSSet> subsets;
 
-  DisjoinedSetUnion(List<BSSet> this.subsets);
+  SetUnion(List<BSSet> this.subsets);
 
   @override
   bool belongs(BSFunction x) {

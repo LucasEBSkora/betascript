@@ -13,6 +13,10 @@ abstract class ExprVisitor {
   dynamic visitThisExpr(ThisExpr e);
   dynamic visitSuperExpr(SuperExpr e);
   dynamic visitDerivativeExpr(DerivativeExpr e);
+  dynamic visitIntervalDefinitionExpr(IntervalDefinitionExpr e);
+  dynamic visitRosterDefinitionExpr(RosterDefinitionExpr e);
+  dynamic visitBuilderDefinitionExpr(BuilderDefinitionExpr e);
+  dynamic visitSetBinaryExpr(SetBinaryExpr e);
 
 }
 
@@ -149,6 +153,60 @@ class DerivativeExpr extends Expr {
   final List<Expr> variables;
   DerivativeExpr(Token this.keyword, Expr this.derivand, List<Expr> this.variables);
  dynamic accept(ExprVisitor v) => v.visitDerivativeExpr(this);
+
+}
+
+class IntervalDefinitionExpr extends Expr {
+  ///token containing '[' or '(' 
+  final Token left;
+  ///left bound
+  final Expr a;
+  ///right bound
+  final Expr b;
+  ///token containing ']' or ')' 
+  final Token right;
+  IntervalDefinitionExpr(Token this.left, Expr this.a, Expr this.b, Token this.right);
+ dynamic accept(ExprVisitor v) => v.visitIntervalDefinitionExpr(this);
+
+}
+
+class RosterDefinitionExpr extends Expr {
+  ///token containing '{' 
+  final Token left;
+  ///elements of the set
+  final List<Expr> elements;
+  ///token containing '}' 
+  final Token right;
+  RosterDefinitionExpr(Token this.left, List<Expr> this.elements, Token this.right);
+ dynamic accept(ExprVisitor v) => v.visitRosterDefinitionExpr(this);
+
+}
+
+class BuilderDefinitionExpr extends Expr {
+  ///token containing '{' 
+  final Token left;
+  ///parameters used in the rule
+  final List<Token> parameters;
+  ///rule used to test for membership
+  final Expr rule;
+  ///token containing '|' 
+  final Token bar;
+  ///token containing '}' 
+  final Token right;
+  BuilderDefinitionExpr(Token this.left, List<Token> this.parameters, Expr this.rule, Token this.bar, Token this.right);
+ dynamic accept(ExprVisitor v) => v.visitBuilderDefinitionExpr(this);
+
+}
+
+class SetBinaryExpr extends Expr {
+  ///left operand
+  final Expr left;
+  ///token containing operator
+  final Token operator;
+  ///right operand
+  final Expr right;
+  SetBinaryExpr(Expr this.left, Token this.operator, Expr this.right);
+ dynamic accept(ExprVisitor v) => v.visitSetBinaryExpr(this);
 
 }
 

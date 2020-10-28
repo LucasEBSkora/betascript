@@ -65,7 +65,7 @@ class BetaScript {
   static void _run(String source) {
     BSScanner scanner = new BSScanner(source);
     List<Token> tokens = scanner.scanTokens(); //lexical analysis
-    // print(tokens);
+    // for (Token token in tokens) print(token);
     BSParser parser = new BSParser(tokens, _interpreter);
     List<Stmt> statements = parser.parse(); //Syntax analysis
     if (hadError) return;

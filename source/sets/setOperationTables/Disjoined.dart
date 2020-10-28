@@ -1,5 +1,8 @@
+// import 'dart:collection' show HashMap;
+
 import '../../Utils/MethodTable.dart';
 import '../sets.dart';
+// import '../../Logic/Logic.dart';
 
 ComutativeMethodTable<bool, BSSet> defineDisjoinedTable() {
   ComutativeMethodTable<bool, BSSet> methods = ComutativeMethodTable();
@@ -16,30 +19,42 @@ ComutativeMethodTable<bool, BSSet> defineDisjoinedTable() {
           (first.b == second.a && (!first.rightClosed || !second.leftClosed)) ||
           (first.a == second.b && (!first.leftClosed || !second.rightClosed)));
 
-  //looks for any elements of second contained in first. if it doesn't find any, the sets are disjoined
-  methods.addMethod(
-      Interval,
-      RosterSet,
-      (Interval first, RosterSet second) =>
-          second.elements.firstWhere((value) => first.belongs(value),
-              orElse: () => null) ==
-          null);
-
-  //looks for any elements of second no disjoined with first
+  //looks for any elements of second not disjoined with first
   methods.addMethodsInColumn(
-      [Interval, RosterSet, BuilderSet, DisjoinedSetUnion],
-      DisjoinedSetUnion,
-      (BSSet first, DisjoinedSetUnion second) =>
+      [
+        Interval,
+        RosterSet,
+        BuilderSet,
+        SetUnion,
+      ],
+      SetUnion,
+      (BSSet first, SetUnion second) =>
           second.subsets.firstWhere((element) => !element.disjoined(first),
               orElse: () => null) ==
           null);
 
-  methods.addMethod(
+  //looks for any elements of first contained in second.
+  //if it doesn't find any, the sets are disjoined
+  methods.addMethodsInLine(
       RosterSet,
-      RosterSet,
-      (RosterSet first, RosterSet second) =>
+      [Interval, RosterSet, BuilderSet, IntensionalSetIntersection],
+      (RosterSet first, BSSet second) =>
           first.elements.firstWhere((value) => second.belongs(value),
               orElse: () => null) ==
           null);
+
+  //no idea, but following the philosophy of "false negatives over false positives", we'll just assume
+  //that the sets are joined for now
+  methods.addMethod(
+      Interval, BuilderSet, (Interval first, BuilderSet second) => false);
+
+  methods.addMethod(
+      BuilderSet, BuilderSet, (BuilderSet first, BuilderSet second) => false);
+
+  methods.addMethodsInColumn(
+      [Interval, BuilderSet, IntensionalSetIntersection],
+      IntensionalSetIntersection,
+      (BSSet first, IntensionalSetIntersection second) => false);
+
   return methods;
 }

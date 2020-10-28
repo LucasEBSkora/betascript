@@ -59,6 +59,7 @@ class BSScanner {
       '!': () => _addToken(TokenType.FACTORIAL),
       "'": () => _addToken(TokenType.APOSTROPHE),
       '^': () => _addToken(TokenType.EXP),
+      '|': () => _addToken(TokenType.VERTICAL_BAR),
       '@': () {
         //word comments ignore everything up to the next character of whitespace (but can be used normally inside strings)
         while (_peek() != '\n' &&
@@ -76,8 +77,10 @@ class BSScanner {
           _addToken(TokenType.DOT);
       },
       //for these, we need to check if they are followed by a '=' or not (since = and ==, < and <=, > and >= are different things)
-      '=': () =>
-          _addToken((_match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL)),
+      //specially '=', which can be '=', '==' or '==='
+      '=': () => _addToken((_match('=')
+          ? (_match('=') ? TokenType.IDENTICALLY_EQUALS : TokenType.EQUALS)
+          : TokenType.ASSIGMENT)),
       '<': () =>
           _addToken((_match('=') ? TokenType.LESS_EQUAL : TokenType.LESS)),
       '>': () => _addToken(
@@ -102,6 +105,7 @@ class BSScanner {
         } else //in any other case we just have a normal slash
           _addToken(TokenType.SLASH);
       },
+      '\\': () => _addToken(TokenType.INVERTED_SLASH),
       //sometimes can be ignored, sometimes used as delimitator, but always increases the line counter.
       '\n': () {
         if (!_tokens.isEmpty) {
@@ -120,8 +124,10 @@ class BSScanner {
             TokenType.STAR,
             TokenType.APPROX,
             TokenType.EXP,
-            TokenType.EQUAL,
-            TokenType.EQUAL_EQUAL,
+            TokenType.VERTICAL_BAR,
+            TokenType.ASSIGMENT,
+            TokenType.EQUALS,
+            TokenType.IDENTICALLY_EQUALS,
             TokenType.GREATER,
             TokenType.GREATER_EQUAL,
             TokenType.LESS,
@@ -129,7 +135,12 @@ class BSScanner {
             TokenType.AND,
             TokenType.OR,
             TokenType.NOT,
-            TokenType.ELSE
+            TokenType.ELSE,
+            TokenType.CONTAINED,
+            TokenType.DISJOINED,
+            TokenType.SET,
+            TokenType.UNION,
+            TokenType.INTERSECTION,
           ].contains(last)) _addToken(TokenType.LINEBREAK);
         }
         _line++;
@@ -143,6 +154,7 @@ class BSScanner {
     });
   }
 
+//TODO: finishing a program with a comment without any characters after it makes it sad
   ///scans a single token.
   void _scanToken() {
     //gets the next character, consuming it (by moving _current forward)
@@ -170,12 +182,16 @@ class BSScanner {
   ///a map containing keywords and the corresponding token type
   static const Map<String, TokenType> _keywords = {
     "and": TokenType.AND,
+    "belongs": TokenType.BELONGS,
     "class": TokenType.CLASS,
+    "contained": TokenType.CONTAINED,
     "del": TokenType.DEL,
+    "disjoined": TokenType.DISJOINED,
     "else": TokenType.ELSE,
     "false": TokenType.FALSE,
     "for": TokenType.FOR,
     "if": TokenType.IF,
+    "intersection": TokenType.INTERSECTION,
     "let": TokenType.LET,
     "nil": TokenType.NIL,
     "not": TokenType.NOT,
@@ -183,10 +199,12 @@ class BSScanner {
     "print": TokenType.PRINT,
     "return": TokenType.RETURN,
     "routine": TokenType.ROUTINE,
+    "set": TokenType.SET,
     "super": TokenType.SUPER,
     "this": TokenType.THIS,
     "true": TokenType.TRUE,
     "while": TokenType.WHILE,
+    "union": TokenType.UNION,
   };
 
   ///creates a new token, using the interval from _start to _current as the token's lexeme.

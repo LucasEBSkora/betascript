@@ -126,16 +126,8 @@ class Resolver implements ExprVisitor, StmtVisitor {
     
     */
     _declare(s.name);
-    if (s.parameters != null) {
-      for (Token parameter in s.parameters) {
-        //if a parameter has a name not yet declared, defines it in current scope
-        if (!(!_scopes.isEmpty && _scopes.last.containsKey(parameter.lexeme)) && !_globals.containsKey(parameter.lexeme)) {
-          _declare(parameter);
-          _define(parameter);
-        }
-      }
+    _declareParameters(s.parameters);
 
-    }
     if (s.initializer != null) _resolveExpr(s.initializer);
     _define(s.name);
   }
@@ -144,12 +136,11 @@ class Resolver implements ExprVisitor, StmtVisitor {
   void visitVariableExpr(VariableExpr e) {
     //makes sure a variable isn't trying to read itself in its own initialization
     if (!_scopes.isEmpty) {
-      if (_scopes.last.containsKey(e.name.lexeme) && _scopes.last[e.name.lexeme] == false)
-        BetaScript.error(
-            e.name, "Cannot read variable in its own initializer");
+      if (_scopes.last.containsKey(e.name.lexeme) &&
+          _scopes.last[e.name.lexeme] == false)
+        BetaScript.error(e.name, "Cannot read variable in its own initializer");
     } else if (_globals.containsKey(e.name.lexeme) && !_globals[e.name.lexeme])
-      BetaScript.error(
-          e.name, "Cannot read variable in its own initializer");
+      BetaScript.error(e.name, "Cannot read variable in its own initializer");
 
     _resolveLocal(e, e.name);
   }
@@ -304,4 +295,40 @@ class Resolver implements ExprVisitor, StmtVisitor {
   //at least for now, directives don't have anything to resolve
   @override
   visitDirectiveStmt(DirectiveStmt s) {}
+
+  @override
+  visitBuilderDefinitionExpr(BuilderDefinitionExpr e) {
+    _declareParameters(e.parameters);
+    _resolveExpr(e.rule);
+  }
+
+  @override
+  visitIntervalDefinitionExpr(IntervalDefinitionExpr e) {
+    _resolveExpr(e.a);
+    _resolveExpr(e.b);
+  }
+
+  @override
+  visitRosterDefinitionExpr(RosterDefinitionExpr e) {
+    for (Expr expr in e.elements) _resolveExpr(expr);
+  }
+
+  @override
+  visitSetBinaryExpr(SetBinaryExpr e) {
+    _resolveExpr(e.left);
+    _resolveExpr(e.right);
+  }
+
+  void _declareParameters(List<Token> variables) {
+    if (variables != null) {
+      for (Token parameter in variables) {
+        //if a parameter has a name not yet declared, defines it in current scope
+        if (!(!_scopes.isEmpty && _scopes.last.containsKey(parameter.lexeme)) &&
+            !_globals.containsKey(parameter.lexeme)) {
+          _declare(parameter);
+          _define(parameter);
+        }
+      }
+    }
+  }
 }

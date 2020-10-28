@@ -1,7 +1,7 @@
 import '../BSFunction/BSFunction.dart';
 import '../BSFunction/Number.dart';
 import 'BSSet.dart';
-import 'DisjoinedSetUnion.dart';
+import 'SetUnion.dart';
 import 'EmptySet.dart';
 import 'RosterSet.dart';
 
@@ -40,7 +40,7 @@ class Interval extends BSSet {
       (a < x && x < b) || (a == x && leftClosed) || (x == b && rightClosed);
 
   @override
-  BSSet complement() => disjoinedSetUnion([
+  BSSet complement() => SetUnion([
         Interval(-constants.infinity, a, false, !leftClosed),
         Interval(b, constants.infinity, !rightClosed, false)
       ]);

@@ -4,7 +4,8 @@ import '../BSFunction/BSFunction.dart';
 import '../BSFunction/Number.dart';
 
 import 'BSSet.dart';
-import 'DisjoinedSetUnion.dart';
+import 'EmptySet.dart';
+import 'SetUnion.dart';
 import 'Interval.dart';
 
 import '../Utils/Tuples.dart';
@@ -15,6 +16,8 @@ BSSet rosterSet(Iterable<BSFunction> elements) {
           orElse: () => null) !=
       null)
     throw SetDefinitionError("Sets can only be defined in real numbers!");
+
+  if (elements.length == 0) return emptySet;
   return RosterSet(
       SplayTreeSet.from(elements, (BSFunction first, BSFunction second) {
     Pair<num, num> _nums = BSFunction.toNums(first, second, "compare");
@@ -46,7 +49,7 @@ class RosterSet extends BSSet {
 
     complementSubsets.add(Interval.open(elements.last, constants.infinity));
 
-    return DisjoinedSetUnion(complementSubsets);
+    return SetUnion(complementSubsets);
   }
 
   @override

@@ -1,6 +1,9 @@
 import 'dart:collection' show HashMap;
 
 import '../BSFunction/BSCalculus.dart';
+import '../sets/sets.dart';
+import '../Logic/Logic.dart';
+import '../Utils/Tuples.dart';
 import 'BSCallable.dart';
 import 'BSEnvironment.dart';
 import 'BSInstance.dart';
@@ -46,37 +49,78 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     dynamic leftOperand = _evaluate(e.left);
     dynamic rightOperand = _evaluate(e.right);
 
-    switch (e.op.type) {
-      case TokenType.MINUS:
-        _checkNumberOperands(e.op, leftOperand, rightOperand);
-        return leftOperand - rightOperand;
-      case TokenType.SLASH:
-        _checkNumberOperands(e.op, leftOperand, rightOperand);
-        return leftOperand / rightOperand;
-      case TokenType.STAR:
-        _checkNumberOperands(e.op, leftOperand, rightOperand);
-        return leftOperand * rightOperand;
-      case TokenType.EXP:
-        _checkNumberOperands(e.op, leftOperand, rightOperand);
-        return leftOperand ^ rightOperand;
-      case TokenType.PLUS:
-        _checkStringOrNumberOperands(e.op, leftOperand, rightOperand);
-        return leftOperand + rightOperand;
+    //operations for functions
+    if (leftOperand is BSFunction && rightOperand is BSFunction) {
+      Pair<num, num> nums = BSFunction.toNums(leftOperand, rightOperand);
 
-      case TokenType.GREATER:
-        return leftOperand > rightOperand;
-      case TokenType.GREATER_EQUAL:
-        return leftOperand >= rightOperand;
-      case TokenType.LESS:
-        return leftOperand < rightOperand;
-      case TokenType.LESS_EQUAL:
-        return leftOperand <= rightOperand;
-      case TokenType.EQUAL_EQUAL:
-        return _isEqual(leftOperand, rightOperand);
-      default:
+      switch (e.op.type) {
+        case TokenType.MINUS:
+          return leftOperand - rightOperand;
+        case TokenType.SLASH:
+          return leftOperand / rightOperand;
+        case TokenType.STAR:
+          return leftOperand * rightOperand;
+        case TokenType.EXP:
+          return leftOperand ^ rightOperand;
+        case TokenType.PLUS:
+          return leftOperand + rightOperand;
+        case TokenType.GREATER:
+          if (nums.first != null) return nums.first > nums.second;
+          return GreaterThan(leftOperand, rightOperand);
+        case TokenType.GREATER_EQUAL:
+          if (nums.first != null) return nums.first >= nums.second;
+          return GreaterOrEqual(leftOperand, rightOperand);
+        case TokenType.LESS:
+          if (nums.first != null) return nums.first < nums.second;
+          return LessThan(leftOperand, rightOperand);
+        case TokenType.LESS_EQUAL:
+          if (nums.first != null) return nums.first <= nums.second;
+          return LessOrEqual(leftOperand, rightOperand);
+        // EQUALS returns logic expressions for functions and bools for everything else
+        case TokenType.EQUALS:
+          if (nums.first != null) return nums.first == nums.second;
+          return Equal(leftOperand, rightOperand);
+        // IDENTICALLY_EQUALS always returns booleans
+        case TokenType.IDENTICALLY_EQUALS:
+          return _isEqual(leftOperand, rightOperand);
+        default:
+          throw new RuntimeError(
+              e.op, "operation '${e.op}' not supported for functions");
+      }
     }
 
-    return null;
+    //operations for sets
+    if (leftOperand is BSSet && rightOperand is BSSet) {
+      switch (e.op.type) {
+        case TokenType.MINUS:
+        case TokenType.SLASH:
+          return leftOperand.relativeComplement(rightOperand);
+
+        case TokenType.STAR:
+          return leftOperand.intersection(rightOperand);
+        case TokenType.PLUS:
+          return leftOperand.union(rightOperand);
+        // EQUALS returns logic expressions for functions and bools for everything else
+        // IDENTICALLY_EQUALS always returns booleans
+        case TokenType.EQUALS:
+        case TokenType.IDENTICALLY_EQUALS:
+          return _isEqual(leftOperand, rightOperand);
+        default:
+          throw new RuntimeError(
+              e.op, "operation '${e.op}' not supported for sets");
+      }
+    }
+
+    //operation for string
+    if (e.op.type == TokenType.PLUS) {
+      if (leftOperand is String && rightOperand is String)
+        return leftOperand + rightOperand;
+      if (leftOperand is String) return leftOperand + rightOperand.toString();
+      if (rightOperand is String) return leftOperand.toString() + rightOperand;
+    }
+
+    throw new RuntimeError(e.op,
+        "operation '${e.op}' not supported for values $leftOperand and $rightOperand");
   }
 
   @override
@@ -98,17 +142,23 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       //"not" (!) would be here, but i decided to use it for factorials and use the "not" keyword explicitly
       case TokenType.APPROX:
         if (operand is BSFunction) return operand.approx;
+        if (operand is BuilderSet) return operand.knownElements;
         throw new RuntimeError(e.op,
-            "The approximation (~) operator may only be applied to functions");
+            "The approximation (~) operator may only be applied to functions and builder sets");
       case TokenType.APOSTROPHE:
         if (operand is BSFunction) {
           Set<Variable> params = operand.parameters;
-          if (params.length > 1) throw new RuntimeError(e.op, "the apostrophe operator may only be applied to functions defined in a single (or no) variables");
-          if (params.length == 1) return operand.derivative(params.last);
-          else return 0; //functions defined in 0 variables are always constant, so their derivative is 0
+          if (params.length > 1)
+            throw new RuntimeError(e.op,
+                "the apostrophe operator may only be applied to functions defined in a single (or no) variables");
+          if (params.length == 1)
+            return operand.derivative(params.last);
+          else
+            return 0; //functions defined in 0 variables are always constant, so their derivative is 0
         }
+        if (operand is BSSet) return operand.complement();
         throw new RuntimeError(e.op,
-            "The apostrophe operator may only be applied to functions");
+            "The apostrophe operator may only be applied to functions and sets");
       case TokenType.FACTORIAL:
         throw new RuntimeError(e.op, "error! factorial not yet implemented");
       default:
@@ -118,9 +168,11 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   dynamic _evaluate(Expr e) => e.accept(this);
 
-  ///null and false are "falsy", everything else is "truthy" (isn't the value 'true' but can be used in logic as if it was)
-  static bool _istruthy(dynamic object) =>
-      ((object is bool) ? object : (!object == null));
+  ///null false and emptySet are "falsy", everything else is "truthy" (isn't the value 'true' but can be used in logic as if it was)
+  static bool _istruthy(dynamic object) {
+    if (object is bool) return object;
+    return (object != null) && (object != emptySet);
+  }
 
   static _isEqual(dynamic a, dynamic b) {
     if (a == null && b == null) return true; //null is only equal to null
@@ -133,22 +185,6 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     if (!(value is BSFunction))
       throw new RuntimeError(
           value, "Operand for ${token.lexeme} must be function");
-  }
-
-  static void _checkNumberOperands(Token token, dynamic left, dynamic right) {
-    if (!(left is BSFunction) || !(right is BSFunction))
-      throw new RuntimeError(
-          token, "Operands for ${token.lexeme} must be functions");
-  }
-
-  void _checkStringOrNumberOperands(Token token, dynamic left, dynamic right) {
-    try {
-      _checkNumberOperands(token, left, right);
-    } on RuntimeError {
-      if (!(left is String) || !(right is String))
-        throw new RuntimeError(
-            token, "Operands for ${token.lexeme} must be functions or strings");
-    }
   }
 
   @override
@@ -434,6 +470,107 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   visitDirectiveStmt(DirectiveStmt s) {
     directives.setDirective(s.directive, true);
     print("local directive ${s.directive} set");
+  }
+
+  @override
+  visitBuilderDefinitionExpr(BuilderDefinitionExpr e) {
+
+    List<Variable> parameters = null;
+
+    if (e.parameters != null) {
+      parameters = List();
+      //Checks if each of the parameters is already a Variable, and when they don't exist, create them as variables
+      for (Token parameter in e.parameters) {
+        Object _variable = _environment.search(parameter);
+        if (_variable == null) {
+          _variable = variable(parameter.lexeme);
+          _environment.define(parameter.lexeme, _variable);
+        } else if (!(_variable is Variable))
+          throw new RuntimeError(
+              parameter, "Parameters to a function must always be Variables");
+
+        parameters.add(_variable);
+      }
+    }
+    Object rule = _evaluate(e.rule);
+    // print(rule.runtimeType);
+    if (rule is LogicExpression)
+      return builderSet(rule, parameters);
+    else
+      throw new RuntimeError(
+          e.bar, "Builder set definitions must contain comparisons!");
+  }
+
+  @override
+  visitIntervalDefinitionExpr(IntervalDefinitionExpr e) {
+    Object _a = _evaluate(e.a);
+    Object _b = _evaluate(e.b);
+    var nums = BSFunction.toNums(_a, _b);
+    if (nums.first == null || nums.second == null) {
+      throw new RuntimeError(
+          e.left, "Interval definitions must have both edges be numbers");
+    }
+
+    return interval(_a, _b,
+        leftClosed: e.left == '[', rightClosed: e.right == ']');
+  }
+
+  @override
+  visitRosterDefinitionExpr(RosterDefinitionExpr e) {
+    List<BSFunction> elements = List();
+
+    for (Expr expr in e.elements) {
+      Object el = _evaluate(expr);
+      if (el is BSFunction) {
+        var number = BSFunction.extractFromNegative<Number>(el);
+        if (number.second) {
+          elements.add(el);
+          continue;
+        }
+      }
+      throw new RuntimeError(
+          e.left, "Roster Set definitions must have all elements as numbers");
+    }
+
+    return rosterSet(elements);
+  }
+
+  @override
+  visitSetBinaryExpr(SetBinaryExpr e) {
+    Object left = _evaluate(e.left);
+    Object right = _evaluate(e.right);
+
+    if (right is BSSet) {
+      if (left is BSSet) {
+        switch (e.operator.type) {
+          case TokenType.UNION:
+            return left.union(right);
+          case TokenType.INTERSECTION:
+            return left.intersection(right);
+          case TokenType.DISJOINED:
+            return left.disjoined(right);
+          case TokenType.INVERTED_SLASH:
+            return left.relativeComplement(right);
+          case TokenType.CONTAINED:
+            return right.contains(left);
+          case TokenType.BELONGS:
+            throw new RuntimeError(
+                e.operator, "left operand for this operation must be a number");
+          default:
+            throw new RuntimeError(e.operator, "not a valid set operator!");
+        }
+      } else {
+        if (left is BSFunction &&
+            e.operator.type == TokenType.BELONGS &&
+            BSFunction.extractFromNegative<Number>(left).second) {
+          return right.belongs(left);
+        }
+        throw new RuntimeError(
+            e.operator, "left operand not valid for this operator");
+      }
+    }
+    throw new RuntimeError(
+        e.operator, "this operation must be done exclusively on sets");
   }
 }
 

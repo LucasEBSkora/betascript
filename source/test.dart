@@ -1,29 +1,30 @@
 import 'BSFunction/BSCalculus.dart';
 import 'sets/sets.dart';
+import 'Logic/Logic.dart';
 
 void main() {
-  // Variable x = variable("x");
-  // Variable y = variable("y");
-  // Variable z = variable("z");
+  Variable x = variable("x");
+  Variable y = variable("y");
+  Variable z = variable("z");
 
-  // BSFunction f = tan(y - x) * z;
-  // BSFunction g = f([arctan(x), sin(n(0.5)), n(1) / n(2)]);
-  // BSFunction h = f.withParameters(Set.from([z, y, x]));
-  // BSFunction i = h([arctan(x), sin(n(0.5)), n(4) / n(2)]);
+  BSFunction f = tan(y - x) * z;
+  BSFunction g = f([arctan(x), sin(n(0.5)), n(1) / n(2)]);
+  BSFunction h = f.withParameters(Set.from([z, y, x]));
+  BSFunction i = h([arctan(x), sin(n(0.5)), n(4) / n(2)]);
 
-  // print(f);
-  // print(f.parameters);
-  // print(g);
-  // print(h);
-  // print(i);
+  print(f);
+  print(f.parameters);
+  print(g);
+  print(h);
+  print(i);
 
-  // BSFunction j = x/y + (-x)/y + x/(-y) + (-x)/(-y);
-  // print(j);
+  BSFunction j = x/y + (-x)/y + x/(-y) + (-x)/(-y);
+  print(j);
 
-  // Type t = BSFunction;
-  // print(j.runtimeType.toString());
+  Type t = BSFunction;
+  print(j.runtimeType.toString());
 
-  // print(t == j.runtimeType);
+  print(t == j.runtimeType);
 
   BSSet first = interval(n(13), n(14), leftClosed: true, rightClosed: false);
 
@@ -67,4 +68,9 @@ void main() {
       .union(Interval.closed(n(-900), n(-100)));
 
   print(third.union(many));
+
+  LogicExpression e1 = Or(LessOrEqual(-x+n(3), n(0)), Equal(x, n(0)));
+  print(e1);
+  print(e1.solution);
+
 }

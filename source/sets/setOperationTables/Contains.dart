@@ -17,16 +17,17 @@ MethodTable<bool, BSSet> defineContainsTable() {
 
   //all subsets of second need to be contained in first
   methods.addMethodsInColumn(
-      [Interval, RosterSet, BuilderSet, DisjoinedSetUnion], DisjoinedSetUnion,
-      (BSSet first, DisjoinedSetUnion second) {
+      [Interval, RosterSet, BuilderSet, SetUnion, IntensionalSetIntersection],
+      SetUnion, (BSSet first, SetUnion second) {
     for (var element in second.subsets)
       if (!first.contains(element)) return false;
 
     return true;
   });
-  methods.addMethod(
+
+  methods.addMethodsInColumn(
       //all elements of second need to be belong to first
-      Interval,
+      [Interval, RosterSet, BuilderSet, IntensionalSetIntersection],
       RosterSet,
       (Interval first, RosterSet second) => second.elements.fold(true,
           (previousValue, element) => previousValue && first.belongs(element)));
@@ -36,19 +37,45 @@ MethodTable<bool, BSSet> defineContainsTable() {
   methods.addMethod(
       RosterSet, Interval, (RosterSet first, Interval second) => false);
 
-  methods.addMethod(RosterSet, RosterSet, (RosterSet first, RosterSet second) {
-    for (var element in second.elements) {
-      if (!first.elements.contains(element)) return false;
-    }
-    return true;
+  //checks if the intersection of first and the complement of second is empty
+  methods.addMethodsInLine(
+      SetUnion,
+      [Interval, RosterSet, BuilderSet],
+      (SetUnion first, BSSet second) =>
+          second.relativeComplement(first) == emptySet);
+
+  //will return false negatives:
+  //if A = B ∩ C and D contains B and C, then D contains A
+  //however, the reciprocal is not true
+  methods.addMethodsInColumn(
+      [Interval, RosterSet, BuilderSet, SetUnion, IntensionalSetIntersection],
+      IntensionalSetIntersection,
+      (BSSet first, IntensionalSetIntersection second) {
+    return first.contains(second.first) && first.contains(second.second);
   });
 
-  //checks if the intersection of first' and second is empty
-  methods.addMethodsInLine(
-      DisjoinedSetUnion,
-      [Interval, RosterSet, BuilderSet],
-      (DisjoinedSetUnion first, BSSet second) =>
-          second.relativeComplement(first) == emptySet);
+  //if A = B ∩ C and B and C contain D, then A contains D
+  methods.addMethod(
+      IntensionalSetIntersection,
+      Interval,
+      (IntensionalSetIntersection first, Interval second) =>
+          first.first.contains(second) && first.second.contains(second));
+
+  methods.addMethod(
+      BuilderSet,
+      Interval,
+      (BuilderSet first, Interval second) =>
+          first.knownElements.contains(second));
+
+  //can't be sure
+  methods.addMethod(
+      Interval, BuilderSet, (Interval first, BuilderSet second) => false);
+
+  methods.addMethod(
+      RosterSet, BuilderSet, (RosterSet first, BuilderSet second) => false);
+
+  methods.addMethod(
+      BuilderSet, BuilderSet, (BuilderSet first, BuilderSet second) => false);
 
   return methods;
 }

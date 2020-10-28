@@ -1,26 +1,40 @@
+import 'dart:collection';
+
 import '../BSFunction/BSFunction.dart';
+import '../BSFunction/Variable.dart';
+
 import 'BSSet.dart';
 
-import '../BSFunction/Comparison.dart';
+import '../Logic/Logic.dart';
 
-BSSet builderSet(Iterable<Comparison> rules) {
-  return BuilderSet(Set.from(rules));
+BSSet builderSet(LogicExpression rule, List<Variable> parameters) {
+  BSSet sol = rule.solution;
+  if (rule.foundEverySolution)
+    return sol;
+  else
+    return BuilderSet(rule, parameters);
 }
 
 class BuilderSet extends BSSet {
-  final Set<Comparison> rules;
+  final List<Variable> parameters;
+  final LogicExpression rule;
 
-  BuilderSet(this.rules);
+  BuilderSet(this.rule, List<Variable> this.parameters);
 
   @override
-  bool belongs(BSFunction x) {
-    // TODO: implement belongs
-    throw UnimplementedError();
-  }
+  bool belongs(BSFunction x) =>
+      rule.isSolution(HashMap.from({rule.parameters.last: x}));
 
   @override
   BSSet complement() {
-    // TODO: implement complement
-    throw UnimplementedError();
+    return BuilderSet(Not(rule), parameters);
+  }
+
+  BSSet get knownElements => rule.solution;
+
+  @override
+  String toString() {
+    String params = rule.parameters.reduce((previousValue, element) => "$previousValue, $element");
+    return "{$params | $rule}";
   }
 }

@@ -67,11 +67,13 @@ abstract class BSFunction implements BSCallable {
   bool operator ==(dynamic other) =>
       (other is BSFunction) && toString() == other.toString();
 
-  static Pair<num, num> toNums(BSFunction a, BSFunction b, String op) {
+  static Pair<num, num> toNums(BSFunction a, BSFunction b, [String op = null]) {
     Trio<Number, bool, bool> _a = BSFunction.extractFromNegative<Number>(a);
     Trio<Number, bool, bool> _b = BSFunction.extractFromNegative<Number>(b);
-    if (!_a.second || !_b.second)
-      throw BetascriptFunctionError("operand $op can only be used on numbers");
+    if (!_a.second || !_b.second) {
+      if (op != null) throw BetascriptFunctionError("operand $op can only be used on numbers");
+      else return Pair(null, null);
+    }
 
     return Pair<num, num>(((_a.third) ? -1 : 1) * _a.first.value,
         ((_b.third) ? -1 : 1) * _b.first.value);
@@ -120,7 +122,6 @@ abstract class BSFunction implements BSCallable {
   /// Extra parameters should be ignored, but missing ones will cause a fatal error.
   ///Will always return an exact value, and it is not guaranteed to be as simplified as possible. This means that sin(0.5) will return Sin(0.5).
   ///for approximations, use the approx getter
-  @protected
   BSFunction evaluate(HashMap<String, BSFunction> p);
 
   String toString() => throw UnimplementedError();

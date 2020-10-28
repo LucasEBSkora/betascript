@@ -13,14 +13,17 @@ enum TokenType {
   LINEBREAK, // '\n' - when the scanner isn't able to determine on it's own that a linebreak isn't relevant
   //mainly after the tokens detailed in diary entry 15/07/2020
   SLASH, // /
+  INVERTED_SLASH, // \
   STAR, // *
   FACTORIAL, // !
   APOSTROPHE, // '
-  APPROX, //~
-  EXP, //^
-
-  EQUAL, // =
-  EQUAL_EQUAL, // ==
+  APPROX, // ~
+  EXP, // ^
+  VERTICAL_BAR, // |
+  
+  ASSIGMENT, // = or :=
+  EQUALS, // == or =
+  IDENTICALLY_EQUALS, // === or ==
   GREATER, // >
   GREATER_EQUAL, // >=
   LESS, // <
@@ -34,12 +37,16 @@ enum TokenType {
 
   //reserved keywords
   AND,
+  BELONGS,
   CLASS,
+  CONTAINED,
   DEL,
+  DISJOINED,
   ELSE,
   FALSE,
   FOR,
   IF,
+  INTERSECTION,
   LET,
   NIL,
   NOT,
@@ -47,9 +54,11 @@ enum TokenType {
   PRINT,
   RETURN,
   ROUTINE,
+  SET,
   SUPER,
   THIS,
   TRUE,
+  UNION,
   WHILE,
 
   EOF

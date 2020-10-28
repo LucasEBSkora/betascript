@@ -1,0 +1,31 @@
+//A program which uses the Euler Method for differential equations to solve the following system:
+// dy/dt = f(y, t) 
+// y(t0)=y0 
+// y(tf) ~= ?
+//using step size h
+
+
+//parameters
+let f(y, t) = y*(3-t*y)
+let t0 = 0
+let y0 = 0.5
+let h = 0.01
+let tf = 3
+
+print t0 < tf
+
+for (; t0 < tf; t0 = t0 + h) {
+  print ("t: " + t0 + " y: " + y0);
+  y0 = ~(y0 + f(y0, t0)*h);
+}
+print("t: " + t0 + " y: " + y0);
+
+/*
+y0 = 1
+
+//second-degree Euler aproximation
+for (t0 = 0; t0 < tf; t0 = t0 + h) {
+  print "t: " + t0 + " y: " + y0 ;
+  y0 = ~(y0 + f(y0, t0)*h + (-2 - f(y0,t0)/2)*(h^2)/2);
+}
+*/

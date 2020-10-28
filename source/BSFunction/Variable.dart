@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'BSCalculus.dart';
 import 'BSFunction.dart';
 import 'Number.dart';
@@ -14,10 +13,8 @@ class Variable extends BSFunction implements Comparable {
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    if (!p.containsKey(name)) {
-      print("Error! Missing arguments in call call: " + name + " not defined");
-      exit(1);
-    }
+    if (!p.containsKey(name)) 
+      throw BetascriptFunctionError("Error! Missing arguments in call call: " + name + " not defined");
     return p[name];
   }
 

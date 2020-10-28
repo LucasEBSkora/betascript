@@ -1,0 +1,19 @@
+let A = {1, 2, 3, 4};
+
+let B = (0, 5);
+
+let C = {x| x < 5};
+
+print A
+print B
+print C
+
+print A contained B
+
+print 2.5 belongs A
+
+print 2.5 belongs B
+
+print (A union B)
+print (A intersection B)
+print A disjoined C
