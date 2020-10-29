@@ -29,3 +29,7 @@ print 4'
 
 //not allowed - only works for single variable functions
 //print j'
+
+print f == g
+
+print f === g

@@ -2,7 +2,7 @@ let A = {1, 2, 3, 4};
 
 let B = (0, 5);
 
-let C = {x| x < 5};
+let C = {x| x == 5};
 
 print A
 print B
