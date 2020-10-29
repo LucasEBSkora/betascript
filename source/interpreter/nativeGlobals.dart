@@ -3,7 +3,7 @@ import 'dart:math';
 import 'BSInterpreter.dart';
 import 'NativeCallable.dart';
 import '../BSFunction/BSCalculus.dart';
-
+import '../sets/sets.dart';
 final Variable _x = variable("x");
 final Variable _b = variable("b");
 
@@ -55,4 +55,7 @@ final Map<String, Object> nativeGlobals = {
   //constant named numbers
   "e": constants.e,
   "pi": constants.pi,
+  
+  //empty set
+  "emptySet": emptySet,
 };
