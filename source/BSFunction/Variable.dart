@@ -3,7 +3,7 @@ import 'BSFunction.dart';
 import 'Number.dart';
 import 'dart:collection' show HashMap, SplayTreeSet;
 
-BSFunction variable(String name, [Set<Variable> params = null]) =>
+Variable variable(String name, [Set<Variable> params = null]) =>
     Variable._(name, params);
 
 class Variable extends BSFunction implements Comparable {

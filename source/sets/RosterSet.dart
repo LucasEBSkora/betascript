@@ -43,7 +43,7 @@ class RosterSet extends BSSet {
     complementSubsets
         .add(Interval.open(constants.negativeInfinity, elements.first));
 
-    for (int i = 0; i < elements.length; ++i)
+    for (int i = 1; i < elements.length; ++i)
       complementSubsets
           .add(Interval.open(elements.elementAt(i - 1), elements.elementAt(i)));
 

@@ -85,7 +85,7 @@ abstract class Comparison extends LogicExpression {
       _sol = solver.attemptSolve();
       _foundEverySolution = solver.EverySolutionFound;
     }
-    return (_sol == emptySet) ? BuilderSet(this, this.parameters.map((element) => variable(element))) : _sol;
+    return (_sol == emptySet) ? BuilderSet(this, this.parameters.map((element) => variable(element)).toList()) : _sol;
   }
 
   @override

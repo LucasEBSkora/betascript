@@ -1,12 +1,15 @@
-let A = {1, 2, 3, 4};
+let A = {1, 2, 3, 4}
 
-let B = (0, 5);
+let B = (0, 5)
 
-let C = {x| x == 5};
+let C = {x| x == 5}
+
+let D = {| x^2 == 2}
 
 print A
 print B
 print C
+print D
 
 print A contained B
 
@@ -14,6 +17,10 @@ print 2.5 belongs A
 
 print 2.5 belongs B
 
-print (A union B)
-print (A intersection B)
+print A union B
+print A intersection B
 print A disjoined C
+
+print C'
+
+print A\B

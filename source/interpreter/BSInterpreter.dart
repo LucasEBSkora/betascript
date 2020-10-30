@@ -511,8 +511,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
           e.left, "Interval definitions must have both edges be numbers");
     }
 
+
     return interval(_a, _b,
-        leftClosed: e.left == '[', rightClosed: e.right == ']');
+        leftClosed: e.left.lexeme == '[', rightClosed: e.right.lexeme == ']');
   }
 
   @override
