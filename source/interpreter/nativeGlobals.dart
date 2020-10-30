@@ -55,6 +55,7 @@ final Map<String, Object> nativeGlobals = {
   //constant named numbers
   "e": constants.e,
   "pi": constants.pi,
+  "infinity": constants.infinity,
   
   //empty set
   "emptySet": emptySet,
