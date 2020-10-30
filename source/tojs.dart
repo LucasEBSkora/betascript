@@ -9,9 +9,36 @@ int main() {
   // File file = File("example.bs");
   // String contents = file.readAsStringSync();
 
-  String contents =
-  //     'class A {\n  method() {\n    print "a method";\n  }\n}\n\nclass B < A {\n  method() {\n    print "B method";\n  }\n\n  test() {\n    super.method();\n  }\n}\n\nclass C < B {\n  C(callback) {\n    this.callback = callback;\n  }\n\n  callCallback() {\n    this.callback();\n  }\n}\n\nfunction printStuff() {\n  print "stu" + "ff";\n}\n\nvar thing = C(printStuff);\n\nthing.test();\nthing.method();\nthing.callCallback();';
-  "let f(x) = sin(x);\n\nlet g = f(cos(x));\n\nprint g;\n\nprint f + g;\n\nprint e^x;\n\nlet h(x, y, z) = 0;\n\nprint h(1, 2, arcosh(z));\n\nlet i(y,x) = pi + 2 - log(y, 33)*sec(y/x);\nprint i(11, 2);\nprint ~i(11, 2);\n\nlet j(x, y, z) = x^2*y^3;\n\nprint del(j)/del(x, y, x);";
+  String contents = """
+let f(x) = sin(x)
+  
+let g = f(cos(x))
+  
+print g
+
+print f + g
+
+print e^x
+
+let h(x, y, z) = 0
+
+print h(1, 2, arcosh(z))
+
+let i(y,x) = pi + 2 - log(y, 33)*sec(y/x)
+print i(11, 2)
+print ~i(11, 2)
+
+let j(x, y, z) = x^2*y^3
+
+print del(j)/del(x, y, x)
+
+let A = {x | x > 2}
+let B = [-10, 5)
+print A union B
+print A\\B
+print A contained B
+print A'
+""";
   (document.getElementById("source") as TextAreaElement).value = contents;
 
   //Sets a listener for "interpretButton", which gets the text in the textarea "source", runs it through the interpreter and writes the

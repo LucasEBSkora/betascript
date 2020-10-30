@@ -4892,7 +4892,7 @@
       var t3,
         t1 = document,
         t2 = type$.legacy_TextAreaElement._as(t1.getElementById("source"));
-      (t2 && C.TextAreaElement_methods).set$value(t2, "let f(x) = sin(x);\n\nlet g = f(cos(x));\n\nprint g;\n\nprint f + g;\n\nprint e^x;\n\nlet h(x, y, z) = 0;\n\nprint h(1, 2, arcosh(z));\n\nlet i(y,x) = pi + 2 - log(y, 33)*sec(y/x);\nprint i(11, 2);\nprint ~i(11, 2);\n\nlet j(x, y, z) = x^2*y^3;\n\nprint del(j)/del(x, y, x);");
+      (t2 && C.TextAreaElement_methods).set$value(t2, "let f(x) = sin(x)\n  \nlet g = f(cos(x))\n  \nprint g\n\nprint f + g\n\nprint e^x\n\nlet h(x, y, z) = 0\n\nprint h(1, 2, arcosh(z))\n\nlet i(y,x) = pi + 2 - log(y, 33)*sec(y/x)\nprint i(11, 2)\nprint ~i(11, 2)\n\nlet j(x, y, z) = x^2*y^3\n\nprint del(j)/del(x, y, x)\n\nlet A = {x | x > 2}\nlet B = [-10, 5)\nprint A union B\nprint A\\B\nprint A contained B\nprint A'\n");
       t1 = J.get$onClick$x(t1.getElementById("interpretButton"));
       t2 = t1.$ti;
       t3 = t2._eval$1("~(1)?")._as(new N.main_closure());
@@ -9073,7 +9073,7 @@
       nums = X.BSFunction_toNums(_a, _b, null);
       if (nums.first == null || nums.second == null)
         throw H.wrapException(Y.RuntimeError$(e.left, "Interval definitions must have both edges be numbers"));
-      return B.interval(_a, _b, false, false);
+      return B.interval(_a, _b, e.left.lexeme === "[", e.right.lexeme === "]");
     },
     visitRosterDefinitionExpr$1: function(e) {
       var t1, t2, t3, _i, el,
@@ -10373,7 +10373,7 @@
       return false;
     },
     get$solution: function() {
-      var _sol, t2, _this = this,
+      var _sol, t2, t3, _this = this,
         solver = new F.SingleVariableSolver(_this),
         t1 = solver.appliesInternal$0();
       solver.doesApply = t1;
@@ -10385,8 +10385,9 @@
       if (_sol.$eq(0, C.C_EmptySet)) {
         t1 = _this.get$parameters();
         t2 = t1.$ti;
-        t2 = new K.BuilderSet(type$.legacy_List_legacy_Variable._as(new H.EfficientLengthMappedIterable(t1, t2._eval$1("BSFunction*(1)")._as(new T.Comparison_solution_closure()), t2._eval$1("EfficientLengthMappedIterable<1,BSFunction*>"))), _this);
-        t1 = t2;
+        t3 = t2._eval$1("EfficientLengthMappedIterable<1,Variable*>");
+        t3 = new K.BuilderSet(P.List_List$from(new H.EfficientLengthMappedIterable(t1, t2._eval$1("Variable*(1)")._as(new T.Comparison_solution_closure()), t3), true, t3._eval$1("Iterable.E")), _this);
+        t1 = t3;
       } else
         t1 = _sol;
       return t1;
@@ -12038,7 +12039,7 @@
         complementSubsets = H.setRuntimeTypeInfo([], type$.JSArray_legacy_BSSet),
         t1 = this.elements;
       C.JSArray_methods.add$1(complementSubsets, new B.Interval(false, false, C.Negative_T3K, t1.get$first(t1)));
-      for (i = 0; i < t1._count; ++i)
+      for (i = 1; i < t1._count; ++i)
         C.JSArray_methods.add$1(complementSubsets, new B.Interval(false, false, t1.elementAt$1(0, i - 1), t1.elementAt$1(0, i)));
       C.JSArray_methods.add$1(complementSubsets, new B.Interval(false, false, t1.get$last(t1), C.Number_8xB));
       return new E.SetUnion(complementSubsets);
@@ -13082,7 +13083,7 @@
     mangledNames: {},
     getTypeFromName: getGlobalFromName,
     metadata: [],
-    types: ["~()", "Null()", "bool*(BSFunction*)", "Null(BSFunction*)", "~(~())", "Null(@)", "bool*(BSSet*)", "BSFunction*(BSFunction*)", "BSSet*(Interval*,Interval*)", "String*(Variable*)", "bool*(Interval*,Interval*)", "bool*(BSSet*,SetUnion*)", "bool*(BSSet*,IntensionalSetIntersection*)", "bool*(Interval*,BuilderSet*)", "bool*(BuilderSet*,BuilderSet*)", "~(Type*)", "BSSet*(BSSet*)", "BSSet*(BSSet*,IntensionalSetIntersection*)", "BSSet*(Interval*,RosterSet*)", "SetUnion*(SetUnion*,SetUnion*)", "BSSet*(BuilderSet*,BuilderSet*)", "bool*(SetUnion*,BSSet*)", "bool*(RosterSet*,Interval*)", "@(@)", "_Future<@>(@)", "bool*(IntensionalSetIntersection*,Interval*)", "bool*(BuilderSet*,Interval*)", "Null(@,@)", "bool*(RosterSet*,BuilderSet*)", "Null(Object?,Object?)", "bool(@)", "bool*(RosterSet*,BSSet*)", "Null(~())", "@(String)", "@(@,@)", "@(Event)", "Null(Variable*)", "BSFunction*(Object*)", "SetUnion*(Interval*,RosterSet*)", "BSSet*(BSSet*,SetUnion*)", "BSSet*(@,BSSet*)", "RosterSet*(RosterSet*,BSSet*)", "SetUnion*(SetUnion*,BSSet*)", "String*(String*,String*)", "BSSet*(BSSet*,BuilderSet*)", "BSFunction*(String*)", "BSSet*(BuilderSet*,BSSet*)", "int(Comparable<@>,Comparable<@>)", "bool*(@)", "int*(BSFunction*,BSFunction*)", "BSSet*(BSSet*,BSSet*)", "String*(String*,BSSet*)", "bool*(bool*,BSFunction*)", "SetUnion*(BSSet*,SetUnion*)", "@(@,String)", "Null(RosterSet*,RosterSet*)", "Null(Object,StackTrace)", "SetUnion*(BSSet*,BuilderSet*)", "bool*(Interval*,RosterSet*)", "SetUnion*(Interval*,SetUnion*)", "IntensionalSetIntersection*(IntensionalSetIntersection*,SetUnion*)", "~(BSSet*)", "RosterSet*(RosterSet*,RosterSet*)", "IntensionalSetIntersection*(Interval*,BuilderSet*)", "RosterSet*(RosterSet*,BuilderSet*)", "IntensionalSetIntersection*(BSSet*,IntensionalSetIntersection*)", "int*(BSInterpreter*,List<Object*>*)", "Null(MouseEvent*)", "bool*(@,BSFunction*)", "Object?(Object?)", "int(@,@)", "BSSet*(IntensionalSetIntersection*,BSSet*)"],
+    types: ["~()", "Null()", "bool*(BSFunction*)", "Null(BSFunction*)", "~(~())", "Null(@)", "bool*(BSSet*)", "BSFunction*(BSFunction*)", "BSSet*(Interval*,Interval*)", "String*(Variable*)", "bool*(Interval*,Interval*)", "bool*(BSSet*,SetUnion*)", "bool*(BSSet*,IntensionalSetIntersection*)", "bool*(Interval*,BuilderSet*)", "bool*(BuilderSet*,BuilderSet*)", "~(Type*)", "BSSet*(BSSet*)", "BSSet*(BSSet*,IntensionalSetIntersection*)", "BSSet*(Interval*,RosterSet*)", "SetUnion*(SetUnion*,SetUnion*)", "BSSet*(BuilderSet*,BuilderSet*)", "bool*(SetUnion*,BSSet*)", "bool*(RosterSet*,Interval*)", "@(@)", "_Future<@>(@)", "bool*(IntensionalSetIntersection*,Interval*)", "bool*(BuilderSet*,Interval*)", "Null(@,@)", "bool*(RosterSet*,BuilderSet*)", "Null(Object?,Object?)", "bool(@)", "bool*(RosterSet*,BSSet*)", "Null(~())", "@(String)", "@(@,@)", "@(Event)", "Null(Variable*)", "BSFunction*(Object*)", "SetUnion*(Interval*,RosterSet*)", "BSSet*(BSSet*,SetUnion*)", "BSSet*(@,BSSet*)", "RosterSet*(RosterSet*,BSSet*)", "SetUnion*(SetUnion*,BSSet*)", "String*(String*,String*)", "BSSet*(BSSet*,BuilderSet*)", "Variable*(String*)", "BSSet*(BuilderSet*,BSSet*)", "int(Comparable<@>,Comparable<@>)", "bool*(@)", "int*(BSFunction*,BSFunction*)", "BSSet*(BSSet*,BSSet*)", "String*(String*,BSSet*)", "bool*(bool*,BSFunction*)", "SetUnion*(BSSet*,SetUnion*)", "@(@,String)", "Null(RosterSet*,RosterSet*)", "Null(Object,StackTrace)", "SetUnion*(BSSet*,BuilderSet*)", "bool*(Interval*,RosterSet*)", "SetUnion*(Interval*,SetUnion*)", "IntensionalSetIntersection*(IntensionalSetIntersection*,SetUnion*)", "~(BSSet*)", "RosterSet*(RosterSet*,RosterSet*)", "IntensionalSetIntersection*(Interval*,BuilderSet*)", "RosterSet*(RosterSet*,BuilderSet*)", "IntensionalSetIntersection*(BSSet*,IntensionalSetIntersection*)", "int*(BSInterpreter*,List<Object*>*)", "Null(MouseEvent*)", "bool*(@,BSFunction*)", "Object?(Object?)", "int(@,@)", "BSSet*(IntensionalSetIntersection*,BSSet*)"],
     interceptorsByTag: null,
     leafTags: null,
     arrayRti: typeof Symbol == "function" && typeof Symbol() == "symbol" ? Symbol("$ti") : "$ti"
@@ -13164,7 +13165,6 @@
       legacy_List_legacy_Token: findType("List<Token*>*"),
       legacy_List_legacy_TokenType: findType("List<TokenType*>*"),
       legacy_List_legacy_Type: findType("List<Type*>*"),
-      legacy_List_legacy_Variable: findType("List<Variable*>*"),
       legacy_MouseEvent: findType("MouseEvent*"),
       legacy_Multiplication: findType("Multiplication*"),
       legacy_Never: findType("0&*"),
