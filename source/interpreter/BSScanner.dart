@@ -35,7 +35,26 @@ class BSScanner {
       _tokens.add(new Token(TokenType.LINEBREAK, "\n", null, _line));
     //adds a end of file token in the end, although it isn't completely necessary
     _tokens.add(new Token(TokenType.EOF, "", null, _line));
-    return _tokens;
+    return _removeLinebreaks(_tokens);
+  }
+
+  //many linebreaks can be removed looking at the next token, which means we have to wait until the scanner is finished to remove them
+  static List<Token> _removeLinebreaks(List<Token> tokens) {
+    for (int i = 0; i < tokens.length - 1;) {
+      if (tokens[i].type == TokenType.LINEBREAK) {
+        switch (tokens[i + 1].type) {
+          case TokenType.RIGHT_BRACE:
+          case TokenType.RIGHT_PARENTHESES:
+          case TokenType.RIGHT_SQUARE:
+          case TokenType.ELSE:
+            tokens.removeAt(i);
+            continue;
+          default:
+            ++i;
+        }
+      } else ++i;
+    }
+    return tokens;
   }
 
   bool _isAtEnd() => _current >= _source.length;
@@ -111,36 +130,36 @@ class BSScanner {
         if (!_tokens.isEmpty) {
           TokenType last = _tokens.last.type;
           if (![
-            TokenType.LEFT_PARENTHESES,
-            TokenType.LEFT_BRACE,
-            TokenType.LEFT_SQUARE,
-            TokenType.COMMA,
-            TokenType.DOT,
-            TokenType.MINUS,
-            TokenType.PLUS,
-            TokenType.SEMICOLON,
-            TokenType.LINEBREAK,
-            TokenType.SLASH,
-            TokenType.STAR,
-            TokenType.APPROX,
-            TokenType.EXP,
-            TokenType.VERTICAL_BAR,
-            TokenType.ASSIGMENT,
-            TokenType.EQUALS,
-            TokenType.IDENTICALLY_EQUALS,
-            TokenType.GREATER,
-            TokenType.GREATER_EQUAL,
-            TokenType.LESS,
-            TokenType.LESS_EQUAL,
-            TokenType.AND,
-            TokenType.OR,
-            TokenType.NOT,
-            TokenType.ELSE,
-            TokenType.CONTAINED,
-            TokenType.DISJOINED,
-            TokenType.SET,
-            TokenType.UNION,
-            TokenType.INTERSECTION,
+            TokenType.LEFT_PARENTHESES, //(
+            TokenType.LEFT_BRACE, // [
+            TokenType.LEFT_SQUARE, // {
+            TokenType.COMMA, // ,
+            TokenType.DOT, // .
+            TokenType.MINUS, // -
+            TokenType.PLUS, // +
+            TokenType.SEMICOLON, // ;
+            TokenType.LINEBREAK, //
+            TokenType.SLASH, // /
+            TokenType.STAR, // *
+            TokenType.APPROX, // ~
+            TokenType.EXP, // ^
+            TokenType.VERTICAL_BAR, // |
+            TokenType.ASSIGMENT, // =
+            TokenType.EQUALS, // ==
+            TokenType.IDENTICALLY_EQUALS, // ===
+            TokenType.GREATER, // >
+            TokenType.GREATER_EQUAL, // >=
+            TokenType.LESS, // <
+            TokenType.LESS_EQUAL, // <=
+            TokenType.AND, // and
+            TokenType.OR, // or
+            TokenType.NOT, // not
+            TokenType.ELSE, // else
+            TokenType.CONTAINED, // contained
+            TokenType.DISJOINED, // disjoined
+            TokenType.SET, // set
+            TokenType.UNION, // union
+            TokenType.INTERSECTION, // intersection
           ].contains(last)) _addToken(TokenType.LINEBREAK);
         }
         _line++;
@@ -154,7 +173,6 @@ class BSScanner {
     });
   }
 
-//TODO: finishing a program with a comment without any characters after it makes it sad
   ///scans a single token.
   void _scanToken() {
     //gets the next character, consuming it (by moving _current forward)
