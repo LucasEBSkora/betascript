@@ -63,7 +63,11 @@ intervalDefinition -> ("[" | "(") linebreak? expression "," linebreak? expressio
 rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
 builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? | linebreak?  logicOr linebreak? "}"
 
-delimitator -> "\n" | ";"
+
+WHAT TO DO ABOUT "|", "}" AND "," AS UNCONSUMED TERMINATORS?
+delimitator -> "\n" | ";" 
+
+
 
 
 these should be interpreted the following way: in order to build a valid BetaScript expression, one starts at the expression rule, and

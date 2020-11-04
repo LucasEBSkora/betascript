@@ -31,8 +31,6 @@ class BSScanner {
     }
 
     //if the last line of the file doesn`t end with a line break, it might come up as unterminated. To solve this, we add an extra linebreak token
-    if (_tokens.last.type != TokenType.LINEBREAK)
-      _tokens.add(new Token(TokenType.LINEBREAK, "\n", null, _line));
     //adds a end of file token in the end, although it isn't completely necessary
     _tokens.add(new Token(TokenType.EOF, "", null, _line));
     return _removeLinebreaks(_tokens);
@@ -52,7 +50,8 @@ class BSScanner {
           default:
             ++i;
         }
-      } else ++i;
+      } else
+        ++i;
     }
     return tokens;
   }
@@ -74,6 +73,7 @@ class BSScanner {
       '~': () => _addToken(TokenType.APPROX),
       '+': () => _addToken(TokenType.PLUS),
       ';': () => _addToken(TokenType.SEMICOLON),
+      ';': () => _addToken(TokenType.SEMICOLON), //greek question mark
       '*': () => _addToken(TokenType.STAR),
       '!': () => _addToken(TokenType.FACTORIAL),
       "'": () => _addToken(TokenType.APOSTROPHE),
@@ -185,7 +185,7 @@ class BSScanner {
       //if it isn't, it's either the start of a numeric literal, a identifier (or keyword), or an unexpected character.
       if (_IsDigit(c)) {
         _number();
-      } else if (_isAlpha(c)) {
+      } else if (_isValidCharacter(c)) {
         _identifier();
       } else
         BetaScript.error(_line, "Error: Unexpected character " + c);
@@ -307,7 +307,7 @@ class BSScanner {
   ///having found the start of a identifier, reads the rest of it and adds it to _tokens.
   void _identifier() {
     //keeps going while it finds numbers (even though it can't start with a number)
-    while (_isAlphaNumeric(_peek())) _advance();
+    while (!_isAtEnd() && _isExpandedAlphanumeric(_peek())) _advance();
 
     String text = _source.substring(_start, _current);
 
@@ -316,15 +316,30 @@ class BSScanner {
         (_keywords.containsKey(text)) ? _keywords[text] : TokenType.IDENTIFIER);
   }
 
-  ///returns whether the character c is a underscore or a letter.
+  ///returns whether the character c is a underscore or a latin alphabet letter.
   static bool _isAlpha(String c) =>
       ((c?.length ?? 0) == 1) &&
       (c == "_" ||
           ("a".compareTo(c) <= 0 && "z".compareTo(c) >= 0) ||
           ("A".compareTo(c) <= 0 && "Z".compareTo(c) >= 0));
 
-  ///returns true if the character c is a digit, letter or underscore
-  static bool _isAlphaNumeric(String c) => _isAlpha(c) || _IsDigit(c);
+  //as per https://stackoverflow.com/a/47956543/14011990
+  static bool _isGreek(String c) {
+    final int asUnicode = c.runes.single;
+    return (0x391 <= asUnicode && asUnicode <= 0x3a9) || //Greek capitals
+        (0x3B1 <= asUnicode && asUnicode <= 0x3c9); //Grek small
+  }
+
+
+  static bool _isMathSymbol(String c) => false;
+
+  //returns true if character is from the latin or greek alphabets, or if it is a valid mathematical symbol
+  static bool _isValidCharacter(String c) =>
+      _isAlpha(c) || _isGreek(c) || _isMathSymbol(c);
+
+  ///returns true if the character c is a digit, from the latin or greek alphabets, or if it is a valid mathematical symbol
+  static bool _isExpandedAlphanumeric(String c) =>
+      _isValidCharacter(c) || _IsDigit(c);
 
   ///does the same as _identifier, but for directives, which are basically any string of characters ending in whitespace
   void _directive() {

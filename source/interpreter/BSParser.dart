@@ -235,8 +235,7 @@ class BSParser {
       _error(_previous(),
           "linebreak right after 'print' keyword not allowed. Please start the target expression in the same line.");
     Expr value = _expression();
-    _consumeAny([TokenType.SEMICOLON, TokenType.LINEBREAK],
-        "Expect ';' or linebreak after value");
+    _checkTerminator();
     return new PrintStmt(value);
   }
 
@@ -914,7 +913,7 @@ class BSParser {
   ///checks if a expression is properly terminated: linebreaks and ; terminated them and must be consumed, } terminate but aren't supposed to be consumed
   void _checkTerminator() {
     if (_checkAny(
-        [TokenType.RIGHT_BRACE, TokenType.COMMA, TokenType.VERTICAL_BAR]))
+        [TokenType.RIGHT_BRACE, TokenType.COMMA, TokenType.VERTICAL_BAR]) || _isAtEnd())
       return;
     _consumeAny([TokenType.SEMICOLON, TokenType.LINEBREAK],
         "Expect ';' or line break after return value");
