@@ -1,4 +1,4 @@
-This isn't backus-naur, because i can't be bothered to learn it now
+This doesn't use any standard form of formal grammar representation, and isn't being maintained. go to "pure BNF.ebnf" for the update grammar
 
 program -> (declaration | linebreak)* EOF
 

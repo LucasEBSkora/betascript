@@ -22,7 +22,8 @@ class BSParser {
   //The parser works by implementing the rules in the language's formal grammar,
   //which are described in 'formal grammar representation.txt'
 
-  ///This function is basically the program -> (declaration | linebreak)* EOF
+  ///This function is basically this rule:
+  ///<program> ::= <declaration> <program>| <linebreak> <program> | <unterminated_optional_stmt> EOF | EOF
   List<Stmt> parse() {
     List<Stmt> statements = new List();
 
@@ -36,12 +37,12 @@ class BSParser {
     return statements;
   }
 
-  ///declaration -> classDecl | rouDecl | varDecl | statement
+  ///<declaration> ::= <class_decl> | <rou_decl> | <var_decl_stmt> | <statement> 
   Stmt _declaration() {
     try {
       if (_match(TokenType.CLASS)) return _classDeclaration();
 
-      ///rouDecl -> "routine" routine
+      ///<rou_decl> ::= "routine" <routine>
       if (_match(TokenType.ROUTINE)) return _routine("routine");
       if (_match(TokenType.LET)) return _varDeclaration();
       return _statement();
@@ -55,11 +56,12 @@ class BSParser {
     }
   }
 
-  ///classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER)? "{" linebreak routine* linebreak "}"
+  ///<class_decl> ::= "class" <whitespace> <identifier> <{> <routines> <}> 
+  ///             | "class" <whitespace> <identifier> <whitespace> "<" <whitespace> <identifier> <{> <routines>  <}> 
   Stmt _classDeclaration() {
     Token name = _consume(TokenType.IDENTIFIER, "Expect class name");
 
-    //( "<" IDENTIFIER)
+    //"<" <whitespace> <identifier>
     VariableExpr superclass = null;
     if (_match(TokenType.LESS)) {
       _consume(TokenType.IDENTIFIER, "Expect superclass name");
@@ -71,7 +73,7 @@ class BSParser {
 
     List<RoutineStmt> methods = new List();
 
-    //and linebreaks between routines dealt with here
+    //<routines> ::= routine <routines> | <whitespace_or_linebreak> <routines> ""
     while (!_check(TokenType.RIGHT_BRACE) && !_isAtEnd())
       if (_check(TokenType.LINEBREAK))
         _advance();
@@ -84,7 +86,8 @@ class BSParser {
   }
 
   ///kind is either 'routine' or 'method'
-  ///routine -> IDENTIFIER "(" linebreak? parameters? linebreak?")" linebreak? block
+  ///<routine> ::= <identifier> <(> <parameters> <)> <whitespace_or_linebreak> <block>
+  ///            | <identifier> <(> <)> <whitespace_or_linebreak> <block>
   RoutineStmt _routine(String kind) {
     Token name = _consume(TokenType.IDENTIFIER, "Expect $kind name.");
 
@@ -93,7 +96,7 @@ class BSParser {
 
     List<Token> parameters = new List();
 
-    ///parameters -> IDENTIFIER ( "," linebreak? IDENTIFIER)*
+    //<parameters> ::= <identifier> | <identifier> <whitespace> "," <whitespace_or_linebreak> <parameters>
     if (!_check(TokenType.RIGHT_PARENTHESES)) {
       do {
         if (_match(TokenType.LINEBREAK)) continue;
@@ -110,7 +113,15 @@ class BSParser {
     return new RoutineStmt(name, parameters, body);
   }
 
-  ///varDecl -> "let" IDENTIFIER ("(" linebreak? parameters linebreak? ")")? ( "=" linebreak? expression)? delimitator
+  ///<var_decl_stmt> ::= <unterminated_var_decl_stmt> <delimitator>
+  
+  ///<unterminated_var_decl_stmt> ::= <let> <identifier>
+  ///                               | <let> <identifier> <assigment_operator> <expression>
+  ///                               | <let> <identifier> <(>  <)> <assigment_operator> <expression>
+  ///                               | <let> <identifier> <(> <parameters> <)> <assigment_operator> <expression>
+  ///<let> ::= "let" <whitespace>
+  ///<assigment_operator> ::= <whitespace> "=" <whitespace_or_linebreak>
+
   Stmt _varDeclaration() {
     Token name = _consume(TokenType.IDENTIFIER, "Expect variable name");
 
@@ -141,7 +152,7 @@ class BSParser {
     return new VarStmt(name, parameters, initializer);
   }
 
-  //statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block | directive
+  ///<statement> ::= <expr_stmt> | <for_stmt> | <if_stmt> | <print_stmt> | <return_stmt> | <while_stmt> | <block> | <directive>
   Stmt _statement() {
     if (_match(TokenType.FOR)) return _forStatement();
     if (_match(TokenType.IF)) return _ifStatement();
@@ -154,14 +165,17 @@ class BSParser {
     return _expressionStatement();
   }
 
-  ///exprStmt -> expression delimitator
+  ///<expr_stmt> ::= <expression> <delimitator>
   Stmt _expressionStatement() {
     Expr expr = _expression();
-    _checkTerminator();
+    _checkTerminator("expression");
     return new ExpressionStmt(expr);
   }
 
-  ///forStmt -> "for" "(" linebreak? (varDecl | exprStmt | ";") linebreak? expression? ";" linebreak? expression? linebreak? ")" linebreak statement
+  ///<for_stmt> ::= "for" <(> <for_stmt_init_clause> <whitespace> ";" <whitespace_or_linebreak> <for_stmt__clause> <whitespace> ";"
+  ///               <whitespace_or_linebreak> <for_stmt__clause>  <)> <whitespace_or_linebreak> <statement>
+  ///<for_stmt_init_clause> ::= <var_decl> | <expression> | ""
+  ///<for_stmt__clause> ::= <expression> | ""
   Stmt _forStatement() {
     Token token = _previous();
 
@@ -208,7 +222,9 @@ class BSParser {
     return body;
   }
 
-  ///ifStmt -> "if" "(" linebreak? expression linebreak? ")" linebreak? statement linebreak? ( "else" linebreak? statement)?
+  ///<if_stmt> := <if_clause> | <if_clause> <whitespace_or_linebreak> <else_clause>
+  ///<if_clause> ::= "if" <(> <expression> <)> <whitespace_or_linebreak> <statement>
+  ///<else_clause> ::= "else" <whitespace_or_linebreak> <statement> 
   Stmt _ifStatement() {
     _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after 'if'.");
     //linebreaks after left parentheses handled by the parser
@@ -229,17 +245,21 @@ class BSParser {
     return new IfStmt(condition, thenBranch, elseBranch);
   }
 
-  ///printStmt -> "print" expression delimitator
+  ///<print_stmt> ::= <unterminated_print_stmt> <delimitator>
+  ///<unterminated_print_stmt> ::= "print" <expression>
   Stmt _printStatement() {
     if (_match(TokenType.LINEBREAK))
       _error(_previous(),
           "linebreak right after 'print' keyword not allowed. Please start the target expression in the same line.");
     Expr value = _expression();
-    _checkTerminator();
+    _checkTerminator("print");
     return new PrintStmt(value);
   }
 
-  ///returnStmt -> "return" ((expression? ";") | (expression "\n"))
+  ///<return_stmt> ::= "return" <whitespace> <expression> <whitespace> ";"
+  ///                | "return" <whitespace> ";"
+  ///                | "return" <whitespace> <expression> <whitespace> <linebreak>
+  ///<unterminated_return_stmt> ::= "return" | "return" <whitespace> <expression>
   Stmt _returnStatement() {
     Token keyword = _previous();
     if (_match(TokenType.LINEBREAK))
@@ -248,12 +268,12 @@ class BSParser {
     Expr value =
         (_check(TokenType.SEMICOLON)) ? LiteralExpr(null) : _expression();
 
-    _checkTerminator();
+    _checkTerminator("return");
 
     return new ReturnStmt(keyword, value);
   }
 
-  ///whileStmt -> "while" "(" linebreak? expression linebreak? ")" linebreak statement
+  ///<while_stmt> ::= "while" <(> <expression> <)> <statement>
   Stmt _whileStatement() {
     Token token = _previous();
     _consume(TokenType.LEFT_PARENTHESES, "Expect '(' after 'while'.");
@@ -273,7 +293,8 @@ class BSParser {
     return new WhileStmt(token, condition, body);
   }
 
-  ///block -> "{" (declaration | linebreak)* "}"
+  ///<block> ::= <{> <block_body> <}> | <{> <block_body> <unterminated_optional_stmt> <}>
+  ///<block_body> ::= <whitespace_or_linebreak> <block_body> | <statement> <block_body> | ""
   List<Stmt> _block() {
     //The left brace was already consumed in _statement or _routine
     List<Stmt> statements = new List();
@@ -288,12 +309,13 @@ class BSParser {
     return statements;
   }
 
-  ///expression -> assigment
+  ///<expression> ::= <assigment>
   Expr _expression() {
     return _assigment();
   }
 
-  ///assigment -> (( call ".")? linebreak? IDENTIFIER "=" linebreak? assigment) | logicOr
+  ///<assigment> ::= <logic_or> | <calls> <identifier> <assigment_operator> <assigment>
+  ///<calls> ::= <call> <whitespace> "." <whitespace_or_linebreak> <calls> | ""
   Expr _assigment() {
     //Assigment is hard because when you get to the "=" token, you already consumed the identifier token
     //and if it is something more complex, mainly envolving objects, it may be necessary to go many tokens back to discover
@@ -322,7 +344,7 @@ class BSParser {
     return expr;
   }
 
-  ///logicOr -> logicAnd ( "or"  linebreak logicAnd)*
+  ///<logic_or> ::= <logic_and> | <logic_and> <whitespace> "or" <whitespace_or_linebreak> <logic_or>
   Expr _or() {
     Expr expr = _and();
 
@@ -336,7 +358,7 @@ class BSParser {
     return expr;
   }
 
-  ///logicAnd -> equality ( "and"  linebreak equality)*
+  ///<logic_and> ::= <equality> | <equality> <whitespace> "and" <whitespace_or_linebreak> <logic_and>
   Expr _and() {
     Expr expr = _equality();
 
@@ -350,7 +372,8 @@ class BSParser {
     return expr;
   }
 
-  ///equality -> comparison ( ("==" | "===") linebreak comparison )*
+  ///<equality> ::= <comparison> | <comparison> <whitespace> <equality_operator> <whitespace_or_linebreak> <equality>
+  ///<equality_operator> ::= "==" | "==="
   Expr _equality() {
     Expr expr = _comparison();
 
@@ -364,7 +387,8 @@ class BSParser {
     return expr;
   }
 
-  ///comparison -> setBinary ( (">" | ">=" | "<" | "<=") linebreak? setBinary)*
+  ///<comparison> ::= <set_binary> | <set_binary> <whitespace> <comparison_operator> <whitespace_or_linebreak> <comparison>
+  ///<comparison_operator> ::= ">" | ">=" | "<" | "<="
   Expr _comparison() {
     //follows the pattern in _equality
 
@@ -383,7 +407,8 @@ class BSParser {
     return expr;
   }
 
-  ///setBinary -> addition ( ("union" | "intersection" | "\" | "contained" | "disjoined" | "belongs") linebreak? addition)*
+  ///<set_binary> ::= <addition> | <addition> <whitespace> <set_operator> <whitespace_or_linebreak> <set_binary>
+  ///<set_operator> ::= "union" | "intersection" | "\" | "contained" | "disjoined" | "belongs"
   Expr _setBinary() {
     Expr expr = _addition();
     while (_matchAny([
@@ -401,7 +426,8 @@ class BSParser {
     return expr;
   }
 
-  ///addition -> multiplication ( ("-" | "+") linebreak? multiplication)*
+  ///<addition> ::= <multiplication> | <multiplication> <whitespace> <addition_operator> <whitespace_or_linebreak> <addition>
+  ///<addition_operator> ::= "-" | "+"
   Expr _addition() {
     //follows the pattern in _equality
 
@@ -416,7 +442,8 @@ class BSParser {
     return expr;
   }
 
-  ///multiplication -> exponentiation ( ("*" | "/") linebreak? exponentiation)*
+  ///<multiplication> ::= <exponentiation> | <exponentiation> <whitespace> <multiplication_operator> <whitespace_or_linebreak> <multiplication>
+  ///<multiplication_operator> ::= "*" | "/"
   Expr _multiplication() {
     //follows the pattern in _equality
 
@@ -431,7 +458,7 @@ class BSParser {
     return expr;
   }
 
-  ///exponentiation -> unary_left ("^" linebreak? unary_left)*
+  ///<exponentiation> ::= <unary_left> | <unary_left> <whitespace> "^" <whitespace_or_linebreak> <exponentiation>
   Expr _exponentiation() {
     //follows the pattern in _equality
 
@@ -446,7 +473,8 @@ class BSParser {
     return expr;
   }
 
-  ///unary_left -> (("not" | "-" | "~") linebreak?)? unary_left) | unary_right
+  ///<unary_left> ::= <unary_right> | <unary_left_operator> <whitespace_or_linebreak> <unary_left>
+  ///<unary_left_operator> ::= "not" | "-" | "~"
   Expr _unary_left() {
     //this rule is a little different, and actually uses recursion. When you reach this rule, if you immediately find  '!', '-' or '~',
     //go back to the 'unary' rule
@@ -462,7 +490,8 @@ class BSParser {
     return _unary_right();
   }
 
-  //unary_right -> (unary_right ("!" | "'")?) | call | derivative
+  ///<unary_right> ::= <call> | <derivative> | <unary_right> <whitespace> <unary_right_operator>
+  ///<unary_right_operator> ::= "!" | "'"
   Expr _unary_right() {
     Expr operand;
     //if it finds a 'del' token, parses a derivative
@@ -478,8 +507,11 @@ class BSParser {
     return operand;
   }
 
-  ///call -> primary ( "(" linebreak? arguments? linebreak?")" | "." linebreak? IDENTIFIER)*
-  ///arguments -> expression ( "," linebreak? expression )*
+  ///<call> ::= <primary> <whitespace> <routine_or_field>
+  ///<routine_or_field> ::= ""
+  ///                     | <(> <)> <routine_or_field>
+  ///                     | <(> <arguments> <)> <routine_or_field> |
+  ///                     | "." <whitespace_or_linebreak> <identifier> <routine_or_field>
   Expr _call() {
     Expr expr = _primary();
 
@@ -501,8 +533,7 @@ class BSParser {
     return expr;
   }
 
-  ///call -> primary ( "(" linebreak? arguments? linebreak?")" | "." linebreak? IDENTIFIER)*
-  ///arguments -> expression ( "," linebreak? expression )*
+  ///<arguments> ::= <expression> | <expression> <whitespace> "," <whitespace_or_linebreak> <arguments>
   Expr _finishCall(Expr callee) {
     List<Expr> arguments = new List();
     //If you immediately find the ')' token, there are no arguments to the function call
@@ -524,7 +555,10 @@ class BSParser {
     return new CallExpr(callee, paren, arguments);
   }
 
-  ///derivative -> "del" "(" linebreak? expression linebreak?  ")" "/" linebreak?  "del" "(" linebreak?  arguments linebreak? ")"
+  
+  ///<derivative> ::= <partial_differential> <whitespace> "/" <whitespace_or_linebreak> <derivative_parameters>
+  ///<partial_differential> ::=  "del" <(> <expression> <)>
+  ///<derivative_parameters> ::= "del" <(> <arguments> <)>
   Expr _derivative() {
     Token keyword = _consume(TokenType.LEFT_PARENTHESES,
         "Expect '(' after del keyword - linebreaks not allowed between 'del' and '('");
@@ -555,14 +589,18 @@ class BSParser {
     return new DerivativeExpr(keyword, derivand, variables);
   }
 
-  ///primary -> setDefinition | NUMBER | STRING | "false" | "true" | "nil" |
-  /// "(" linebreak? expression linebreak? ")" | IDENTIFIER |
-  ///  ("super" "." linebreak? IDENTIFIER)
-  ///
-  /// setDefinition -> ("set" linebreak?)? intervalDefinition | rosterSetDefinition | builderSetDefinition
-  //intervalDefinition -> ("[ " | "(") linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
-  //rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
-  //builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? "|" linebreak? expression linebreak? "}"
+  /// <primary> ::= <set_definition> | NUMBER | STRING | "false" | "true" | "nil" 
+  ///            | <(> <expression> <)>
+  ///            | <identifier> | "super" <whitespace> "." <whitespace_or_linebreak> <identifier>
+  ///<set_definition> ::= "set" <whitespace_or_linebreak> <set_def> | <whitespace_or_linebreak> <set_def>
+  ///<set_def> ::= <interval_definition> | <roster_set_definition> | <builder_set_definition>
+  ///<interval_definition> ::= <left_interval_edge> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>                          <whitespace_or_linebreak> expression <whitespace_or_linebreak> <right_interval_edge>
+  ///<left_interval_edge> ::= <[> | <(>
+  ///<right_interval_edge> ::= <]> | <)>
+  ///<roster_set_definition> ::= <{> <}> | <{> <arguments> <}>
+  ///<builder_set_definition> ::= <{> "|" <whitespace_or_linebreak> <logic_or> <}>
+  ///                           | <{> <arguments> <whitespace> "|" <whitespace_or_linebreak> <logic_or> <}>
+
   Expr _primary() {
     //since some tokens may both be sets and other types of syntax
     //(braces may be sets or blocks, parentheses may be groupings or intervals,
@@ -585,26 +623,27 @@ class BSParser {
     //nil
     if (_match(TokenType.NIL)) return new LiteralExpr(null);
 
-    //"(" linebreak? expression linebreak? ")"
+    //<(> <expression> <)>
     //OR
-    //intervalDefinition -> "(" linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+    //<interval_definition> ::= <(> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
     if (_match(TokenType.LEFT_PARENTHESES)) return _parseLeftParentheses();
 
-    //rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
+    //<roster_set_definition> ::= <{> <}> | <{> <arguments> <}>
     //OR
-    //builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? "|" linebreak? expression linebreak? "}"
+    //<builder_set_definition> ::= <{> "|" <whitespace_or_linebreak> <logic_or> <}>
+    //                           | <{> <arguments> <whitespace> "|" <whitespace_or_linebreak> <logic_or> <}>
     //OR
     //just a block
     if (_match(TokenType.LEFT_BRACE)) return _parseLeftBrace(true);
 
-    //intervalDefinition -> "[" linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+    //<interval_definition> ::= <[> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
     if (_match(TokenType.LEFT_SQUARE)) return _parseLeftSquare();
 
     //IDENTIFIER
     if (_match(TokenType.IDENTIFIER)) return new VariableExpr(_previous());
     if (_match(TokenType.THIS)) return new ThisExpr(_previous());
 
-    //("super" "." linebreak? IDENTIFIER)
+    //"super" <whitespace> "." <whitespace_or_linebreak> <identifier>
     if (_match(TokenType.SUPER)) {
       Token keyword = _previous();
       _consume(TokenType.DOT,
@@ -651,9 +690,9 @@ class BSParser {
     throw _error(_previous(), "Expecting Set definition after 'set' keyword");
   }
 
-  //"(" linebreak? expression linebreak? ")"
-  //OR
-  //intervalDefinition -> ("[ " | "(") linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+  ///<(> <expression> <)>
+  ///OR
+  ///<interval_definition> ::= <(> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
   Expr _parseLeftParentheses([bool mustBeSet = false]) {
     Token _left = _previous();
     //linebreaks after '(' handled by scanner
@@ -675,7 +714,7 @@ class BSParser {
     return new GroupingExpr(expr);
   }
 
-  //intervalDefinition -> ("[ " | "(") linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
+  ///<interval_definition> ::= <[> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
   Expr _parseLeftSquare([bool mustBeSet = false]) {
     Token left = _previous();
 
@@ -692,11 +731,11 @@ class BSParser {
     return new IntervalDefinitionExpr(left, expr, _expr, _previous());
   }
 
-  //rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
-  //OR
-  //builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? "|" linebreak? expression linebreak? "}"
-  //OR
-  //block -> "{" (declaration | linebreak)* "}"
+  ///rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
+  ///OR
+  ///builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? "|" linebreak? expression linebreak? "}"
+  ///OR
+  ///block -> "{" (declaration | linebreak)* "}"
   Object _parseLeftBrace([bool expectSet = false]) {
     Token _leftBrace = _previous();
     Expr _setReturn = null;
@@ -746,7 +785,6 @@ class BSParser {
               "all parameters in a builder set definition must evaluate to a variable");
       }
 
-      //TODO: fix this whole pile of bullshit
       Token bar = _previous();
       Expr logic = _expression();
       //linebreak before } handled by scanner
@@ -900,6 +938,9 @@ class BSParser {
     }
   }
 
+  ///<directive> ::= "#" directiveName 
+  ///<directive_name ::=  a directive name is composed of anything that isn't whitespace. There is probably a simple way of expressing this in regEx, 
+  ///                     but i unforgivably don't know how to use them. basically, if it can be a twitter hashtag, it counts
   Stmt _directive() {
     DirectiveStmt stmt = DirectiveStmt(_previous(), _previous().literal);
     //if the directive is global, it is set directly in the global directives
@@ -910,12 +951,41 @@ class BSParser {
       return null;
   }
 
-  ///checks if a expression is properly terminated: linebreaks and ; terminated them and must be consumed, } terminate but aren't supposed to be consumed
-  void _checkTerminator() {
-    if (_checkAny(
-        [TokenType.RIGHT_BRACE, TokenType.COMMA, TokenType.VERTICAL_BAR]) || _isAtEnd())
+  ///delimitator ::= <linebreak> | <;> 
+  void _checkTerminator(String type) {
+    //'}' and EOF are unconsumed terminators to deal with the fact something at the end of a program or block might not have a linebreak,
+    //which should work. ',' and '|' are unconsumed terminator as a crutch to make sure that they the first expression after an ambiguous
+    //'{'. Since none of these are consumed, they will still cause an error when in the wrong place, so this isn't going to allow weird stuff
+    //(i hope)
+    if (_checkAny([TokenType.SEMICOLON, TokenType.LINEBREAK])) {
+      _advance();
       return;
-    _consumeAny([TokenType.SEMICOLON, TokenType.LINEBREAK],
-        "Expect ';' or line break after return value");
+    }
+    if (_isAtEnd() ||
+        _checkAny(
+            [TokenType.RIGHT_BRACE, TokenType.COMMA, TokenType.VERTICAL_BAR]))
+      return;
+
+    throw _error(_peek(), "Expect ';' or line break after $type value");
   }
 }
+
+//whitespace rules:
+
+//<unterminated_optional_stmt> ::= <unterminated_print_stmt> | <unterminated_return_stmt> | <unterminated_var_decl_stmt> | <expression>
+//<whitespace> ::= TAB <whitespace> | " " <whitespace> | ""
+//<linebreak> ::= LINEBREAK <linebreak> | LINEBREAK
+//<whitespace_or_linebreak> ::= <whitespace> <whitespace_or_linebreak> | <linebreak> <whitespace_or_linebreak> | "" 
+
+//whitespace treatment rules
+
+//<;> ::= <whitespace> ";" <whitespace_or_linebreak>
+
+//<(> ::= <whitespace> "(" <whitespace_or_linebreak>
+//<)> ::= <whitespace_or_linebreak> ")" <whitespace>
+
+//<[> ::= <whitespace> "[" <whitespace_or_linebreak>
+//<]> ::= <whitespace_or_linebreak> "]" <whitespace>
+
+//<{> ::= <whitespace> "{" <whitespace_or_linebreak>
+//<}> ::= <whitespace_or_linebreak> "}" <whitespace>
