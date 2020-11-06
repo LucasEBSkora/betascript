@@ -61,7 +61,7 @@ setDefinition -> ("set" linebreak?)? intervalDefinition | rosterSetDefinition | 
 
 intervalDefinition -> ("[" | "(") linebreak? expression "," linebreak? expression linebreak? ("]" | ")")
 rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
-builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? | linebreak?  logicOr linebreak? "}"
+builderSetDefinition -> "{" linebreak? (expression, ("," expression)* )? "|" linebreak?  logicOr linebreak? "}"
 
 
 WHAT TO DO ABOUT "|", "}" AND "," AS UNCONSUMED TERMINATORS?

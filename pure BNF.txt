@@ -1,0 +1,134 @@
+<program> ::= <declaration> <program>| <linebreak> <program> | EOF
+
+<whitespace> ::= TAB <whitespace> | " " <whitespace> | ""
+
+<linebreak> ::= LINEBREAK <linebreak> | LINEBREAK
+
+<whitespace_or_linebreak> ::= <whitespace> <whitespace_or_linebreak> | <linebreak> <whitespace_or_linebreak> | "" 
+
+<declaration> ::= <class_decl> | <rou_decl> | <var_decl_stmt> | <statement> 
+
+<class_decl> ::= "class" <identifier> "{" <whitespace_or_linebreak> <routines> <whitespace_or_linebreak> "}" 
+              | "class" <identifier> "<" <identifier> "{" <whitespace_or_linebreak> <routines> <whitespace_or_linebreak> "}" 
+
+<routines> ::= routine <routines> | ""
+
+<rou_decl> ::= "routine" <routine>
+<routine> ::= <identifier> <whitespace> "(" <whitespace_or_linebreak> <parameters> <whitespace_or_linebreak> ")" <whitespace_or_linebreak> <block>
+          | <identifier> <whitespace> "(" <whitespace_or_linebreak> ")" <whitespace_or_linebreak> <block>
+
+<parameters> ::= <identifier> | <identifier> <whitespace> "," <whitespace_or_linebreak> <parameters>
+
+<var_decl_stmt> ::= <var_decl> <delimitator>
+
+<var_decl> ::= "let" <whitespace> <identifier> <delimitator>
+          | "let" <whitespace> <identifier> <whitespace> <assigment_operator> <whitespace_or_linebreak> <expression> <delimitator>
+          | "let" <whitespace> <identifier> "(" <whitespace_or_linebreak> ")" <whitespace> <assigment_operator> <whitespace_or_linebreak> <expression> <delimitator>
+          | "let" <whitespace> <identifier> "(" <parameters> ")" <whitespace> <assigment_operator> <whitespace_or_linebreak> <expression> <delimitator>
+          
+<assigment_operator> ::= "=" 
+
+<statement> ::= <expr_stmt> | <for_stmt> | <if_stmt> | <print_stmt> | <return_stmt> | <while_stmt> | <block> | <directive>
+
+<directive> ::= "#" directiveName 
+
+<directive_name ::= a directive name is composed of anything that isn't whitespace. There is probably a simple way of expressing this in regEx, 
+but i unforgivably don't know how to use them. basically, if it can be a twitter hashtag, it counts
+
+<expr_stmt> ::= <expression> <delimitator>
+
+<for_stmt> ::= "for" <whitespace> "(" <whitespace_or_linebreak> <for_stmt_init_clause> <whitespace> ";" <whitespace_or_linebreak> <for_stmt__clause> <whitespace> ";"
+               <whitespace_or_linebreak> <for_stmt__clause> <whitespace_or_linebreak> ")" <whitespace_or_linebreak> <statement>
+
+<for_stmt_init_clause> ::= <var_decl> | <expression> | ""
+<for_stmt__clause> ::= <expression> | ""
+
+<if_stmt> := <if_clause> | <if_clause> <whitespace_or_linebreak> <else_clause>
+
+<if_clause> ::= "if" <whitespace> "(" <whitespace_or_linebreak> <expression> <whitespace_or_linebreak> ")" <whitespace_or_linebreak> <statement>
+
+<else_clause> ::= "else" <whitespace_or_linebreak> <statement> 
+
+<print_stmt> ::= "print" <expression> <delimitator>
+
+<return_stmt> ::= "return" ((expression? ";") | (expression "\n"))
+
+<return_stmt> ::= "return" <whitespace> <expression> <whitespace> ";"
+                | "return" <whitespace> ";"
+                | "return" <whitespace> <expression> <whitespace> <linebreak>
+
+<while_stmt> ::= "while" <whitespace> "(" <whitespace_or_linebreak> <expression> <whitespace_or_linebreak> ")" <statement>
+
+<block> ::= "{" <block_body> "}"
+
+<block_body> ::= <whitespace_or_linebreak> <block_body> | <statement> <block_body> | ""
+
+<expression> ::= <assigment>
+
+<assigment> ::= <logic_or> | <calls> <identifier> <whitespace> <assigment_operator> <assigment>
+
+<calls> ::= <call> <whitespace> "." <whitespace_or_linebreak> <calls> | ""
+
+<logic_or> ::= <logic_and> | <logic_and> <whitespace> "or" <whitespace_or_linebreak> <logic_or>
+<logic_and> ::= <equality> | <equality> <whitespace> "and" <whitespace_or_linebreak> <logic_and>
+
+<equality> ::= <comparison> | <comparison> <whitespace> <equality_operator> <whitespace_or_linebreak> <equality>
+<equality_operator> ::= "==" | "==="
+
+<comparison> ::= <set_binary> | <set_binary> <whitespace> <comparison_operator> <whitespace_or_linebreak> <comparison>
+<comparison_operator> ::= ">" | ">=" | "<" | "<="
+
+<set_binary> ::= <addition> | <addition> <whitespace> <set_operator> <whitespace_or_linebreak> <set_binary>
+<set_operator> ::= "union" | "intersection" | "\" | "contained" | "disjoined" | "belongs"
+
+<addition> ::= <multiplication> | <multiplication> <whitespace> <addition_operator> <whitespace_or_linebreak> <addition>
+<addition_operator> ::= "-" | "+"
+
+<multiplication> ::= <exponentiation> | <exponentiation> <whitespace> <multiplication_operator> <whitespace_or_linebreak> <multiplication>
+<multiplication_operator> ::= "*" | "/"
+
+<exponentiation> ::= <unary_left> | <unary_left> <whitespace> "^" <whitespace_or_linebreak> <exponentiation>
+
+<unary_left> ::= <unary_right> | <unary_left_operator> <whitespace_or_linebreak> <unary_left>
+<unary_left_operator> ::= "not" | "-" | "~"
+
+<unary_right> ::= <call> | <derivative> | <unary_right> <whitespace> <unary_right_operator>
+<unary_right_operator> ::= "!" | "'"
+
+
+<call> ::= <primary> <whitespace> <routine_or_field>
+
+<routine_or_field> ::= ""
+                     | "(" <whitespace_or_linebreak> ")" <routine_or_field>
+                     | "(" <whitespace_or_linebreak> <arguments> <whitespace_or_linebreak> ")" <routine_or_field> |
+                     | "." <whitespace_or_linebreak> <identifier> <routine_or_field>
+
+ATEAQUI
+<arguments> ::= <expression> | <expression> <whitespace> "," <whitespace_or_linebreak> <arguments>
+
+
+<derivative> ::= <partial_differential> <whitespace> "/" <whitespace_or_linebreak> <derivative_parameters>
+<partial_differential> ::=  "del" <whitespace> "(" <whitespace_or_linebreak> <expression> <whitespace_or_linebreak> ")"
+<derivative_parameters> ::= "del" <whitespace> "(" <whitespace_or_linebreak> <arguments> <whitespace_or_linebreak> ")"
+
+<primary> ::= <set_definition> | NUMBER | STRING | "false" | "true" | "nil" 
+            | "(" <whitespace_or_linebreak> <expression> <whitespace_or_linebreak> ")"
+            | <identifier> | "super" <whitespace> "." <whitespace_or_linebreak> <identifier>
+
+<set_definition> ::= "set" <whitespace_or_linebreak> <set_def>
+<set_def> ::= <interval_definition> | <roster_set_definition> | <builder_set_definition>
+
+<interval_definition> ::= <left_interval_edge> <whitespace_or_linebreak> expression <whitespace> ","
+                          <whitespace_or_linebreak> expression <whitespace_or_linebreak> <right_interval_edge>
+<left_interval_edge> ::= "[" | "("
+<right_interval_edge> ::= "]" | ")"
+
+<roster_set_definition> ::= "{" <whitespace_or_linebreak"}" | "{" <whitespace_or_linebreak> <arguments> <whitespace_or_linebreak> "}"
+
+<builder_set_definition> ::= "{" <whitespace_or_linebreak> (expression, ("," expression)* )? "|" <whitespace_or_linebreak>  logicOr <whitespace_or_linebreak> "}"
+<builder_set_definition> ::= "{" <whitespace_or_linebreak> "|" <whitespace_or_linebreak> <logic_or> <whitespace_or_linebreak> "}"
+                           | "{" <whitespace_or_linebreak> <arguments> <whitespace> "|" <whitespace_or_linebreak> <logic_or> <whitespace_or_linebreak> "}"
+
+
+WHAT TO DO ABOUT "|", "}", EOF AND "," AS UNCONSUMED TERMINATORS?
+delimitator ::= "\n" | ";" 

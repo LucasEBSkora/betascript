@@ -5,6 +5,6 @@ print infinity
 print pi
 print π 
 
-let ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩIHαβγδεζηθικλμνξοπρςστυφχψω = "i named a variable every unicode greek character in order and i gotta say, this is some cursed shit"
+let ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψω = "i named a variable every unicode greek character in order and i gotta say, this is some cursed shit"
 
-print ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩIHαβγδεζηθικλμνξοπρςστυφχψω
+print ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψω
