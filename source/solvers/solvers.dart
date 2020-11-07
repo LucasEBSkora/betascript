@@ -1,1 +1,1 @@
-export 'SingleVariableSolver.dart';
+export 'single_variable_solver.dart';

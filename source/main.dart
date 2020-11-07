@@ -1,4 +1,4 @@
-import 'interpreter/BetaScript.dart';
+import 'interpreter/βscript.dart';
 
 //main function for the command line version
 int main(List<String> args) {

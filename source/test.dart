@@ -1,6 +1,6 @@
-import 'BSFunction/BSCalculus.dart';
+import 'βs_function/βs_calculus.dart';
 import 'sets/sets.dart';
-import 'Logic/Logic.dart';
+import 'logic/logic.dart';
 
 void main() {
   Variable x = variable("x");
