@@ -54,34 +54,34 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       Pair<num, num> nums = BSFunction.toNums(leftOperand, rightOperand);
 
       switch (e.op.type) {
-        case TokenType.MINUS:
+        case TokenType.minus:
           return leftOperand - rightOperand;
-        case TokenType.SLASH:
+        case TokenType.slash:
           return leftOperand / rightOperand;
-        case TokenType.STAR:
+        case TokenType.star:
           return leftOperand * rightOperand;
-        case TokenType.EXP:
+        case TokenType.exp:
           return leftOperand ^ rightOperand;
-        case TokenType.PLUS:
+        case TokenType.plus:
           return leftOperand + rightOperand;
-        case TokenType.GREATER:
+        case TokenType.greater:
           if (nums.first != null) return nums.first > nums.second;
           return GreaterThan(leftOperand, rightOperand);
-        case TokenType.GREATER_EQUAL:
+        case TokenType.greaterEqual:
           if (nums.first != null) return nums.first >= nums.second;
           return GreaterOrEqual(leftOperand, rightOperand);
-        case TokenType.LESS:
+        case TokenType.less:
           if (nums.first != null) return nums.first < nums.second;
           return LessThan(leftOperand, rightOperand);
-        case TokenType.LESS_EQUAL:
+        case TokenType.lessEqual:
           if (nums.first != null) return nums.first <= nums.second;
           return LessOrEqual(leftOperand, rightOperand);
-        // EQUALS returns logic expressions for functions and bools for everything else
-        case TokenType.EQUALS:
+        // equals returns logic expressions for functions and bools for everything else
+        case TokenType.equals:
           if (nums.first != null) return nums.first == nums.second;
           return Equal(leftOperand, rightOperand);
-        // IDENTICALLY_EQUALS always returns booleans
-        case TokenType.IDENTICALLY_EQUALS:
+        // identicallyEquals always returns booleans
+        case TokenType.identicallyEquals:
           return _isEqual(leftOperand, rightOperand);
         default:
           throw new RuntimeError(
@@ -92,18 +92,18 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     //operations for sets
     if (leftOperand is BSSet && rightOperand is BSSet) {
       switch (e.op.type) {
-        case TokenType.MINUS:
-        case TokenType.SLASH:
+        case TokenType.minus:
+        case TokenType.slash:
           return leftOperand.relativeComplement(rightOperand);
 
-        case TokenType.STAR:
+        case TokenType.star:
           return leftOperand.intersection(rightOperand);
-        case TokenType.PLUS:
+        case TokenType.plus:
           return leftOperand.union(rightOperand);
-        // EQUALS returns logic expressions for functions and bools for everything else
-        // IDENTICALLY_EQUALS always returns booleans
-        case TokenType.EQUALS:
-        case TokenType.IDENTICALLY_EQUALS:
+        // equals returns logic expressions for functions and bools for everything else
+        // identicallyEquals always returns booleans
+        case TokenType.equals:
+        case TokenType.identicallyEquals:
           return _isEqual(leftOperand, rightOperand);
         default:
           throw new RuntimeError(
@@ -112,7 +112,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     }
 
     //operation for string
-    if (e.op.type == TokenType.PLUS) {
+    if (e.op.type == TokenType.plus) {
       if (leftOperand is String && rightOperand is String)
         return leftOperand + rightOperand;
       if (leftOperand is String) return leftOperand + rightOperand.toString();
@@ -134,18 +134,18 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     dynamic operand = _evaluate(e.operand);
 
     switch (e.op.type) {
-      case TokenType.MINUS:
+      case TokenType.minus:
         _checkNum(e.op, operand);
         return -operand; //Dynamically typed language - if the conversion from operand to num fails, it is intended behavior
-      case TokenType.NOT:
+      case TokenType.not:
         return !_istruthy(operand);
       //"not" (!) would be here, but i decided to use it for factorials and use the "not" keyword explicitly
-      case TokenType.APPROX:
+      case TokenType.approx:
         if (operand is BSFunction) return operand.approx;
         if (operand is BuilderSet) return operand.knownElements;
         throw new RuntimeError(e.op,
             "The approximation (~) operator may only be applied to functions and builder sets");
-      case TokenType.APOSTROPHE:
+      case TokenType.apostrophe:
         if (operand is BSFunction) {
           Set<Variable> params = operand.parameters;
           if (params.length > 1)
@@ -159,7 +159,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
         if (operand is BSSet) return operand.complement();
         throw new RuntimeError(e.op,
             "The apostrophe operator may only be applied to functions and sets");
-      case TokenType.FACTORIAL:
+      case TokenType.factorial:
         throw new RuntimeError(e.op, "error! factorial not yet implemented");
       default:
         return null;
@@ -290,10 +290,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     Object left = _evaluate(e.left);
 
     //Circuit-breaker logical expressions:
-    //true OR other_expression should return true regardless of other_expression, so it isn't even evaluated
-    //false AND other_expression should return false regardless of other_expression, so it isn't even evaluated
+    //true or other_expression should return true regardless of other_expression, so it isn't even evaluated
+    //false and other_expression should return false regardless of other_expression, so it isn't even evaluated
 
-    if (e.op.type == TokenType.OR) {
+    if (e.op.type == TokenType.or) {
       if (_istruthy(left)) return left;
     } else if (!_istruthy(left)) return left;
     return _evaluate(e.right);
@@ -544,17 +544,17 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     if (right is BSSet) {
       if (left is BSSet) {
         switch (e.operator.type) {
-          case TokenType.UNION:
+          case TokenType.union:
             return left.union(right);
-          case TokenType.INTERSECTION:
+          case TokenType.intersection:
             return left.intersection(right);
-          case TokenType.DISJOINED:
+          case TokenType.disjoined:
             return left.disjoined(right);
-          case TokenType.INVERTED_SLASH:
+          case TokenType.invertedSlash:
             return left.relativeComplement(right);
-          case TokenType.CONTAINED:
+          case TokenType.contained:
             return right.contains(left);
-          case TokenType.BELONGS:
+          case TokenType.belongs:
             throw new RuntimeError(
                 e.operator, "left operand for this operation must be a number");
           default:
@@ -562,7 +562,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
         }
       } else {
         if (left is BSFunction &&
-            e.operator.type == TokenType.BELONGS &&
+            e.operator.type == TokenType.belongs &&
             BSFunction.extractFromNegative<Number>(left).second) {
           return right.belongs(left);
         }

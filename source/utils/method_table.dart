@@ -3,18 +3,18 @@ import 'dart:collection' show HashMap;
 import 'package:meta/meta.dart';
 
 ///Used to effitiently store operations between subtypes of a type
-class MethodTable<RETURN_TYPE, DATA_TYPE> {
+class MethodTable<return_TYPE, DATA_TYPE> {
   @protected
   final HashMap<String, Function> hashMap = HashMap();
 
   MethodTable();
 
   //Can't really stop anyone from adding a type which doesn't extend DATA_TYPE
-  //or a method which isn't defined in two DATA_TYPE variables or doesn't return RETURN_TYPE
+  //or a method which isn't defined in two DATA_TYPE variables or doesn't return return_TYPE
   void addMethod(Type t1, Type t2, Function method) =>
       hashMap[t1.toString() + t2.toString()] = method;
 
-  RETURN_TYPE call(DATA_TYPE first, DATA_TYPE second) =>
+  return_TYPE call(DATA_TYPE first, DATA_TYPE second) =>
       findMethod(first.runtimeType, second.runtimeType)(first, second);
 
   ///adds the same method for many cells in the same line
@@ -38,8 +38,8 @@ class MethodTable<RETURN_TYPE, DATA_TYPE> {
   }
 }
 
-class ComutativeMethodTable<RETURN_TYPE, DATA_TYPE>
-    extends MethodTable<RETURN_TYPE, DATA_TYPE> {
+class ComutativeMethodTable<return_TYPE, DATA_TYPE>
+    extends MethodTable<return_TYPE, DATA_TYPE> {
 
   @override 
   void addMethod(Type t1, Type t2, Function method) {
@@ -51,7 +51,7 @@ class ComutativeMethodTable<RETURN_TYPE, DATA_TYPE>
   // void addMethod(Type t1, Type t2, Function method) =>
   //     hashMap[_getStringConversion(t1, t2)] = method;
 
-  // RETURN_TYPE call(DATA_TYPE first, DATA_TYPE second) =>
+  // return_TYPE call(DATA_TYPE first, DATA_TYPE second) =>
   //     (_correctOrder(first.runtimeType, second.runtimeType))
   //         ? findMethod(first.runtimeType, second.runtimeType)(first, second)
   //         : findMethod(first.runtimeType, second.runtimeType)(second, first);

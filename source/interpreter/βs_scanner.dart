@@ -32,19 +32,19 @@ class BSScanner {
 
     //if the last line of the file doesn`t end with a line break, it might come up as unterminated. To solve this, we add an extra linebreak token
     //adds a end of file token in the end, although it isn't completely necessary
-    _tokens.add(new Token(TokenType.EOF, "", null, _line));
+    _tokens.add(new Token(TokenType.eof, "", null, _line));
     return _removeLinebreaks(_tokens);
   }
 
   //many linebreaks can be removed looking at the next token, which means we have to wait until the scanner is finished to remove them
   static List<Token> _removeLinebreaks(List<Token> tokens) {
     for (int i = 0; i < tokens.length - 1;) {
-      if (tokens[i].type == TokenType.LINEBREAK) {
+      if (tokens[i].type == TokenType.lineBreak) {
         switch (tokens[i + 1].type) {
-          case TokenType.RIGHT_BRACE:
-          case TokenType.RIGHT_PARENTHESES:
-          case TokenType.RIGHT_SQUARE:
-          case TokenType.ELSE:
+          case TokenType.rightBrace:
+          case TokenType.rightParentheses:
+          case TokenType.rightSquare:
+          case TokenType.elseToken:
             tokens.removeAt(i);
             continue;
           default:
@@ -62,23 +62,23 @@ class BSScanner {
   void _initializeMap() {
     _charToLexeme = HashMap.from({
       //these lexemes are always single character, and can be initialized with ease
-      '(': () => _addToken(TokenType.LEFT_PARENTHESES),
-      ')': () => _addToken(TokenType.RIGHT_PARENTHESES),
-      '{': () => _addToken(TokenType.LEFT_BRACE),
-      '}': () => _addToken(TokenType.RIGHT_BRACE),
-      '[': () => _addToken(TokenType.LEFT_SQUARE),
-      ']': () => _addToken(TokenType.RIGHT_SQUARE),
-      ',': () => _addToken(TokenType.COMMA),
-      '-': () => _addToken(TokenType.MINUS),
-      '~': () => _addToken(TokenType.APPROX),
-      '+': () => _addToken(TokenType.PLUS),
-      ';': () => _addToken(TokenType.SEMICOLON),
-      ';': () => _addToken(TokenType.SEMICOLON), //greek question mark
-      '*': () => _addToken(TokenType.STAR),
-      '!': () => _addToken(TokenType.FACTORIAL),
-      "'": () => _addToken(TokenType.APOSTROPHE),
-      '^': () => _addToken(TokenType.EXP),
-      '|': () => _addToken(TokenType.VERTICAL_BAR),
+      '(': () => _addToken(TokenType.leftParentheses),
+      ')': () => _addToken(TokenType.rightParentheses),
+      '{': () => _addToken(TokenType.leftBrace),
+      '}': () => _addToken(TokenType.rightBrace),
+      '[': () => _addToken(TokenType.leftSquare),
+      ']': () => _addToken(TokenType.rightSquare),
+      ',': () => _addToken(TokenType.comma),
+      '-': () => _addToken(TokenType.minus),
+      '~': () => _addToken(TokenType.approx),
+      '+': () => _addToken(TokenType.plus),
+      ';': () => _addToken(TokenType.semicolon),
+      ';': () => _addToken(TokenType.semicolon), //greek question mark
+      '*': () => _addToken(TokenType.star),
+      '!': () => _addToken(TokenType.factorial),
+      "'": () => _addToken(TokenType.apostrophe),
+      '^': () => _addToken(TokenType.exp),
+      '|': () => _addToken(TokenType.verticalBar),
       '@': () {
         //word comments ignore everything up to the next character of whitespace (but can be used normally inside strings)
         while (_peek() != '\n' &&
@@ -93,17 +93,17 @@ class BSScanner {
         if (_IsDigit(_peek()))
           _number();
         else
-          _addToken(TokenType.DOT);
+          _addToken(TokenType.dot);
       },
       //for these, we need to check if they are followed by a '=' or not (since = and ==, < and <=, > and >= are different things)
       //specially '=', which can be '=', '==' or '==='
       '=': () => _addToken((_match('=')
-          ? (_match('=') ? TokenType.IDENTICALLY_EQUALS : TokenType.EQUALS)
-          : TokenType.ASSIGMENT)),
+          ? (_match('=') ? TokenType.identicallyEquals : TokenType.equals)
+          : TokenType.assigment)),
       '<': () =>
-          _addToken((_match('=') ? TokenType.LESS_EQUAL : TokenType.LESS)),
+          _addToken((_match('=') ? TokenType.lessEqual : TokenType.less)),
       '>': () => _addToken(
-          (_match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER)),
+          (_match('=') ? TokenType.greaterEqual : TokenType.greater)),
       '/': () {
         //if the slash is followed by another slash, it's actually a comment, and the rest of the line should be ignored
         if (_match('/')) {
@@ -122,45 +122,45 @@ class BSScanner {
           _advance();
           _advance();
         } else //in any other case we just have a normal slash
-          _addToken(TokenType.SLASH);
+          _addToken(TokenType.slash);
       },
-      '\\': () => _addToken(TokenType.INVERTED_SLASH),
+      '\\': () => _addToken(TokenType.invertedSlash),
       //sometimes can be ignored, sometimes used as delimitator, but always increases the line counter.
       '\n': () {
         if (!_tokens.isEmpty) {
           TokenType last = _tokens.last.type;
           if (![
-            TokenType.LEFT_PARENTHESES, //(
-            TokenType.LEFT_BRACE, // [
-            TokenType.LEFT_SQUARE, // {
-            TokenType.COMMA, // ,
-            TokenType.DOT, // .
-            TokenType.MINUS, // -
-            TokenType.PLUS, // +
-            TokenType.SEMICOLON, // ;
-            TokenType.LINEBREAK, //
-            TokenType.SLASH, // /
-            TokenType.STAR, // *
-            TokenType.APPROX, // ~
-            TokenType.EXP, // ^
-            TokenType.VERTICAL_BAR, // |
-            TokenType.ASSIGMENT, // =
-            TokenType.EQUALS, // ==
-            TokenType.IDENTICALLY_EQUALS, // ===
-            TokenType.GREATER, // >
-            TokenType.GREATER_EQUAL, // >=
-            TokenType.LESS, // <
-            TokenType.LESS_EQUAL, // <=
-            TokenType.AND, // and
-            TokenType.OR, // or
-            TokenType.NOT, // not
-            TokenType.ELSE, // else
-            TokenType.CONTAINED, // contained
-            TokenType.DISJOINED, // disjoined
-            TokenType.SET, // set
-            TokenType.UNION, // union
-            TokenType.INTERSECTION, // intersection
-          ].contains(last)) _addToken(TokenType.LINEBREAK);
+            TokenType.leftParentheses, //(
+            TokenType.leftBrace, // [
+            TokenType.leftSquare, // {
+            TokenType.comma, // ,
+            TokenType.dot, // .
+            TokenType.minus, // -
+            TokenType.plus, // +
+            TokenType.semicolon, // ;
+            TokenType.lineBreak, //
+            TokenType.slash, // /
+            TokenType.star, // *
+            TokenType.approx, // ~
+            TokenType.exp, // ^
+            TokenType.verticalBar, // |
+            TokenType.assigment, // =
+            TokenType.equals, // ==
+            TokenType.identicallyEquals, // ===
+            TokenType.greater, // >
+            TokenType.greaterEqual, // >=
+            TokenType.less, // <
+            TokenType.lessEqual, // <=
+            TokenType.and, // and
+            TokenType.or, // or
+            TokenType.not, // not
+            TokenType.elseToken, // else
+            TokenType.contained, // contained
+            TokenType.disjoined, // disjoined
+            TokenType.setToken, // set
+            TokenType.union, // union
+            TokenType.intersection, // intersection
+          ].contains(last)) _addToken(TokenType.lineBreak);
         }
         _line++;
       },
@@ -199,30 +199,30 @@ class BSScanner {
 
   ///a map containing keywords and the corresponding token type
   static const Map<String, TokenType> _keywords = {
-    "and": TokenType.AND,
-    "belongs": TokenType.BELONGS,
-    "class": TokenType.CLASS,
-    "contained": TokenType.CONTAINED,
-    "del": TokenType.DEL,
-    "disjoined": TokenType.DISJOINED,
-    "else": TokenType.ELSE,
-    "false": TokenType.FALSE,
-    "for": TokenType.FOR,
-    "if": TokenType.IF,
-    "intersection": TokenType.INTERSECTION,
-    "let": TokenType.LET,
-    "nil": TokenType.NIL,
-    "not": TokenType.NOT,
-    "or": TokenType.OR,
-    "print": TokenType.PRINT,
-    "return": TokenType.RETURN,
-    "routine": TokenType.ROUTINE,
-    "set": TokenType.SET,
-    "super": TokenType.SUPER,
-    "this": TokenType.THIS,
-    "true": TokenType.TRUE,
-    "while": TokenType.WHILE,
-    "union": TokenType.UNION,
+    "and": TokenType.and,
+    "belongs": TokenType.belongs,
+    "class": TokenType.classToken,
+    "contained": TokenType.contained,
+    "del": TokenType.del,
+    "disjoined": TokenType.disjoined,
+    "else": TokenType.elseToken,
+    "false": TokenType.falseToken,
+    "for": TokenType.forToken,
+    "if": TokenType.ifToken,
+    "intersection": TokenType.intersection,
+    "let": TokenType.let,
+    "nil": TokenType.nil,
+    "not": TokenType.not,
+    "or": TokenType.or,
+    "print": TokenType.print,
+    "return": TokenType.returnToken,
+    "routine": TokenType.routine,
+    "set": TokenType.setToken,
+    "super": TokenType.superToken,
+    "this": TokenType.thisToken,
+    "true": TokenType.trueToken,
+    "while": TokenType.whileToken,
+    "union": TokenType.union,
   };
 
   ///creates a new token, using the interval from _start to _current as the token's lexeme.
@@ -261,12 +261,12 @@ class BSScanner {
       //if the string is properly formed, adds it to the token list, with the literal value having both '"' characters stripped off.
       _advance();
       String value = _source.substring(_start + 1, _current - 1);
-      _addToken(TokenType.STRING, value);
+      _addToken(TokenType.string, value);
     }
   }
 
   //https://stackoverflow.com/a/25886695
-  //^ is the bitwise XOR operand for integers
+  //^ is the bitwise Xor operand for integers
   //since 0 to 9 are 0x30 to 0x39 in UTF-16 where 0x30 is 0b110000 and 0x39 is 111001
   //any value that doesn't have both bites in 0x30 set to true will have the other set
   //to true, becoming bigger than nine
@@ -294,7 +294,7 @@ class BSScanner {
     }
 
     _addToken(
-        TokenType.NUMBER, n(double.parse(_source.substring(_start, _current))));
+        TokenType.number, n(double.parse(_source.substring(_start, _current))));
   }
 
   ///checks the character after current, returning null if it is after the end of the source.
@@ -313,7 +313,7 @@ class BSScanner {
 
     //if the identifier is a keyword, adds a token of the appropriate type.
     _addToken(
-        (_keywords.containsKey(text)) ? _keywords[text] : TokenType.IDENTIFIER);
+        (_keywords.containsKey(text)) ? _keywords[text] : TokenType.identifier);
   }
 
   ///returns whether the character c is a underscore or a latin alphabet letter.
@@ -344,7 +344,7 @@ class BSScanner {
   ///does the same as _identifier, but for directives, which are basically any string of characters ending in whitespace
   void _directive() {
     while (!_isWhitespace(_peek()) && !_isAtEnd()) _advance();
-    _addToken(TokenType.HASH, _source.substring(_start + 1, _current));
+    _addToken(TokenType.hash, _source.substring(_start + 1, _current));
   }
 
   bool _isWhitespace(String c) =>

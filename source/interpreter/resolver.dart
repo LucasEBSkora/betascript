@@ -7,9 +7,9 @@ import 'stmt.dart';
 import 'token.dart';
 import 'native_globals.dart';
 
-enum RoutineType { NONE, ROUTINE, INITIALIZER, METHOD }
+enum RoutineType { none, routine, initializer, method }
 
-enum ClassType { NONE, CLASS, SUBCLASS }
+enum ClassType { none, classType, subClassType }
 
 ///This class is used for variable resolution, running between the parser and the intepreter to determine exactly which variable a name refers to
 ///It does so by determining how many Environments it needs to traverse in order to find the variable to use
@@ -17,8 +17,8 @@ enum ClassType { NONE, CLASS, SUBCLASS }
 class Resolver implements ExprVisitor, StmtVisitor {
   final BSInterpreter _interpreter;
   //Used to see if we're currently traversing a routine, which is important to check if a return statement is valid
-  RoutineType _currentRoutine = RoutineType.NONE;
-  ClassType _currentClass = ClassType.NONE;
+  RoutineType _currentRoutine = RoutineType.none;
+  ClassType _currentClass = ClassType.none;
 
   ///A stack representing Scopes, where the key is the identifier name and the value is whether it is ready to be referenced
   ///because things like var a = a; should cause compile errors
@@ -76,7 +76,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
     //Declares it in current scope, also allowing it to be referenced inside itself for recursiveness
     _declare(s.name);
     _define(s.name);
-    _resolveRoutine(s, RoutineType.ROUTINE);
+    _resolveRoutine(s, RoutineType.routine);
   }
 
   @override
@@ -102,9 +102,9 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitReturnStmt(ReturnStmt s) {
-    if (_currentRoutine == RoutineType.NONE)
+    if (_currentRoutine == RoutineType.none)
       BetaScript.error(s.keyword, "Cannot return from top-level code.");
-    if (_currentRoutine == RoutineType.INITIALIZER)
+    if (_currentRoutine == RoutineType.initializer)
       BetaScript.error(s.keyword, "Cannot return a value from a constructor");
     _resolveExpr(s.value);
   }
@@ -223,7 +223,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
   @override
   void visitClassStmt(ClassStmt s) {
     ClassType enclosingClass = _currentClass;
-    _currentClass = ClassType.CLASS;
+    _currentClass = ClassType.classType;
 
     _declare(s.name);
     _define(s.name);
@@ -233,7 +233,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
         BetaScript.error(
             s.superclass.name, "A class cannot inherit from itself");
 
-      _currentClass = ClassType.SUBCLASS;
+      _currentClass = ClassType.subClassType;
       _resolveExpr(s.superclass);
 
       //Creates a new closure containing super, which contains all the methods
@@ -245,8 +245,8 @@ class Resolver implements ExprVisitor, StmtVisitor {
     _scopes.last["this"] = true;
     for (RoutineStmt method in s.methods) {
       RoutineType declaration = (method.name.lexeme == s.name.lexeme)
-          ? RoutineType.INITIALIZER
-          : RoutineType.METHOD;
+          ? RoutineType.initializer
+          : RoutineType.method;
       _resolveRoutine(method, declaration);
     }
 
@@ -270,7 +270,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   visitThisExpr(ThisExpr e) {
-    if (_currentClass == ClassType.NONE) {
+    if (_currentClass == ClassType.none) {
       BetaScript.error(e.keyword, "Cannot use 'this' outside of a class");
     }
     _resolveLocal(e, e.keyword);
@@ -278,9 +278,9 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitSuperExpr(SuperExpr e) {
-    if (_currentClass == ClassType.NONE)
+    if (_currentClass == ClassType.none)
       BetaScript.error(e.keyword, "Cannot use 'super' outside of a class.");
-    else if (_currentClass != ClassType.SUBCLASS)
+    else if (_currentClass != ClassType.subClassType)
       BetaScript.error(
           e.keyword, "Cannot use 'super' in a class with no superclass");
     _resolveLocal(e, e.keyword);
