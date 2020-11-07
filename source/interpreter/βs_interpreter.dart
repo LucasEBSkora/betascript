@@ -474,7 +474,6 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   visitBuilderDefinitionExpr(BuilderDefinitionExpr e) {
-
     List<Variable> parameters = null;
 
     if (e.parameters != null) {
@@ -510,7 +509,6 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       throw new RuntimeError(
           e.left, "Interval definitions must have both edges be numbers");
     }
-
 
     return interval(_a, _b,
         leftClosed: e.left.lexeme == '[', rightClosed: e.right.lexeme == ']');

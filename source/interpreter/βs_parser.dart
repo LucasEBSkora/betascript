@@ -37,7 +37,7 @@ class BSParser {
     return statements;
   }
 
-  ///<declaration> ::= <class_decl> | <rou_decl> | <var_decl_stmt> | <statement> 
+  ///<declaration> ::= <class_decl> | <rou_decl> | <var_decl_stmt> | <statement>
   Stmt _declaration() {
     try {
       if (_match(TokenType.classToken)) return _classDeclaration();
@@ -56,8 +56,8 @@ class BSParser {
     }
   }
 
-  ///<class_decl> ::= "class" <whitespace> <identifier> <{> <routines> <}> 
-  ///             | "class" <whitespace> <identifier> <whitespace> "<" <whitespace> <identifier> <{> <routines>  <}> 
+  ///<class_decl> ::= "class" <whitespace> <identifier> <{> <routines> <}>
+  ///             | "class" <whitespace> <identifier> <whitespace> "<" <whitespace> <identifier> <{> <routines>  <}>
   Stmt _classDeclaration() {
     Token name = _consume(TokenType.identifier, "Expect class name");
 
@@ -114,7 +114,7 @@ class BSParser {
   }
 
   ///<var_decl_stmt> ::= <unterminated_var_decl_stmt> <delimitator>
-  
+
   ///<unterminated_var_decl_stmt> ::= <let> <identifier>
   ///                               | <let> <identifier> <assigment_operator> <expression>
   ///                               | <let> <identifier> <(>  <)> <assigment_operator> <expression>
@@ -224,7 +224,7 @@ class BSParser {
 
   ///<if_stmt> := <if_clause> | <if_clause> <whitespace_or_linebreak> <else_clause>
   ///<if_clause> ::= "if" <(> <expression> <)> <whitespace_or_linebreak> <statement>
-  ///<else_clause> ::= "else" <whitespace_or_linebreak> <statement> 
+  ///<else_clause> ::= "else" <whitespace_or_linebreak> <statement>
   Stmt _ifStatement() {
     _consume(TokenType.leftParentheses, "Expect '(' after 'if'.");
     //linebreaks after left parentheses handled by the parser
@@ -555,7 +555,6 @@ class BSParser {
     return new CallExpr(callee, paren, arguments);
   }
 
-  
   ///<derivative> ::= <partial_differential> <whitespace> "/" <whitespace_or_linebreak> <derivative_parameters>
   ///<partial_differential> ::=  "del" <(> <expression> <)>
   ///<derivative_parameters> ::= "del" <(> <arguments> <)>
@@ -589,7 +588,7 @@ class BSParser {
     return new DerivativeExpr(keyword, derivand, variables);
   }
 
-  /// <primary> ::= <set_definition> | number | string | "false" | "true" | "nil" 
+  /// <primary> ::= <set_definition> | number | string | "false" | "true" | "nil"
   ///            | <(> <expression> <)>
   ///            | <identifier> | "super" <whitespace> "." <whitespace_or_linebreak> <identifier>
   ///<set_definition> ::= "set" <whitespace_or_linebreak> <set_def> | <whitespace_or_linebreak> <set_def>
@@ -788,8 +787,7 @@ class BSParser {
       Token bar = _previous();
       Expr logic = _expression();
       //linebreak before } handled by scanner
-      _consume(
-          TokenType.rightBrace, "Expect '}' after builder set definition");
+      _consume(TokenType.rightBrace, "Expect '}' after builder set definition");
       List<Token> parameters;
       if (expressions.isNotEmpty) {
         parameters = List();
@@ -881,7 +879,7 @@ class BSParser {
 
   ///returns whether current token is the last one
   ///not adding the eof token would simply mean checking _current >= _tokens.length
-  bool _isAtEnd() => _peek().type == TokenType.eof;
+  bool _isAtEnd() => _peek().type == TokenType.EOF;
 
   ///returns the current token without consuming it
   Token _peek() => _tokens[_current];
@@ -938,8 +936,8 @@ class BSParser {
     }
   }
 
-  ///<directive> ::= "#" directiveName 
-  ///<directive_name ::=  a directive name is composed of anything that isn't whitespace. There is probably a simple way of expressing this in regEx, 
+  ///<directive> ::= "#" directiveName
+  ///<directive_name ::=  a directive name is composed of anything that isn't whitespace. There is probably a simple way of expressing this in regEx,
   ///                     but i unforgivably don't know how to use them. basically, if it can be a twitter hashtag, it counts
   Stmt _directive() {
     DirectiveStmt stmt = DirectiveStmt(_previous(), _previous().literal);
@@ -951,7 +949,7 @@ class BSParser {
       return null;
   }
 
-  ///delimitator ::= <linebreak> | <;> 
+  ///delimitator ::= <linebreak> | <;>
   void _checkTerminator(String type) {
     //'}' and eof are unconsumed terminators to deal with the fact something at the end of a program or block might not have a linebreak,
     //which should work. ',' and '|' are unconsumed terminator as a crutch to make sure that they the first expression after an ambiguous
@@ -975,7 +973,7 @@ class BSParser {
 //<unterminated_optional_stmt> ::= <unterminated_print_stmt> | <unterminated_return_stmt> | <unterminated_var_decl_stmt> | <expression>
 //<whitespace> ::= TAB <whitespace> | " " <whitespace> | ""
 //<linebreak> ::= lineBreak <linebreak> | lineBreak
-//<whitespace_or_linebreak> ::= <whitespace> <whitespace_or_linebreak> | <linebreak> <whitespace_or_linebreak> | "" 
+//<whitespace_or_linebreak> ::= <whitespace> <whitespace_or_linebreak> | <linebreak> <whitespace_or_linebreak> | ""
 
 //whitespace treatment rules
 

@@ -1,11 +1,11 @@
 import 'dart:collection' show HashMap;
 
-import 'βs_interpreter.dart';
-import 'βscript.dart';
 import 'expr.dart';
 import 'stmt.dart';
-import 'token.dart';
 import 'native_globals.dart';
+import 'token.dart';
+import 'βs_interpreter.dart';
+import 'βscript.dart';
 
 enum RoutineType { none, routine, initializer, method }
 

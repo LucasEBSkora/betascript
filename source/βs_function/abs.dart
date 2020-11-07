@@ -23,7 +23,8 @@ class AbsoluteValue extends BSFunction {
       : super(params);
 
   @override
-  BSFunction evaluate(HashMap<String, BSFunction> p) => abs(operand.evaluate(p));
+  BSFunction evaluate(HashMap<String, BSFunction> p) =>
+      abs(operand.evaluate(p));
 
   @override
   BSFunction derivativeInternal(Variable v) =>

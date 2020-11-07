@@ -18,7 +18,7 @@ void main() {
   print(h);
   print(i);
 
-  BSFunction j = x/y + (-x)/y + x/(-y) + (-x)/(-y);
+  BSFunction j = x / y + (-x) / y + x / (-y) + (-x) / (-y);
   print(j);
 
   Type t = BSFunction;
@@ -69,8 +69,7 @@ void main() {
 
   print(third.union(many));
 
-  LogicExpression e1 = Or(LessOrEqual(-x+n(3), n(0)), Equal(x, n(0)));
+  LogicExpression e1 = Or(LessOrEqual(-x + n(3), n(0)), Equal(x, n(0)));
   print(e1);
   print(e1.solution);
-
 }

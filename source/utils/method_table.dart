@@ -40,8 +40,7 @@ class MethodTable<return_TYPE, DATA_TYPE> {
 
 class ComutativeMethodTable<return_TYPE, DATA_TYPE>
     extends MethodTable<return_TYPE, DATA_TYPE> {
-
-  @override 
+  @override
   void addMethod(Type t1, Type t2, Function method) {
     super.addMethod(t1, t2, method);
     super.addMethod(t2, t1, (first, second) => method(second, first));

@@ -20,7 +20,7 @@ enum TokenType {
   approx, // ~
   exp, // ^
   verticalBar, // |
-  
+
   assigment, // = or :=
   equals, // == or =
   identicallyEquals, // === or ==
@@ -61,7 +61,7 @@ enum TokenType {
   union,
   whileToken,
 
-  eof
+  EOF
 }
 
 class Token {

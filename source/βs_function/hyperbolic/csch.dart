@@ -16,7 +16,8 @@ BSFunction csch(BSFunction operand) {
 }
 
 class CscH extends singleOperandFunction {
-  CscH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
+  CscH._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

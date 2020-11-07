@@ -18,7 +18,8 @@ BSFunction tanh(BSFunction operand) {
 }
 
 class TanH extends singleOperandFunction {
-  TanH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
+  TanH._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

@@ -4,23 +4,23 @@ import '../sets/sets.dart';
 import 'constant.dart';
 import 'logic_expression.dart';
 
-LogicExpression and (LogicExpression left, LogicExpression right) {
-  
+LogicExpression and(LogicExpression left, LogicExpression right) {
   // (1 && A) == A, (0 && A) == 0
   if (left is Constant) {
     if (left.value) {
       return right;
-    } else return left;
+    } else
+      return left;
   }
   if (right is Constant) {
     if (right.value) {
       return left;
-    } else return right; 
+    } else
+      return right;
   }
 
   return And(left, right);
 }
-
 
 class And extends LogicExpression {
   final LogicExpression left;

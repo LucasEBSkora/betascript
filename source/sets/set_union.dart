@@ -11,7 +11,6 @@ BSSet setUnion(Iterable<BSSet> subsets) {
   if (_subsets.length == 0) return emptySet;
   if (_subsets.length == 1) return subsets.elementAt(0);
 
-
   //Checks if the elements are actually disjoined
   int i = 0;
   while (i < _subsets.length) {

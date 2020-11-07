@@ -18,13 +18,13 @@ class UserRoutine implements BSCallable {
   Object callThing(BSInterpreter interpreter, List<Object> arguments) {
     //Creates routine scope
     Environment environment = new Environment(_closure);
-    
+
     //defines and initializes parameters in routine scope
 
     //Assumes it is safe to iterate in both lists because arity was checked in Interpreter.VisitCallExpr
-    for (int i = 0; i < _declaration.parameters.length; ++i) 
+    for (int i = 0; i < _declaration.parameters.length; ++i)
       environment.define(_declaration.parameters[i].lexeme, arguments[i]);
-    
+
     //executes block
     //using exceptions as a way to exit the routine and return here, with the proper return value
     try {
@@ -35,7 +35,7 @@ class UserRoutine implements BSCallable {
     }
 
     //if the routine is a constructor, returns 'this' regardless of return statements inside it
-    return (_isInitializer) ? _closure.getAt(0, "this") : null; 
+    return (_isInitializer) ? _closure.getAt(0, "this") : null;
   }
 
   @override
@@ -46,6 +46,5 @@ class UserRoutine implements BSCallable {
     Environment environment = new Environment(_closure);
     environment.define("this", instance);
     return new UserRoutine(_declaration, environment, _isInitializer);
-
   }
 }

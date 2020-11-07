@@ -34,7 +34,8 @@ class BuilderSet extends BSSet {
 
   @override
   String toString() {
-    String params = rule.parameters.reduce((previousValue, element) => "$previousValue, $element");
+    String params = rule.parameters
+        .reduce((previousValue, element) => "$previousValue, $element");
     return "{$params | $rule}";
   }
 }

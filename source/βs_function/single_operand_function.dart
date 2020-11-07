@@ -1,12 +1,14 @@
 import 'variable.dart';
 import 'βs_function.dart';
 import 'dart:collection' show SplayTreeSet;
+
 ///This abstract class is used to improve code reutilization in function classes that have only one operand and are printed
 ///in the following way: name('operand'), where name is the class' name
 abstract class singleOperandFunction extends BSFunction {
   final BSFunction operand;
 
-  singleOperandFunction(BSFunction this.operand, Set<Variable> params) : super(params);
+  singleOperandFunction(BSFunction this.operand, Set<Variable> params)
+      : super(params);
 
   //assumes the class name matches the function name, ignoring camel case
   @override
@@ -26,6 +28,5 @@ abstract class singleOperandFunction extends BSFunction {
   // unfortunately can't define this one either, because we must call the correct constructor
   // @override
   // BSFunction copy([bool negative = null, Set<Variable> params = null]);
-
 
 }

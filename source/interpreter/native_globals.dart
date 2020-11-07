@@ -4,6 +4,7 @@ import 'βs_interpreter.dart';
 import 'native_callable.dart';
 import '../βs_function/βs_calculus.dart';
 import '../sets/sets.dart';
+
 final Variable _x = variable("x");
 final Variable _b = variable("b");
 
@@ -58,7 +59,7 @@ final Map<String, Object> nativeGlobals = {
   "π": constants.pi,
   "infinity": constants.infinity,
   "∞": constants.infinity,
-  
+
   //empty set
   "emptySet": emptySet,
 };

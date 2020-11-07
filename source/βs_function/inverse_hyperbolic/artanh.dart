@@ -17,7 +17,8 @@ BSFunction artanh(BSFunction operand) {
 }
 
 class ArTanH extends singleOperandFunction {
-  ArTanH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
+  ArTanH._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

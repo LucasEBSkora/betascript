@@ -32,7 +32,7 @@ class BSScanner {
 
     //if the last line of the file doesn`t end with a line break, it might come up as unterminated. To solve this, we add an extra linebreak token
     //adds a end of file token in the end, although it isn't completely necessary
-    _tokens.add(new Token(TokenType.eof, "", null, _line));
+    _tokens.add(new Token(TokenType.EOF, "", null, _line));
     return _removeLinebreaks(_tokens);
   }
 
@@ -102,8 +102,8 @@ class BSScanner {
           : TokenType.assigment)),
       '<': () =>
           _addToken((_match('=') ? TokenType.lessEqual : TokenType.less)),
-      '>': () => _addToken(
-          (_match('=') ? TokenType.greaterEqual : TokenType.greater)),
+      '>': () =>
+          _addToken((_match('=') ? TokenType.greaterEqual : TokenType.greater)),
       '/': () {
         //if the slash is followed by another slash, it's actually a comment, and the rest of the line should be ignored
         if (_match('/')) {
@@ -329,7 +329,6 @@ class BSScanner {
     return (0x391 <= asUnicode && asUnicode <= 0x3a9) || //Greek capitals
         (0x3B1 <= asUnicode && asUnicode <= 0x3c9); //Grek small
   }
-
 
   static bool _isMathSymbol(String c) => false;
 

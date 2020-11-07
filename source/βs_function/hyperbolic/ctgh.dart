@@ -37,13 +37,13 @@ class CtgH extends singleOperandFunction {
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_ctgh(op.value) );
+      return n(_ctgh(op.value));
     else
       return ctgh(op);
   }
 
   @override
-  BSFunction copy([ Set<Variable> params = null]) => CtgH._(operand, params);
+  BSFunction copy([Set<Variable> params = null]) => CtgH._(operand, params);
 }
 
 double _ctgh(double v) =>

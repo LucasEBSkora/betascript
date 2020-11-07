@@ -71,8 +71,11 @@ abstract class BSFunction implements BSCallable {
     Trio<Number, bool, bool> _a = BSFunction.extractFromNegative<Number>(a);
     Trio<Number, bool, bool> _b = BSFunction.extractFromNegative<Number>(b);
     if (!_a.second || !_b.second) {
-      if (op != null) throw BetascriptFunctionError("operand $op can only be used on numbers");
-      else return Pair(null, null);
+      if (op != null)
+        throw BetascriptFunctionError(
+            "operand $op can only be used on numbers");
+      else
+        return Pair(null, null);
     }
 
     return Pair<num, num>(((_a.third) ? -1 : 1) * _a.first.value,
@@ -80,36 +83,36 @@ abstract class BSFunction implements BSCallable {
   }
 
   bool operator <=(BSFunction other) {
-    Pair<num, num> v =  toNums(this, other, "<=");
+    Pair<num, num> v = toNums(this, other, "<=");
     return v.first <= v.second;
   }
 
-    bool operator <(BSFunction other) {
-    Pair<num, num> v =  toNums(this, other, "<");
+  bool operator <(BSFunction other) {
+    Pair<num, num> v = toNums(this, other, "<");
     return v.first < v.second;
   }
 
-    bool operator >=(BSFunction other) {
-    Pair<num, num> v =  toNums(this, other, ">=");
+  bool operator >=(BSFunction other) {
+    Pair<num, num> v = toNums(this, other, ">=");
     return v.first >= v.second;
   }
 
-    bool operator >(BSFunction other) {
-    Pair<num, num> v =  toNums(this, other, ">");
+  bool operator >(BSFunction other) {
+    Pair<num, num> v = toNums(this, other, ">");
     return v.first > v.second;
   }
 
   static min(BSFunction x, BSFunction y) {
-    Pair<num, num> v =  toNums(x, y, "min");
+    Pair<num, num> v = toNums(x, y, "min");
     return (v.first < v.second) ? x : y;
   }
 
   static max(BSFunction x, BSFunction y) {
-    Pair<num, num> v =  toNums(x, y, "max");
+    Pair<num, num> v = toNums(x, y, "max");
     return (v.first > v.second) ? x : y;
   }
 
-  ///calculates the partial derivative of this in relation to v without merging. 
+  ///calculates the partial derivative of this in relation to v without merging.
   ///Is called by 'derivative', which also merges the functions.
   @visibleForOverriding
   BSFunction derivativeInternal(Variable v);

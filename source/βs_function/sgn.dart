@@ -6,17 +6,18 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 import '../utils/tuples.dart';
 
 BSFunction sgn(BSFunction operand) {
-      Trio<Number, bool, bool> _f1 = BSFunction.extractFromNegative<Number>(operand);
-    if (_f1.second) {
-      if (_f1.first.value == 0)
-        return n(0);
-      else
-        return n(_f1.third ? -1 : 1);
-    }
+  Trio<Number, bool, bool> _f1 =
+      BSFunction.extractFromNegative<Number>(operand);
+  if (_f1.second) {
+    if (_f1.first.value == 0)
+      return n(0);
+    else
+      return n(_f1.third ? -1 : 1);
+  }
 
-    Trio<AbsoluteValue, bool, bool> _f2 =
-        BSFunction.extractFromNegative<AbsoluteValue>(operand);
-    if (_f2.second) return n(_f2.third ? -1 : 1);
+  Trio<AbsoluteValue, bool, bool> _f2 =
+      BSFunction.extractFromNegative<AbsoluteValue>(operand);
+  if (_f2.second) return n(_f2.third ? -1 : 1);
 
   return Signum._(operand, null);
 }
@@ -28,7 +29,8 @@ class Signum extends BSFunction {
       : super(params);
 
   @override
-  BSFunction evaluate(HashMap<String, BSFunction> p) => sgn(operand.evaluate(p));
+  BSFunction evaluate(HashMap<String, BSFunction> p) =>
+      sgn(operand.evaluate(p));
 
   //The derivative of the sign function is either 0 or undefined.
   @override
@@ -44,7 +46,6 @@ class Signum extends BSFunction {
 
   @override
   BSFunction get approx => sgn(operand.approx);
-
 }
 
 double sign(double v) {

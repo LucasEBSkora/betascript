@@ -5,8 +5,7 @@ import 'number.dart';
 import 'variable.dart';
 
 BSFunction negative(BSFunction op) {
-  if (op is Negative)
-    return op.operand;
+  if (op is Negative) return op.operand;
   if (op == n(0))
     return op;
   else
@@ -16,10 +15,11 @@ BSFunction negative(BSFunction op) {
 class Negative extends BSFunction {
   final BSFunction operand;
 
-  Negative._(BSFunction this.operand, [Set<Variable> params = null]) : super(params);
+  Negative._(BSFunction this.operand, [Set<Variable> params = null])
+      : super(params);
 
   const Negative(BSFunction this.operand) : super(null);
-  
+
   @override
   BSFunction get approx => negative(operand.approx);
 
@@ -37,7 +37,6 @@ class Negative extends BSFunction {
   String toString([bool handleMinus = true]) => "-${operand}";
 
   @override
-  BSFunction evaluate(HashMap<String, BSFunction> p) => negative(operand.evaluate(p));
-
-
+  BSFunction evaluate(HashMap<String, BSFunction> p) =>
+      negative(operand.evaluate(p));
 }

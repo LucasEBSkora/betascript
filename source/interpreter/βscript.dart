@@ -91,7 +91,7 @@ class BetaScript {
   }
 
   static void _errorAtToken(Token token, String message) {
-    if (token.type == TokenType.eof)
+    if (token.type == TokenType.EOF)
       _report(token.line, " at end", message);
     else {
       if (token.lexeme == '\n')

@@ -18,7 +18,8 @@ BSFunction arsinh(BSFunction operand) {
 }
 
 class ArSinH extends singleOperandFunction {
-  ArSinH._(BSFunction operand, [Set<Variable> params = null]) : super(operand, params);
+  ArSinH._(BSFunction operand, [Set<Variable> params = null])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

@@ -18,7 +18,7 @@ BSFunction arctgh(BSFunction operand) {
 
 class ArCtgH extends singleOperandFunction {
   ArCtgH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand,  params);
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -33,10 +33,11 @@ class ArCtgH extends singleOperandFunction {
   BSFunction get approx {
     BSFunction op = operand.approx;
     if (op is Number)
-      return n(_arctgh(op.value) );
+      return n(_arctgh(op.value));
     else
       return arctgh(op);
   }
+
   @override
   BSFunction derivativeInternal(Variable v) =>
       (operand.derivativeInternal(v) / (n(1) - operand ^ n(2)));

@@ -5,7 +5,6 @@ import '../βs_function/βs_calculus.dart';
 const EmptySet emptySet = EmptySet._();
 
 class EmptySet extends BSSet {
-  
   const EmptySet._();
 
   BSSet complement() => BSSet.R;

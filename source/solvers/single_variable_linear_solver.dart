@@ -20,8 +20,6 @@ class SingleVariableLinearSolver extends Solver {
   //keeps note of whether we multiplied the comparison by -1, because that inverts inequations
   bool invertedInequality = false;
 
-
-
   SingleVariableLinearSolver(LogicExpression expr) : super(expr);
 
   @override
