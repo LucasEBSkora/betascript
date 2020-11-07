@@ -1,15 +1,14 @@
+import 'dart:collection' show HashMap, SplayTreeSet;
+
 import 'division.dart';
 import 'exponentiation.dart';
 import 'negative.dart';
 import 'number.dart';
 import 'sum.dart';
-import '../utils/tuples.dart';
-import 'βs_function.dart';
 import 'variable.dart';
-
+import 'βs_function.dart';
+import '../utils/tuples.dart';
 import '../utils/xor.dart';
-
-import 'dart:collection' show HashMap, SplayTreeSet;
 
 BSFunction multiply(List<BSFunction> operands) {
   if (operands == null || operands.length == 0) return (n(0));

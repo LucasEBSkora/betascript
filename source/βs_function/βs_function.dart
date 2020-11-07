@@ -1,19 +1,18 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
+
 import 'package:meta/meta.dart';
 
-import 'βs_calculus.dart';
+import 'division.dart';
+import 'exponentiation.dart';
 import 'multiplication.dart';
 import 'negative.dart';
 import 'number.dart';
 import 'sum.dart';
-import 'division.dart';
-import 'exponentiation.dart';
 import 'variable.dart';
-
-import '../utils/tuples.dart';
-
+import 'βs_calculus.dart';
 import '../interpreter/βs_callable.dart';
 import '../interpreter/βs_interpreter.dart';
+import '../utils/tuples.dart';
 
 abstract class BSFunction implements BSCallable {
   ///set of parameters the function is defined in ( the previous function NEEDS x, y and z to be evaluated, but we could define it in x,y,z and w if we wanted to)

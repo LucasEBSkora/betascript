@@ -1,9 +1,9 @@
 import 'dart:collection' show HashMap;
 
-import 'βs_class.dart';
 import 'token.dart';
-import 'βs_interpreter.dart' show RuntimeError;
 import 'user_routine.dart';
+import 'βs_class.dart';
+import 'βs_interpreter.dart' show RuntimeError;
 
 class BSInstance {
   final BSClass _class;

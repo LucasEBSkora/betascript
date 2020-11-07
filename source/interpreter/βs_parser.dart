@@ -1,8 +1,8 @@
-import 'βs_interpreter.dart';
-import 'βscript.dart';
 import 'expr.dart';
 import 'stmt.dart';
 import 'token.dart';
+import 'βs_interpreter.dart';
+import 'βscript.dart';
 import '../sets/sets.dart';
 
 class ParseError implements Exception {}

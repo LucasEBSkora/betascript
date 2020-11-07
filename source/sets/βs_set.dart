@@ -2,15 +2,13 @@ import 'package:meta/meta.dart';
 
 import 'empty_set.dart';
 import 'interval.dart';
-import '../βs_function/βs_calculus.dart';
-
 import 'set_operation_tables/contains.dart';
 import 'set_operation_tables/disjoined.dart';
+import 'set_operation_tables/intersection.dart';
 import 'set_operation_tables/relative_complements.dart';
 import 'set_operation_tables/union.dart';
-import 'set_operation_tables/intersection.dart';
-
 import '../utils/method_table.dart';
+import '../βs_function/βs_calculus.dart';
 
 //class that represents a set in R
 abstract class BSSet {

@@ -1,9 +1,9 @@
-import '../βs_function/βs_function.dart';
-import '../βs_function/number.dart';
-import 'βs_set.dart';
-import 'set_union.dart';
 import 'empty_set.dart';
 import 'roster_set.dart';
+import 'set_union.dart';
+import 'βs_set.dart';
+import '../βs_function/number.dart';
+import '../βs_function/βs_function.dart';
 
 BSSet interval(BSFunction a, BSFunction b,
     {bool leftClosed = true, bool rightClosed = true}) {

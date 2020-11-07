@@ -1,7 +1,7 @@
-import '../sets/sets.dart';
-import '../logic/logic.dart';
 import 'single_variable_linear_solver.dart';
 import 'solver.dart';
+import '../logic/logic.dart';
+import '../sets/sets.dart';
 
 class SingleVariableSolver extends Solver {
   bool _everySolutionFound = false;

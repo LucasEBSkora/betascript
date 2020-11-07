@@ -1,9 +1,9 @@
 import 'dart:collection' show HashMap;
 
+import 'user_routine.dart';
 import 'βs_callable.dart';
 import 'βs_instance.dart';
 import 'βs_interpreter.dart';
-import 'user_routine.dart';
 
 class BSClass implements BSCallable {
   final String name;

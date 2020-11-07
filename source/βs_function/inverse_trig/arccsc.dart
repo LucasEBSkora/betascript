@@ -4,10 +4,9 @@ import 'dart:math' as math;
 import '../abs.dart';
 import '../number.dart';
 import '../root.dart';
+import '../single_operand_function.dart';
 import '../variable.dart';
 import '../βs_function.dart';
-
-import '../single_operand_function.dart';
 import '../trig/csc.dart';
 
 BSFunction arccsc(BSFunction operand) {

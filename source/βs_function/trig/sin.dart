@@ -1,12 +1,12 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import 'cos.dart';
 import '../number.dart';
+import '../single_operand_function.dart';
 import '../variable.dart';
 import '../βs_function.dart';
 import '../inverse_trig/arcsin.dart';
-import '../single_operand_function.dart';
-import 'cos.dart';
 
 BSFunction sin(BSFunction operand) {
   return (operand is ArcSin) ? operand.operand : Sin._(operand);

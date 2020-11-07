@@ -1,8 +1,9 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
-import '../βs_function/βs_calculus.dart';
-import '../sets/sets.dart';
+
 import 'constant.dart';
 import 'logic_expression.dart';
+import '../sets/sets.dart';
+import '../βs_function/βs_calculus.dart';
 
 LogicExpression not(LogicExpression operand) {
   if (operand is Constant) return Constant(!operand.value);

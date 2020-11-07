@@ -1,12 +1,12 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import 'sin.dart';
 import '../number.dart';
+import '../single_operand_function.dart';
 import '../variable.dart';
 import '../βs_function.dart';
 import '../inverse_trig/arccos.dart';
-import '../single_operand_function.dart';
-import 'sin.dart';
 
 BSFunction cos(BSFunction operand) {
   return (operand is ArcCos) ? operand.operand : Cos._(operand);

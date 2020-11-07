@@ -1,13 +1,12 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import '../βs_calculus.dart';
 import '../number.dart';
-import '../variable.dart';
-import '../βs_function.dart';
-
-import '../hyperbolic/ctgh.dart';
 import '../single_operand_function.dart';
+import '../variable.dart';
+import '../βs_calculus.dart';
+import '../βs_function.dart';
+import '../hyperbolic/ctgh.dart';
 
 BSFunction arctgh(BSFunction operand) {
   return (operand is CtgH) ? operand.operand : ArCtgH._(operand);

@@ -1,8 +1,5 @@
-// import 'dart:collection' show HashMap;
-
-import '../../utils/method_table.dart';
 import '../sets.dart';
-// import '../../logic/logic.dart';
+import '../../utils/method_table.dart';
 
 ComutativeMethodTable<bool, BSSet> defineDisjoinedTable() {
   ComutativeMethodTable<bool, BSSet> methods = ComutativeMethodTable();

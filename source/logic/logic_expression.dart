@@ -1,7 +1,7 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
 
-import '../βs_function/βs_calculus.dart';
 import '../sets/sets.dart';
+import '../βs_function/βs_calculus.dart';
 
 ///A class used to REPRESENT a logic expression and to check if a set of values solves it, but not necessarily to solve them
 abstract class LogicExpression {

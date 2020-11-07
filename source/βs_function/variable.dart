@@ -1,7 +1,8 @@
+import 'dart:collection' show HashMap, SplayTreeSet;
+
+import 'number.dart';
 import 'βs_calculus.dart';
 import 'βs_function.dart';
-import 'number.dart';
-import 'dart:collection' show HashMap, SplayTreeSet;
 
 Variable variable(String name, [Set<Variable> params = null]) =>
     Variable._(name, params);

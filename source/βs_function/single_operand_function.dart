@@ -1,6 +1,7 @@
+import 'dart:collection' show SplayTreeSet;
+
 import 'variable.dart';
 import 'βs_function.dart';
-import 'dart:collection' show SplayTreeSet;
 
 ///This abstract class is used to improve code reutilization in function classes that have only one operand and are printed
 ///in the following way: name('operand'), where name is the class' name

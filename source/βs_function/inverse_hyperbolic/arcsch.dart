@@ -6,7 +6,6 @@ import '../number.dart';
 import '../root.dart';
 import '../variable.dart';
 import '../βs_function.dart';
-
 import '../hyperbolic/csch.dart';
 import '../single_operand_function.dart';
 

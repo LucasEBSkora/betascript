@@ -1,20 +1,20 @@
 import 'dart:collection' show HashMap;
 
-import '../βs_function/βs_calculus.dart';
-import '../sets/sets.dart';
-import '../logic/logic.dart';
-import '../utils/tuples.dart';
-import 'βs_callable.dart';
-import 'βs_environment.dart';
-import 'βs_instance.dart';
-import 'βscript.dart';
-import 'directive_manager.dart';
 import 'expr.dart';
+import 'directive_manager.dart';
+import 'native_globals.dart';
 import 'stmt.dart';
 import 'token.dart';
-import 'βs_class.dart';
 import 'user_routine.dart';
-import 'native_globals.dart';
+import 'βscript.dart';
+import 'βs_callable.dart';
+import 'βs_class.dart';
+import 'βs_environment.dart';
+import 'βs_instance.dart';
+import '../logic/logic.dart';
+import '../sets/sets.dart';
+import '../utils/tuples.dart';
+import '../βs_function/βs_calculus.dart';
 
 class BSInterpreter implements ExprVisitor, StmtVisitor {
   final Environment globals = new Environment(); //Global scope

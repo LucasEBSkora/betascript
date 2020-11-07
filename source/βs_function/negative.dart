@@ -1,8 +1,8 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
 
-import 'βs_function.dart';
 import 'number.dart';
 import 'variable.dart';
+import 'βs_function.dart';
 
 BSFunction negative(BSFunction op) {
   if (op is Negative) return op.operand;

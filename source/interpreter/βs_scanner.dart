@@ -1,8 +1,8 @@
 import 'dart:collection' show HashMap;
 
-import '../βs_function/number.dart';
-import 'βscript.dart';
 import 'token.dart';
+import 'βscript.dart';
+import '../βs_function/number.dart';
 
 ///Scans the source for tokens, returning a list of them on a call to scanTokens, the only public routine in this class.
 class BSScanner {

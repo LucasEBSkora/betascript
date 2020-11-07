@@ -1,5 +1,5 @@
-import '../βs_function/βs_function.dart';
 import 'comparison.dart';
+import '../βs_function/βs_function.dart';
 
 class GreaterThan extends Comparison {
   GreaterThan(BSFunction left, BSFunction right) : super(left, right);

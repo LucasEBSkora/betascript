@@ -1,14 +1,13 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import '../βs_calculus.dart';
 import '../number.dart';
 import '../root.dart';
-import '../variable.dart';
-import '../βs_function.dart';
-
-import '../hyperbolic/sinh.dart';
 import '../single_operand_function.dart';
+import '../variable.dart';
+import '../βs_calculus.dart';
+import '../βs_function.dart';
+import '../hyperbolic/sinh.dart';
 
 BSFunction arsinh(BSFunction operand) {
   return (operand is SinH) ? operand.operand : ArSinH._(operand);

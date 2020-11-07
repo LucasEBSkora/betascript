@@ -2,21 +2,16 @@ import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
 import '../abs.dart';
-import '../βs_calculus.dart';
 import '../number.dart';
 import '../root.dart';
-import '../variable.dart';
-import '../βs_function.dart';
-
 import '../single_operand_function.dart';
+import '../variable.dart';
+import '../βs_calculus.dart';
+import '../βs_function.dart';
 import '../trig/sec.dart';
 
 BSFunction arcsec(BSFunction operand) {
   return (operand is Sec) ? operand.operand : ArcSec._(operand);
-  if (operand is Sec)
-    return operand.operand;
-  else
-    return ArcSec._(operand);
 }
 
 class ArcSec extends singleOperandFunction {

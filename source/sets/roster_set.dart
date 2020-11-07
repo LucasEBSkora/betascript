@@ -1,14 +1,12 @@
 import 'dart:collection' show SplayTreeSet;
 
-import '../βs_function/βs_function.dart';
-import '../βs_function/number.dart';
-
-import 'βs_set.dart';
 import 'empty_set.dart';
-import 'set_union.dart';
 import 'interval.dart';
-
+import 'set_union.dart';
+import 'βs_set.dart';
 import '../utils/tuples.dart';
+import '../βs_function/number.dart';
+import '../βs_function/βs_function.dart';
 
 BSSet rosterSet(Iterable<BSFunction> elements) {
   if (elements.firstWhere(

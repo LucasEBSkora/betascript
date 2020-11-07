@@ -1,12 +1,12 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import 'tan.dart';
 import '../number.dart';
+import '../single_operand_function.dart';
 import '../variable.dart';
 import '../βs_function.dart';
 import '../inverse_trig/arcsec.dart';
-import '../single_operand_function.dart';
-import 'tan.dart';
 
 BSFunction sec(BSFunction operand) {
   return (operand is ArcSec) ? operand.operand : Sec._(operand);

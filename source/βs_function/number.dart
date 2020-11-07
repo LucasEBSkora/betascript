@@ -1,8 +1,9 @@
-import 'βs_function.dart';
+import 'dart:collection' show HashMap, SplayTreeSet;
+import 'dart:math' as math;
+
 import 'negative.dart';
 import 'variable.dart';
-import 'dart:math' as math;
-import 'dart:collection' show HashMap, SplayTreeSet;
+import 'βs_function.dart';
 
 BSFunction n(num value) {
   if (value < 0) return negative(Number._(value.abs(), null));

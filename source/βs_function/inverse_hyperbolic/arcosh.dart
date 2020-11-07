@@ -1,14 +1,13 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import '../βs_calculus.dart';
 import '../number.dart';
+import '../root.dart';
+import '../single_operand_function.dart';
 import '../variable.dart';
 import '../βs_function.dart';
-
+import '../βs_calculus.dart';
 import '../hyperbolic/cosh.dart';
-import '../single_operand_function.dart';
-import '../root.dart';
 
 BSFunction arcosh(BSFunction operand) {
   return (operand is CosH) ? operand.operand : ArCosH._(operand);

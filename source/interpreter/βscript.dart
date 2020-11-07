@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'βs_interpreter.dart';
-import 'βs_parser.dart';
-import 'βs_scanner.dart';
 import 'resolver.dart';
 import 'stmt.dart';
 import 'token.dart';
+import 'βs_interpreter.dart';
+import 'βs_parser.dart';
+import 'βs_scanner.dart';
 
 class BetaScript {
   static bool hadError = false;

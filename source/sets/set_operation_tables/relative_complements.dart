@@ -1,5 +1,5 @@
-import '../../utils/method_table.dart';
 import '../sets.dart';
+import '../../utils/method_table.dart';
 import '../../βs_function/βs_calculus.dart';
 
 //Remember that if we get to this method we already know the sets aren't disjoined and that the second doesn't

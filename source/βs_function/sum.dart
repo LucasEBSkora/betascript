@@ -1,11 +1,11 @@
+import 'dart:collection' show HashMap, SplayTreeSet;
+
 import 'multiplication.dart';
 import 'negative.dart';
 import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
-
 import '../utils/tuples.dart';
-import 'dart:collection' show HashMap, SplayTreeSet;
 
 BSFunction add(List<BSFunction> operands) {
   if (operands == null || operands.length == 0) return n(0);

@@ -1,7 +1,7 @@
 import 'dart:collection' show HashMap;
 
-import 'βs_interpreter.dart';
 import 'token.dart';
+import 'βs_interpreter.dart';
 
 //In essence, an Environment is the implementation of a scope.
 class Environment {

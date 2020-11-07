@@ -1,12 +1,12 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import 'ctg.dart';
 import '../number.dart';
+import '../single_operand_function.dart';
 import '../variable.dart';
 import '../βs_function.dart';
 import '../inverse_trig/arccsc.dart';
-import '../single_operand_function.dart';
-import 'ctg.dart';
 
 BSFunction csc(BSFunction operand) {
   return (operand is ArcCsc) ? operand.operand : Csc._(operand);

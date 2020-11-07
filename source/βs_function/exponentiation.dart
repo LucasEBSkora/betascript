@@ -1,9 +1,10 @@
+import 'dart:collection' show HashMap, SplayTreeSet;
+import 'dart:math';
+
 import 'log.dart';
+import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
-import 'dart:math';
-import 'number.dart';
-import 'dart:collection' show HashMap, SplayTreeSet;
 
 BSFunction exp(BSFunction exponent, [BSFunction base = constants.e]) {
   if (exponent == n(1)) return base;

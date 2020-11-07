@@ -1,12 +1,12 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
+
+import 'tanh.dart';
 import '../number.dart';
+import '../single_operand_function.dart';
 import '../variable.dart';
 import '../βs_function.dart';
-
 import '../inverse_hyperbolic/arsech.dart';
-import '../single_operand_function.dart';
-import 'tanh.dart';
 
 BSFunction sech(BSFunction operand) {
   return (operand is ArSecH) ? operand.operand : SecH._(operand);

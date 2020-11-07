@@ -1,8 +1,8 @@
 import 'dart:collection';
 
 import 'logic_expression.dart';
-import '../βs_function/βs_calculus.dart';
 import '../sets/sets.dart';
+import '../βs_function/βs_calculus.dart';
 
 class Constant extends LogicExpression {
   final bool value;

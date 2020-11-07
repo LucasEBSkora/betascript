@@ -1,8 +1,8 @@
 import 'dart:collection';
 
-import '../../utils/method_table.dart';
 import '../sets.dart';
 import '../../logic/logic.dart';
+import '../../utils/method_table.dart';
 import '../../βs_function/βs_calculus.dart';
 
 ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {

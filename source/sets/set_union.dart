@@ -1,8 +1,7 @@
-import 'βs_set.dart';
-
-import '../βs_function/βs_calculus.dart';
 import 'empty_set.dart';
 import 'roster_set.dart';
+import 'βs_set.dart';
+import '../βs_function/βs_calculus.dart';
 
 BSSet setUnion(Iterable<BSSet> subsets) {
   List<BSSet> _subsets =

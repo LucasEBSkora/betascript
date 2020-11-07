@@ -1,12 +1,13 @@
+import 'dart:collection' show HashMap, SplayTreeSet;
+
 import 'exponentiation.dart';
 import 'multiplication.dart';
 import 'negative.dart';
 import 'number.dart';
-import 'βs_function.dart';
 import 'variable.dart';
-import 'dart:collection' show HashMap, SplayTreeSet;
-import '../utils/xor.dart';
+import 'βs_function.dart';
 import '../utils/tuples.dart';
+import '../utils/xor.dart';
 
 BSFunction divide(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {

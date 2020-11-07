@@ -1,9 +1,10 @@
+import 'dart:collection' show HashMap, SplayTreeSet;
+import 'dart:math' as math;
+
 import 'exponentiation.dart';
 import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
-import 'dart:math' as math;
-import 'dart:collection' show HashMap, SplayTreeSet;
 //TODO: Implement roots that aren't square roots
 
 BSFunction root(BSFunction operand) {

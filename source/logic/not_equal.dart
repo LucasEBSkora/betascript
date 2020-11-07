@@ -1,5 +1,5 @@
-import '../βs_function/βs_function.dart';
 import 'comparison.dart';
+import '../βs_function/βs_function.dart';
 
 class NotEqual extends Comparison {
   NotEqual(BSFunction left, BSFunction right) : super(left, right);

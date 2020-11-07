@@ -1,12 +1,12 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
+
 import 'package:meta/meta.dart';
 
-import '../βs_function/βs_calculus.dart';
-import '../sets/sets.dart';
 import 'logic_expression.dart';
-import '../utils/tuples.dart';
-
+import '../sets/sets.dart';
 import '../solvers/single_variable_solver.dart';
+import '../utils/tuples.dart';
+import '../βs_function/βs_calculus.dart';
 
 ///A class that represents an equation or inequality
 abstract class Comparison extends LogicExpression {

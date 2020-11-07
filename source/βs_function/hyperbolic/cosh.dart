@@ -1,12 +1,12 @@
 import 'dart:collection' show HashMap;
-import '../number.dart';
-import '../variable.dart';
-import '../βs_function.dart';
 import 'dart:math' as math;
 
-import '../inverse_hyperbolic/arcosh.dart';
-import '../single_operand_function.dart';
 import 'sinh.dart';
+import '../number.dart';
+import '../single_operand_function.dart';
+import '../variable.dart';
+import '../βs_function.dart';
+import '../inverse_hyperbolic/arcosh.dart';
 
 BSFunction cosh(BSFunction operand) {
   return (operand is ArCosH) ? operand.operand : CosH._(operand);

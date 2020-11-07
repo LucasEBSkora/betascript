@@ -1,8 +1,9 @@
+import 'dart:collection' show HashMap, SplayTreeSet;
+
 import 'abs.dart';
+import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
-import 'number.dart';
-import 'dart:collection' show HashMap, SplayTreeSet;
 import '../utils/tuples.dart';
 
 BSFunction sgn(BSFunction operand) {

@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 
-import '../sets/sets.dart';
 import '../logic/logic.dart';
+import '../sets/sets.dart';
 
 abstract class Solver {
   final LogicExpression expr;

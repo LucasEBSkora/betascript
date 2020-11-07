@@ -1,5 +1,4 @@
 import 'βs_set.dart';
-
 import '../βs_function/βs_calculus.dart';
 
 const EmptySet emptySet = EmptySet._();
