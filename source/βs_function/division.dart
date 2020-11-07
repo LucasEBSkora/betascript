@@ -169,19 +169,22 @@ void _openMultiplicationsAndDivisions(
       numeratorList.removeAt(i);
       BSFunction numerator = f.numerator;
 
-      if (numerator is Multiplication)
+      if (numerator is Multiplication) {
         numeratorList.insertAll(i, numerator.operands);
-      else
+      } else {
         numeratorList.insert(i, numerator);
+      }
 
       BSFunction denominator = f.denominator;
 
-      if (denominator is Multiplication)
+      if (denominator is Multiplication) {
         denominatorList.addAll(denominator.operands);
-      else
+      } else {
         denominatorList.add(denominator);
-    } else
+      }
+    } else {
       ++i;
+    }
   }
 
   //the same for denominatorList
@@ -195,19 +198,22 @@ void _openMultiplicationsAndDivisions(
       denominatorList.removeAt(i);
       BSFunction numerator = f.numerator;
 
-      if (numerator is Multiplication)
+      if (numerator is Multiplication) {
         denominatorList.insertAll(i, numerator.operands);
-      else
+      } else {
         denominatorList.insert(i, numerator);
+      }
 
       BSFunction denominator = f.denominator;
 
-      if (denominator is Multiplication)
+      if (denominator is Multiplication) {
         numeratorList.addAll(denominator.operands);
-      else
+      } else {
         numeratorList.add(denominator);
-    } else
+      }
+    } else {
       ++i;
+    }
   }
 }
 

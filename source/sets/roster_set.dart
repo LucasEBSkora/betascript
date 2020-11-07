@@ -14,8 +14,9 @@ BSSet rosterSet(Iterable<BSFunction> elements) {
   if (elements.firstWhere(
           (element) => !BSFunction.extractFromNegative<Number>(element).second,
           orElse: () => null) !=
-      null)
+      null) {
     throw SetDefinitionError("Sets can only be defined in real numbers!");
+  }
 
   if (elements.length == 0) return emptySet;
   return RosterSet(

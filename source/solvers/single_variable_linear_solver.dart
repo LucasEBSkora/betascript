@@ -38,10 +38,12 @@ class SingleVariableLinearSolver extends Solver {
         }
         List<BSFunction> _terms = List();
         //if the function is a sum, separates it into terms to check if all of them are linear
-        if (_left is Sum)
+        if (_left is Sum) {
           _terms.addAll((_left as Sum).operands);
-        else //if it isn't, checks that single term
+        } else {
+          //if it isn't, checks that single term
           _terms.add(_left);
+        }
 
         //checks if all terms are linear, and calculates the coefficients when they are. If all terms are linear, the solver applies
         return _terms.fold(
@@ -61,32 +63,41 @@ class SingleVariableLinearSolver extends Solver {
     if (a == 0) {
       //in this case, the value of the variable doesn't matter, which means any value solves it or no value solves it
 
-      if ((expr as Comparison).compare(b, 0))
+      if ((expr as Comparison).compare(b, 0)) {
         return BSSet.R;
-      else
+      } else {
         return emptySet;
+      }
     } else {
       //we rewrite the comparison as x ?= -b/a, remembering that if a < 0, then we must invert the inequation
       if (a < 0) invertedInequality = !invertedInequality;
       BSFunction val = n(-b / a);
       if (_comp is Equal) return rosterSet([val]);
-      if (_comp is NotEqual)
+      if (_comp is NotEqual) {
         return SetUnion([
           Interval.open(constants.negativeInfinity, val),
           Interval.open(val, constants.infinity)
         ]);
+      }
       if ((_comp is LessThan && !invertedInequality) ||
-          (_comp is GreaterThan && invertedInequality))
+          (_comp is GreaterThan && invertedInequality)) {
         return Interval.open(constants.negativeInfinity, val);
+      }
+
       if ((_comp is GreaterThan && !invertedInequality) ||
-          (_comp is LessThan && invertedInequality))
+          (_comp is LessThan && invertedInequality)) {
         return Interval.open(val, constants.infinity);
+      }
+
       if ((_comp is LessOrEqual && !invertedInequality) ||
-          (_comp is GreaterOrEqual && invertedInequality))
+          (_comp is GreaterOrEqual && invertedInequality)) {
         return Interval(constants.negativeInfinity, val, false, true);
+      }
+
       if ((_comp is GreaterOrEqual && !invertedInequality) ||
-          (_comp is LessOrEqual && invertedInequality))
+          (_comp is LessOrEqual && invertedInequality)) {
         return Interval(val, constants.infinity, true, false);
+      }
     }
 
     return emptySet;
@@ -96,10 +107,11 @@ class SingleVariableLinearSolver extends Solver {
     var _asNumber = BSFunction.extractFromNegative<Number>(term);
     //if it's a number, adds it to 'b'
     if (_asNumber.second) {
-      if (_asNumber.third)
+      if (_asNumber.third) {
         b -= _asNumber.first.value;
-      else
+      } else {
         b += _asNumber.first.value;
+      }
 
       return true;
     }
@@ -107,10 +119,11 @@ class SingleVariableLinearSolver extends Solver {
     var _asVar = BSFunction.extractFromNegative<Variable>(term);
 
     if (_asVar.second) {
-      if (_asNumber.third)
+      if (_asNumber.third) {
         a -= 1;
-      else
+      } else {
         a += 1;
+      }
       return true;
     }
 
@@ -122,10 +135,11 @@ class SingleVariableLinearSolver extends Solver {
     if (_asMul.second) {
       List<BSFunction> op = _asMul.first.operands;
       if (op.length == 2 && op.first is Number && op.last is Variable) {
-        if (_asMul.third)
+        if (_asMul.third) {
           a -= (op.first as Number).value;
-        else
+        } else {
           a += (op.first as Number).value;
+        }
         return true;
       }
     }

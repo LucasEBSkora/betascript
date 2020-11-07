@@ -9,10 +9,7 @@ import '../single_operand_function.dart';
 import 'tan.dart';
 
 BSFunction sec(BSFunction operand) {
-  if (operand is ArcSec)
-    return operand.operand;
-  else
-    return Sec._(operand);
+  return (operand is ArcSec) ? operand.operand : Sec._(operand);
 }
 
 class Sec extends singleOperandFunction {

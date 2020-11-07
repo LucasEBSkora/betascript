@@ -44,16 +44,18 @@ BSFunction multiply(List<BSFunction> operands) {
 
       for (Division f in divisions) {
         BSFunction num = f.numerator;
-        if (num is Multiplication)
+        if (num is Multiplication) {
           nums.addAll(num.operands);
-        else
+        } else {
           nums.add(num);
+        }
 
         BSFunction den = f.denominator;
-        if (den is Multiplication)
+        if (den is Multiplication) {
           dens.addAll(den.operands);
-        else
+        } else {
           dens.add(den);
+        }
       }
 
       return divide(nums, dens);
@@ -70,12 +72,13 @@ BSFunction multiply(List<BSFunction> operands) {
 
   BSFunction _mul;
 
-  if (operands.length == 0)
+  if (operands.length == 0) {
     return n(0);
-  else if (operands.length == 1)
+  } else if (operands.length == 1) {
     _mul = operands[0];
-  else
+  } else {
     _mul = Multiplication(operands);
+  }
 
   return (_negative) ? negative(_mul) : _mul;
 }
@@ -187,13 +190,14 @@ bool _multiplyNumbers(List<BSFunction> operands) {
       operands.removeAt(i);
       Number n = _op.first;
       //if it's a regular number, just multiplies the accumulator
-      if (!n.isNamed)
+      if (!n.isNamed) {
         number *= n.value * (_op.third ? -1 : 1);
-      else {
+      } else {
         //if it's named, adds it to the map.
 
-        if (!namedNumbers.containsKey(n.name))
+        if (!namedNumbers.containsKey(n.name)) {
           namedNumbers[n.name] = Pair<double, int>(n.absvalue, 0);
+        }
 
         ++namedNumbers[n.name].second;
 
@@ -214,9 +218,10 @@ bool _multiplyNumbers(List<BSFunction> operands) {
 
     //adds the named numbers
     for (String key in namedNumbers.keys) {
-      if (namedNumbers[key].second != 0)
+      if (namedNumbers[key].second != 0) {
         numbers.add(namedNumber(namedNumbers[key].first, key) ^
             n(namedNumbers[key].second));
+      }
     }
 
     //adds the numbers to the operands

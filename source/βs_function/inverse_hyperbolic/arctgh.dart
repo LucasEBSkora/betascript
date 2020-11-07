@@ -10,10 +10,7 @@ import '../hyperbolic/ctgh.dart';
 import '../single_operand_function.dart';
 
 BSFunction arctgh(BSFunction operand) {
-  if (operand is CtgH)
-    return operand.operand;
-  else
-    return ArCtgH._(operand);
+  return (operand is CtgH) ? operand.operand : ArCtgH._(operand);
 }
 
 class ArCtgH extends singleOperandFunction {
@@ -32,10 +29,11 @@ class ArCtgH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_arctgh(op.value));
-    else
+    } else {
       return arctgh(op);
+    }
   }
 
   @override

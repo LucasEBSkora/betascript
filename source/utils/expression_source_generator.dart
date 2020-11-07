@@ -106,7 +106,7 @@ int main() {
       ["Expr", "right", "right operand"],
     ]),
   ], [
-    'Token'
+    'token'
   ]);
 
   defineAst("../interpreter", "Stmt", [
@@ -185,8 +185,8 @@ int main() {
       ["String", "directive", "the directive being issued"],
     ])
   ], [
-    'Expr',
-    'Token'
+    'expr',
+    'token'
   ]);
   return 0;
 }
@@ -207,7 +207,7 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
   String source = "";
 
   for (String import in imports) {
-    source += "import '$import.dart';";
+    source += "import '$import.dart';\n";
   }
 
   String visitorClassName = fileName + "Visitor";
@@ -220,17 +220,17 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
         "  dynamic visit$className($className ${fileName[0].toLowerCase()});\n";
   }
 
-  source += "\n}\n";
+  source += "}\n";
 
   source +=
-      "\nabstract class $fileName {\n dynamic accept($visitorClassName v);\n}\n\n";
+      "\nabstract class $fileName {\n  dynamic accept($visitorClassName v);\n}\n\n";
 
   for (NodeType e in types) {
     String className = e.name + fileName;
     source += "class $className extends $fileName {\n";
     for (List<String> field in e.fields) {
       if (field.length > 2) source += "  ///${field[2]}\n";
-      source += "  final ${field[0]} ${field[1]};\n";
+      source += "  final ${field[0]} ${field[1]};\n\n";
     }
 
     source += '  $className(';
@@ -241,9 +241,9 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
     source += "${e.fields[i][0]} this.${e.fields[i][1]});\n";
 
     source +=
-        " dynamic accept($visitorClassName v) => v.visit$className(this);\n";
+        "  dynamic accept($visitorClassName v) => v.visit$className(this);\n";
 
-    source += '\n}\n\n';
+    source += '}\n\n';
   }
 
   outputFile.writeAsStringSync(source);

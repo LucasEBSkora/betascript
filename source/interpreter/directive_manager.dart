@@ -14,10 +14,11 @@ class DirectiveManager {
   bool isGlobal(String dir) => _globalDirectives.containsKey(dir);
 
   void setDirective(String dir, Object value) {
-    if (_globalDirectives.containsKey(dir))
+    if (_globalDirectives.containsKey(dir)) {
       _globalDirectives[dir] = value;
-    else
+    } else {
       _localDirectives[dir] = value;
+    }
   }
 
   ///returns wheter the directive was set
@@ -25,8 +26,9 @@ class DirectiveManager {
     if (isGlobal(dir)) {
       _globalDirectives[dir] = value;
       return true;
-    } else
+    } else {
       return false;
+    }
   }
 
   Object getDirective(String dir) {

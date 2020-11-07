@@ -9,10 +9,11 @@ import '../logic/logic.dart';
 
 BSSet builderSet(LogicExpression rule, List<Variable> parameters) {
   BSSet sol = rule.solution;
-  if (rule.foundEverySolution)
+  if (rule.foundEverySolution) {
     return sol;
-  else
+  } else {
     return BuilderSet(rule, parameters);
+  }
 }
 
 class BuilderSet extends BSSet {

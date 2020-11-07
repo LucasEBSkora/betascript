@@ -13,17 +13,19 @@ ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
     BSFunction _b = BSFunction.min(first.b, second.b);
 
     bool _leftClosed;
-    if (first.a == second.a)
+    if (first.a == second.a) {
       _leftClosed = first.leftClosed && second.leftClosed;
-    else
+    } else {
       _leftClosed = first.a > second.a ? first.leftClosed : second.leftClosed;
+    }
 
     bool _rightClosed;
-    if (first.b == second.b)
+    if (first.b == second.b) {
       _rightClosed = first.rightClosed && second.rightClosed;
-    else
+    } else {
       _rightClosed =
           first.b < second.b ? first.rightClosed : second.rightClosed;
+    }
 
     return interval(_a, _b, leftClosed: _leftClosed, rightClosed: _rightClosed);
   });
@@ -43,15 +45,15 @@ ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
 
   //IntensionalSetIntersections always have exactly one member that is a BuilderSet,
   //so we take the one that isn't and intersect it with the rest
-  methods.addMethod(IntensionalSetIntersection, SetUnion,
-      (IntensionalSetIntersection first, SetUnion second) {
-    if (first.first is BuilderSet)
-      return IntensionalSetIntersection(
-          second.intersection(first.second), first.first);
-    else
-      return IntensionalSetIntersection(
-          second.intersection(first.first), first.second);
-  });
+  methods.addMethod(
+      IntensionalSetIntersection,
+      SetUnion,
+      (IntensionalSetIntersection first, SetUnion second) =>
+          (first.first is BuilderSet)
+              ? IntensionalSetIntersection(
+                  second.intersection(first.second), first.first)
+              : IntensionalSetIntersection(
+                  second.intersection(first.first), first.second));
 
   methods.addMethod(SetUnion, SetUnion, (SetUnion first, SetUnion second) {
     List<BSSet> _new = List();
@@ -100,12 +102,13 @@ ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
       [Interval, RosterSet, BuilderSet, IntensionalSetIntersection],
       IntensionalSetIntersection,
       (BSSet first, IntensionalSetIntersection second) {
-    if (second.first is BuilderSet)
+    if (second.first is BuilderSet) {
       return IntensionalSetIntersection(
           second.second.intersection(first), second.first);
-    else if (second.second is BuilderSet)
+    } else if (second.second is BuilderSet) {
       return IntensionalSetIntersection(
           second.first.intersection(first), second.second);
+    }
   });
 
   return methods;

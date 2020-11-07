@@ -11,10 +11,7 @@ import '../single_operand_function.dart';
 import '../trig/csc.dart';
 
 BSFunction arccsc(BSFunction operand) {
-  if (operand is Csc)
-    return operand.operand;
-  else
-    return ArcCsc._(operand);
+  return (operand is Csc) ? operand.operand : ArcCsc._(operand);
 }
 
 class ArcCsc extends singleOperandFunction {
@@ -33,10 +30,11 @@ class ArcCsc extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(math.asin(1 / op.value));
-    else
+    } else {
       return arccsc(op);
+    }
   }
 
   @override

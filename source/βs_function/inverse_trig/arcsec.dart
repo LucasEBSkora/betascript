@@ -12,6 +12,7 @@ import '../single_operand_function.dart';
 import '../trig/sec.dart';
 
 BSFunction arcsec(BSFunction operand) {
+  return (operand is Sec) ? operand.operand : ArcSec._(operand);
   if (operand is Sec)
     return operand.operand;
   else
@@ -34,10 +35,11 @@ class ArcSec extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(math.acos(1 / op.value));
-    else
+    } else {
       return arcsec(op);
+    }
   }
 
   @override

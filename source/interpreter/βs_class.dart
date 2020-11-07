@@ -27,8 +27,9 @@ class BSClass implements BSCallable {
     //finds the constructor method
     UserRoutine initializer = findMethod(this.name);
     //returns the constructor method bound to the empty instance so that 'this' is valid
-    if (initializer != null)
+    if (initializer != null) {
       initializer.bind(instance).callThing(interpreter, arguments);
+    }
     return instance;
   }
 

@@ -13,9 +13,10 @@ class Variable extends BSFunction implements Comparable {
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    if (!p.containsKey(name))
+    if (!p.containsKey(name)) {
       throw BetascriptFunctionError(
           "Error! Missing arguments in call call: " + name + " not defined");
+    }
     return p[name];
   }
 

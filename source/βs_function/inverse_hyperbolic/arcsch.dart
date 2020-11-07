@@ -11,10 +11,7 @@ import '../hyperbolic/csch.dart';
 import '../single_operand_function.dart';
 
 BSFunction arcsch(BSFunction operand) {
-  if (operand is CscH)
-    return operand.operand;
-  else
-    return ArCscH._(operand);
+  return (operand is CscH) ? operand.operand : ArCscH._(operand);
 }
 
 class ArCscH extends singleOperandFunction {
@@ -33,10 +30,11 @@ class ArCscH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_arcsch(op.value));
-    else
+    } else {
       return arcsch(op);
+    }
   }
 
   @override

@@ -47,10 +47,11 @@ class Root extends BSFunction {
   @override
   BSFunction get approx {
     BSFunction opvalue = operand.approx;
-    if (opvalue
-        is Number) //if the operand already evaluates to a number, returns its root
+    //if the operand already evaluates to a number, returns its root
+    if (opvalue is Number) {
       return n(math.sqrt(opvalue.value));
-    else
+    } else {
       return root(opvalue); //in any other case, returns a root
+    }
   }
 }

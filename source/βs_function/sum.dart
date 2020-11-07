@@ -13,12 +13,13 @@ BSFunction add(List<BSFunction> operands) {
   _openOtherSums(operands);
   _SumNumbers(operands);
   _createMultiplications(operands);
-  if (operands.length == 0)
+  if (operands.length == 0) {
     return n(0);
-  else if (operands.length == 1)
+  } else if (operands.length == 1) {
     return operands[0];
-  else
+  } else {
     return Sum._(operands, null);
+  }
 }
 
 class Sum extends BSFunction {
@@ -121,11 +122,12 @@ void _SumNumbers(List<BSFunction> operands) {
     if (op is Number) {
       operands.removeAt(i);
       Number n = op;
-      if (!n.isNamed)
+      if (!n.isNamed) {
         number += n.value * (_negative ? -1 : 1);
-      else {
-        if (!namedNumbers.containsKey(n.name))
+      } else {
+        if (!namedNumbers.containsKey(n.name)) {
           namedNumbers[n.name] = Pair<double, int>(n.value, 0);
+        }
 
         namedNumbers[n.name].second += (_negative ? -1 : 1);
       }
@@ -135,14 +137,15 @@ void _SumNumbers(List<BSFunction> operands) {
 
   List<BSFunction> numbers = List<BSFunction>();
 
-  if (number > 0)
+  if (number > 0) {
     numbers.add(n(number));
-  else if (number < 0) operands.add(n(number));
+  } else if (number < 0) operands.add(n(number));
 
   for (String key in namedNumbers.keys) {
-    if (namedNumbers[key].second != 0)
+    if (namedNumbers[key].second != 0) {
       numbers.add(n(namedNumbers[key].second) *
           namedNumber(namedNumbers[key].first, key));
+    }
   }
 
   operands.insertAll(0, numbers);

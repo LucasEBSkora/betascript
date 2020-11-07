@@ -10,10 +10,7 @@ import '../single_operand_function.dart';
 import 'cosh.dart';
 
 BSFunction sinh(BSFunction operand) {
-  if (operand is ArSinH)
-    return operand.operand;
-  else
-    return SinH._(operand);
+  return (operand is ArSinH) ? operand.operand : SinH._(operand);
 }
 
 class SinH extends singleOperandFunction {
@@ -35,10 +32,11 @@ class SinH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_sinh(op.value));
-    else
+    } else {
       return sinh(op);
+    }
   }
 
   @override

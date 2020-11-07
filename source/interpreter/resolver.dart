@@ -102,10 +102,12 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitReturnStmt(ReturnStmt s) {
-    if (_currentRoutine == RoutineType.none)
+    if (_currentRoutine == RoutineType.none) {
       BetaScript.error(s.keyword, "Cannot return from top-level code.");
-    if (_currentRoutine == RoutineType.initializer)
+    }
+    if (_currentRoutine == RoutineType.initializer) {
       BetaScript.error(s.keyword, "Cannot return a value from a constructor");
+    }
     _resolveExpr(s.value);
   }
 
@@ -137,10 +139,13 @@ class Resolver implements ExprVisitor, StmtVisitor {
     //makes sure a variable isn't trying to read itself in its own initialization
     if (!_scopes.isEmpty) {
       if (_scopes.last.containsKey(e.name.lexeme) &&
-          _scopes.last[e.name.lexeme] == false)
+          _scopes.last[e.name.lexeme] == false) {
         BetaScript.error(e.name, "Cannot read variable in its own initializer");
-    } else if (_globals.containsKey(e.name.lexeme) && !_globals[e.name.lexeme])
+      }
+    } else if (_globals.containsKey(e.name.lexeme) &&
+        !_globals[e.name.lexeme]) {
       BetaScript.error(e.name, "Cannot read variable in its own initializer");
+    }
 
     _resolveLocal(e, e.name);
   }
@@ -171,15 +176,17 @@ class Resolver implements ExprVisitor, StmtVisitor {
   void _declare(Token name) {
     if (!_scopes.isEmpty) {
       //Variable declared twice - error in routines (honestly should always be error, or variables shouldn't need declaration)
-      if (_scopes.last.containsKey(name.lexeme))
+      if (_scopes.last.containsKey(name.lexeme)) {
         BetaScript.error(
             name, "Variable with this name already declared in this scope.");
+      }
 
       _scopes.last[name.lexeme] = false;
     } else {
-      if (_globals.containsKey(name.lexeme))
+      if (_globals.containsKey(name.lexeme)) {
         BetaScript.error(name,
             "Variable with this name already declared in global scope (might be shadowing native declaration).");
+      }
       _globals[name.lexeme] = false;
     }
   }
@@ -188,8 +195,9 @@ class Resolver implements ExprVisitor, StmtVisitor {
   void _define(Token name) {
     if (!_scopes.isEmpty) {
       _scopes.last[name.lexeme] = true;
-    } else
+    } else {
       _globals[name.lexeme] = true;
+    }
   }
 
   void _resolveLocal(Expr e, Token name) {
@@ -278,11 +286,12 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitSuperExpr(SuperExpr e) {
-    if (_currentClass == ClassType.none)
+    if (_currentClass == ClassType.none) {
       BetaScript.error(e.keyword, "Cannot use 'super' outside of a class.");
-    else if (_currentClass != ClassType.subClassType)
+    } else if (_currentClass != ClassType.subClassType) {
       BetaScript.error(
           e.keyword, "Cannot use 'super' in a class with no superclass");
+    }
     _resolveLocal(e, e.keyword);
   }
 

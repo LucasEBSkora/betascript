@@ -17,17 +17,19 @@ ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
     BSFunction _b = BSFunction.max(first.b, second.b);
 
     bool _leftClosed;
-    if (first.a == second.a)
+    if (first.a == second.a) {
       _leftClosed = first.leftClosed || second.leftClosed;
-    else
+    } else {
       _leftClosed = first.a < second.a ? first.leftClosed : second.leftClosed;
+    }
 
     bool _rightClosed;
-    if (first.b == second.b)
+    if (first.b == second.b) {
       _rightClosed = first.rightClosed || second.rightClosed;
-    else
+    } else {
       _rightClosed =
           first.b > second.b ? first.rightClosed : second.rightClosed;
+    }
 
     return interval(_a, _b, leftClosed: _leftClosed, rightClosed: _rightClosed);
   });
@@ -49,10 +51,11 @@ ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
 
     BSSet _second =
         rosterSet(second.elements.where((element) => !first.belongs(element)));
-    if (_second == emptySet)
+    if (_second == emptySet) {
       return first;
-    else
+    } else {
       return SetUnion([first, _second]);
+    }
   });
 
   //Uses the native set implementation to filter out repeated elements

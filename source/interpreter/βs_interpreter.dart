@@ -113,8 +113,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
     //operation for string
     if (e.op.type == TokenType.plus) {
-      if (leftOperand is String && rightOperand is String)
+      if (leftOperand is String && rightOperand is String) {
         return leftOperand + rightOperand;
+      }
       if (leftOperand is String) return leftOperand + rightOperand.toString();
       if (rightOperand is String) return leftOperand.toString() + rightOperand;
     }
@@ -148,13 +149,14 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       case TokenType.apostrophe:
         if (operand is BSFunction) {
           Set<Variable> params = operand.parameters;
-          if (params.length > 1)
+          if (params.length > 1) {
             throw new RuntimeError(e.op,
                 "the apostrophe operator may only be applied to functions defined in a single (or no) variables");
-          if (params.length == 1)
+          }
+          if (params.length == 1) {
             return operand.derivative(params.last);
-          else
-            return 0; //functions defined in 0 variables are always constant, so their derivative is 0
+          } else //functions defined in 0 variables are always constant, so their derivative is 0
+            return 0;
         }
         if (operand is BSSet) return operand.complement();
         throw new RuntimeError(e.op,
@@ -182,9 +184,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   }
 
   static void _checkNum(Token token, dynamic value) {
-    if (!(value is BSFunction))
+    if (!(value is BSFunction)) {
       throw new RuntimeError(
           value, "Operand for ${token.lexeme} must be function");
+    }
   }
 
   @override
@@ -211,9 +214,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
         if (_variable == null) {
           _variable = variable(parameter.lexeme);
           _environment.define(parameter.lexeme, _variable);
-        } else if (!(_variable is Variable))
+        } else if (!(_variable is Variable)) {
           throw new RuntimeError(
               parameter, "Parameters to a function must always be Variables");
+        }
 
         _variables.add(_variable);
       }
@@ -222,9 +226,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
       for (int i = 0; i < _variables.length; ++i)
         for (int j = i + 1; j < _variables.length; ++j)
-          if (_variables[i] == _variables[j])
+          if (_variables[i] == _variables[j]) {
             throw new RuntimeError(s.name,
                 "Duplicate parameters not allowed in function variables");
+          }
     }
 
     Object value = null;
@@ -232,15 +237,16 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       value = _evaluate(s.initializer);
     }
 
-    if (_variables != null && value == null)
+    if (_variables != null && value == null) {
       throw new RuntimeError(s.name,
           "Function variable declarations with explicit parameter lists must always be initialized");
-    else if (_variables != null && !(value is BSFunction))
+    } else if (_variables != null && !(value is BSFunction)) {
       throw new RuntimeError(
           s.name, "Only function variable declarations may include parameters");
-    else if (_variables != null && value is BSFunction)
+    } else if (_variables != null && value is BSFunction) {
       value =
           (value as BSFunction).withParameters(Set<Variable>.from(_variables));
+    }
 
     _environment.define(s.name.lexeme, value);
   }
@@ -253,10 +259,11 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     Object value = _evaluate(e.value);
 
     int distance = _locals[e];
-    if (distance != null)
+    if (distance != null) {
       _environment.assignAt(distance, e.name, value);
-    else
+    } else {
       globals.assign(e.name, value);
+    }
 
     return value;
   }
@@ -301,9 +308,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitWhileStmt(WhileStmt s) {
-    if (directives.getDirective("bs_tt_interpret"))
+    if (directives.getDirective("bs_tt_interpret")) {
       throw new RuntimeError(
           s.token, "loops are forbidden when interpreting for twitter");
+    }
     while (_istruthy(_evaluate(s.condition))) _execute(s.body);
   }
 
@@ -311,14 +319,16 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   Object visitCallExpr(CallExpr e) {
     Object callee = _evaluate(e.callee);
 
-    if (!(callee is BSCallable))
+    if (!(callee is BSCallable)) {
       throw new RuntimeError(
           e.paren, "Can only call routines, functions and classes.");
+    }
 
     if (directives.getDirective("bs_tt_interpret") &&
-        !(callee is BSFunction || callee is BSClass))
+        !(callee is BSFunction || callee is BSClass)) {
       throw new RuntimeError(e.paren,
           "when interpreting for twitter, you can only call functions and constructors");
+    }
 
     List<Object> arguments = new List();
 
@@ -332,9 +342,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     }
     if (callee is BSFunction) {
       for (Object a in arguments)
-        if (!(a is BSFunction))
+        if (!(a is BSFunction)) {
           throw new RuntimeError(
               e.paren, "functions only support other functions as parameters.");
+        }
     }
 
     return function.callThing(this, arguments);
@@ -342,9 +353,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitRoutineStmt(RoutineStmt s) {
-    if (directives.getDirective("bs_tt_interpret"))
+    if (directives.getDirective("bs_tt_interpret")) {
       throw new RuntimeError(s.name,
           "routine definitions are forbidden when interpreting for twitter");
+    }
     UserRoutine routine = new UserRoutine(s, _environment, false);
     _environment.define(s.name.lexeme, routine);
   }
@@ -365,22 +377,25 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   ///which are stored directly in globals
   Object _lookUpVariable(Token name, Expr e) {
     int distance = _locals[e];
-    if (distance != null)
+    if (distance != null) {
       return _environment.getAt(distance, name.lexeme);
-    else
+    } else {
       return globals.get(name);
+    }
   }
 
   @override
   void visitClassStmt(ClassStmt s) {
-    if (directives.getDirective("bs_tt_interpret"))
+    if (directives.getDirective("bs_tt_interpret")) {
       throw new RuntimeError(s.name,
           "class definitions are forbidden when interpreting for twitter");
+    }
     Object superclass = null;
     if (s.superclass != null) {
       superclass = _evaluate(s.superclass);
-      if (!(superclass is BSClass))
+      if (!(superclass is BSClass)) {
         throw new RuntimeError(s.superclass.name, "Superclass must be a class");
+      }
     }
 
     _environment.define(s.name.lexeme, null);
@@ -417,8 +432,9 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   visitSetExpr(SetExpr e) {
     Object object = _evaluate(e.object);
 
-    if (!(object is BSInstance))
+    if (!(object is BSInstance)) {
       throw new RuntimeError(e.name, "Only instances have fields");
+    }
 
     Object value = _evaluate(e.value);
     (object as BSInstance).set(e.name, value);
@@ -439,9 +455,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     //finds the method in the superclass and binds it to 'this'
     UserRoutine method = superclass.findMethod(e.method.lexeme);
 
-    if (method == null)
+    if (method == null) {
       throw new RuntimeError(
           e.method, "Undefined property '${e.method.lexeme}'.");
+    }
 
     return method.bind(object);
   }
@@ -449,17 +466,19 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   @override
   visitDerivativeExpr(DerivativeExpr e) {
     Object f = _evaluate(e.derivand);
-    if (!(f is BSFunction))
+    if (!(f is BSFunction)) {
       throw new RuntimeError(
           e.keyword, "target of derivative must be function");
+    }
     List<Variable> _variables = List();
     for (Expr exp in e.variables) {
       Object v = _evaluate(exp);
-      if (v is Variable)
+      if (v is Variable) {
         _variables.add(v);
-      else
+      } else {
         throw RuntimeError(
             e.keyword, "Functions may only be derivated in variables");
+      }
     }
     BSFunction _value = f;
     for (Variable v in _variables) _value = _value.derivative(v);
@@ -484,20 +503,22 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
         if (_variable == null) {
           _variable = variable(parameter.lexeme);
           _environment.define(parameter.lexeme, _variable);
-        } else if (!(_variable is Variable))
+        } else if (!(_variable is Variable)) {
           throw new RuntimeError(
               parameter, "Parameters to a function must always be Variables");
+        }
 
         parameters.add(_variable);
       }
     }
     Object rule = _evaluate(e.rule);
     // print(rule.runtimeType);
-    if (rule is LogicExpression)
+    if (rule is LogicExpression) {
       return builderSet(rule, parameters);
-    else
+    } else {
       throw new RuntimeError(
           e.bar, "Builder set definitions must contain comparisons!");
+    }
   }
 
   @override

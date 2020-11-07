@@ -78,12 +78,13 @@ class BetaScript {
   }
 
   static void error(dynamic value, String message) {
-    if (value is int)
+    if (value is int) {
       _errorAtLine(value, message);
-    else if (value is Token)
+    } else if (value is Token) {
       _errorAtToken(value, message);
-    else
+    } else {
       _report(-1, "at unknown location: '${value}'", message);
+    }
   }
 
   static void _errorAtLine(int line, String message) {
@@ -91,13 +92,14 @@ class BetaScript {
   }
 
   static void _errorAtToken(Token token, String message) {
-    if (token.type == TokenType.EOF)
+    if (token.type == TokenType.EOF) {
       _report(token.line, " at end", message);
-    else {
-      if (token.lexeme == '\n')
+    } else {
+      if (token.lexeme == '\n') {
         _report(token.line, " at linebreak ('\\n')", message);
-      else
+      } else {
         _report(token.line, " at '${token.lexeme}'", message);
+      }
     }
   }
 

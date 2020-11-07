@@ -10,10 +10,7 @@ import '../single_operand_function.dart';
 import '../trig/ctg.dart';
 
 BSFunction arcctg(BSFunction operand) {
-  if (operand is Ctg)
-    return operand.operand;
-  else
-    return ArcCtg._(operand);
+  return (operand is Ctg) ? operand.operand : ArcCtg._(operand);
 }
 
 class ArcCtg extends singleOperandFunction {
@@ -32,10 +29,11 @@ class ArcCtg extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(math.atan(1 / op.value));
-    else
+    } else {
       return arcctg(op);
+    }
   }
 
   @override

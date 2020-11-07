@@ -10,10 +10,7 @@ import '../single_operand_function.dart';
 import '../trig/tan.dart';
 
 BSFunction arctan(BSFunction operand) {
-  if (operand is Tan)
-    return operand.operand;
-  else
-    return ArcTan._(operand);
+  return (operand is Tan) ? operand.operand : ArcTan._(operand);
 }
 
 class ArcTan extends singleOperandFunction {
@@ -32,10 +29,11 @@ class ArcTan extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(math.atan(op.value));
-    else
+    } else {
       return arctan(op);
+    }
   }
 
   @override

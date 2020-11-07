@@ -35,10 +35,11 @@ class Environment {
   void assign(Token name, Object value) {
     if (values.containsKey(name.lexeme)) {
       values[name.lexeme] = value;
-    } else if (enclosing != null)
+    } else if (enclosing != null) {
       enclosing.assign(name, value);
-    else
+    } else {
       throw new RuntimeError(name, "Undefined variable '${name.lexeme}'");
+    }
   }
 
   ///Gets the value of the variable with 'name', stored in the distance-th scope enclosing this one

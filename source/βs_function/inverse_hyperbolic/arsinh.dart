@@ -11,10 +11,7 @@ import '../hyperbolic/sinh.dart';
 import '../single_operand_function.dart';
 
 BSFunction arsinh(BSFunction operand) {
-  if (operand is SinH)
-    return operand.operand;
-  else
-    return ArSinH._(operand);
+  return (operand is SinH) ? operand.operand : ArSinH._(operand);
 }
 
 class ArSinH extends singleOperandFunction {
@@ -33,10 +30,11 @@ class ArSinH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_arsinh(op.value));
-    else
+    } else {
       return arsinh(op);
+    }
   }
 
   @override

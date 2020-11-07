@@ -9,10 +9,7 @@ BSFunction sgn(BSFunction operand) {
   Trio<Number, bool, bool> _f1 =
       BSFunction.extractFromNegative<Number>(operand);
   if (_f1.second) {
-    if (_f1.first.value == 0)
-      return n(0);
-    else
-      return n(_f1.third ? -1 : 1);
+    return (_f1.first.value == 0) ? n(0) : n(_f1.third ? -1 : 1);
   }
 
   Trio<AbsoluteValue, bool, bool> _f2 =
@@ -49,8 +46,5 @@ class Signum extends BSFunction {
 }
 
 double sign(double v) {
-  if (v == 0)
-    return 0;
-  else
-    return ((v > 0) ? 1 : -1);
+  return (v == 0) ? 0 : ((v > 0) ? 1 : -1);
 }

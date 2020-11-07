@@ -11,10 +11,7 @@ import '../hyperbolic/sech.dart';
 import '../single_operand_function.dart';
 
 BSFunction arsech(BSFunction operand) {
-  if (operand is SecH)
-    return operand.operand;
-  else
-    return ArSecH._(operand);
+  return (operand is SecH) ? operand.operand : ArSecH._(operand);
 }
 
 class ArSecH extends singleOperandFunction {
@@ -33,10 +30,11 @@ class ArSecH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_arsech(op.value));
-    else
+    } else {
       return arsech(op);
+    }
   }
 
   @override

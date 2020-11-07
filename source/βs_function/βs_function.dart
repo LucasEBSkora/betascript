@@ -23,9 +23,10 @@ abstract class BSFunction implements BSCallable {
   ///parameter.
   BSFunction call(List<BSFunction> parameters) {
     Set<Variable> _p = this.parameters;
-    if (parameters.length != _p.length)
+    if (parameters.length != _p.length) {
       throw new BetascriptFunctionError(
           "Error! Missing parameters in function call!");
+    }
 
     return evaluate(
         HashMap.fromIterables(this.parameters.map((e) => e.name), parameters));
@@ -45,9 +46,10 @@ abstract class BSFunction implements BSCallable {
     Set<Variable> _p = defaultParameters;
 
     _p.forEach((element) {
-      if (!p.contains(element))
+      if (!p.contains(element)) {
         throw new BetascriptFunctionError(
             "Error! Function parameters not sufficient to evaluate this function!");
+      }
     });
     return copy(p);
   }
@@ -71,11 +73,12 @@ abstract class BSFunction implements BSCallable {
     Trio<Number, bool, bool> _a = BSFunction.extractFromNegative<Number>(a);
     Trio<Number, bool, bool> _b = BSFunction.extractFromNegative<Number>(b);
     if (!_a.second || !_b.second) {
-      if (op != null)
+      if (op != null) {
         throw BetascriptFunctionError(
             "operand $op can only be used on numbers");
-      else
+      } else {
         return Pair(null, null);
+      }
     }
 
     return Pair<num, num>(((_a.third) ? -1 : 1) * _a.first.value,

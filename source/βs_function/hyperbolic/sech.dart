@@ -9,10 +9,7 @@ import '../single_operand_function.dart';
 import 'tanh.dart';
 
 BSFunction sech(BSFunction operand) {
-  if (operand is ArSecH)
-    return operand.operand;
-  else
-    return SecH._(operand);
+  return (operand is ArSecH) ? operand.operand : SecH._(operand);
 }
 
 class SecH extends singleOperandFunction {
@@ -35,10 +32,11 @@ class SecH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_sech(op.value));
-    else
+    } else {
       return sech(op);
+    }
   }
 
   @override

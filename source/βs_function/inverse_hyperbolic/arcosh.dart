@@ -11,10 +11,7 @@ import '../single_operand_function.dart';
 import '../root.dart';
 
 BSFunction arcosh(BSFunction operand) {
-  if (operand is CosH)
-    return operand.operand;
-  else
-    return ArCosH._(operand);
+  return (operand is CosH) ? operand.operand : ArCosH._(operand);
 }
 
 class ArCosH extends singleOperandFunction {
@@ -33,10 +30,11 @@ class ArCosH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_arcosh(op.value));
-    else
+    } else {
       return arcosh(op);
+    }
   }
 
   @override

@@ -90,10 +90,11 @@ class BSScanner {
       '#': _directive,
       //since things like .01 are valid numeric literals, '.' needs to be checked to be sure it's a dot or part of a literal.
       '.': () {
-        if (_IsDigit(_peek()))
+        if (_IsDigit(_peek())) {
           _number();
-        else
+        } else {
           _addToken(TokenType.dot);
+        }
       },
       //for these, we need to check if they are followed by a '=' or not (since = and ==, < and <=, > and >= are different things)
       //specially '=', which can be '=', '==' or '==='
@@ -179,9 +180,9 @@ class BSScanner {
     String c = _advance();
 
     //checks if it's one of the characters in _charToLexeme
-    if (_charToLexeme.containsKey(c))
+    if (_charToLexeme.containsKey(c)) {
       _charToLexeme[c]();
-    else {
+    } else {
       //if it isn't, it's either the start of a numeric literal, a identifier (or keyword), or an unexpected character.
       if (_IsDigit(c)) {
         _number();
@@ -255,9 +256,9 @@ class BSScanner {
     }
 
     //if the source ended without another '"' to close the string, causes an error.
-    if (_isAtEnd())
+    if (_isAtEnd()) {
       BetaScript.error(_line, "Unterminated String.");
-    else {
+    } else {
       //if the string is properly formed, adds it to the token list, with the literal value having both '"' characters stripped off.
       _advance();
       String value = _source.substring(_start + 1, _current - 1);

@@ -9,10 +9,7 @@ import '../single_operand_function.dart';
 import 'ctg.dart';
 
 BSFunction csc(BSFunction operand) {
-  if (operand is ArcCsc)
-    return operand.operand;
-  else
-    return Csc._(operand);
+  return (operand is ArcCsc) ? operand.operand : Csc._(operand);
 }
 
 class Csc extends singleOperandFunction {

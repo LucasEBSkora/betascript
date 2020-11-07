@@ -9,10 +9,7 @@ import '../single_operand_function.dart';
 import 'cos.dart';
 
 BSFunction sin(BSFunction operand) {
-  if (operand is ArcSin)
-    return operand.operand;
-  else
-    return Sin._(operand);
+  return (operand is ArcSin) ? operand.operand : Sin._(operand);
 }
 
 class Sin extends singleOperandFunction {

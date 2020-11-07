@@ -40,10 +40,11 @@ class Number extends BSFunction {
 
   ///creates a name from the number, but if it can be cast to a int, does it (so 1.0 is displayed as 1)
   static String _makeName(num value) {
-    if (value == value.toInt())
+    if (value == value.toInt()) {
       return value.toInt().abs().toString();
-    else
+    } else {
       return value.abs().toString();
+    }
   }
 
   @override
@@ -59,10 +60,11 @@ class Number extends BSFunction {
 
   @override
   BSFunction copy([Set<Variable> params = null]) {
-    if (isNamed)
+    if (isNamed) {
       return Number._named(absvalue, name, params);
-    else
+    } else {
       return Number._(absvalue, params);
+    }
   }
 
   @override

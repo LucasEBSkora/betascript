@@ -11,10 +11,7 @@ import '../trig/cos.dart';
 import '../root.dart';
 
 BSFunction arccos(BSFunction operand) {
-  if (operand is Cos)
-    return operand.operand;
-  else
-    return ArcCos._(operand);
+  return (operand is Cos) ? operand.operand : ArcCos._(operand);
 }
 
 class ArcCos extends singleOperandFunction {
@@ -33,10 +30,11 @@ class ArcCos extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(math.acos(op.value));
-    else
+    } else {
       return arccos(op);
+    }
   }
 
   @override

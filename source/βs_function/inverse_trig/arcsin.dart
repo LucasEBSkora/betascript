@@ -11,10 +11,7 @@ import '../single_operand_function.dart';
 import '../trig/sin.dart';
 
 BSFunction arcsin(BSFunction operand) {
-  if (operand is Sin)
-    return operand.operand;
-  else
-    return ArcSin._(operand);
+  return (operand is Sin) ? operand.operand : ArcSin._(operand);
 }
 
 class ArcSin extends singleOperandFunction {
@@ -33,10 +30,11 @@ class ArcSin extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(math.asin(op.value));
-    else
+    } else {
       return arcsin(op);
+    }
   }
 
   @override

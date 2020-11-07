@@ -75,10 +75,11 @@ class BSParser {
 
     //<routines> ::= routine <routines> | <whitespace_or_linebreak> <routines> ""
     while (!_check(TokenType.rightBrace) && !_isAtEnd())
-      if (_check(TokenType.lineBreak))
+      if (_check(TokenType.lineBreak)) {
         _advance();
-      else
+      } else {
         methods.add(_routine("method"));
+      }
 
     _consume(TokenType.rightBrace, "Expect '}' after class body");
 
@@ -186,12 +187,13 @@ class BSParser {
     Stmt initializer;
 
     //the initializer may be empty, a variable declaration or any other expression
-    if (_match(TokenType.semicolon))
+    if (_match(TokenType.semicolon)) {
       initializer = null;
-    else if (_match(TokenType.let))
+    } else if (_match(TokenType.let)) {
       initializer = _varDeclaration();
-    else
+    } else {
       initializer = _expressionStatement();
+    }
 
     //linebreaks after semicolons handled by the parser
 
@@ -211,8 +213,9 @@ class BSParser {
         "Expect ')' after increment in for statement");
     Stmt body = _statement();
 
-    if (increment != null)
+    if (increment != null) {
       body = new BlockStmt([body, new ExpressionStmt(increment)]);
+    }
     if (condition == null) condition = new LiteralExpr(true);
 
     body = new WhileStmt(token, condition, body);
@@ -248,9 +251,10 @@ class BSParser {
   ///<print_stmt> ::= <unterminated_print_stmt> <delimitator>
   ///<unterminated_print_stmt> ::= "print" <expression>
   Stmt _printStatement() {
-    if (_match(TokenType.lineBreak))
+    if (_match(TokenType.lineBreak)) {
       _error(_previous(),
           "linebreak right after 'print' keyword not allowed. Please start the target expression in the same line.");
+    }
     Expr value = _expression();
     _checkTerminator("print");
     return new PrintStmt(value);
@@ -262,9 +266,10 @@ class BSParser {
   ///<unterminated_return_stmt> ::= "return" | "return" <whitespace> <expression>
   Stmt _returnStatement() {
     Token keyword = _previous();
-    if (_match(TokenType.lineBreak))
+    if (_match(TokenType.lineBreak)) {
       _error(_previous(),
           "linebreak not allowed immediately after return keyword! If you want to end the routine early, either write 'return null' or 'return;'");
+    }
     Expr value =
         (_check(TokenType.semicolon)) ? LiteralExpr(null) : _expression();
 
@@ -495,11 +500,12 @@ class BSParser {
   Expr _unary_right() {
     Expr operand;
     //if it finds a 'del' token, parses a derivative
-    if (_match(TokenType.del))
+    if (_match(TokenType.del)) {
       operand = _derivative();
-    else //in any other case, go to the 'call' rule
+    } else {
+      //in any other case, go to the 'call' rule
       operand = _call();
-
+    }
     //keeps composing it until it's done
     while (_matchAny([TokenType.apostrophe, TokenType.factorial]))
       operand = UnaryExpr(_previous(), operand);
@@ -572,9 +578,10 @@ class BSParser {
     _consume(TokenType.leftParentheses, "expect '(' after second del keyword");
     //linebreaks after '(' handled by scanner
     List<Expr> variables = List();
-    if (_check(TokenType.rightParentheses))
+    if (_check(TokenType.rightParentheses)) {
       _error(_previous(),
           "at least one variable is necessary in derivative expression");
+    }
     do {
       //linebreaks after '(' and ',' handled by scanner
       variables.add(_expression());
@@ -610,14 +617,19 @@ class BSParser {
     if (_match(TokenType.setToken)) return _setDefinition();
 
     //number | string
-    if (_matchAny([TokenType.number, TokenType.string]))
+    if (_matchAny([TokenType.number, TokenType.string])) {
       return new LiteralExpr(_previous().literal);
+    }
 
     //false
-    if (_match(TokenType.falseToken)) return new LiteralExpr(false);
+    if (_match(TokenType.falseToken)) {
+      return new LiteralExpr(false);
+    }
 
     //true
-    if (_match(TokenType.trueToken)) return new LiteralExpr(true);
+    if (_match(TokenType.trueToken)) {
+      return new LiteralExpr(true);
+    }
 
     //nil
     if (_match(TokenType.nil)) return new LiteralExpr(null);
@@ -741,10 +753,11 @@ class BSParser {
 
     //{} -> empty set
     if (_match(TokenType.rightBrace)) {
-      if (expectSet)
+      if (expectSet) {
         return LiteralExpr(emptySet);
-      else
+      } else {
         return ExpressionStmt(LiteralExpr(emptySet));
+      }
     }
 
     //if we find a comma, we know it's a set definition
@@ -762,11 +775,12 @@ class BSParser {
 
     if (_match(TokenType.comma)) {
       if (first == null) _error(_previous(), "expect token before comma");
-      if (first is ExpressionStmt)
+      if (first is ExpressionStmt) {
         expressions.add(first.expression);
-      else
+      } else {
         _error(_previous(),
             "all elements in a roster set definition must evaluate to a number");
+      }
       isSet = true;
       do {
         //linebreaks after ','  handled by scanner
@@ -777,11 +791,12 @@ class BSParser {
     //is a builder set
     if (_match(TokenType.verticalBar)) {
       if (first != null) {
-        if (first is ExpressionStmt)
+        if (first is ExpressionStmt) {
           expressions.add(first.expression);
-        else
+        } else {
           _error(_previous(),
               "all parameters in a builder set definition must evaluate to a variable");
+        }
       }
 
       Token bar = _previous();
@@ -792,11 +807,12 @@ class BSParser {
       if (expressions.isNotEmpty) {
         parameters = List();
         for (Expr parameter in expressions) {
-          if (parameter is VariableExpr)
+          if (parameter is VariableExpr) {
             parameters.add(parameter.name);
-          else
+          } else {
             throw new SetDefinitionError(
                 "parameter is not explicit variable name");
+          }
         }
       }
 
@@ -961,8 +977,9 @@ class BSParser {
     }
     if (_isAtEnd() ||
         _checkAny(
-            [TokenType.rightBrace, TokenType.comma, TokenType.verticalBar]))
+            [TokenType.rightBrace, TokenType.comma, TokenType.verticalBar])) {
       return;
+    }
 
     throw _error(_peek(), "Expect ';' or line break after $type value");
   }

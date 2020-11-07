@@ -9,10 +9,7 @@ import '../single_operand_function.dart';
 import 'ctgh.dart';
 
 BSFunction csch(BSFunction operand) {
-  if (operand is ArCscH)
-    return operand.operand;
-  else
-    return CscH._(operand);
+  return (operand is ArCscH) ? operand.operand : CscH._(operand);
 }
 
 class CscH extends singleOperandFunction {
@@ -35,10 +32,11 @@ class CscH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_csch(op.value));
-    else
+    } else {
       return csch(op);
+    }
   }
 
   @override

@@ -8,17 +8,19 @@ MethodTable<BSSet, BSSet> defineRelativeComplementTable() {
   MethodTable<BSSet, BSSet> methods = MethodTable();
 
   methods.addMethod(Interval, Interval, (Interval first, Interval second) {
-    if (first.contains(second)) //second is fully contained in first
+    if (first.contains(second)) {
+      //second is fully contained in first
       return SetUnion([
         interval(first.a, second.a,
             leftClosed: first.leftClosed, rightClosed: !second.leftClosed),
         interval(second.b, first.b,
             leftClosed: !second.rightClosed, rightClosed: first.rightClosed)
       ]);
-
+    }
     //left edge of second is in first
-    if (first.belongs(second.a))
+    if (first.belongs(second.a)) {
       return Interval(first.a, second.a, first.leftClosed, !second.leftClosed);
+    }
 
     //right edge of second is in first: only other case
     // if (first.belongs(second.b))
@@ -76,14 +78,16 @@ MethodTable<BSSet, BSSet> defineRelativeComplementTable() {
       IntensionalSetIntersection,
       (BSSet first, IntensionalSetIntersection second) {
     //tries to simplifies the non-intensional part
-    if (second.first is BuilderSet)
+    if (second.first is BuilderSet) {
       return first
           .relativeComplement(second.second)
           .relativeComplement(second.first);
-    if (second.second is BuilderSet)
+    }
+    if (second.second is BuilderSet) {
       return first
           .relativeComplement(second.first)
           .relativeComplement(second.second);
+    }
   });
 
   methods.addMethodsInLine(

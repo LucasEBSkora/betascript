@@ -45,10 +45,11 @@ BSSet setUnion(Iterable<BSSet> subsets) {
     if (_set is RosterSet) {
       rosterElements.addAll(_set.elements);
       _subsets.removeAt(i);
-    } else if (_set is EmptySet)
+    } else if (_set is EmptySet) {
       _subsets.removeAt(i);
-    else
+    } else {
       ++i;
+    }
   }
 
   if (rosterElements.isNotEmpty) _subsets.add(rosterSet(rosterElements));

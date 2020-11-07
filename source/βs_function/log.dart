@@ -7,13 +7,15 @@ import 'βs_function.dart';
 
 BSFunction log(BSFunction operand, [BSFunction base = constants.e]) {
   //log_a(1) == 0 for every a
-  if (operand == n(1))
+  if (operand == n(1)) {
     return n(0);
+  }
   //log_a(a) == 1 for every a
-  else if (operand == base)
+  else if (operand == base) {
     return n(1);
-  else
+  } else {
     return Log._(operand, base);
+  }
 }
 
 class Log extends BSFunction {
@@ -24,11 +26,10 @@ class Log extends BSFunction {
 
   @override
   BSFunction derivativeInternal(Variable v) {
-    if (base is Number)
-      return (operand.derivativeInternal(v) / (log(base) * operand));
-
+    return (base is Number)
+        ? (operand.derivativeInternal(v) / (log(base) * operand))
+        : ((log(operand) / log(base)).derivativeInternal(v));
     //if base is also a function, uses log_b(a) = ln(a)/ln(b) s
-    return ((log(operand) / log(base)).derivativeInternal(v));
   }
 
   @override
@@ -46,10 +47,7 @@ class Log extends BSFunction {
 
   @override
   String toString([bool handleMinus = true]) {
-    if (base == constants.e)
-      return "ln($operand)";
-    else
-      return "log($base)($operand)";
+    return (base == constants.e) ? "ln($operand)" : "log($base)($operand)";
   }
 
   @override
@@ -67,8 +65,8 @@ class Log extends BSFunction {
   BSFunction get approx {
     BSFunction b = base.approx;
     BSFunction op = operand.approx;
-    if (b is Number && op is Number)
-      return n(math.log(op.value) / math.log(b.value));
-    return log(op, b);
+    return (b is Number && op is Number)
+        ? n(math.log(op.value) / math.log(b.value))
+        : log(op, b);
   }
 }

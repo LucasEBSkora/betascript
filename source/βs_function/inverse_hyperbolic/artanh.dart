@@ -10,10 +10,7 @@ import '../hyperbolic/tanh.dart';
 import '../single_operand_function.dart';
 
 BSFunction artanh(BSFunction operand) {
-  if (operand is TanH)
-    return operand.operand;
-  else
-    return ArTanH._(operand);
+  return (operand is TanH) ? operand.operand : ArTanH._(operand);
 }
 
 class ArTanH extends singleOperandFunction {
@@ -32,10 +29,11 @@ class ArTanH extends singleOperandFunction {
   @override
   BSFunction get approx {
     BSFunction op = operand.approx;
-    if (op is Number)
+    if (op is Number) {
       return n(_artanh(op.value));
-    else
+    } else {
       return artanh(op);
+    }
   }
 
   @override

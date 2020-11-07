@@ -10,10 +10,7 @@ import '../single_operand_function.dart';
 import 'sec.dart';
 
 BSFunction tan(BSFunction operand) {
-  if (operand is ArcTan)
-    return operand.operand;
-  else
-    return Tan._(operand);
+  return (operand is ArcTan) ? operand.operand : Tan._(operand);
 }
 
 class Tan extends singleOperandFunction {

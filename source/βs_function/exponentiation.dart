@@ -12,9 +12,9 @@ BSFunction exp(BSFunction exponent, [BSFunction base = constants.e]) {
   if (exponent is Number &&
       base is Number &&
       !exponent.isNamed &&
-      !base.isNamed)
+      !base.isNamed) {
     return n(pow(base.value, exponent.value));
-  else
+  } else
     return Exponentiation._(exponent, base);
 }
 
@@ -64,9 +64,10 @@ class Exponentiation extends BSFunction {
     BSFunction expo = exponent.approx;
 
     var pair = BSFunction.toNums(b, expo);
-    if (pair.first == null || pair.second == null)
+    if (pair.first == null || pair.second == null) {
       return exp(b, expo);
-    else
+    } else {
       return n(pow(pair.first, pair.second));
+    }
   }
 }

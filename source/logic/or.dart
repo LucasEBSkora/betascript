@@ -7,16 +7,10 @@ import 'logic_expression.dart';
 LogicExpression or(LogicExpression left, LogicExpression right) {
   // (1 || A) == 1, (0 || A) == A
   if (left is Constant) {
-    if (left.value) {
-      return left;
-    } else
-      return right;
+    return (left.value) ? left : right;
   }
   if (right is Constant) {
-    if (right.value) {
-      return right;
-    } else
-      return left;
+    return (right.value) ? right : left;
   }
 
   return Or(left, right);

@@ -8,17 +8,20 @@ import 'roster_set.dart';
 BSSet interval(BSFunction a, BSFunction b,
     {bool leftClosed = true, bool rightClosed = true}) {
   if (!BSFunction.extractFromNegative<Number>(a).second ||
-      !BSFunction.extractFromNegative<Number>(b).second)
+      !BSFunction.extractFromNegative<Number>(b).second) {
     throw BetascriptFunctionError("sets can only be defined in numbers");
+  }
   if (a == b) {
-    if (leftClosed && rightClosed)
+    if (leftClosed && rightClosed) {
       return rosterSet([a]);
-    else
+    } else {
       return emptySet;
-  } else if (a > b)
+    }
+  } else if (a > b) {
     return emptySet;
-  else
+  } else {
     return Interval(a, b, leftClosed, rightClosed);
+  }
 }
 
 //a class that represents an interval in R
