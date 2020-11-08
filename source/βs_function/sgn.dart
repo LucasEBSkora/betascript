@@ -4,17 +4,14 @@ import 'abs.dart';
 import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
-import '../utils/tuples.dart';
 
 BSFunction sgn(BSFunction operand) {
-  Trio<Number, bool, bool> _f1 =
-      BSFunction.extractFromNegative<Number>(operand);
+  final _f1 = BSFunction.extractFromNegative<Number>(operand);
   if (_f1.second) {
     return (_f1.first.value == 0) ? n(0) : n(_f1.third ? -1 : 1);
   }
 
-  Trio<AbsoluteValue, bool, bool> _f2 =
-      BSFunction.extractFromNegative<AbsoluteValue>(operand);
+  final _f2 = BSFunction.extractFromNegative<AbsoluteValue>(operand);
   if (_f2.second) return n(_f2.third ? -1 : 1);
 
   return Signum._(operand, null);

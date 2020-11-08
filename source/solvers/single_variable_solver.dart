@@ -13,7 +13,7 @@ class SingleVariableSolver extends Solver {
   @override
   BSSet attemptSolveInternal() {
     BSSet solution = emptySet;
-    SingleVariableLinearSolver s1 = SingleVariableLinearSolver(expr);
+    final s1 = SingleVariableLinearSolver(expr);
     if (s1.applies()) {
       solution = s1.attemptSolve();
       _everySolutionFound = s1.EverySolutionFound;

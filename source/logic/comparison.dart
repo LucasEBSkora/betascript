@@ -20,14 +20,11 @@ abstract class Comparison extends LogicExpression {
   String get type;
 
   bool get alwaysTrue {
-    BSFunction _left = left.approx;
-    BSFunction _right = right.approx;
-
-    Pair<num, num> nums = BSFunction.toNums(_left, _right);
+    final nums = BSFunction.toNums(left.approx, right.approx);
 
     //for now, if it can't convert both to numbers to make sure the comparison is always true, doesn't even try
-    if (nums.first != null) {
-      compare(nums.first, nums.second);
+    if (nums != null) {
+      return compare(nums.first, nums.second);
     }
 
     return false;
@@ -35,15 +32,12 @@ abstract class Comparison extends LogicExpression {
 
   ///checks if an expression is always false(so that comparisons between numbers aren't represented by trees when they could be a boolean)
   bool get alwaysFalse {
-    BSFunction _left = left.approx;
-    BSFunction _right = right.approx;
-
-    Pair<num, num> nums = BSFunction.toNums(_left, _right);
+    final nums = BSFunction.toNums(left.approx, right.approx);
 
     //for now, if it can't convert both to numbers to make sure the comparison is always false, doesn't even try
     //basically gets "alwaysTrue" and inverts it
 
-    if (nums.first != null) {
+    if (nums != null) {
       return compare(nums.first, nums.second);
     }
 
@@ -62,9 +56,9 @@ abstract class Comparison extends LogicExpression {
       return false;
     }
 
-    Pair<num, num> nums = BSFunction.toNums(_left, _right);
+    final nums = BSFunction.toNums(_left, _right);
 
-    if (nums.first != null) {
+    if (nums != null) {
       return compare(nums.first, nums.second);
     }
 
@@ -95,9 +89,8 @@ abstract class Comparison extends LogicExpression {
   String toString() => "$left $type $right";
 
   SplayTreeSet<String> get parameters {
-    Set<Variable> params = left.parameters;
-    params.addAll(right.parameters);
-    return SplayTreeSet.from(params.map((e) => e.name));
+    final params = <Variable>{...left.parameters, ...right.parameters};
+    return SplayTreeSet<String>.from(params.map((e) => e.name));
   }
 
   bool _foundEverySolution = false;

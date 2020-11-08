@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'resolver.dart';
-import 'stmt.dart';
 import 'token.dart';
 import 'βs_interpreter.dart';
 import 'βs_parser.dart';
@@ -17,7 +16,7 @@ class BetaScript {
 
   static void runFile(String path) {
     printCallback = print;
-    File file = File(path);
+    final file = File(path);
     String fileContents;
     try {
       fileContents = file.readAsStringSync();
@@ -45,7 +44,7 @@ class BetaScript {
   }
 
   static String runForWeb(String source) {
-    String output = "";
+    var output = "";
 
     //resets everything so it always interprets from a fresh start
     hadError = false;
@@ -63,14 +62,14 @@ class BetaScript {
   }
 
   static void _run(String source) {
-    BSScanner scanner = BSScanner(source);
-    List<Token> tokens = scanner.scanTokens(); //lexical analysis
+    final scanner = BSScanner(source);
+    final tokens = scanner.scanTokens(); //lexical analysis
     // for (Token token in tokens) print(token);
-    BSParser parser = BSParser(tokens, _interpreter);
-    List<Stmt> statements = parser.parse(); //Syntax analysis
+    final parser = BSParser(tokens, _interpreter);
+    final statements = parser.parse(); //Syntax analysis
     if (hadError) return;
 
-    Resolver resolver = Resolver(_interpreter);
+    final resolver = Resolver(_interpreter);
     resolver.resolveAll(statements); //Semantic analysis
 
     if (hadError) return;

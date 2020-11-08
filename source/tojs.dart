@@ -9,7 +9,7 @@ int main() {
   // File file = File("example.bs");
   // String contents = file.readAsStringSync();
 
-  String contents = """
+  const contents = """
 let f(x) = sin(x)
   
 let g = f(cos(x))

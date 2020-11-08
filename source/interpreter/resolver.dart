@@ -17,17 +17,17 @@ enum ClassType { none, classType, subClassType }
 class Resolver implements ExprVisitor, StmtVisitor {
   final BSInterpreter _interpreter;
   //Used to see if we're currently traversing a routine, which is important to check if a return statement is valid
-  RoutineType _currentRoutine = RoutineType.none;
-  ClassType _currentClass = ClassType.none;
+  var _currentRoutine = RoutineType.none;
+  var _currentClass = ClassType.none;
 
   ///A stack representing Scopes, where the key is the identifier name and the value is whether it is ready to be referenced
   ///because things like var a = a; should cause compile errors
-  final List<HashMap<String, bool>> _scopes = List();
+  final _scopes = <HashMap<String, bool>>[];
 
   ///Represents all the global values. Used to check if a global is being redefined (to avoid overriding native functions and routines)
   ///Since all native things are already define, they are added to the map from the start
-  final HashMap<String, bool> _globals =
-      HashMap.fromIterable(nativeGlobals.keys, value: (_) => true);
+  final _globals = HashMap<String, bool>.fromIterable(nativeGlobals.keys,
+      value: (_) => true);
 
   Resolver(this._interpreter);
 
@@ -63,7 +63,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
   void visitCallExpr(CallExpr e) {
     _resolveExpr(e.callee);
 
-    for (Expr argument in e.arguments) _resolveExpr(argument);
+    for (var argument in e.arguments) _resolveExpr(argument);
   }
 
   @override
@@ -163,7 +163,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
   }
 
   void resolveAll(List<Stmt> statements) {
-    for (Stmt s in statements) _resolveStmt(s);
+    for (var s in statements) _resolveStmt(s);
   }
 
   void _resolveStmt(Stmt s) => s.accept(this);
@@ -214,11 +214,11 @@ class Resolver implements ExprVisitor, StmtVisitor {
   ///Resolves both routines and methods
   void _resolveRoutine(RoutineStmt s, RoutineType type) {
     //Stores the last routine type, because routines can call other routines (or methods)
-    RoutineType enclosingRoutine = _currentRoutine;
+    var enclosingRoutine = _currentRoutine;
     _currentRoutine = type;
 
     _beginScope();
-    for (Token param in s.parameters) {
+    for (var param in s.parameters) {
       _declare(param);
       _define(param);
     }
@@ -230,7 +230,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   @override
   void visitClassStmt(ClassStmt s) {
-    ClassType enclosingClass = _currentClass;
+    var enclosingClass = _currentClass;
     _currentClass = ClassType.classType;
 
     _declare(s.name);

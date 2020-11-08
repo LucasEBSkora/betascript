@@ -8,7 +8,7 @@ import 'βs_function.dart';
 import '../utils/tuples.dart';
 
 BSFunction add(List<BSFunction> operands) {
-  if (operands == null || operands.length == 0) return n(0);
+  if (operands?.isEmpty ?? true) return n(0);
 
   _openOtherSums(operands);
   _SumNumbers(operands);
@@ -37,12 +37,12 @@ class Sum extends BSFunction {
 
   @override
   String toString([bool handleMinus = true]) {
-    String s = '(';
+    var s = '(';
 
     s += operands[0].toString();
 
     for (int i = 1; i < operands.length; ++i) {
-      BSFunction _op = operands[i];
+      var _op = operands[i];
       if (_op is Negative) {
         s += " - ";
         _op = (_op as Negative).operand;
@@ -61,36 +61,25 @@ class Sum extends BSFunction {
   BSFunction copy([Set<Variable> params]) => Sum._(operands, params);
 
   @override
-  SplayTreeSet<Variable> get defaultParameters {
-    Set<Variable> params = SplayTreeSet();
-
-    for (BSFunction operand in operands) params.addAll(operand.parameters);
-
-    return params;
-  }
+  SplayTreeSet<Variable> get defaultParameters => SplayTreeSet<Variable>.from(
+      <Variable>{for (final operand in operands) ...operand.parameters});
 
   @override
-  BSFunction get approx {
-    List<BSFunction> ops = <BSFunction>[];
-    for (var f in operands) {
-      ops.add(f.approx);
-    }
-    return add(ops);
-  }
+  BSFunction get approx =>
+      add(<BSFunction>[for (final f in operands) f.approx]);
 }
 
 ///If the List passed already has Sums in it, removes the Sum and adds its operators to the list
 void _openOtherSums(List<BSFunction> operands) {
-  int i = 0;
+  var i = 0;
   while (i < operands.length) {
-    Trio<Sum, bool, bool> _op =
-        BSFunction.extractFromNegative<Sum>(operands[i]);
+    final _op = BSFunction.extractFromNegative<Sum>(operands[i]);
 
     //if it finds a sum
     if (_op.second) {
       Sum s = operands.removeAt(i);
 
-      List<BSFunction> newOperands = <BSFunction>[];
+      var newOperands = <BSFunction>[];
 
       //if it finds a sum within a negative
       if (_op.third) {
@@ -108,20 +97,18 @@ void _openOtherSums(List<BSFunction> operands) {
 
 ///Gets the operands, sums up all numbers and adds them to the beginning of the list (which already eliminates zeros)
 void _SumNumbers(List<BSFunction> operands) {
-  double number = 0;
+  var number = 0.0;
 
-  HashMap<String, Pair<double, int>> namedNumbers =
-      HashMap<String, Pair<double, int>>();
+  final namedNumbers = HashMap<String, Pair<double, int>>();
 
-  int i = 0;
+  var i = 0;
   while (i < operands.length) {
-    bool _negative = operands[i] is Negative;
-    BSFunction op =
-        ((_negative) ? (operands[i] as Negative).operand : operands[i]);
+    final _negative = operands[i] is Negative;
+    final op = ((_negative) ? (operands[i] as Negative).operand : operands[i]);
 
     if (op is Number) {
       operands.removeAt(i);
-      Number n = op;
+      final n = op;
       if (!n.isNamed) {
         number += n.value * (_negative ? -1 : 1);
       } else {
@@ -135,13 +122,13 @@ void _SumNumbers(List<BSFunction> operands) {
       ++i;
   }
 
-  List<BSFunction> numbers = <BSFunction>[];
+  final numbers = <BSFunction>[];
 
   if (number > 0) {
     numbers.add(n(number));
   } else if (number < 0) operands.add(n(number));
 
-  for (String key in namedNumbers.keys) {
+  for (final key in namedNumbers.keys) {
     if (namedNumbers[key].second != 0) {
       numbers.add(n(namedNumbers[key].second) *
           namedNumber(namedNumbers[key].first, key));
@@ -157,38 +144,36 @@ void _createMultiplications(List<BSFunction> operands) {
   if (operands.length < 2) return;
   for (int i = 0; i < operands.length; ++i) {
     //for each operand, divides it into numeric factor and function
-    BSFunction f = operands[i];
+    final f = operands[i];
 
     BSFunction h;
     BSFunction originalFactor;
     BSFunction factor;
-    Trio<Multiplication, bool, bool> _mul =
-        BSFunction.extractFromNegative<Multiplication>(f);
+    final _mul = BSFunction.extractFromNegative<Multiplication>(f);
 
     if (_mul.second &&
         _mul.first.operands.length >= 2 &&
         _mul.first.operands[0] is Number) {
       //in this case, "h" must be the multiplication with all other factors excluding the number
-      List<BSFunction> otherOps = _mul.first.operands.toList();
+      final otherOps = _mul.first.operands.toList();
       otherOps.removeAt(0);
       h = Multiplication(otherOps);
       factor = originalFactor = _mul.first.operands[0] * n(_mul.third ? -1 : 1);
     } else {
-      Trio<BSFunction, bool, bool> _f = BSFunction.extractFromNegative(f);
+      final _f = BSFunction.extractFromNegative(f);
       h = _f.first;
       factor = originalFactor = n((_f.third ? -1 : 1));
     }
 
-    for (int j = i + 1; j < operands.length; ++j) {
-      BSFunction g = operands[j];
-      Trio<Multiplication, bool, bool> _mul =
-          BSFunction.extractFromNegative<Multiplication>(g);
+    for (var j = i + 1; j < operands.length; ++j) {
+      var g = operands[j];
+      final _mul = BSFunction.extractFromNegative<Multiplication>(g);
 
       if (_mul.second &&
           _mul.first.operands.length >= 2 &&
           _mul.first.operands[0] is Number) {
         //in this case, "h" must be the multiplication with all other factors excluding the number
-        List<BSFunction> otherOps = _mul.first.operands.toList();
+        final otherOps = _mul.first.operands.toList();
         otherOps.removeAt(0);
         g = Multiplication(otherOps);
         if (h == g) {
@@ -196,7 +181,7 @@ void _createMultiplications(List<BSFunction> operands) {
           factor += _mul.first.operands[0] * n(_mul.third ? -1 : 1);
         }
       } else {
-        Trio<BSFunction, bool, bool> _g = BSFunction.extractFromNegative(g);
+        final _g = BSFunction.extractFromNegative(g);
         if (_g.first == h) {
           operands.removeAt(j);
           factor += n((_g.third ? -1 : 1));

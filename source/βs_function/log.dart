@@ -34,8 +34,8 @@ class Log extends BSFunction {
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    BSFunction b = base.evaluate(p);
-    BSFunction op = operand.evaluate(p);
+    final b = base.evaluate(p);
+    final op = operand.evaluate(p);
     if (b is Number && op is Number) {
       //if both are numbers, checks if the evaluation is a integer. if it is, returns the integer.
       double v = math.log(op.value) / math.log(b.value);
@@ -46,24 +46,20 @@ class Log extends BSFunction {
   }
 
   @override
-  String toString([bool handleMinus = true]) {
-    return (base == constants.e) ? "ln($operand)" : "log($base)($operand)";
-  }
+  String toString([bool handleMinus = true]) =>
+      (base == constants.e) ? "ln($operand)" : "log($base)($operand)";
 
   @override
   BSFunction copy([Set<Variable> params]) => Log._(operand, base, params);
 
   @override
-  SplayTreeSet<Variable> get defaultParameters {
-    Set<Variable> params = base.parameters;
-    params.addAll(operand.parameters);
-    return params;
-  }
+  SplayTreeSet<Variable> get defaultParameters => SplayTreeSet<Variable>.from(
+      <Variable>{...base.parameters, ...operand.parameters});
 
   @override
   BSFunction get approx {
-    BSFunction b = base.approx;
-    BSFunction op = operand.approx;
+    final b = base.approx;
+    final op = operand.approx;
     return (b is Number && op is Number)
         ? n(math.log(op.value) / math.log(b.value))
         : log(op, b);

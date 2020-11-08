@@ -21,7 +21,7 @@ class Cos extends singleOperandFunction {
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    BSFunction op = operand.evaluate(p);
+    final op = operand.evaluate(p);
     if (op is Number) {
       double v = math.cos(op.value);
       //Doesn't cover nearly enough angles with exact cosines, but will do for now
@@ -32,7 +32,7 @@ class Cos extends singleOperandFunction {
 
   @override
   BSFunction get approx {
-    BSFunction op = operand.approx;
+    final op = operand.approx;
     if (op is Number) return n(math.cos(op.value));
     return cos(op);
   }

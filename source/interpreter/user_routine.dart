@@ -17,12 +17,12 @@ class UserRoutine implements BSCallable {
   @override
   Object callThing(BSInterpreter interpreter, List<Object> arguments) {
     //Creates routine scope
-    Environment environment = Environment(_closure);
+    var environment = Environment(_closure);
 
     //defines and initializes parameters in routine scope
 
     //Assumes it is safe to iterate in both lists because arity was checked in Interpreter.VisitCallExpr
-    for (int i = 0; i < _declaration.parameters.length; ++i)
+    for (var i = 0; i < _declaration.parameters.length; ++i)
       environment.define(_declaration.parameters[i].lexeme, arguments[i]);
 
     //executes block

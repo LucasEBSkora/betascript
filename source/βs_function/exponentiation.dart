@@ -35,10 +35,10 @@ class Exponentiation extends BSFunction {
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    BSFunction b = base.evaluate(p);
-    BSFunction expo = exponent.evaluate(p);
-    var pair = BSFunction.toNums(b, expo);
-    if (pair.first != null && pair.second != null) {
+    final b = base.evaluate(p);
+    final expo = exponent.evaluate(p);
+    final pair = BSFunction.toNums(b, expo);
+    if (pair != null) {
       double v = pow(pair.first, pair.second);
       if (v == v.toInt()) return n(v);
     }
@@ -53,19 +53,16 @@ class Exponentiation extends BSFunction {
       Exponentiation._(exponent, base, params);
 
   @override
-  SplayTreeSet<Variable> get defaultParameters {
-    Set<Variable> params = base.parameters;
-    params.addAll(exponent.parameters);
-    return params;
-  }
+  SplayTreeSet<Variable> get defaultParameters => SplayTreeSet<Variable>.from(
+      <Variable>{...base.parameters, ...exponent.parameters});
 
   @override
   BSFunction get approx {
-    BSFunction b = base.approx;
-    BSFunction expo = exponent.approx;
+    final b = base.approx;
+    final expo = exponent.approx;
 
-    var pair = BSFunction.toNums(b, expo);
-    if (pair.first == null || pair.second == null) {
+    final pair = BSFunction.toNums(b, expo);
+    if (pair == null) {
       return exp(b, expo);
     } else {
       return n(pow(pair.first, pair.second));

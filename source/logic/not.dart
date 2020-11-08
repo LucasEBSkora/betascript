@@ -6,8 +6,7 @@ import '../sets/sets.dart';
 import '../βs_function/βs_calculus.dart';
 
 LogicExpression not(LogicExpression operand) {
-  if (operand is Constant) return Constant(!operand.value);
-  return Not(operand);
+  return (operand is Constant) ? Constant(!operand.value) : Not(operand);
 }
 
 class Not extends LogicExpression {

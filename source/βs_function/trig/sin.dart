@@ -21,7 +21,7 @@ class Sin extends singleOperandFunction {
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    BSFunction op = operand.evaluate(p);
+    final op = operand.evaluate(p);
     if (op is Number) {
       double v = math.sin(op.value);
       //Doesn't cover nearly enough angles with exact sines, but will do for now
@@ -32,7 +32,7 @@ class Sin extends singleOperandFunction {
 
   @override
   BSFunction get approx {
-    BSFunction op = operand.approx;
+    final op = operand.approx;
     if (op is Number) return n(math.sin(op.value));
     return sin(op);
   }

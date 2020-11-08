@@ -20,7 +20,7 @@ class Csc extends singleOperandFunction {
       (-csc(operand) * ctg(operand) * operand.derivativeInternal(v));
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    BSFunction op = operand.evaluate(p);
+    final op = operand.evaluate(p);
     if (op is Number) {
       double v = 1 / math.sin(op.value);
       //Doesn't cover nearly enough angles with exact cossecants, but will do for now
@@ -31,7 +31,7 @@ class Csc extends singleOperandFunction {
 
   @override
   BSFunction get approx {
-    BSFunction op = operand.approx;
+    final op = operand.approx;
     if (op is Number) return n(1 / math.sin(op.value));
     return csc(op);
   }

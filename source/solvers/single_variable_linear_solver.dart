@@ -36,7 +36,7 @@ class SingleVariableLinearSolver extends Solver {
           invertedInequality = true;
           _left = (_left as Negative).operand;
         }
-        List<BSFunction> _terms = <BSFunction>[];
+        final _terms = <BSFunction>[];
         //if the function is a sum, separates it into terms to check if all of them are linear
         if (_left is Sum) {
           _terms.addAll((_left as Sum).operands);
@@ -71,7 +71,7 @@ class SingleVariableLinearSolver extends Solver {
     } else {
       //we rewrite the comparison as x ?= -b/a, remembering that if a < 0, then we must invert the inequation
       if (a < 0) invertedInequality = !invertedInequality;
-      BSFunction val = n(-b / a);
+      final val = n(-b / a);
       if (_comp is Equal) return rosterSet([val]);
       if (_comp is NotEqual) {
         return SetUnion([
@@ -104,7 +104,7 @@ class SingleVariableLinearSolver extends Solver {
   }
 
   bool extractCoefficients(BSFunction term) {
-    var _asNumber = BSFunction.extractFromNegative<Number>(term);
+    final _asNumber = BSFunction.extractFromNegative<Number>(term);
     //if it's a number, adds it to 'b'
     if (_asNumber.second) {
       if (_asNumber.third) {
@@ -116,7 +116,7 @@ class SingleVariableLinearSolver extends Solver {
       return true;
     }
 
-    var _asVar = BSFunction.extractFromNegative<Variable>(term);
+    final _asVar = BSFunction.extractFromNegative<Variable>(term);
 
     if (_asVar.second) {
       if (_asNumber.third) {
@@ -127,13 +127,13 @@ class SingleVariableLinearSolver extends Solver {
       return true;
     }
 
-    var _asMul = BSFunction.extractFromNegative<Multiplication>(term);
+    final _asMul = BSFunction.extractFromNegative<Multiplication>(term);
 
     //since multiplications are guaranteed to have at least two terms, and any constants in them to be in the first term,
     //we can simply check that the first operand is a number and the second a variable
     //(which we know is the one we're using because we already checked the function is defined in a single variable)
     if (_asMul.second) {
-      List<BSFunction> op = _asMul.first.operands;
+      final op = _asMul.first.operands;
       if (op.length == 2 && op.first is Number && op.last is Variable) {
         if (_asMul.third) {
           a -= (op.first as Number).value;

@@ -11,20 +11,19 @@ import '../utils/tuples.dart';
 import '../utils/xor.dart';
 
 BSFunction multiply(List<BSFunction> operands) {
-  if (operands == null || operands.length == 0) return (n(0));
+  if (operands?.isEmpty ?? true) return (n(0));
 
   _openOtherMultiplications(operands);
 
-  bool divisionNegatives = false;
+  var divisionNegatives = false;
 
   //if there are any divions in the operands, makes a new division with its numerator with
   //the other operands added, and its denominator
-  for (int i = 0; i < operands.length; ++i) {
-    List<BSFunction> divisions = <BSFunction>[];
+  for (var i = 0; i < operands.length; ++i) {
+    final divisions = <Division>[];
 
-    for (int i = 0; i < operands.length;) {
-      Trio<Division, bool, bool> _op =
-          BSFunction.extractFromNegative<Division>(operands[i]);
+    for (var i = 0; i < operands.length;) {
+      final _op = BSFunction.extractFromNegative<Division>(operands[i]);
       if (_op.second) {
         operands.removeAt(i);
 
@@ -36,24 +35,22 @@ BSFunction multiply(List<BSFunction> operands) {
     }
 
     if (divisions.length != 0) {
-      List<BSFunction> nums = <BSFunction>[];
-      List<BSFunction> dens = <BSFunction>[];
-
-      nums.addAll(operands);
+      final nums = <BSFunction>[...operands];
+      final dens = <BSFunction>[];
 
       for (Division f in divisions) {
-        BSFunction num = f.numerator;
-        if (num is Multiplication) {
-          nums.addAll(num.operands);
+        final numerator = f.numerator;
+        if (numerator is Multiplication) {
+          nums.addAll(numerator.operands);
         } else {
-          nums.add(num);
+          nums.add(numerator);
         }
 
-        BSFunction den = f.denominator;
-        if (den is Multiplication) {
-          dens.addAll(den.operands);
+        final denominator = f.denominator;
+        if (denominator is Multiplication) {
+          dens.addAll(denominator.operands);
         } else {
-          dens.add(den);
+          dens.add(denominator);
         }
       }
 
@@ -61,10 +58,10 @@ BSFunction multiply(List<BSFunction> operands) {
     }
   }
 
-  bool negativeForNumbers = _multiplyNumbers(operands);
-  bool negativeOthers = _consolidateNegatives(operands);
+  final negativeForNumbers = _multiplyNumbers(operands);
+  final negativeOthers = _consolidateNegatives(operands);
 
-  bool _negative = xor(negativeForNumbers, negativeOthers);
+  var _negative = xor(negativeForNumbers, negativeOthers);
   _negative = xor(_negative, divisionNegatives);
 
   _createExponents(operands);
@@ -89,10 +86,10 @@ class Multiplication extends BSFunction {
 
   @override
   BSFunction derivativeInternal(Variable v) {
-    List<BSFunction> ops = <BSFunction>[];
+    final ops = <BSFunction>[];
     for (int i = 0; i < operands.length; ++i) {
       //copies list
-      List<BSFunction> term = operands.toList();
+      final term = operands.toList();
 
       term.insert(i, term.removeAt(i).derivative(v));
       //removes "current" operand (which isn't derivated)
@@ -104,21 +101,16 @@ class Multiplication extends BSFunction {
   }
 
   @override
-  BSFunction evaluate(HashMap<String, BSFunction> p) {
-    List<BSFunction> ops = <BSFunction>[];
-    for (var f in operands) {
-      ops.add(f.evaluate(p));
-    }
-    return multiply(ops);
-  }
+  BSFunction evaluate(HashMap<String, BSFunction> p) =>
+      multiply(<BSFunction>[for (final f in operands) f.evaluate(p)]);
 
   @override
   String toString([bool handleMinus = true]) {
-    String s = '(';
+    var s = '(';
 
     s += operands[0].toString();
 
-    for (int i = 1; i < operands.length; ++i) {
+    for (var i = 1; i < operands.length; ++i) {
       s += '*' + operands[i].toString();
     }
 
@@ -131,34 +123,23 @@ class Multiplication extends BSFunction {
   BSFunction copy([Set<Variable> params]) => Multiplication(operands, params);
 
   @override
-  SplayTreeSet<Variable> get defaultParameters {
-    Set<Variable> params = SplayTreeSet();
-
-    for (BSFunction operand in operands) params.addAll(operand.parameters);
-
-    return params;
-  }
+  SplayTreeSet<Variable> get defaultParameters => SplayTreeSet<Variable>.from(
+      <Variable>{for (final operand in operands) ...operand.parameters});
 
   @override
-  BSFunction get approx {
-    List<BSFunction> ops = <BSFunction>[];
-    for (var f in operands) {
-      ops.add(f.approx);
-    }
-    return multiply(ops);
-  }
+  BSFunction get approx =>
+      multiply(<BSFunction>[for (var f in operands) f.approx]);
 }
 
 ///If there are other Multiplications in the operand list, takes its operands and adds them to the list
 void _openOtherMultiplications(List<BSFunction> operands) {
-  int i = 0;
+  var i = 0;
   while (i < operands.length) {
-    Trio<Multiplication, bool, bool> _op =
-        BSFunction.extractFromNegative<Multiplication>(operands[i]);
+    final _op = BSFunction.extractFromNegative<Multiplication>(operands[i]);
 
     if (_op.second) {
       operands.removeAt(i);
-      Multiplication m = _op.first;
+      var m = _op.first;
       operands.insertAll(i, m.operands);
       if (_op.third) operands.add(n(-1));
     } else
@@ -168,24 +149,23 @@ void _openOtherMultiplications(List<BSFunction> operands) {
 
 ///Returns the value of "negative" and takes all numbers be multiplied.
 bool _multiplyNumbers(List<BSFunction> operands) {
-  double number = 1;
-  bool negative = false;
+  var number = 1.0;
+  var negative = false;
 
   //used to store named numbers, because they shouldn't be multiplied with the others
   //the key is the name of the number, the double is its value, and the int is the power
   //to which it should be raised
-  HashMap<String, Pair<double, int>> namedNumbers = HashMap();
+  final namedNumbers = HashMap<String, Pair<double, int>>();
 
-  int i = 0;
+  var i = 0;
   while (i < operands.length) {
     //if the operand is a number, removes it and
 
-    Trio<Number, bool, bool> _op =
-        BSFunction.extractFromNegative<Number>(operands[i]);
+    final _op = BSFunction.extractFromNegative<Number>(operands[i]);
 
     if (_op.second) {
       operands.removeAt(i);
-      Number n = _op.first;
+      final n = _op.first;
       //if it's a regular number, just multiplies the accumulator
       if (!n.isNamed) {
         number *= n.value * (_op.third ? -1 : 1);
@@ -209,12 +189,12 @@ bool _multiplyNumbers(List<BSFunction> operands) {
     operands.clear();
   else {
     //makes a new list with the normal number and the named numbers
-    List<BSFunction> numbers = <BSFunction>[];
+    final numbers = <BSFunction>[];
     if (number < 0) negative = true;
     if (number.abs() != 1) numbers.add(n(number.abs()));
 
     //adds the named numbers
-    for (String key in namedNumbers.keys) {
+    for (final key in namedNumbers.keys) {
       if (namedNumbers[key].second != 0) {
         numbers.add(namedNumber(namedNumbers[key].first, key) ^
             n(namedNumbers[key].second));
@@ -232,10 +212,10 @@ bool _multiplyNumbers(List<BSFunction> operands) {
 }
 
 bool _consolidateNegatives(List<BSFunction> operands) {
-  bool _negative = false;
+  var _negative = false;
 
-  List<BSFunction> newOperands = operands.map((BSFunction f) {
-    Trio<BSFunction, bool, bool> _op = BSFunction.extractFromNegative(f);
+  final newOperands = operands.map((BSFunction f) {
+    final _op = BSFunction.extractFromNegative(f);
     if (_op.third) _negative = !_negative;
     return _op.first;
   }).toList();
@@ -248,9 +228,9 @@ bool _consolidateNegatives(List<BSFunction> operands) {
 
 ///if operands can be joined as an exponentiation, does it
 void _createExponents(List<BSFunction> operands) {
-  for (int i = 0; i < operands.length; ++i) {
+  for (var i = 0; i < operands.length; ++i) {
     //for each operand, divides it into base and exponent, event if the exponent is 1
-    BSFunction f = operands[i];
+    final f = operands[i];
 
     BSFunction base;
     BSFunction exponent;
@@ -264,8 +244,8 @@ void _createExponents(List<BSFunction> operands) {
     }
 
     //for every following operand, checks if the other is equal to the base or if it is also an exponentiation with the same base.
-    for (int j = i + 1; j < operands.length; ++j) {
-      BSFunction g = operands[j];
+    for (var j = i + 1; j < operands.length; ++j) {
+      final g = operands[j];
       if (g is Exponentiation) {
         if (g.base == base) {
           operands.removeAt(j);

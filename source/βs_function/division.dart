@@ -6,7 +6,6 @@ import 'negative.dart';
 import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
-import '../utils/tuples.dart';
 import '../utils/xor.dart';
 
 BSFunction divide(
@@ -42,30 +41,27 @@ class Division extends BSFunction {
       : super(params);
 
   @override
-  BSFunction derivativeInternal(Variable v) {
-    return ((numerator.derivativeInternal(v) * denominator -
-            denominator.derivativeInternal(v) * numerator) /
-        (denominator ^ (n(2))));
-  }
+  BSFunction derivativeInternal(Variable v) =>
+      ((numerator.derivativeInternal(v) * denominator -
+              denominator.derivativeInternal(v) * numerator) /
+          (denominator ^ (n(2))));
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    BSFunction _n = numerator.evaluate(p);
-    BSFunction _d = denominator.evaluate(p);
-    Trio<Number, bool, bool> _numNumber =
-        BSFunction.extractFromNegative<Number>(_n);
+    final _n = numerator.evaluate(p);
+    final _d = denominator.evaluate(p);
+    final _numNumber = BSFunction.extractFromNegative<Number>(_n);
 
-    Trio<Number, bool, bool> _denNumber =
-        BSFunction.extractFromNegative<Number>(_d);
+    final _denNumber = BSFunction.extractFromNegative<Number>(_d);
 
     if (_numNumber.second && _denNumber.second) {
-      double v = _numNumber.first.value / _denNumber.first.value;
+      final v = _numNumber.first.value / _denNumber.first.value;
       if (v == v.toInt())
         return n(v * (xor(_numNumber.third, _denNumber.third) ? -1 : 1));
     }
 
-    Trio<BSFunction, bool, bool> _num = BSFunction.extractFromNegative(_n);
-    Trio<BSFunction, bool, bool> _den = BSFunction.extractFromNegative(_d);
+    final _num = BSFunction.extractFromNegative(_n);
+    final _den = BSFunction.extractFromNegative(_d);
 
     return (xor(_num.third, _den.third))
         ? negative(divide([_num.first], [_den.first]))
@@ -80,21 +76,16 @@ class Division extends BSFunction {
       Division._(numerator, denominator, params);
 
   @override
-  SplayTreeSet<Variable> get defaultParameters {
-    Set<Variable> params = numerator.parameters;
-    params.addAll(denominator.parameters);
-    return params;
-  }
+  SplayTreeSet<Variable> get defaultParameters => SplayTreeSet<Variable>.from(
+      <Variable>{...numerator.parameters, ...denominator.parameters});
 
   @override
   BSFunction get approx {
-    BSFunction _n = numerator.approx;
-    BSFunction _d = denominator.approx;
-    Trio<Number, bool, bool> _numNumber =
-        BSFunction.extractFromNegative<Number>(_n);
+    final _n = numerator.approx;
+    final _d = denominator.approx;
+    final _numNumber = BSFunction.extractFromNegative<Number>(_n);
 
-    Trio<Number, bool, bool> _denNumber =
-        BSFunction.extractFromNegative<Number>(_d);
+    final _denNumber = BSFunction.extractFromNegative<Number>(_d);
 
     if (_numNumber.second && _denNumber.second) {
       return n(_numNumber.first.value /
@@ -102,8 +93,8 @@ class Division extends BSFunction {
           (xor(_numNumber.third, _denNumber.third) ? -1 : 1));
     }
 
-    Trio<BSFunction, bool, bool> _num = BSFunction.extractFromNegative(_n);
-    Trio<BSFunction, bool, bool> _den = BSFunction.extractFromNegative(_d);
+    final _num = BSFunction.extractFromNegative(_n);
+    final _den = BSFunction.extractFromNegative(_d);
 
     return (xor(_num.third, _den.third))
         ? negative(divide([_num.first], [_den.first]))
@@ -114,9 +105,9 @@ class Division extends BSFunction {
 ///Cancels out identical factors in the numerator and denominator lists, also opening exponentiations when possible
 void _eliminateDuplicates(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {
-  for (int i = 0; i < numeratorList.length; ++i) {
+  for (var i = 0; i < numeratorList.length; ++i) {
     //for each operand in the numerator, divides it into base and exponent, event if the exponent is 1
-    BSFunction f = numeratorList[i];
+    final f = numeratorList[i];
 
     BSFunction base;
     BSFunction exponent;
@@ -131,7 +122,7 @@ void _eliminateDuplicates(
 
     //for every operand in the denominator, checks if the other is equal to the base or if it is also an exponentiation with the same base.
     for (int j = 0; j < denominatorList.length; ++j) {
-      BSFunction g = denominatorList[j];
+      final g = denominatorList[j];
       if (g is Exponentiation) {
         if (g.base == base) {
           denominatorList.removeAt(j);
@@ -152,14 +143,14 @@ void _eliminateDuplicates(
       numeratorList.insert(i, base ^ exponent);
     }
   }
-  if (numeratorList.length == 0) numeratorList.add(n(1));
+  if (numeratorList.isEmpty) numeratorList.add(n(1));
 }
 
 ///if there are multiplications or divisions, takes their operands and adds them to the lists
 void _openMultiplicationsAndDivisions(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {
   for (int i = 0; i < numeratorList.length;) {
-    BSFunction f = numeratorList[i];
+    final f = numeratorList[i];
     //if there is a multiplication in numeratorList, takes its operands and adds them to the list
     if (f is Multiplication) {
       numeratorList.removeAt(i);
@@ -175,7 +166,7 @@ void _openMultiplicationsAndDivisions(
         numeratorList.insert(i, numerator);
       }
 
-      BSFunction denominator = f.denominator;
+      final denominator = f.denominator;
 
       if (denominator is Multiplication) {
         denominatorList.addAll(denominator.operands);
@@ -188,15 +179,15 @@ void _openMultiplicationsAndDivisions(
   }
 
   //the same for denominatorList
-  for (int i = 0; i < denominatorList.length;) {
-    BSFunction f = denominatorList[i];
+  for (var i = 0; i < denominatorList.length;) {
+    final f = denominatorList[i];
 
     if (f is Multiplication) {
       denominatorList.removeAt(i);
       denominatorList.insertAll(i, f.operands);
     } else if (f is Division) {
       denominatorList.removeAt(i);
-      BSFunction numerator = f.numerator;
+      final numerator = f.numerator;
 
       if (numerator is Multiplication) {
         denominatorList.insertAll(i, numerator.operands);
@@ -204,7 +195,7 @@ void _openMultiplicationsAndDivisions(
         denominatorList.insert(i, numerator);
       }
 
-      BSFunction denominator = f.denominator;
+      final denominator = f.denominator;
 
       if (denominator is Multiplication) {
         numeratorList.addAll(denominator.operands);
@@ -219,12 +210,12 @@ void _openMultiplicationsAndDivisions(
 
 ///if operands can be joined as an exponentiation, does it
 void _createExponents(List<BSFunction> operands) {
-  for (int i = 0; i < operands.length; ++i) {
+  for (var i = 0; i < operands.length; ++i) {
     //for each operand, divides it into base and exponent, event if the exponent is 1
-    BSFunction f = operands[i];
+    final f = operands[i];
 
-    BSFunction base;
-    BSFunction exponent;
+    var base;
+    var exponent;
 
     if (f is Exponentiation) {
       base = f.base;
@@ -236,7 +227,7 @@ void _createExponents(List<BSFunction> operands) {
 
     //for every following operand, checks if the other is equal to the base or if it is also an exponentiation with the same base.
     for (int j = i + 1; j < operands.length; ++j) {
-      BSFunction g = operands[j];
+      final g = operands[j];
       if (g is Exponentiation) {
         if (g.base == base) {
           operands.removeAt(j);

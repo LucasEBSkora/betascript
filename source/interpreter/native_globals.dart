@@ -5,8 +5,8 @@ import 'βs_interpreter.dart';
 import '../sets/sets.dart';
 import '../βs_function/βs_calculus.dart';
 
-final Variable _x = variable("x");
-final Variable _b = variable("b");
+final _x = variable("x");
+final _b = variable("b");
 
 final Map<String, Object> nativeGlobals = {
   //actual native routines

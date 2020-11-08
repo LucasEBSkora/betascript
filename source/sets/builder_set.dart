@@ -6,7 +6,7 @@ import '../βs_function/variable.dart';
 import '../βs_function/βs_function.dart';
 
 BSSet builderSet(LogicExpression rule, List<Variable> parameters) {
-  BSSet sol = rule.solution;
+  final sol = rule.solution;
   if (rule.foundEverySolution) {
     return sol;
   } else {
@@ -25,16 +25,11 @@ class BuilderSet extends BSSet {
       rule.isSolution(HashMap.from({rule.parameters.last: x}));
 
   @override
-  BSSet complement() {
-    return BuilderSet(Not(rule), parameters);
-  }
+  BSSet complement() => BuilderSet(Not(rule), parameters);
 
   BSSet get knownElements => rule.solution;
 
   @override
-  String toString() {
-    String params = rule.parameters
-        .reduce((previousValue, element) => "$previousValue, $element");
-    return "{$params | $rule}";
-  }
+  String toString() =>
+      "{${rule.parameters.reduce((previousValue, element) => "$previousValue, $element")} | $rule}";
 }

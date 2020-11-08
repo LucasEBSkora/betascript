@@ -20,7 +20,7 @@ class SinH extends singleOperandFunction {
       (cosh(operand) * (operand.derivativeInternal(v)));
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    BSFunction op = operand.evaluate(p);
+    final op = operand.evaluate(p);
     if (op is Number) {
       //put simplifications here
     }
@@ -29,7 +29,7 @@ class SinH extends singleOperandFunction {
 
   @override
   BSFunction get approx {
-    BSFunction op = operand.approx;
+    final op = operand.approx;
     if (op is Number) {
       return n(_sinh(op.value));
     } else {

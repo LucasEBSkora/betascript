@@ -25,14 +25,14 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   DirectiveManager directives = DirectiveManager();
 
   BSInterpreter() {
-    for (String _name in nativeGlobals.keys)
+    for (var _name in nativeGlobals.keys)
       globals.define(_name, nativeGlobals[_name]);
     _environment = globals;
   }
 
   void interpret(List<Stmt> statements) {
     try {
-      for (Stmt stmt in statements) {
+      for (var stmt in statements) {
         _execute(stmt);
       }
     } on RuntimeError catch (e) {
@@ -46,12 +46,45 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   Object visitBinaryExpr(BinaryExpr e) {
-    dynamic leftOperand = _evaluate(e.left);
-    dynamic rightOperand = _evaluate(e.right);
+    var leftOperand = _evaluate(e.left);
+    var rightOperand = _evaluate(e.right);
 
     //operations for functions
     if (leftOperand is BSFunction && rightOperand is BSFunction) {
       Pair<num, num> nums = BSFunction.toNums(leftOperand, rightOperand);
+
+      //if both are numbers
+      if (nums != null) {
+        switch (e.op.type) {
+          case TokenType.minus:
+            return leftOperand - rightOperand;
+          case TokenType.slash:
+            return leftOperand / rightOperand;
+          case TokenType.star:
+            return leftOperand * rightOperand;
+          case TokenType.exp:
+            return leftOperand ^ rightOperand;
+          case TokenType.plus:
+            return leftOperand + rightOperand;
+          case TokenType.greater:
+            return nums.first > nums.second;
+          case TokenType.greaterEqual:
+            return nums.first >= nums.second;
+          case TokenType.less:
+            return nums.first < nums.second;
+          case TokenType.lessEqual:
+            return nums.first <= nums.second;
+          // equals returns logic expressions for functions and bools for everything else
+          case TokenType.equals:
+            return nums.first == nums.second;
+          // identicallyEquals always returns booleans
+          case TokenType.identicallyEquals:
+            return _isEqual(leftOperand, rightOperand);
+          default:
+            throw RuntimeError(
+                e.op, "operation '${e.op}' not supported for functions");
+        }
+      }
 
       switch (e.op.type) {
         case TokenType.minus:
@@ -65,20 +98,15 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
         case TokenType.plus:
           return leftOperand + rightOperand;
         case TokenType.greater:
-          if (nums.first != null) return nums.first > nums.second;
           return GreaterThan(leftOperand, rightOperand);
         case TokenType.greaterEqual:
-          if (nums.first != null) return nums.first >= nums.second;
           return GreaterOrEqual(leftOperand, rightOperand);
         case TokenType.less:
-          if (nums.first != null) return nums.first < nums.second;
           return LessThan(leftOperand, rightOperand);
         case TokenType.lessEqual:
-          if (nums.first != null) return nums.first <= nums.second;
           return LessOrEqual(leftOperand, rightOperand);
         // equals returns logic expressions for functions and bools for everything else
         case TokenType.equals:
-          if (nums.first != null) return nums.first == nums.second;
           return Equal(leftOperand, rightOperand);
         // identicallyEquals always returns booleans
         case TokenType.identicallyEquals:
@@ -132,7 +160,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   Object visitUnaryExpr(UnaryExpr e) {
-    dynamic operand = _evaluate(e.operand);
+    var operand = _evaluate(e.operand);
 
     switch (e.op.type) {
       case TokenType.minus:
@@ -148,7 +176,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
             "The approximation (~) operator may only be applied to functions and builder sets");
       case TokenType.apostrophe:
         if (operand is BSFunction) {
-          Set<Variable> params = operand.parameters;
+          var params = operand.parameters;
           if (params.length > 1) {
             throw RuntimeError(e.op,
                 "the apostrophe operator may only be applied to functions defined in a single (or no) variables");
@@ -194,7 +222,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitPrintStmt(PrintStmt stmt) {
-    dynamic value = _evaluate(stmt.expression);
+    var value = _evaluate(stmt.expression);
 
     //calls the appropriate print function
     BetaScript.printCallback(_stringify(value));
@@ -206,10 +234,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     List<Variable> _variables;
 
     if (s.parameters != null) {
-      _variables = List();
+      _variables = <Variable>[];
       //Checks if each of the parameters is already a Variable, and when they don't exist, create them as variables
       for (Token parameter in s.parameters) {
-        Object _variable = _environment.search(parameter);
+        var _variable = _environment.search(parameter);
         if (_variable == null) {
           _variable = variable(parameter.lexeme);
           _environment.define(parameter.lexeme, _variable);
@@ -274,7 +302,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   ///Parameters here are the list of statements to run and the environment in which to run them
   void executeBlock(List<Stmt> statements, Environment environment) {
-    Environment previous = _environment;
+    var previous = _environment;
     try {
       _environment = environment;
       for (Stmt s in statements) _execute(s);
@@ -292,7 +320,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   Object visitlogicBinaryExpr(logicBinaryExpr e) {
-    Object left = _evaluate(e.left);
+    var left = _evaluate(e.left);
 
     //Circuit-breaker logical expressions:
     //true or other_expression should return true regardless of other_expression, so it isn't even evaluated
@@ -315,7 +343,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   Object visitCallExpr(CallExpr e) {
-    Object callee = _evaluate(e.callee);
+    var callee = _evaluate(e.callee);
 
     if (!(callee is BSCallable)) {
       throw RuntimeError(
@@ -328,11 +356,11 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
           "when interpreting for twitter, you can only call functions and constructors");
     }
 
-    List<Object> arguments = List();
+    final arguments = <Object>[
+      for (final argument in e.arguments) _evaluate(argument)
+    ];
 
-    for (Expr argument in e.arguments) arguments.add(_evaluate(argument));
-
-    BSCallable function = callee;
+    var function = callee;
 
     if (arguments.length != function.arity) {
       throw RuntimeError(e.paren,
@@ -361,9 +389,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitReturnStmt(ReturnStmt s) {
-    Object value = (s.value != null) ? _evaluate(s.value) : null;
-
-    throw Return(value);
+    throw Return((s.value != null) ? _evaluate(s.value) : null);
   }
 
   ///Adds a resolved variable from Resolver to the map
@@ -374,7 +400,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   ///Retrieves a variable value from the Environment. Do remember that the resolver doesn't deal with global variables,
   ///which are stored directly in globals
   Object _lookUpVariable(Token name, Expr e) {
-    int distance = _locals[e];
+    var distance = _locals[e];
     if (distance != null) {
       return _environment.getAt(distance, name.lexeme);
     } else {
@@ -388,7 +414,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       throw RuntimeError(s.name,
           "class definitions are forbidden when interpreting for twitter");
     }
-    Object superclass = null;
+    var superclass;
     if (s.superclass != null) {
       superclass = _evaluate(s.superclass);
       if (!(superclass is BSClass)) {
@@ -404,13 +430,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       _environment.define("super", superclass);
     }
 
-    HashMap<String, UserRoutine> methods = HashMap();
+    final methods = HashMap<String, UserRoutine>();
 
-    for (RoutineStmt method in s.methods)
+    for (final method in s.methods)
       methods[method.name.lexeme] = UserRoutine(
           method, _environment, method.name.lexeme == s.name.lexeme);
 
-    BSClass bsclass = BSClass(s.name.lexeme, superclass, methods);
+    final bsclass = BSClass(s.name.lexeme, superclass, methods);
 
     if (superclass != null) _environment = _environment.enclosing;
 
@@ -419,7 +445,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   visitGetExpr(GetExpr e) {
-    Object object = _evaluate(e.object);
+    var object = _evaluate(e.object);
     if (object is BSInstance) {
       return object.get(e.name);
     }
@@ -428,13 +454,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   visitSetExpr(SetExpr e) {
-    Object object = _evaluate(e.object);
+    var object = _evaluate(e.object);
 
     if (!(object is BSInstance)) {
       throw RuntimeError(e.name, "Only instances have fields");
     }
 
-    Object value = _evaluate(e.value);
+    var value = _evaluate(e.value);
     (object as BSInstance).set(e.name, value);
     return value;
   }
@@ -444,14 +470,14 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   Object visitSuperExpr(SuperExpr e) {
-    int distance = _locals[e];
+    var distance = _locals[e];
     BSClass superclass = _environment.getAt(distance, "super");
 
     //'this' is always contained one closure "inner" than 'super'
-    BSInstance object = _environment.getAt(distance - 1, "this");
+    var object = _environment.getAt(distance - 1, "this");
 
     //finds the method in the superclass and binds it to 'this'
-    UserRoutine method = superclass.findMethod(e.method.lexeme);
+    var method = superclass.findMethod(e.method.lexeme);
 
     if (method == null) {
       throw RuntimeError(e.method, "Undefined property '${e.method.lexeme}'.");
@@ -462,11 +488,11 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   visitDerivativeExpr(DerivativeExpr e) {
-    Object f = _evaluate(e.derivand);
+    var f = _evaluate(e.derivand);
     if (!(f is BSFunction)) {
       throw RuntimeError(e.keyword, "target of derivative must be function");
     }
-    List<Variable> _variables = <Variable>[];
+    var _variables = <Variable>[];
     for (Expr exp in e.variables) {
       Object v = _evaluate(exp);
       if (v is Variable) {
@@ -476,7 +502,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
             e.keyword, "Functions may only be derivated in variables");
       }
     }
-    BSFunction _value = f;
+    var _value = f;
     for (Variable v in _variables) _value = _value.derivative(v);
     return _value;
   }
@@ -489,13 +515,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   visitBuilderDefinitionExpr(BuilderDefinitionExpr e) {
-    List<Variable> parameters = null;
+    List<Variable> parameters;
 
     if (e.parameters != null) {
       parameters = List();
       //Checks if each of the parameters is already a Variable, and when they don't exist, create them as variables
       for (Token parameter in e.parameters) {
-        Object _variable = _environment.search(parameter);
+        var _variable = _environment.search(parameter);
         if (_variable == null) {
           _variable = variable(parameter.lexeme);
           _environment.define(parameter.lexeme, _variable);
@@ -507,8 +533,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
         parameters.add(_variable);
       }
     }
-    Object rule = _evaluate(e.rule);
-    // print(rule.runtimeType);
+    var rule = _evaluate(e.rule);
     if (rule is LogicExpression) {
       return builderSet(rule, parameters);
     } else {
@@ -519,10 +544,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   visitIntervalDefinitionExpr(IntervalDefinitionExpr e) {
-    Object _a = _evaluate(e.a);
-    Object _b = _evaluate(e.b);
+    var _a = _evaluate(e.a);
+    var _b = _evaluate(e.b);
     var nums = BSFunction.toNums(_a, _b);
-    if (nums.first == null || nums.second == null) {
+    if (nums == null) {
       throw RuntimeError(
           e.left, "Interval definitions must have both edges be numbers");
     }
@@ -533,10 +558,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   visitRosterDefinitionExpr(RosterDefinitionExpr e) {
-    List<BSFunction> elements = <BSFunction>[];
+    var elements = <BSFunction>[];
 
-    for (Expr expr in e.elements) {
-      Object el = _evaluate(expr);
+    for (var expr in e.elements) {
+      var el = _evaluate(expr);
       if (el is BSFunction) {
         var number = BSFunction.extractFromNegative<Number>(el);
         if (number.second) {
@@ -553,8 +578,8 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   visitSetBinaryExpr(SetBinaryExpr e) {
-    Object left = _evaluate(e.left);
-    Object right = _evaluate(e.right);
+    var left = _evaluate(e.left);
+    var right = _evaluate(e.right);
 
     if (right is BSSet) {
       if (left is BSSet) {

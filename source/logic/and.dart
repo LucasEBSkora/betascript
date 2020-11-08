@@ -43,9 +43,8 @@ class And extends LogicExpression {
 
   @override
   SplayTreeSet<String> get parameters {
-    var params = left.parameters;
-    params.addAll(right.parameters);
-    return params;
+    return SplayTreeSet<String>.from(
+        <String>{...left.parameters, ...right.parameters});
   }
 
   @override

@@ -21,7 +21,7 @@ abstract class BSFunction implements BSCallable {
   ///Checks if the list of parameters passed is the correct length, creates a map containing the variables in the correct place by matching the params getter and this
   ///parameter.
   BSFunction call(List<BSFunction> parametersList) {
-    Set<Variable> _p = parameters;
+    final _p = parameters;
     if (parametersList.length != _p.length) {
       throw BetascriptFunctionError(
           "Error! Missing parameters in function call!");
@@ -42,7 +42,7 @@ abstract class BSFunction implements BSCallable {
 
   ///Returns a copy of this function with the custom parameters passed in p, and checks if they include all needed parameters
   BSFunction withParameters(Set<Variable> p) {
-    Set<Variable> _p = defaultParameters;
+    final _p = defaultParameters;
 
     for (var element in _p) {
       if (!p.contains(element)) {
@@ -69,14 +69,14 @@ abstract class BSFunction implements BSCallable {
       (other is BSFunction) && toString() == other.toString();
 
   static Pair<num, num> toNums(BSFunction a, BSFunction b, [String op]) {
-    Trio<Number, bool, bool> _a = BSFunction.extractFromNegative<Number>(a);
-    Trio<Number, bool, bool> _b = BSFunction.extractFromNegative<Number>(b);
+    final _a = BSFunction.extractFromNegative<Number>(a);
+    final _b = BSFunction.extractFromNegative<Number>(b);
     if (!_a.second || !_b.second) {
       if (op != null) {
         throw BetascriptFunctionError(
             "operand $op can only be used on numbers");
       } else {
-        return Pair(null, null);
+        return null;
       }
     }
 
@@ -85,32 +85,32 @@ abstract class BSFunction implements BSCallable {
   }
 
   bool operator <=(BSFunction other) {
-    Pair<num, num> v = toNums(this, other, "<=");
+    final v = toNums(this, other, "<=");
     return v.first <= v.second;
   }
 
   bool operator <(BSFunction other) {
-    Pair<num, num> v = toNums(this, other, "<");
+    final v = toNums(this, other, "<");
     return v.first < v.second;
   }
 
   bool operator >=(BSFunction other) {
-    Pair<num, num> v = toNums(this, other, ">=");
+    final v = toNums(this, other, ">=");
     return v.first >= v.second;
   }
 
   bool operator >(BSFunction other) {
-    Pair<num, num> v = toNums(this, other, ">");
+    final v = toNums(this, other, ">");
     return v.first > v.second;
   }
 
   static min(BSFunction x, BSFunction y) {
-    Pair<num, num> v = toNums(x, y, "min");
+    final v = toNums(x, y, "min");
     return (v.first < v.second) ? x : y;
   }
 
   static max(BSFunction x, BSFunction y) {
-    Pair<num, num> v = toNums(x, y, "max");
+    final v = toNums(x, y, "max");
     return (v.first > v.second) ? x : y;
   }
 
@@ -148,7 +148,7 @@ abstract class BSFunction implements BSCallable {
   ///If it is contained inside a negative, third is set to true.
   static Trio<T, bool, bool> extractFromNegative<T extends BSFunction>(
       BSFunction f) {
-    bool _isInNegative = false;
+    var _isInNegative = false;
     if (f is Negative) {
       f = (f as Negative).operand;
       _isInNegative = true;

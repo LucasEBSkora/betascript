@@ -4,7 +4,6 @@ import 'empty_set.dart';
 import 'interval.dart';
 import 'set_union.dart';
 import 'βs_set.dart';
-import '../utils/tuples.dart';
 import '../βs_function/number.dart';
 import '../βs_function/βs_function.dart';
 
@@ -16,10 +15,10 @@ BSSet rosterSet(Iterable<BSFunction> elements) {
     throw SetDefinitionError("Sets can only be defined in real numbers!");
   }
 
-  if (elements.length == 0) return emptySet;
+  if (elements.isEmpty) return emptySet;
   return RosterSet(
       SplayTreeSet.from(elements, (BSFunction first, BSFunction second) {
-    Pair<num, num> _nums = BSFunction.toNums(first, second, "compare");
+    final _nums = BSFunction.toNums(first, second, "compare");
     return _nums.first.compareTo(_nums.second);
   }));
 }
@@ -35,28 +34,23 @@ class RosterSet extends BSSet {
 
   @override
   BSSet complement() {
-    List<BSSet> complementSubsets = <BSSet>[];
-
     //For a set {x1, x2, x3, ..., xn}, its complement is
     //(-∞, x1) U (x1, x2) U (x2, x3) U (x3, x4) ... U (x(n -1), xn) U (xn, +∞)
-    complementSubsets
-        .add(Interval.open(constants.negativeInfinity, elements.first));
-
-    for (int i = 1; i < elements.length; ++i)
-      complementSubsets
-          .add(Interval.open(elements.elementAt(i - 1), elements.elementAt(i)));
-
-    complementSubsets.add(Interval.open(elements.last, constants.infinity));
-
-    return SetUnion(complementSubsets);
+    return SetUnion(<BSSet>[
+      Interval.open(constants.negativeInfinity, elements.first), //(-∞, x1)
+      //(x1, x2) U (x2, x3) U (x3, x4) ... U (x(n -1), xn)
+      for (var i = 1; i < elements.length; ++i)
+        Interval.open(elements.elementAt(i - 1), elements.elementAt(i)),
+      Interval.open(elements.last, constants.infinity) //(xn, +∞)
+    ]);
   }
 
   @override
   String toString() {
-    String s = "{ ";
+    var s = "{ ";
 
     s += elements.first.toString();
-    for (int i = 1; i < elements.length; ++i) s += ", ${elements.elementAt(i)}";
+    for (var i = 1; i < elements.length; ++i) s += ", ${elements.elementAt(i)}";
 
     s += " }";
     return s;

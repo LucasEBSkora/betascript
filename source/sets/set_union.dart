@@ -4,16 +4,15 @@ import 'βs_set.dart';
 import '../βs_function/βs_calculus.dart';
 
 BSSet setUnion(Iterable<BSSet> subsets) {
-  List<BSSet> _subsets =
-      subsets.where((element) => !(element == emptySet)).toList();
+  var _subsets = subsets.where((element) => !(element == emptySet)).toList();
   //Checks for things which can be completely simplified
-  if (_subsets.length == 0) return emptySet;
+  if (_subsets.isEmpty) return emptySet;
   if (_subsets.length == 1) return subsets.elementAt(0);
 
   //Checks if the elements are actually disjoined
-  int i = 0;
+  var i = 0;
   while (i < _subsets.length) {
-    int j = i + 1;
+    var j = i + 1;
     while (j < _subsets.length) {
       if (i != j && !_subsets[i].disjoined(_subsets[j])) {
         _subsets[i] = _subsets[i].union(_subsets[j]);
@@ -28,7 +27,7 @@ BSSet setUnion(Iterable<BSSet> subsets) {
 
   //If any of the subsets is itself a union of disjoint sets, removes that union and adds its elements to this one
   for (int i = 0; i < _subsets.length; ++i) {
-    BSSet element = _subsets[i];
+    var element = _subsets[i];
     if (element is SetUnion) {
       _subsets.removeAt(i);
       _subsets.insertAll(i, element.subsets);
@@ -36,10 +35,10 @@ BSSet setUnion(Iterable<BSSet> subsets) {
   }
   _subsets = _subsets.where((element) => !(element is EmptySet)).toList();
 
-  List<BSFunction> rosterElements = <BSFunction>[];
+  var rosterElements = <BSFunction>[];
 
-  for (int i = 0; i < _subsets.length;) {
-    BSSet _set = _subsets[i];
+  for (var i = 0; i < _subsets.length;) {
+    var _set = _subsets[i];
     if (_set is RosterSet) {
       rosterElements.addAll(_set.elements);
       _subsets.removeAt(i);
@@ -66,7 +65,7 @@ class SetUnion extends BSSet {
 
   @override
   bool belongs(BSFunction x) {
-    for (int i = 0; i < subsets.length; ++i) {
+    for (var i = 0; i < subsets.length; ++i) {
       if (subsets.elementAt(i).belongs(x)) return true;
     }
     return false;

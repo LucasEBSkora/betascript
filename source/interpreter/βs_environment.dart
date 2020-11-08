@@ -52,7 +52,7 @@ class Environment {
 
   ///Returns the distance-th enclosing scope of this one
   Environment _ancestor(int distance) {
-    Environment e = this;
+    var e = this;
     for (int i = 0; i < distance; ++i) e = e.enclosing;
     return e;
   }

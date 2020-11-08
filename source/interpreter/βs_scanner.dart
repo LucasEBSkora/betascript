@@ -7,20 +7,16 @@ import '../βs_function/number.dart';
 ///Scans the source for tokens, returning a list of them on a call to scanTokens, the only public routine in this class.
 class BSScanner {
   final String _source;
-  final List<Token> _tokens = <Token>[];
+  final List<Token> _tokens = new List();
   HashMap<String, Function> _charToLexeme; //see _initializeMap
 
   //_start is the start of the lexeme currently being read, and _current the current value being processed.
-  int _start;
-  int _current;
+  int _start = 0;
+  int _current = 0;
   //If the source scanned is multiline, keeps the value of the current line for error reporting
-  int _line;
+  int _line = 1;
 
-  BSScanner(this._source) {
-    _start = 0;
-    _current = 0;
-    _line = 1;
-
+  BSScanner(String this._source) {
     _initializeMap();
   }
 
@@ -38,7 +34,7 @@ class BSScanner {
 
   //many linebreaks can be removed looking at the next token, which means we have to wait until the scanner is finished to remove them
   static List<Token> _removeLinebreaks(List<Token> tokens) {
-    for (int i = 0; i < tokens.length - 1;) {
+    for (var i = 0; i < tokens.length - 1;) {
       if (tokens[i].type == TokenType.lineBreak) {
         switch (tokens[i + 1].type) {
           case TokenType.rightBrace:
@@ -177,7 +173,7 @@ class BSScanner {
   ///scans a single token.
   void _scanToken() {
     //gets the next character, consuming it (by moving _current forward)
-    String c = _advance();
+    final c = _advance();
 
     //checks if it's one of the characters in _charToLexeme
     if (_charToLexeme.containsKey(c)) {
@@ -199,7 +195,7 @@ class BSScanner {
   }
 
   ///a map containing keywords and the corresponding token type
-  static HashMap<String, TokenType> _keywords = HashMap.from({
+  static const Map<String, TokenType> _keywords = {
     "and": TokenType.and,
     "belongs": TokenType.belongs,
     "class": TokenType.classToken,
@@ -224,11 +220,11 @@ class BSScanner {
     "true": TokenType.trueToken,
     "while": TokenType.whileToken,
     "union": TokenType.union,
-  });
+  };
 
   ///creates a new token, using the interval from _start to _current as the token's lexeme.
   void _addToken(TokenType type, [dynamic literal]) {
-    String text = _source.substring(_start, _current);
+    var text = _source.substring(_start, _current);
     _tokens.add(new Token(type, text, literal, _line));
   }
 
@@ -242,10 +238,7 @@ class BSScanner {
   }
 
   ///basically, _advance without actually advancing. Used to check if a literal or identifier has ended.
-  String _peek() {
-    if (_isAtEnd()) return null;
-    return _source[_current];
-  }
+  String _peek() => (_isAtEnd()) ? null : _source[_current];
 
   ///having identified the beginning of a string literal, this function reads the rest of it.
   void _string() {
@@ -261,7 +254,7 @@ class BSScanner {
     } else {
       //if the string is properly formed, adds it to the token list, with the literal value having both '"' characters stripped off.
       _advance();
-      String value = _source.substring(_start + 1, _current - 1);
+      var value = _source.substring(_start + 1, _current - 1);
       _addToken(TokenType.string, value);
     }
   }
@@ -299,18 +292,16 @@ class BSScanner {
   }
 
   ///checks the character after current, returning null if it is after the end of the source.
-  String _peekNext() {
-    if (_current + 1 >= _source.length) return null;
-
-    return _source.substring(_current + 1, _current + 2);
-  }
+  String _peekNext() => (_current + 1 >= _source.length)
+      ? null
+      : _source.substring(_current + 1, _current + 2);
 
   ///having found the start of a identifier, reads the rest of it and adds it to _tokens.
   void _identifier() {
     //keeps going while it finds numbers (even though it can't start with a number)
     while (!_isAtEnd() && _isExpandedAlphanumeric(_peek())) _advance();
 
-    String text = _source.substring(_start, _current);
+    var text = _source.substring(_start, _current);
 
     //if the identifier is a keyword, adds a token of the appropriate type.
     _addToken(
