@@ -28,14 +28,14 @@ BSSet rosterSet(Iterable<BSFunction> elements) {
 class RosterSet extends BSSet {
   final SplayTreeSet<BSFunction> elements;
 
-  RosterSet(SplayTreeSet<BSFunction> this.elements);
+  RosterSet(this.elements);
 
   @override
   bool belongs(BSFunction x) => elements.contains(x);
 
   @override
   BSSet complement() {
-    List<BSSet> complementSubsets = List();
+    List<BSSet> complementSubsets = <BSSet>[];
 
     //For a set {x1, x2, x3, ..., xn}, its complement is
     //(-∞, x1) U (x1, x2) U (x2, x3) U (x3, x4) ... U (x(n -1), xn) U (xn, +∞)

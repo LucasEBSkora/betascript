@@ -6,12 +6,12 @@ import 'βs_interpreter.dart';
 //In essence, an Environment is the implementation of a scope.
 class Environment {
   ///Stores variable names and values
-  final HashMap<String, Object> values = new HashMap();
+  final HashMap<String, Object> values = HashMap();
 
   ///Represents the enclosing Environment (scope)
   final Environment enclosing;
 
-  Environment([Environment this.enclosing = null]);
+  Environment([this.enclosing]);
 
   ///Defines a new variable. Note it doesn't check if it already exists here, because that is handled by the resolver
   void define(String name, Object value) => values[name] = value;
@@ -21,7 +21,7 @@ class Environment {
   Object get(Token name) {
     if (values.containsKey(name.lexeme)) return values[name.lexeme];
     if (enclosing != null) return enclosing.get(name);
-    throw new RuntimeError(name, "Undefined variable '${name.lexeme}'");
+    throw RuntimeError(name, "Undefined variable '${name.lexeme}'");
   }
 
   ///like 'get', but doesn't throw if the variable doesn't exist
@@ -38,7 +38,7 @@ class Environment {
     } else if (enclosing != null) {
       enclosing.assign(name, value);
     } else {
-      throw new RuntimeError(name, "Undefined variable '${name.lexeme}'");
+      throw RuntimeError(name, "Undefined variable '${name.lexeme}'");
     }
   }
 

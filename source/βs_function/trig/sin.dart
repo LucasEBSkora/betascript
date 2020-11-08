@@ -13,8 +13,7 @@ BSFunction sin(BSFunction operand) {
 }
 
 class Sin extends singleOperandFunction {
-  Sin._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  Sin._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -39,5 +38,5 @@ class Sin extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Sin._(operand, params);
+  BSFunction copy([Set<Variable> params]) => Sin._(operand, params);
 }

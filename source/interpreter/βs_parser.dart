@@ -13,11 +13,9 @@ class BSParser {
   final List<Token> _tokens;
   final BSInterpreter _interpreter;
   //The token currently being parsed
-  int _current;
+  int _current = 0;
 
-  BSParser(List<Token> this._tokens, this._interpreter) {
-    _current = 0;
-  }
+  BSParser(this._tokens, this._interpreter);
 
   //The parser works by implementing the rules in the language's formal grammar,
   //which are described in 'formal grammar representation.txt'
@@ -25,7 +23,7 @@ class BSParser {
   ///This function is basically this rule:
   ///<program> ::= <declaration> <program>| <linebreak> <program> | <unterminated_optional_stmt> eof | eof
   List<Stmt> parse() {
-    List<Stmt> statements = new List();
+    List<Stmt> statements = <Stmt>[];
 
     //ignores linebreaks here so it doesn't have to go all the way down the recursion to do it
     while (!_isAtEnd()) {
@@ -65,13 +63,13 @@ class BSParser {
     VariableExpr superclass = null;
     if (_match(TokenType.less)) {
       _consume(TokenType.identifier, "Expect superclass name");
-      superclass = new VariableExpr(_previous());
+      superclass = VariableExpr(_previous());
     }
 
     //linebreaks after { dealt with by scanner
     _consume(TokenType.leftBrace, "Expect '{' before class body");
 
-    List<RoutineStmt> methods = new List();
+    List<RoutineStmt> methods = <RoutineStmt>[];
 
     //<routines> ::= routine <routines> | <whitespace_or_linebreak> <routines> ""
     while (!_check(TokenType.rightBrace) && !_isAtEnd())
@@ -83,7 +81,7 @@ class BSParser {
 
     _consume(TokenType.rightBrace, "Expect '}' after class body");
 
-    return new ClassStmt(name, superclass, methods);
+    return ClassStmt(name, superclass, methods);
   }
 
   ///kind is either 'routine' or 'method'
@@ -95,7 +93,7 @@ class BSParser {
     //linebreaks after this dealt with by scanner
     _consume(TokenType.leftParentheses, "Expect '(' after $kind name;");
 
-    List<Token> parameters = new List();
+    List<Token> parameters = <Token>[];
 
     //<parameters> ::= <identifier> | <identifier> <whitespace> "," <whitespace_or_linebreak> <parameters>
     if (!_check(TokenType.rightParentheses)) {
@@ -111,7 +109,7 @@ class BSParser {
     _match(TokenType.lineBreak);
     _consume(TokenType.leftBrace, "Expect '{' after routine parameters");
     List<Stmt> body = _block();
-    return new RoutineStmt(name, parameters, body);
+    return RoutineStmt(name, parameters, body);
   }
 
   ///<var_decl_stmt> ::= <unterminated_var_decl_stmt> <delimitator>
@@ -126,7 +124,7 @@ class BSParser {
   Stmt _varDeclaration() {
     Token name = _consume(TokenType.identifier, "Expect variable name");
 
-    List<Token> parameters = null;
+    List<Token> parameters;
     if (_match(TokenType.leftParentheses)) {
       parameters = List();
 
@@ -142,7 +140,7 @@ class BSParser {
     }
     if (parameters?.isEmpty ?? true) parameters = null;
 
-    Expr initializer = null;
+    Expr initializer;
     if (_match(TokenType.assigment)) {
       //linebreak after = handled by scanner
       initializer = _expression();
@@ -150,7 +148,7 @@ class BSParser {
 
     _consumeAny([TokenType.semicolon, TokenType.lineBreak],
         "Expect ';' or line break after variable declaration");
-    return new VarStmt(name, parameters, initializer);
+    return VarStmt(name, parameters, initializer);
   }
 
   ///<statement> ::= <expr_stmt> | <for_stmt> | <if_stmt> | <print_stmt> | <return_stmt> | <while_stmt> | <block> | <directive>
@@ -170,7 +168,7 @@ class BSParser {
   Stmt _expressionStatement() {
     Expr expr = _expression();
     _checkTerminator("expression");
-    return new ExpressionStmt(expr);
+    return ExpressionStmt(expr);
   }
 
   ///<for_stmt> ::= "for" <(> <for_stmt_init_clause> <whitespace> ";" <whitespace_or_linebreak> <for_stmt__clause> <whitespace> ";"
@@ -214,13 +212,13 @@ class BSParser {
     Stmt body = _statement();
 
     if (increment != null) {
-      body = new BlockStmt([body, new ExpressionStmt(increment)]);
+      body = BlockStmt([body, ExpressionStmt(increment)]);
     }
-    if (condition == null) condition = new LiteralExpr(true);
+    if (condition == null) condition = LiteralExpr(true);
 
-    body = new WhileStmt(token, condition, body);
+    body = WhileStmt(token, condition, body);
 
-    if (initializer != null) body = new BlockStmt([initializer, body]);
+    if (initializer != null) body = BlockStmt([initializer, body]);
 
     return body;
   }
@@ -245,7 +243,7 @@ class BSParser {
 
     Stmt elseBranch = (_match(TokenType.elseToken)) ? _statement() : null;
 
-    return new IfStmt(condition, thenBranch, elseBranch);
+    return IfStmt(condition, thenBranch, elseBranch);
   }
 
   ///<print_stmt> ::= <unterminated_print_stmt> <delimitator>
@@ -257,7 +255,7 @@ class BSParser {
     }
     Expr value = _expression();
     _checkTerminator("print");
-    return new PrintStmt(value);
+    return PrintStmt(value);
   }
 
   ///<return_stmt> ::= "return" <whitespace> <expression> <whitespace> ";"
@@ -275,7 +273,7 @@ class BSParser {
 
     _checkTerminator("return");
 
-    return new ReturnStmt(keyword, value);
+    return ReturnStmt(keyword, value);
   }
 
   ///<while_stmt> ::= "while" <(> <expression> <)> <statement>
@@ -295,14 +293,14 @@ class BSParser {
 
     Stmt body = _statement();
 
-    return new WhileStmt(token, condition, body);
+    return WhileStmt(token, condition, body);
   }
 
   ///<block> ::= <{> <block_body> <}> | <{> <block_body> <unterminated_optional_stmt> <}>
   ///<block_body> ::= <whitespace_or_linebreak> <block_body> | <statement> <block_body> | ""
   List<Stmt> _block() {
     //The left brace was already consumed in _statement or _routine
-    List<Stmt> statements = new List();
+    List<Stmt> statements = <Stmt>[];
 
     while (!_check(TokenType.rightBrace) && !_isAtEnd()) {
       if (_match(TokenType.lineBreak)) continue;
@@ -338,9 +336,9 @@ class BSParser {
       //This is why Grouping is considered a different type of expression: a = 1 is allowed, but (a) = 1 isn't.
       if (expr is VariableExpr) {
         Token name = expr.name;
-        return new AssignExpr(name, value);
+        return AssignExpr(name, value);
       } else if (expr is GetExpr) {
-        return new SetExpr(expr.object, expr.name, value);
+        return SetExpr(expr.object, expr.name, value);
       }
 
       _error(equals, "Invalid assigment target");
@@ -357,7 +355,7 @@ class BSParser {
       Token op = _previous();
       //linebreaks after 'or' keyword handled by scannner
       Expr right = _and();
-      expr = new logicBinaryExpr(expr, op, right);
+      expr = logicBinaryExpr(expr, op, right);
     }
 
     return expr;
@@ -371,7 +369,7 @@ class BSParser {
       Token op = _previous();
       //linebreaks after 'and' keyword handled by scanner
       Expr right = _equality();
-      expr = new logicBinaryExpr(expr, op, right);
+      expr = logicBinaryExpr(expr, op, right);
     }
 
     return expr;
@@ -386,7 +384,7 @@ class BSParser {
       Token op = _previous();
       //linebreaks after '==' operator handled by scanner
       Expr right = _comparison();
-      expr = new BinaryExpr(expr, op, right);
+      expr = BinaryExpr(expr, op, right);
     }
 
     return expr;
@@ -406,7 +404,7 @@ class BSParser {
       TokenType.lessEqual
     ])) {
       //linebreaks after the operators listed above handled by scanner
-      expr = new BinaryExpr(expr, _previous(), _setBinary());
+      expr = BinaryExpr(expr, _previous(), _setBinary());
     }
 
     return expr;
@@ -425,7 +423,7 @@ class BSParser {
       TokenType.belongs
     ])) {
       //linebreaks after these tokens handled by the scanner
-      expr = new SetBinaryExpr(expr, _previous(), _addition());
+      expr = SetBinaryExpr(expr, _previous(), _addition());
     }
 
     return expr;
@@ -442,7 +440,7 @@ class BSParser {
       Token op = _previous();
       //linebreaks after the operators listed above handled by scanner
       Expr right = _multiplication();
-      expr = new BinaryExpr(expr, op, right);
+      expr = BinaryExpr(expr, op, right);
     }
     return expr;
   }
@@ -458,7 +456,7 @@ class BSParser {
       Token op = _previous();
       //linebreaks after the operators listed above handled by scanner
       Expr right = _exponentiation();
-      expr = new BinaryExpr(expr, op, right);
+      expr = BinaryExpr(expr, op, right);
     }
     return expr;
   }
@@ -473,7 +471,7 @@ class BSParser {
       Token op = _previous();
       //linebreaks after '^' operator handled by scanner
       Expr right = _unary_left();
-      expr = new BinaryExpr(expr, op, right);
+      expr = BinaryExpr(expr, op, right);
     }
     return expr;
   }
@@ -488,7 +486,7 @@ class BSParser {
       Token op = _previous();
       //linebreaks after the operators listed above handled by scanner
       Expr right = _unary_left();
-      return new UnaryExpr(op, right);
+      return UnaryExpr(op, right);
     }
 
     //if it doesn't find any left-unary operators, looks for the right ones
@@ -531,7 +529,7 @@ class BSParser {
         //linebreak after . handled by scanner
         Token name =
             _consume(TokenType.identifier, "Expect property name after '.'");
-        expr = new GetExpr(expr, name);
+        expr = GetExpr(expr, name);
       } else
         break;
     }
@@ -541,7 +539,7 @@ class BSParser {
 
   ///<arguments> ::= <expression> | <expression> <whitespace> "," <whitespace_or_linebreak> <arguments>
   Expr _finishCall(Expr callee) {
-    List<Expr> arguments = new List();
+    List<Expr> arguments = <Expr>[];
     //If you immediately find the ')' token, there are no arguments to the function call
 
     if (!_check(TokenType.rightParentheses)) {
@@ -558,7 +556,7 @@ class BSParser {
     Token paren =
         _consume(TokenType.rightParentheses, "Expect ')' after arguments.");
 
-    return new CallExpr(callee, paren, arguments);
+    return CallExpr(callee, paren, arguments);
   }
 
   ///<derivative> ::= <partial_differential> <whitespace> "/" <whitespace_or_linebreak> <derivative_parameters>
@@ -577,7 +575,7 @@ class BSParser {
     _consume(TokenType.del, "expect second 'del' after derivand");
     _consume(TokenType.leftParentheses, "expect '(' after second del keyword");
     //linebreaks after '(' handled by scanner
-    List<Expr> variables = List();
+    List<Expr> variables = <Expr>[];
     if (_check(TokenType.rightParentheses)) {
       _error(_previous(),
           "at least one variable is necessary in derivative expression");
@@ -592,7 +590,7 @@ class BSParser {
     _consume(
         TokenType.rightParentheses, "expect ')' after derivative variables");
 
-    return new DerivativeExpr(keyword, derivand, variables);
+    return DerivativeExpr(keyword, derivand, variables);
   }
 
   /// <primary> ::= <set_definition> | number | string | "false" | "true" | "nil"
@@ -618,21 +616,21 @@ class BSParser {
 
     //number | string
     if (_matchAny([TokenType.number, TokenType.string])) {
-      return new LiteralExpr(_previous().literal);
+      return LiteralExpr(_previous().literal);
     }
 
     //false
     if (_match(TokenType.falseToken)) {
-      return new LiteralExpr(false);
+      return LiteralExpr(false);
     }
 
     //true
     if (_match(TokenType.trueToken)) {
-      return new LiteralExpr(true);
+      return LiteralExpr(true);
     }
 
     //nil
-    if (_match(TokenType.nil)) return new LiteralExpr(null);
+    if (_match(TokenType.nil)) return LiteralExpr(null);
 
     //<(> <expression> <)>
     //or
@@ -651,8 +649,8 @@ class BSParser {
     if (_match(TokenType.leftSquare)) return _parseLeftSquare();
 
     //identifier
-    if (_match(TokenType.identifier)) return new VariableExpr(_previous());
-    if (_match(TokenType.thisToken)) return new ThisExpr(_previous());
+    if (_match(TokenType.identifier)) return VariableExpr(_previous());
+    if (_match(TokenType.thisToken)) return ThisExpr(_previous());
 
     //"super" <whitespace> "." <whitespace_or_linebreak> <identifier>
     if (_match(TokenType.superToken)) {
@@ -662,7 +660,7 @@ class BSParser {
       //linebreaks after '.' handled by scanner
       Token method =
           _consume(TokenType.identifier, "Expect superclass method name");
-      return new SuperExpr(keyword, method);
+      return SuperExpr(keyword, method);
     }
 
     //if you get to this rule and don't find any of the above, you found a syntax error instead
@@ -715,14 +713,14 @@ class BSParser {
       //linebreaks before ']' and ')' handled by scanner
       _consumeAny([TokenType.rightBrace, TokenType.rightParentheses],
           "Expected ] or ) ending interval definition");
-      return new IntervalDefinitionExpr(_left, expr, _expr, _previous());
+      return IntervalDefinitionExpr(_left, expr, _expr, _previous());
     }
     if (mustBeSet) throw _error(_previous(), "Expecting Interval definition");
 
     //linebreaks before ')' handled by scanner
     //if the ')' is not there, it's an error
     _consume(TokenType.rightParentheses, "Expect ')' after expression");
-    return new GroupingExpr(expr);
+    return GroupingExpr(expr);
   }
 
   ///<interval_definition> ::= <[> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
@@ -739,7 +737,7 @@ class BSParser {
 
     _consumeAny([TokenType.rightBrace, TokenType.rightParentheses],
         "Expected ] or ) ending interval definition");
-    return new IntervalDefinitionExpr(left, expr, _expr, _previous());
+    return IntervalDefinitionExpr(left, expr, _expr, _previous());
   }
 
   ///rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
@@ -749,7 +747,7 @@ class BSParser {
   ///block -> "{" (declaration | linebreak)* "}"
   Object _parseLeftBrace([bool expectSet = false]) {
     Token _leftBrace = _previous();
-    Expr _setReturn = null;
+    Expr _setReturn;
 
     //{} -> empty set
     if (_match(TokenType.rightBrace)) {
@@ -763,7 +761,7 @@ class BSParser {
     //if we find a comma, we know it's a set definition
     //if we find a vertical bar, we know it's a builder set definition
 
-    List<Expr> expressions = new List();
+    List<Expr> expressions = <Expr>[];
 
     Stmt first;
 
@@ -810,31 +808,29 @@ class BSParser {
           if (parameter is VariableExpr) {
             parameters.add(parameter.name);
           } else {
-            throw new SetDefinitionError(
-                "parameter is not explicit variable name");
+            throw SetDefinitionError("parameter is not explicit variable name");
           }
         }
       }
 
-      _setReturn = new BuilderDefinitionExpr(
+      _setReturn = BuilderDefinitionExpr(
           _leftBrace, parameters, logic, bar, _previous());
     } else if (isSet) {
       //Roster set
       //linebreak before } handled by scanner
       _consume(TokenType.rightBrace, "Expect '}' after roster set definition");
 
-      _setReturn =
-          new RosterDefinitionExpr(_leftBrace, expressions, _previous());
+      _setReturn = RosterDefinitionExpr(_leftBrace, expressions, _previous());
     }
 
     //if there is a single element, and it is a expression statement, assumes it's a RosterSet with a single element
     //if it isn't, assumes it is a block with a single
     if (_match(TokenType.rightBrace)) {
       if (first is ExpressionStmt) {
-        _setReturn = new RosterDefinitionExpr(
-            _leftBrace, [first.expression], _previous());
+        _setReturn =
+            RosterDefinitionExpr(_leftBrace, [first.expression], _previous());
       } else
-        return new BlockStmt([first]);
+        return BlockStmt([first]);
     }
 
     if (_setReturn != null) {
@@ -844,7 +840,7 @@ class BSParser {
         return ExpressionStmt(_setReturn);
     }
 
-    List<Stmt> statements = new List();
+    List<Stmt> statements = <Stmt>[];
     statements.add(first);
 
     while (!_check(TokenType.rightBrace) && !_isAtEnd()) {
@@ -853,7 +849,7 @@ class BSParser {
     }
 
     _consume(TokenType.rightBrace, "Expect '}' after block.");
-    return new BlockStmt(statements);
+    return BlockStmt(statements);
   }
   //Helper function corner
 
@@ -925,7 +921,7 @@ class BSParser {
   ///Reports an error to the general interpreter and creates a ParseError without necessarily throwing it
   ParseError _error(Token token, String message) {
     BetaScript.error(token, message);
-    return new ParseError();
+    return ParseError();
   }
 
   ///When a syntax error is found, ignores the rest of the current expression by moving _current forward

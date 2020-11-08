@@ -31,18 +31,13 @@ class Interval extends BSSet {
   final BSFunction a;
   final BSFunction b;
 
-  const Interval(BSFunction this.a, BSFunction this.b, bool this.leftClosed,
-      bool this.rightClosed);
+  const Interval(this.a, this.b, this.leftClosed, this.rightClosed);
 
-  const Interval.closed(
-    BSFunction this.a,
-    BSFunction this.b,
-  )   : this.leftClosed = true,
+  const Interval.closed(this.a, this.b)
+      : this.leftClosed = true,
         this.rightClosed = true;
-  const Interval.open(
-    BSFunction this.a,
-    BSFunction this.b,
-  )   : this.leftClosed = false,
+  const Interval.open(this.a, this.b)
+      : this.leftClosed = false,
         this.rightClosed = false;
 
   //doesn't need to check if x is number because < will do it anyway

@@ -53,7 +53,7 @@ abstract class Comparison extends LogicExpression {
   ///checks if a set of values solves the expression
   ///if the variables passed aren't suficient to evaluate the expression, simply returns false instead of throwing
   bool isSolution(HashMap<String, BSFunction> p) {
-    BSFunction _left = null, _right = null;
+    BSFunction _left, _right;
 
     try {
       _left = left.evaluate(p).approx;
@@ -87,7 +87,7 @@ abstract class Comparison extends LogicExpression {
     }
     return (_sol == emptySet)
         ? BuilderSet(
-            this, this.parameters.map((element) => variable(element)).toList())
+            this, parameters.map((element) => variable(element)).toList())
         : _sol;
   }
 

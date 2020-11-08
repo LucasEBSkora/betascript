@@ -13,8 +13,7 @@ BSFunction arcctg(BSFunction operand) {
 }
 
 class ArcCtg extends singleOperandFunction {
-  ArcCtg._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArcCtg._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -40,5 +39,5 @@ class ArcCtg extends singleOperandFunction {
       (-operand.derivativeInternal(v) / (n(1) + (operand ^ n(2))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArcCtg._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArcCtg._(operand, params);
 }

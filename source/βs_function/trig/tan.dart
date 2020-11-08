@@ -13,8 +13,7 @@ BSFunction tan(BSFunction operand) {
 }
 
 class Tan extends singleOperandFunction {
-  Tan._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  Tan._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -39,5 +38,5 @@ class Tan extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Tan._(operand, params);
+  BSFunction copy([Set<Variable> params]) => Tan._(operand, params);
 }

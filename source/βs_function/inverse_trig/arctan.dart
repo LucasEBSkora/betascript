@@ -13,8 +13,7 @@ BSFunction arctan(BSFunction operand) {
 }
 
 class ArcTan extends singleOperandFunction {
-  ArcTan._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArcTan._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -40,5 +39,5 @@ class ArcTan extends singleOperandFunction {
       (operand.derivativeInternal(v) / (n(1) + (operand ^ n(2))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArcTan._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArcTan._(operand, params);
 }

@@ -13,8 +13,7 @@ BSFunction artanh(BSFunction operand) {
 }
 
 class ArTanH extends singleOperandFunction {
-  ArTanH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArTanH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -40,7 +39,7 @@ class ArTanH extends singleOperandFunction {
       (operand.derivativeInternal(v) / (n(1) - (operand ^ n(2))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArTanH._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArTanH._(operand, params);
 }
 
 double _artanh(double v) => (1 / 2) * math.log((1 + v) / (1 - v));

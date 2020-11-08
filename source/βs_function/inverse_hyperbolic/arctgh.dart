@@ -13,8 +13,7 @@ BSFunction arctgh(BSFunction operand) {
 }
 
 class ArCtgH extends singleOperandFunction {
-  ArCtgH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArCtgH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -40,7 +39,7 @@ class ArCtgH extends singleOperandFunction {
       (operand.derivativeInternal(v) / (n(1) - operand ^ n(2)));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArCtgH._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArCtgH._(operand, params);
 }
 
 double _arctgh(double v) => 0.5 * math.log((v + 1) / (v - 1));

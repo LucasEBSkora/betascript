@@ -20,7 +20,7 @@ BSFunction multiply(List<BSFunction> operands) {
   //if there are any divions in the operands, makes a new division with its numerator with
   //the other operands added, and its denominator
   for (int i = 0; i < operands.length; ++i) {
-    List<BSFunction> divisions = List();
+    List<BSFunction> divisions = <BSFunction>[];
 
     for (int i = 0; i < operands.length;) {
       Trio<Division, bool, bool> _op =
@@ -36,8 +36,8 @@ BSFunction multiply(List<BSFunction> operands) {
     }
 
     if (divisions.length != 0) {
-      List<BSFunction> nums = List();
-      List<BSFunction> dens = List();
+      List<BSFunction> nums = <BSFunction>[];
+      List<BSFunction> dens = <BSFunction>[];
 
       nums.addAll(operands);
 
@@ -85,15 +85,14 @@ BSFunction multiply(List<BSFunction> operands) {
 class Multiplication extends BSFunction {
   final List<BSFunction> operands;
 
-  Multiplication(List<BSFunction> this.operands, [Set<Variable> params = null])
-      : super(params);
+  Multiplication(this.operands, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) {
-    List<BSFunction> ops = List<BSFunction>();
+    List<BSFunction> ops = <BSFunction>[];
     for (int i = 0; i < operands.length; ++i) {
       //copies list
-      List<BSFunction> term = List.from(operands);
+      List<BSFunction> term = operands.toList();
 
       term.insert(i, term.removeAt(i).derivative(v));
       //removes "current" operand (which isn't derivated)
@@ -106,10 +105,10 @@ class Multiplication extends BSFunction {
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
-    List<BSFunction> ops = new List();
-    operands.forEach((BSFunction f) {
+    List<BSFunction> ops = <BSFunction>[];
+    for (var f in operands) {
       ops.add(f.evaluate(p));
-    });
+    }
     return multiply(ops);
   }
 
@@ -129,8 +128,7 @@ class Multiplication extends BSFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) =>
-      Multiplication(operands, params);
+  BSFunction copy([Set<Variable> params]) => Multiplication(operands, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters {
@@ -143,10 +141,10 @@ class Multiplication extends BSFunction {
 
   @override
   BSFunction get approx {
-    List<BSFunction> ops = new List();
-    operands.forEach((BSFunction f) {
+    List<BSFunction> ops = <BSFunction>[];
+    for (var f in operands) {
       ops.add(f.approx);
-    });
+    }
     return multiply(ops);
   }
 }
@@ -211,7 +209,7 @@ bool _multiplyNumbers(List<BSFunction> operands) {
     operands.clear();
   else {
     //makes a new list with the normal number and the named numbers
-    List<BSFunction> numbers = List<BSFunction>();
+    List<BSFunction> numbers = <BSFunction>[];
     if (number < 0) negative = true;
     if (number.abs() != 1) numbers.add(n(number.abs()));
 

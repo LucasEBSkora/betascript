@@ -29,10 +29,9 @@ MethodTable<BSSet, BSSet> defineRelativeComplementTable() {
 
   methods.addMethod(Interval, RosterSet, (Interval first, RosterSet second) {
     //Only elements which concern us are the ones contained in first
-    List<BSFunction> containedElements =
-        second.elements.where((element) => first.belongs(element));
+    List<BSFunction> containedElements = second.elements.where(first.belongs);
 
-    List<BSSet> complementSubsets = List();
+    List<BSSet> complementSubsets = <BSSet>[];
 
     //See RosterSet.complement
     complementSubsets.add(

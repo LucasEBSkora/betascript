@@ -38,8 +38,7 @@ class Division extends BSFunction {
   final BSFunction numerator;
   final BSFunction denominator;
 
-  Division._(BSFunction this.numerator, BSFunction this.denominator,
-      [Set<Variable> params = null])
+  Division._(this.numerator, this.denominator, [Set<Variable> params])
       : super(params);
 
   @override
@@ -77,7 +76,7 @@ class Division extends BSFunction {
   String toString([bool handleMinus = true]) => "(($numerator)/($denominator))";
 
   @override
-  BSFunction copy([Set<Variable> params = null]) =>
+  BSFunction copy([Set<Variable> params]) =>
       Division._(numerator, denominator, params);
 
   @override

@@ -23,7 +23,7 @@ class Exponentiation extends BSFunction {
   final BSFunction base;
   final BSFunction exponent;
 
-  Exponentiation._(this.exponent, this.base, [Set<Variable> params = null])
+  Exponentiation._(this.exponent, this.base, [Set<Variable> params])
       : super(params);
 
   @override
@@ -49,7 +49,7 @@ class Exponentiation extends BSFunction {
   @override
   String toString([bool handleMinus = true]) => "(($base)^($exponent))";
 
-  BSFunction copy([Set<Variable> params = null]) =>
+  BSFunction copy([Set<Variable> params]) =>
       Exponentiation._(exponent, base, params);
 
   @override

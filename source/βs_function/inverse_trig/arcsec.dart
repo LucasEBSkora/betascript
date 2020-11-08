@@ -15,8 +15,7 @@ BSFunction arcsec(BSFunction operand) {
 }
 
 class ArcSec extends singleOperandFunction {
-  ArcSec._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArcSec._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -42,5 +41,5 @@ class ArcSec extends singleOperandFunction {
       (abs(operand) * root((operand ^ n(2)) - n(1))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArcSec._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArcSec._(operand, params);
 }

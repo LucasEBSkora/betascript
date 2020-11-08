@@ -14,8 +14,7 @@ BSFunction arccos(BSFunction operand) {
 }
 
 class ArcCos extends singleOperandFunction {
-  ArcCos._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArcCos._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -41,5 +40,5 @@ class ArcCos extends singleOperandFunction {
       (-operand.derivativeInternal(v) / root(n(1) - (operand ^ n(2))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArcCos._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArcCos._(operand, params);
 }

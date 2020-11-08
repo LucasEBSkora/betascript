@@ -13,8 +13,7 @@ BSFunction csc(BSFunction operand) {
 }
 
 class Csc extends singleOperandFunction {
-  Csc._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  Csc._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -38,5 +37,5 @@ class Csc extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Csc._(operand, params);
+  BSFunction copy([Set<Variable> params]) => Csc._(operand, params);
 }

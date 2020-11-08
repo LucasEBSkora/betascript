@@ -25,7 +25,7 @@ BSFunction add(List<BSFunction> operands) {
 class Sum extends BSFunction {
   final List<BSFunction> operands;
 
-  Sum._(List<BSFunction> this.operands, Set<Variable> params) : super(params);
+  Sum._(this.operands, params) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -58,7 +58,7 @@ class Sum extends BSFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Sum._(operands, params);
+  BSFunction copy([Set<Variable> params]) => Sum._(operands, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters {
@@ -71,10 +71,10 @@ class Sum extends BSFunction {
 
   @override
   BSFunction get approx {
-    List<BSFunction> ops = new List();
-    operands.forEach((BSFunction f) {
+    List<BSFunction> ops = <BSFunction>[];
+    for (var f in operands) {
       ops.add(f.approx);
-    });
+    }
     return add(ops);
   }
 }
@@ -90,13 +90,13 @@ void _openOtherSums(List<BSFunction> operands) {
     if (_op.second) {
       Sum s = operands.removeAt(i);
 
-      List<BSFunction> newOperands = List<BSFunction>();
+      List<BSFunction> newOperands = <BSFunction>[];
 
       //if it finds a sum within a negative
       if (_op.third) {
-        s.operands.forEach((BSFunction f) {
+        for (var f in s.operands) {
           newOperands.add(-f);
-        });
+        }
       } else
         newOperands = s.operands;
 
@@ -135,7 +135,7 @@ void _SumNumbers(List<BSFunction> operands) {
       ++i;
   }
 
-  List<BSFunction> numbers = List<BSFunction>();
+  List<BSFunction> numbers = <BSFunction>[];
 
   if (number > 0) {
     numbers.add(n(number));
@@ -169,7 +169,7 @@ void _createMultiplications(List<BSFunction> operands) {
         _mul.first.operands.length >= 2 &&
         _mul.first.operands[0] is Number) {
       //in this case, "h" must be the multiplication with all other factors excluding the number
-      List<BSFunction> otherOps = List.from(_mul.first.operands);
+      List<BSFunction> otherOps = _mul.first.operands.toList();
       otherOps.removeAt(0);
       h = Multiplication(otherOps);
       factor = originalFactor = _mul.first.operands[0] * n(_mul.third ? -1 : 1);
@@ -188,7 +188,7 @@ void _createMultiplications(List<BSFunction> operands) {
           _mul.first.operands.length >= 2 &&
           _mul.first.operands[0] is Number) {
         //in this case, "h" must be the multiplication with all other factors excluding the number
-        List<BSFunction> otherOps = List.from(_mul.first.operands);
+        List<BSFunction> otherOps = _mul.first.operands.toList();
         otherOps.removeAt(0);
         g = Multiplication(otherOps);
         if (h == g) {

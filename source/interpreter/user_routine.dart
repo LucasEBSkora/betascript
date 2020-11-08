@@ -17,7 +17,7 @@ class UserRoutine implements BSCallable {
   @override
   Object callThing(BSInterpreter interpreter, List<Object> arguments) {
     //Creates routine scope
-    Environment environment = new Environment(_closure);
+    Environment environment = Environment(_closure);
 
     //defines and initializes parameters in routine scope
 
@@ -43,8 +43,8 @@ class UserRoutine implements BSCallable {
 
   ///Creates a new scope for the method copying the old one and includes the "variable" 'this' in it
   UserRoutine bind(BSInstance instance) {
-    Environment environment = new Environment(_closure);
+    Environment environment = Environment(_closure);
     environment.define("this", instance);
-    return new UserRoutine(_declaration, environment, _isInitializer);
+    return UserRoutine(_declaration, environment, _isInitializer);
   }
 }

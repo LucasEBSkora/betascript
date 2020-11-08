@@ -13,8 +13,7 @@ BSFunction ctg(BSFunction operand) {
 }
 
 class Ctg extends singleOperandFunction {
-  Ctg._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  Ctg._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -39,5 +38,5 @@ class Ctg extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Ctg._(operand, params);
+  BSFunction copy([Set<Variable> params]) => Ctg._(operand, params);
 }

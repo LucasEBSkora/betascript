@@ -20,22 +20,22 @@ abstract class BSFunction implements BSCallable {
 
   ///Checks if the list of parameters passed is the correct length, creates a map containing the variables in the correct place by matching the params getter and this
   ///parameter.
-  BSFunction call(List<BSFunction> parameters) {
-    Set<Variable> _p = this.parameters;
-    if (parameters.length != _p.length) {
-      throw new BetascriptFunctionError(
+  BSFunction call(List<BSFunction> parametersList) {
+    Set<Variable> _p = parameters;
+    if (parametersList.length != _p.length) {
+      throw BetascriptFunctionError(
           "Error! Missing parameters in function call!");
     }
 
     return evaluate(
-        HashMap.fromIterables(this.parameters.map((e) => e.name), parameters));
+        HashMap.fromIterables(parameters.map((e) => e.name), parametersList));
   }
 
   ///Returns the function with all possible aproximations made.
   BSFunction get approx;
 
   //Returns the partial derivative of this in relation to v
-  BSFunction derivative(Variable v) => _merge(this.derivativeInternal(v), this);
+  BSFunction derivative(Variable v) => _merge(derivativeInternal(v), this);
 
   ///If there is a custom set of parameters, returns it. If there isn't, returns the default one
   Set<Variable> get parameters => (_parameters ?? defaultParameters);
@@ -44,12 +44,12 @@ abstract class BSFunction implements BSCallable {
   BSFunction withParameters(Set<Variable> p) {
     Set<Variable> _p = defaultParameters;
 
-    _p.forEach((element) {
+    for (var element in _p) {
       if (!p.contains(element)) {
-        throw new BetascriptFunctionError(
+        throw BetascriptFunctionError(
             "Error! Function parameters not sufficient to evaluate this function!");
       }
-    });
+    }
     return copy(p);
   }
 
@@ -68,7 +68,7 @@ abstract class BSFunction implements BSCallable {
   bool operator ==(dynamic other) =>
       (other is BSFunction) && toString() == other.toString();
 
-  static Pair<num, num> toNums(BSFunction a, BSFunction b, [String op = null]) {
+  static Pair<num, num> toNums(BSFunction a, BSFunction b, [String op]) {
     Trio<Number, bool, bool> _a = BSFunction.extractFromNegative<Number>(a);
     Trio<Number, bool, bool> _b = BSFunction.extractFromNegative<Number>(b);
     if (!_a.second || !_b.second) {
@@ -120,7 +120,7 @@ abstract class BSFunction implements BSCallable {
   BSFunction derivativeInternal(Variable v);
 
   @protected
-  const BSFunction(Set<Variable> this._parameters);
+  const BSFunction(this._parameters);
 
   ///For internal use only! To actually evaluate, use call
   ///returns the value of this function when called with the parameters having the values in the map.

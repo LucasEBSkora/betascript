@@ -56,11 +56,12 @@ ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
                   second.intersection(first.first), first.second));
 
   methods.addMethod(SetUnion, SetUnion, (SetUnion first, SetUnion second) {
-    List<BSSet> _new = List();
+    List<BSSet> _new = <BSSet>[];
     //computes the union of the intersections of second
     //with each set in first
-    first.subsets.forEach((element) => _new.add(second.intersection(element)));
-
+    for (var subset in first.subsets) {
+      _new.add(second.intersection(subset));
+    }
     return SetUnion(_new);
   });
 

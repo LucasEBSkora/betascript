@@ -36,7 +36,7 @@ class SingleVariableLinearSolver extends Solver {
           invertedInequality = true;
           _left = (_left as Negative).operand;
         }
-        List<BSFunction> _terms = List();
+        List<BSFunction> _terms = <BSFunction>[];
         //if the function is a sum, separates it into terms to check if all of them are linear
         if (_left is Sum) {
           _terms.addAll((_left as Sum).operands);

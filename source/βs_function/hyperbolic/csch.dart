@@ -13,8 +13,7 @@ BSFunction csch(BSFunction operand) {
 }
 
 class CscH extends singleOperandFunction {
-  CscH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  CscH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -40,7 +39,7 @@ class CscH extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => CscH._(operand, params);
+  BSFunction copy([Set<Variable> params]) => CscH._(operand, params);
 }
 
 double _csch(double v) => 2 / (math.exp(v) - math.exp(-v));

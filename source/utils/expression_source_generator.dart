@@ -236,9 +236,9 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
     source += '  $className(';
     int i;
     for (i = 0; i < e.fields.length - 1; ++i)
-      source += "${e.fields[i][0]} this.${e.fields[i][1]}, ";
+      source += "this.${e.fields[i][1]}, ";
 
-    source += "${e.fields[i][0]} this.${e.fields[i][1]});\n";
+    source += "this.${e.fields[i][1]});\n";
 
     source +=
         "  dynamic accept($visitorClassName v) => v.visit$className(this);\n";

@@ -13,8 +13,7 @@ BSFunction cos(BSFunction operand) {
 }
 
 class Cos extends singleOperandFunction {
-  Cos._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  Cos._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -39,5 +38,5 @@ class Cos extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Cos._(operand, params);
+  BSFunction copy([Set<Variable> params]) => Cos._(operand, params);
 }

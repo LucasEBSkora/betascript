@@ -31,7 +31,7 @@ class AssignExpr extends Expr {
   ///The expression whose result should be assigned to the variable
   final Expr value;
 
-  AssignExpr(Token this.name, Expr this.value);
+  AssignExpr(this.name, this.value);
   dynamic accept(ExprVisitor v) => v.visitAssignExpr(this);
 }
 
@@ -45,7 +45,7 @@ class BinaryExpr extends Expr {
   ///operand to the right of the operator
   final Expr right;
 
-  BinaryExpr(Expr this.left, Token this.op, Expr this.right);
+  BinaryExpr(this.left, this.op, this.right);
   dynamic accept(ExprVisitor v) => v.visitBinaryExpr(this);
 }
 
@@ -59,7 +59,7 @@ class CallExpr extends Expr {
   ///The list of arguments being passed
   final List<Expr> arguments;
 
-  CallExpr(Expr this.callee, Token this.paren, List<Expr> this.arguments);
+  CallExpr(this.callee, this.paren, this.arguments);
   dynamic accept(ExprVisitor v) => v.visitCallExpr(this);
 }
 
@@ -70,7 +70,7 @@ class GetExpr extends Expr {
   ///The field being accessed
   final Token name;
 
-  GetExpr(Expr this.object, Token this.name);
+  GetExpr(this.object, this.name);
   dynamic accept(ExprVisitor v) => v.visitGetExpr(this);
 }
 
@@ -78,7 +78,7 @@ class GroupingExpr extends Expr {
   ///A grouping is a collection of other Expressions, so it holds only another expression.
   final Expr expression;
 
-  GroupingExpr(Expr this.expression);
+  GroupingExpr(this.expression);
   dynamic accept(ExprVisitor v) => v.visitGroupingExpr(this);
 }
 
@@ -86,7 +86,7 @@ class LiteralExpr extends Expr {
   ///Literals are numbers, strings, booleans or null. This field holds one of them.
   final dynamic value;
 
-  LiteralExpr(dynamic this.value);
+  LiteralExpr(this.value);
   dynamic accept(ExprVisitor v) => v.visitLiteralExpr(this);
 }
 
@@ -97,7 +97,7 @@ class UnaryExpr extends Expr {
   ///The operand on which the operator is applied
   final Expr operand;
 
-  UnaryExpr(Token this.op, Expr this.operand);
+  UnaryExpr(this.op, this.operand);
   dynamic accept(ExprVisitor v) => v.visitUnaryExpr(this);
 }
 
@@ -105,7 +105,7 @@ class VariableExpr extends Expr {
   ///The token containing the variable's name
   final Token name;
 
-  VariableExpr(Token this.name);
+  VariableExpr(this.name);
   dynamic accept(ExprVisitor v) => v.visitVariableExpr(this);
 }
 
@@ -119,7 +119,7 @@ class logicBinaryExpr extends Expr {
   ///operand to the right of the operator
   final Expr right;
 
-  logicBinaryExpr(Expr this.left, Token this.op, Expr this.right);
+  logicBinaryExpr(this.left, this.op, this.right);
   dynamic accept(ExprVisitor v) => v.visitlogicBinaryExpr(this);
 }
 
@@ -133,7 +133,7 @@ class SetExpr extends Expr {
   ///The value being assigned to the field
   final Expr value;
 
-  SetExpr(Expr this.object, Token this.name, Expr this.value);
+  SetExpr(this.object, this.name, this.value);
   dynamic accept(ExprVisitor v) => v.visitSetExpr(this);
 }
 
@@ -141,7 +141,7 @@ class ThisExpr extends Expr {
   ///The token containing the keyword 'this'
   final Token keyword;
 
-  ThisExpr(Token this.keyword);
+  ThisExpr(this.keyword);
   dynamic accept(ExprVisitor v) => v.visitThisExpr(this);
 }
 
@@ -152,7 +152,7 @@ class SuperExpr extends Expr {
   ///The method being accessed
   final Token method;
 
-  SuperExpr(Token this.keyword, Token this.method);
+  SuperExpr(this.keyword, this.method);
   dynamic accept(ExprVisitor v) => v.visitSuperExpr(this);
 }
 
@@ -166,8 +166,7 @@ class DerivativeExpr extends Expr {
   ///Variables this function is being derivated in
   final List<Expr> variables;
 
-  DerivativeExpr(
-      Token this.keyword, Expr this.derivand, List<Expr> this.variables);
+  DerivativeExpr(this.keyword, this.derivand, this.variables);
   dynamic accept(ExprVisitor v) => v.visitDerivativeExpr(this);
 }
 
@@ -184,8 +183,7 @@ class IntervalDefinitionExpr extends Expr {
   ///token containing ']' or ')'
   final Token right;
 
-  IntervalDefinitionExpr(
-      Token this.left, Expr this.a, Expr this.b, Token this.right);
+  IntervalDefinitionExpr(this.left, this.a, this.b, this.right);
   dynamic accept(ExprVisitor v) => v.visitIntervalDefinitionExpr(this);
 }
 
@@ -199,8 +197,7 @@ class RosterDefinitionExpr extends Expr {
   ///token containing '}'
   final Token right;
 
-  RosterDefinitionExpr(
-      Token this.left, List<Expr> this.elements, Token this.right);
+  RosterDefinitionExpr(this.left, this.elements, this.right);
   dynamic accept(ExprVisitor v) => v.visitRosterDefinitionExpr(this);
 }
 
@@ -220,8 +217,8 @@ class BuilderDefinitionExpr extends Expr {
   ///token containing '}'
   final Token right;
 
-  BuilderDefinitionExpr(Token this.left, List<Token> this.parameters,
-      Expr this.rule, Token this.bar, Token this.right);
+  BuilderDefinitionExpr(
+      this.left, this.parameters, this.rule, this.bar, this.right);
   dynamic accept(ExprVisitor v) => v.visitBuilderDefinitionExpr(this);
 }
 
@@ -235,6 +232,6 @@ class SetBinaryExpr extends Expr {
   ///right operand
   final Expr right;
 
-  SetBinaryExpr(Expr this.left, Token this.operator, Expr this.right);
+  SetBinaryExpr(this.left, this.operator, this.right);
   dynamic accept(ExprVisitor v) => v.visitSetBinaryExpr(this);
 }

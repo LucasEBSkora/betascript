@@ -14,8 +14,7 @@ BSFunction arcsch(BSFunction operand) {
 }
 
 class ArCscH extends singleOperandFunction {
-  ArCscH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArCscH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -41,7 +40,7 @@ class ArCscH extends singleOperandFunction {
       (abs(operand) * root((operand ^ n(2)) + n(1))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArCscH._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArCscH._(operand, params);
 }
 
 double _arcsch(double v) => math.log(math.sqrt(1 + math.pow(v, 2)) / v);

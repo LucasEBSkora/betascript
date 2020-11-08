@@ -23,8 +23,7 @@ BSFunction sgn(BSFunction operand) {
 class Signum extends BSFunction {
   final BSFunction operand;
 
-  const Signum._(BSFunction this.operand, [Set<Variable> params = null])
-      : super(params);
+  const Signum._(this.operand, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>
@@ -38,7 +37,7 @@ class Signum extends BSFunction {
   String toString([bool handleMinus = true]) => "sign($operand)";
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Signum._(operand, params);
+  BSFunction copy([Set<Variable> params]) => Signum._(operand, params);
 
   SplayTreeSet<Variable> get defaultParameters => operand.parameters;
 

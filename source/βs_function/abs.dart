@@ -19,8 +19,7 @@ BSFunction abs(BSFunction operand) {
 class AbsoluteValue extends BSFunction {
   final BSFunction operand;
 
-  AbsoluteValue._(BSFunction this.operand, [Set<Variable> params = null])
-      : super(params);
+  AbsoluteValue._(this.operand, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>
@@ -34,8 +33,7 @@ class AbsoluteValue extends BSFunction {
   String toString([bool handleMinus = true]) => "|${operand}|";
 
   @override
-  BSFunction copy([Set<Variable> params = null]) =>
-      AbsoluteValue._(operand, params);
+  BSFunction copy([Set<Variable> params]) => AbsoluteValue._(operand, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters => operand.defaultParameters;

@@ -15,16 +15,15 @@ BSFunction negative(BSFunction op) {
 class Negative extends BSFunction {
   final BSFunction operand;
 
-  Negative._(BSFunction this.operand, [Set<Variable> params = null])
-      : super(params);
+  Negative._(this.operand, [Set<Variable> params]) : super(params);
 
-  const Negative(BSFunction this.operand) : super(null);
+  const Negative(this.operand) : super(null);
 
   @override
   BSFunction get approx => negative(operand.approx);
 
   @override
-  BSFunction copy([Set<Variable> parameters = null]) =>
+  BSFunction copy([Set<Variable> parameters]) =>
       Negative._(operand, parameters);
 
   @override

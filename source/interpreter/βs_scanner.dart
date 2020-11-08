@@ -7,7 +7,7 @@ import '../βs_function/number.dart';
 ///Scans the source for tokens, returning a list of them on a call to scanTokens, the only public routine in this class.
 class BSScanner {
   final String _source;
-  final List<Token> _tokens = new List();
+  final List<Token> _tokens = <Token>[];
   HashMap<String, Function> _charToLexeme; //see _initializeMap
 
   //_start is the start of the lexeme currently being read, and _current the current value being processed.
@@ -16,7 +16,7 @@ class BSScanner {
   //If the source scanned is multiline, keeps the value of the current line for error reporting
   int _line;
 
-  BSScanner(String this._source) {
+  BSScanner(this._source) {
     _start = 0;
     _current = 0;
     _line = 1;
@@ -199,7 +199,7 @@ class BSScanner {
   }
 
   ///a map containing keywords and the corresponding token type
-  static const Map<String, TokenType> _keywords = {
+  static HashMap<String, TokenType> _keywords = HashMap.from({
     "and": TokenType.and,
     "belongs": TokenType.belongs,
     "class": TokenType.classToken,
@@ -224,10 +224,10 @@ class BSScanner {
     "true": TokenType.trueToken,
     "while": TokenType.whileToken,
     "union": TokenType.union,
-  };
+  });
 
   ///creates a new token, using the interval from _start to _current as the token's lexeme.
-  void _addToken(TokenType type, [dynamic literal = null]) {
+  void _addToken(TokenType type, [dynamic literal]) {
     String text = _source.substring(_start, _current);
     _tokens.add(new Token(type, text, literal, _line));
   }

@@ -7,7 +7,7 @@ import 'βs_interpreter.dart' show RuntimeError;
 
 class BSInstance {
   final BSClass _class;
-  final HashMap<String, Object> _fields = new HashMap();
+  final HashMap<String, Object> _fields = HashMap();
 
   BSInstance(this._class);
 
@@ -20,7 +20,7 @@ class BSInstance {
     UserRoutine method = _class.findMethod(name.lexeme);
     if (method != null) return method.bind(this);
 
-    throw new RuntimeError(name, "Undefined property '${name.lexeme}'.");
+    throw RuntimeError(name, "Undefined property '${name.lexeme}'.");
   }
 
   void set(Token name, Object value) => _fields[name.lexeme] = value;

@@ -14,8 +14,7 @@ BSFunction arsinh(BSFunction operand) {
 }
 
 class ArSinH extends singleOperandFunction {
-  ArSinH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArSinH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -41,7 +40,7 @@ class ArSinH extends singleOperandFunction {
       (operand.derivativeInternal(v) / root(n(1) + (operand ^ n(2))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArSinH._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArSinH._(operand, params);
 }
 
 double _arsinh(double v) => math.log(v + math.sqrt(1 + math.pow(v, 2)));

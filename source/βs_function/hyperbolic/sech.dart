@@ -13,8 +13,7 @@ BSFunction sech(BSFunction operand) {
 }
 
 class SecH extends singleOperandFunction {
-  SecH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  SecH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -40,7 +39,7 @@ class SecH extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => SecH._(operand, params);
+  BSFunction copy([Set<Variable> params]) => SecH._(operand, params);
 }
 
 double _sech(double v) => 2 / (math.exp(v) + math.exp(-v));

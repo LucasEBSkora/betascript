@@ -8,8 +8,7 @@ import 'βs_function.dart';
 abstract class singleOperandFunction extends BSFunction {
   final BSFunction operand;
 
-  singleOperandFunction(BSFunction this.operand, Set<Variable> params)
-      : super(params);
+  singleOperandFunction(this.operand, Set<Variable> params) : super(params);
 
   //assumes the class name matches the function name, ignoring camel case
   @override
@@ -28,6 +27,6 @@ abstract class singleOperandFunction extends BSFunction {
 
   // unfortunately can't define this one either, because we must call the correct constructor
   // @override
-  // BSFunction copy([bool negative = null, Set<Variable> params = null]);
+  // BSFunction copy([bool negative, Set<Variable> params]);
 
 }

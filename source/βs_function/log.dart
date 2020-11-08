@@ -22,7 +22,7 @@ class Log extends BSFunction {
   final BSFunction base;
   final BSFunction operand;
 
-  Log._(this.operand, this.base, [Set<Variable> params = null]) : super(params);
+  Log._(this.operand, this.base, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) {
@@ -51,8 +51,7 @@ class Log extends BSFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) =>
-      Log._(operand, base, params);
+  BSFunction copy([Set<Variable> params]) => Log._(operand, base, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters {

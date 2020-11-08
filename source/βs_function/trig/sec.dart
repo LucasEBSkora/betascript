@@ -13,8 +13,7 @@ BSFunction sec(BSFunction operand) {
 }
 
 class Sec extends singleOperandFunction {
-  Sec._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  Sec._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -39,5 +38,5 @@ class Sec extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Sec._(operand, params);
+  BSFunction copy([Set<Variable> params]) => Sec._(operand, params);
 }

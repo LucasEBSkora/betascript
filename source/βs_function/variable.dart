@@ -4,13 +4,13 @@ import 'number.dart';
 import 'βs_calculus.dart';
 import 'βs_function.dart';
 
-Variable variable(String name, [Set<Variable> params = null]) =>
+Variable variable(String name, [Set<Variable> params]) =>
     Variable._(name, params);
 
 class Variable extends BSFunction implements Comparable {
   final String name;
 
-  Variable._(String this.name, Set<Variable> params) : super(params);
+  Variable._(this.name, params) : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -22,14 +22,13 @@ class Variable extends BSFunction implements Comparable {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) => n((v.name == this.name) ? 1 : 0);
+  BSFunction derivativeInternal(Variable v) => n((v.name == name) ? 1 : 0);
 
   @override
   String toString() => name;
 
   @override
-  BSFunction copy([Set<Variable> params = null]) =>
-      Variable._(name, this.parameters);
+  BSFunction copy([Set<Variable> params]) => Variable._(name, parameters);
 
   @override
   SplayTreeSet<Variable> get defaultParameters => SplayTreeSet.from([this]);
@@ -42,6 +41,6 @@ class Variable extends BSFunction implements Comparable {
     if (other is Variable) {
       return name.compareTo(other.name);
     } else
-      throw new Exception("Can't compare Variable with ${other.runtimeType}!");
+      throw Exception("Can't compare Variable with ${other.runtimeType}!");
   }
 }

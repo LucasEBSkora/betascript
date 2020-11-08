@@ -14,8 +14,7 @@ BSFunction arccsc(BSFunction operand) {
 }
 
 class ArcCsc extends singleOperandFunction {
-  ArcCsc._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArcCsc._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -41,5 +40,5 @@ class ArcCsc extends singleOperandFunction {
       (abs(operand) * root((operand ^ n(2)) - n(1))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArcCsc._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArcCsc._(operand, params);
 }

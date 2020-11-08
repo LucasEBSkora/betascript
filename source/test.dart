@@ -9,7 +9,7 @@ void main() {
 
   BSFunction f = tan(y - x) * z;
   BSFunction g = f([arctan(x), sin(n(0.5)), n(1) / n(2)]);
-  BSFunction h = f.withParameters(Set.from([z, y, x]));
+  BSFunction h = f.withParameters(<Variable>{z, y, x});
   BSFunction i = h([arctan(x), sin(n(0.5)), n(4) / n(2)]);
 
   print(f);

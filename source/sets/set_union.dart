@@ -34,10 +34,9 @@ BSSet setUnion(Iterable<BSSet> subsets) {
       _subsets.insertAll(i, element.subsets);
     }
   }
-
   _subsets = _subsets.where((element) => !(element is EmptySet)).toList();
 
-  List<BSFunction> rosterElements = List();
+  List<BSFunction> rosterElements = <BSFunction>[];
 
   for (int i = 0; i < _subsets.length;) {
     BSSet _set = _subsets[i];
@@ -63,7 +62,7 @@ BSSet setUnion(Iterable<BSSet> subsets) {
 class SetUnion extends BSSet {
   final List<BSSet> subsets;
 
-  SetUnion(List<BSSet> this.subsets);
+  SetUnion(this.subsets);
 
   @override
   bool belongs(BSFunction x) {

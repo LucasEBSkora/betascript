@@ -14,8 +14,7 @@ BSFunction arcsin(BSFunction operand) {
 }
 
 class ArcSin extends singleOperandFunction {
-  ArcSin._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  ArcSin._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -41,5 +40,5 @@ class ArcSin extends singleOperandFunction {
       (operand.derivativeInternal(v) / root(n(1) - (operand ^ n(2))));
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => ArcSin._(operand, params);
+  BSFunction copy([Set<Variable> params]) => ArcSin._(operand, params);
 }

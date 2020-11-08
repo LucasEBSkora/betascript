@@ -10,7 +10,7 @@ import 'βs_scanner.dart';
 class BetaScript {
   static bool hadError = false;
   static bool hadRuntimeError = false;
-  static BSInterpreter _interpreter = new BSInterpreter();
+  static BSInterpreter _interpreter = BSInterpreter();
 
   ///The callback used when the function 'print' is called. Might print to a string (web version), to a file (not yet implemented) or to the console
   static Function printCallback;
@@ -50,7 +50,7 @@ class BetaScript {
     //resets everything so it always interprets from a fresh start
     hadError = false;
     hadRuntimeError = false;
-    _interpreter = new BSInterpreter();
+    _interpreter = BSInterpreter();
 
     //all print statements redirect to this function, allowing the results to be printed in the 'output' field
     printCallback = (dynamic object) {
@@ -63,14 +63,14 @@ class BetaScript {
   }
 
   static void _run(String source) {
-    BSScanner scanner = new BSScanner(source);
+    BSScanner scanner = BSScanner(source);
     List<Token> tokens = scanner.scanTokens(); //lexical analysis
     // for (Token token in tokens) print(token);
-    BSParser parser = new BSParser(tokens, _interpreter);
+    BSParser parser = BSParser(tokens, _interpreter);
     List<Stmt> statements = parser.parse(); //Syntax analysis
     if (hadError) return;
 
-    Resolver resolver = new Resolver(_interpreter);
+    Resolver resolver = Resolver(_interpreter);
     resolver.resolveAll(statements); //Semantic analysis
 
     if (hadError) return;

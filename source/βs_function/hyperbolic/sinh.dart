@@ -13,8 +13,7 @@ BSFunction sinh(BSFunction operand) {
 }
 
 class SinH extends singleOperandFunction {
-  SinH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  SinH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -39,7 +38,7 @@ class SinH extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => SinH._(operand, params);
+  BSFunction copy([Set<Variable> params]) => SinH._(operand, params);
 }
 
 double _sinh(double v) => (math.exp(v) - math.exp(-v)) / 2;

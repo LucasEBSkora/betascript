@@ -40,7 +40,7 @@ class Root extends BSFunction {
   String toString([bool handleMinus = true]) => "sqrt($operand)";
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => Root._(operand, params);
+  BSFunction copy([Set<Variable> params]) => Root._(operand, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters => operand.parameters;

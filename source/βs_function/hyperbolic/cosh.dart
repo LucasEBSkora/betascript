@@ -13,8 +13,7 @@ BSFunction cosh(BSFunction operand) {
 }
 
 class CosH extends singleOperandFunction {
-  CosH._(BSFunction operand, [Set<Variable> params = null])
-      : super(operand, params);
+  CosH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -40,7 +39,7 @@ class CosH extends singleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params = null]) => CosH._(operand, params);
+  BSFunction copy([Set<Variable> params]) => CosH._(operand, params);
 }
 
 double _cosh(double v) => (math.exp(v) + math.exp(-v)) / 2;

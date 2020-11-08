@@ -26,15 +26,14 @@ class Number extends BSFunction {
   final String name;
   final bool isInt;
 
-  Number._(num value, [Set<Variable> params = null])
+  Number._(num value, [Set<Variable> params])
       : absvalue = value.abs(),
         name = _makeName(value),
         isInt = (value == value.toInt()),
         isNamed = false,
         super(params);
 
-  const Number._named(num this.absvalue, this.name,
-      [Set<Variable> params = null])
+  const Number._named(this.absvalue, this.name, [Set<Variable> params])
       : isNamed = true,
         isInt = (absvalue is int),
         super(params);
@@ -60,7 +59,7 @@ class Number extends BSFunction {
   num get value => absvalue;
 
   @override
-  BSFunction copy([Set<Variable> params = null]) {
+  BSFunction copy([Set<Variable> params]) {
     if (isNamed) {
       return Number._named(absvalue, name, params);
     } else {
@@ -71,8 +70,7 @@ class Number extends BSFunction {
   @override
   SplayTreeSet<Variable> get defaultParameters => SplayTreeSet();
 
-  bool operator ==(dynamic other) =>
-      (other is Number) && this.value == other.value;
+  bool operator ==(dynamic other) => (other is Number) && value == other.value;
 
   @override
   BSFunction get approx => n(value);

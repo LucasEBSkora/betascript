@@ -36,7 +36,7 @@ ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
   methods.addMethodsInColumn(
       [Interval, RosterSet, BuilderSet, IntensionalSetIntersection], SetUnion,
       (BSSet first, SetUnion second) {
-    List<BSSet> _new = List.from(second.subsets);
+    List<BSSet> _new = second.subsets.toList();
     _new.add(first);
     //Delegates to the SetUnion factory function for simplifications
     return SetUnion(_new);
@@ -65,7 +65,7 @@ ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
   });
 
   methods.addMethod(SetUnion, SetUnion, (SetUnion first, SetUnion second) {
-    List<BSSet> _new = List.from(first.subsets);
+    List<BSSet> _new = first.subsets.toList();
     _new.addAll(second.subsets);
     //Delegates to the SetUnion factory function for simplifications
     return SetUnion(_new);
