@@ -14,7 +14,8 @@ BSFunction arcsin(BSFunction operand) {
 }
 
 class ArcSin extends singleOperandFunction {
-  ArcSin._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArcSin._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

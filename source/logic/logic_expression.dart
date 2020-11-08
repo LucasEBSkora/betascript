@@ -6,6 +6,7 @@ import '../βs_function/βs_calculus.dart';
 ///A class used to REPRESENT a logic expression and to check if a set of values solves it, but not necessarily to solve them
 abstract class LogicExpression {
   //Remember that betascript follows a "false negatives over false positives": if betascript isn't sure, it will say no, and only say yes when absolutely sure
+  const LogicExpression();
 
   ///checks if an expression is always true (so that comparisons between numbers aren't represented by trees when they could be a boolean)
   bool get alwaysTrue => false;

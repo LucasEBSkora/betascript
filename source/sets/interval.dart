@@ -32,6 +32,7 @@ class Interval extends BSSet {
   const Interval.closed(this.a, this.b)
       : this.leftClosed = true,
         this.rightClosed = true;
+
   const Interval.open(this.a, this.b)
       : this.leftClosed = false,
         this.rightClosed = false;

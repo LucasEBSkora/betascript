@@ -7,7 +7,7 @@ import '../βs_function/βs_calculus.dart';
 class Constant extends LogicExpression {
   final bool value;
 
-  Constant(this.value);
+  const Constant(this.value);
 
   bool get alwaysTrue => value;
   bool get alwaysFalse => !value;

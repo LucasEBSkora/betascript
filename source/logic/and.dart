@@ -21,7 +21,7 @@ class And extends LogicExpression {
   final LogicExpression left;
   final LogicExpression right;
 
-  And(this.left, this.right);
+  const And(this.left, this.right);
 
   bool get alwaysTrue => left.alwaysTrue && right.alwaysTrue;
 

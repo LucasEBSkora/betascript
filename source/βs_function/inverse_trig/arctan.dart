@@ -13,7 +13,8 @@ BSFunction arctan(BSFunction operand) {
 }
 
 class ArcTan extends singleOperandFunction {
-  ArcTan._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArcTan._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

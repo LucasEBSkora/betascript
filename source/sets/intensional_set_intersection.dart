@@ -6,7 +6,7 @@ class IntensionalSetIntersection extends BSSet {
   final BSSet first;
   final BSSet second;
 
-  IntensionalSetIntersection(this.first, this.second);
+  const IntensionalSetIntersection(this.first, this.second);
 
   @override
   bool belongs(BSFunction x) => first.belongs(x) && second.belongs(x);

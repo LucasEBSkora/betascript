@@ -14,7 +14,8 @@ BSFunction arcosh(BSFunction operand) {
 }
 
 class ArCosH extends singleOperandFunction {
-  ArCosH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArCosH._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

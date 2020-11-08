@@ -13,7 +13,8 @@ BSFunction sech(BSFunction operand) {
 }
 
 class SecH extends singleOperandFunction {
-  SecH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const SecH._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

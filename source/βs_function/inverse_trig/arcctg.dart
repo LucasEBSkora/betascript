@@ -13,7 +13,8 @@ BSFunction arcctg(BSFunction operand) {
 }
 
 class ArcCtg extends singleOperandFunction {
-  ArcCtg._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArcCtg._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

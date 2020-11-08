@@ -10,7 +10,7 @@ class BSClass implements BSCallable {
   final BSClass _superclass;
   final HashMap<String, UserRoutine> _methods;
 
-  BSClass(this.name, this._superclass, this._methods);
+  const BSClass(this.name, this._superclass, this._methods);
 
   @override
   String toString() => name;

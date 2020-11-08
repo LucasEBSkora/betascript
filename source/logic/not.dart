@@ -12,7 +12,7 @@ LogicExpression not(LogicExpression operand) {
 class Not extends LogicExpression {
   final LogicExpression operand;
 
-  Not(this.operand);
+  const Not(this.operand);
 
   bool get alwaysTrue => operand.alwaysFalse;
 

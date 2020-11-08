@@ -13,7 +13,8 @@ BSFunction tanh(BSFunction operand) {
 }
 
 class TanH extends singleOperandFunction {
-  TanH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const TanH._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

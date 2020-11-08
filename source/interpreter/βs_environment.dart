@@ -6,7 +6,7 @@ import 'βs_interpreter.dart';
 //In essence, an Environment is the implementation of a scope.
 class Environment {
   ///Stores variable names and values
-  final HashMap<String, Object> values = HashMap();
+  final HashMap<String, Object> values = HashMap<String, Object>();
 
   ///Represents the enclosing Environment (scope)
   final Environment enclosing;

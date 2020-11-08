@@ -27,7 +27,7 @@ BSSet rosterSet(Iterable<BSFunction> elements) {
 class RosterSet extends BSSet {
   final SplayTreeSet<BSFunction> elements;
 
-  RosterSet(this.elements);
+  const RosterSet(this.elements);
 
   @override
   bool belongs(BSFunction x) => elements.contains(x);

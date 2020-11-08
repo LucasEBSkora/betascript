@@ -13,7 +13,8 @@ BSFunction artanh(BSFunction operand) {
 }
 
 class ArTanH extends singleOperandFunction {
-  ArTanH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArTanH._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

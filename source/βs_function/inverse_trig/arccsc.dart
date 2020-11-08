@@ -14,7 +14,8 @@ BSFunction arccsc(BSFunction operand) {
 }
 
 class ArcCsc extends singleOperandFunction {
-  ArcCsc._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArcCsc._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

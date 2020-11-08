@@ -9,7 +9,7 @@ class UserRoutine implements BSCallable {
   final Environment _closure;
   final bool _isInitializer;
 
-  UserRoutine(this._declaration, this._closure, this._isInitializer);
+  const UserRoutine(this._declaration, this._closure, this._isInitializer);
 
   @override
   int get arity => _declaration.parameters.length;

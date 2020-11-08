@@ -22,7 +22,7 @@ class Log extends BSFunction {
   final BSFunction base;
   final BSFunction operand;
 
-  Log._(this.operand, this.base, [Set<Variable> params]) : super(params);
+  const Log._(this.operand, this.base, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) {

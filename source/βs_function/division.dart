@@ -37,7 +37,7 @@ class Division extends BSFunction {
   final BSFunction numerator;
   final BSFunction denominator;
 
-  Division._(this.numerator, this.denominator, [Set<Variable> params])
+  const Division._(this.numerator, this.denominator, [Set<Variable> params])
       : super(params);
 
   @override

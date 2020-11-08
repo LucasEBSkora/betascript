@@ -21,7 +21,7 @@ class Or extends LogicExpression {
   final LogicExpression left;
   final LogicExpression right;
 
-  Or(this.left, this.right);
+  const Or(this.left, this.right);
 
   bool get alwaysTrue => left.alwaysTrue || right.alwaysTrue;
 

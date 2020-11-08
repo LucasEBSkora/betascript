@@ -13,7 +13,8 @@ BSFunction arctgh(BSFunction operand) {
 }
 
 class ArCtgH extends singleOperandFunction {
-  ArCtgH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArCtgH._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

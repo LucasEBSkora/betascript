@@ -25,7 +25,7 @@ BSFunction add(List<BSFunction> operands) {
 class Sum extends BSFunction {
   final List<BSFunction> operands;
 
-  Sum._(this.operands, params) : super(params);
+  const Sum._(this.operands, params) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

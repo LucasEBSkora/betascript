@@ -19,7 +19,7 @@ BSFunction abs(BSFunction operand) {
 class AbsoluteValue extends BSFunction {
   final BSFunction operand;
 
-  AbsoluteValue._(this.operand, [Set<Variable> params]) : super(params);
+  const AbsoluteValue._(this.operand, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>

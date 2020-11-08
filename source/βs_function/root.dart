@@ -17,7 +17,7 @@ BSFunction root(BSFunction operand) {
 class Root extends BSFunction {
   final BSFunction operand;
 
-  Root._(this.operand, [Set<Variable> params]) : super(params);
+  const Root._(this.operand, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

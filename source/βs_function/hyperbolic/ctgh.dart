@@ -13,7 +13,8 @@ BSFunction ctgh(BSFunction operand) {
 }
 
 class CtgH extends singleOperandFunction {
-  CtgH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const CtgH._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

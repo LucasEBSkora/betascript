@@ -15,7 +15,7 @@ BSFunction negative(BSFunction op) {
 class Negative extends BSFunction {
   final BSFunction operand;
 
-  Negative._(this.operand, [Set<Variable> params]) : super(params);
+  const Negative._(this.operand, [Set<Variable> params]) : super(params);
 
   const Negative(this.operand) : super(null);
 

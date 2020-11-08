@@ -5,13 +5,13 @@ import 'package:meta/meta.dart';
 import 'logic_expression.dart';
 import '../sets/sets.dart';
 import '../solvers/single_variable_solver.dart';
-import '../utils/tuples.dart';
 import '../βs_function/βs_calculus.dart';
 
 ///A class that represents an equation or inequality
 abstract class Comparison extends LogicExpression {
   final BSFunction left;
   final BSFunction right;
+
   Comparison(this.left, this.right);
 
   bool compare(num _left, num _right);
@@ -94,7 +94,7 @@ abstract class Comparison extends LogicExpression {
   }
 
   bool _foundEverySolution = false;
-  //TODO: calling this without calling solution first will do dumb-dumb - VERY BAD
+  //TODO: calling this without calling solution first will do dumb-dumb - VERY BAD. Also stops it from being const
   @override
   bool get foundEverySolution => _foundEverySolution;
 }

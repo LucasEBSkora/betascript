@@ -82,7 +82,7 @@ BSFunction multiply(List<BSFunction> operands) {
 class Multiplication extends BSFunction {
   final List<BSFunction> operands;
 
-  Multiplication(this.operands, [Set<Variable> params]) : super(params);
+  const Multiplication(this.operands, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) {

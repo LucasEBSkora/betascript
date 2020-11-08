@@ -13,7 +13,8 @@ BSFunction cosh(BSFunction operand) {
 }
 
 class CosH extends singleOperandFunction {
-  CosH._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const CosH._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

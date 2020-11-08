@@ -6,7 +6,7 @@ class NativeCallable implements BSCallable {
   final int _arity;
   final Function _function;
 
-  NativeCallable(this._arity, this._function);
+  const NativeCallable(this._arity, this._function);
 
   @override
   int get arity => _arity;

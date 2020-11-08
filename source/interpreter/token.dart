@@ -66,12 +66,13 @@ enum TokenType {
 
 class Token {
   final TokenType type;
-  final String lexeme; //the source string that generated this lexeme
-  final dynamic
-      literal; //the literal value of the Token. Only initialized for number and string literals.
+  //the source string that generated this lexeme
+  final String lexeme;
+  //the literal value of the Token. Only initialized for number and string literals.
+  final dynamic literal;
   final int line;
 
-  Token(this.type, this.lexeme, this.literal, this.line);
+  const Token(this.type, this.lexeme, this.literal, this.line);
 
   @override
   String toString() => "$type '$lexeme' $literal";

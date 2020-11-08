@@ -13,7 +13,8 @@ BSFunction sin(BSFunction operand) {
 }
 
 class Sin extends singleOperandFunction {
-  Sin._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const Sin._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

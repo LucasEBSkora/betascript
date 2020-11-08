@@ -10,7 +10,7 @@ Variable variable(String name, [Set<Variable> params]) =>
 class Variable extends BSFunction implements Comparable {
   final String name;
 
-  Variable._(this.name, params) : super(params);
+  const Variable._(this.name, Set<Variable> params) : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

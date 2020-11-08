@@ -15,6 +15,7 @@ abstract class StmtVisitor {
 }
 
 abstract class Stmt {
+  const Stmt();
   dynamic accept(StmtVisitor v);
 }
 
@@ -22,7 +23,7 @@ class ExpressionStmt extends Stmt {
   ///Expression statements are basically wrappers for Expressions
   final Expr expression;
 
-  ExpressionStmt(this.expression);
+  const ExpressionStmt(this.expression);
   dynamic accept(StmtVisitor v) => v.visitExpressionStmt(this);
 }
 
@@ -30,7 +31,7 @@ class PrintStmt extends Stmt {
   ///print statements evaluate and then print their expressions
   final Expr expression;
 
-  PrintStmt(this.expression);
+  const PrintStmt(this.expression);
   dynamic accept(StmtVisitor v) => v.visitPrintStmt(this);
 }
 
@@ -44,7 +45,7 @@ class VarStmt extends Stmt {
   ///If the variable is initialized on declaration, the inicializer is stored here
   final Expr initializer;
 
-  VarStmt(this.name, this.parameters, this.initializer);
+  const VarStmt(this.name, this.parameters, this.initializer);
   dynamic accept(StmtVisitor v) => v.visitVarStmt(this);
 }
 
@@ -52,7 +53,7 @@ class BlockStmt extends Stmt {
   ///A block contains a sequence of Statements, being basically a region of code with specific scope
   final List<Stmt> statements;
 
-  BlockStmt(this.statements);
+  const BlockStmt(this.statements);
   dynamic accept(StmtVisitor v) => v.visitBlockStmt(this);
 }
 
@@ -66,7 +67,7 @@ class IfStmt extends Stmt {
   ///
   final Stmt elseBranch;
 
-  IfStmt(this.condition, this.thenBranch, this.elseBranch);
+  const IfStmt(this.condition, this.thenBranch, this.elseBranch);
   dynamic accept(StmtVisitor v) => v.visitIfStmt(this);
 }
 
@@ -80,7 +81,7 @@ class RoutineStmt extends Stmt {
   ///The routine body
   final List<Stmt> body;
 
-  RoutineStmt(this.name, this.parameters, this.body);
+  const RoutineStmt(this.name, this.parameters, this.body);
   dynamic accept(StmtVisitor v) => v.visitRoutineStmt(this);
 }
 
@@ -94,7 +95,7 @@ class WhileStmt extends Stmt {
   ///
   final Stmt body;
 
-  WhileStmt(this.token, this.condition, this.body);
+  const WhileStmt(this.token, this.condition, this.body);
   dynamic accept(StmtVisitor v) => v.visitWhileStmt(this);
 }
 
@@ -105,7 +106,7 @@ class ReturnStmt extends Stmt {
   ///The expression whose value should be returned
   final Expr value;
 
-  ReturnStmt(this.keyword, this.value);
+  const ReturnStmt(this.keyword, this.value);
   dynamic accept(StmtVisitor v) => v.visitReturnStmt(this);
 }
 
@@ -119,7 +120,7 @@ class ClassStmt extends Stmt {
   ///A list of the class' methods
   final List<RoutineStmt> methods;
 
-  ClassStmt(this.name, this.superclass, this.methods);
+  const ClassStmt(this.name, this.superclass, this.methods);
   dynamic accept(StmtVisitor v) => v.visitClassStmt(this);
 }
 
@@ -130,6 +131,6 @@ class DirectiveStmt extends Stmt {
   ///the directive being issued
   final String directive;
 
-  DirectiveStmt(this.token, this.directive);
+  const DirectiveStmt(this.token, this.directive);
   dynamic accept(StmtVisitor v) => v.visitDirectiveStmt(this);
 }

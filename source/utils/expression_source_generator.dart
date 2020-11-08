@@ -223,7 +223,7 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
   source += "}\n";
 
   source +=
-      "\nabstract class $fileName {\n  dynamic accept($visitorClassName v);\n}\n\n";
+      "\nabstract class $fileName {\n  const $fileName();\n  dynamic accept($visitorClassName v);\n}\n\n";
 
   for (NodeType e in types) {
     String className = e.name + fileName;
@@ -233,7 +233,7 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
       source += "  final ${field[0]} ${field[1]};\n\n";
     }
 
-    source += '  $className(';
+    source += '  const $className(';
     int i;
     for (i = 0; i < e.fields.length - 1; ++i)
       source += "this.${e.fields[i][1]}, ";

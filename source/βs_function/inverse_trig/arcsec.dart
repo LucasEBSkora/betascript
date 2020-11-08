@@ -15,7 +15,8 @@ BSFunction arcsec(BSFunction operand) {
 }
 
 class ArcSec extends singleOperandFunction {
-  ArcSec._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArcSec._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {

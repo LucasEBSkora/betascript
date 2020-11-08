@@ -6,7 +6,7 @@ import 'βs_interpreter.dart' show RuntimeError;
 
 class BSInstance {
   final BSClass _class;
-  final HashMap<String, Object> _fields = HashMap();
+  final HashMap<String, Object> _fields = HashMap<String, Object>();
 
   BSInstance(this._class);
 

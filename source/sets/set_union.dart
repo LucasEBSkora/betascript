@@ -61,7 +61,7 @@ BSSet setUnion(Iterable<BSSet> subsets) {
 class SetUnion extends BSSet {
   final List<BSSet> subsets;
 
-  SetUnion(this.subsets);
+  const SetUnion(this.subsets);
 
   @override
   bool belongs(BSFunction x) {

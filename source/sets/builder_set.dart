@@ -18,7 +18,7 @@ class BuilderSet extends BSSet {
   final List<Variable> parameters;
   final LogicExpression rule;
 
-  BuilderSet(this.rule, this.parameters);
+  const BuilderSet(this.rule, this.parameters);
 
   @override
   bool belongs(BSFunction x) =>

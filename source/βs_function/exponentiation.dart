@@ -23,7 +23,7 @@ class Exponentiation extends BSFunction {
   final BSFunction base;
   final BSFunction exponent;
 
-  Exponentiation._(this.exponent, this.base, [Set<Variable> params])
+  const Exponentiation._(this.exponent, this.base, [Set<Variable> params])
       : super(params);
 
   @override

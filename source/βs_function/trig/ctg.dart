@@ -13,7 +13,8 @@ BSFunction ctg(BSFunction operand) {
 }
 
 class Ctg extends singleOperandFunction {
-  Ctg._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const Ctg._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>

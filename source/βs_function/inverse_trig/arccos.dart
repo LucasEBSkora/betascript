@@ -14,7 +14,8 @@ BSFunction arccos(BSFunction operand) {
 }
 
 class ArcCos extends singleOperandFunction {
-  ArcCos._(BSFunction operand, [Set<Variable> params]) : super(operand, params);
+  const ArcCos._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
