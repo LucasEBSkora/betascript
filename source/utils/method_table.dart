@@ -3,18 +3,18 @@ import 'dart:collection' show HashMap;
 import 'package:meta/meta.dart';
 
 ///Used to effitiently store operations between subtypes of a type
-class MethodTable<return_TYPE, DATA_TYPE> {
+class MethodTable<R, D> {
   @protected
   final HashMap<String, Function> hashMap = HashMap();
 
   MethodTable();
 
-  //Can't really stop anyone from adding a type which doesn't extend DATA_TYPE
-  //or a method which isn't defined in two DATA_TYPE variables or doesn't return return_TYPE
+  //Can't really stop anyone from adding a type which doesn't extend D
+  //or a method which isn't defined in two D variables or doesn't return R
   void addMethod(Type t1, Type t2, Function method) =>
       hashMap[t1.toString() + t2.toString()] = method;
 
-  return_TYPE call(DATA_TYPE first, DATA_TYPE second) =>
+  R call(D first, D second) =>
       findMethod(first.runtimeType, second.runtimeType)(first, second);
 
   ///adds the same method for many cells in the same line
@@ -33,14 +33,14 @@ class MethodTable<return_TYPE, DATA_TYPE> {
       if (!hashMap.containsKey(t1.toString() + t2.toString())) {
         throw UnimplementedError();
       } else {
-        throw e;
+        rethrow;
       }
     }
   }
 }
 
-class ComutativeMethodTable<return_TYPE, DATA_TYPE>
-    extends MethodTable<return_TYPE, DATA_TYPE> {
+class ComutativeMethodTable<R, D>
+    extends MethodTable<R, D> {
   @override
   void addMethod(Type t1, Type t2, Function method) {
     super.addMethod(t1, t2, method);

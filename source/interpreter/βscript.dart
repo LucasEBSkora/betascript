@@ -11,8 +11,10 @@ class BetaScript {
   static bool hadRuntimeError = false;
   static BSInterpreter _interpreter = BSInterpreter();
 
-  ///The callback used when the function 'print' is called. Might print to a string (web version), to a file (not yet implemented) or to the console
-  static Function printCallback;
+  ///The callback used when a print statement is used. 
+  ///Might print to a string (web version), 
+  ///to a file (not yet implemented) or to the console.
+  static void Function(Object) printCallback;
 
   static void runFile(String path) {
     printCallback = print;
@@ -52,7 +54,7 @@ class BetaScript {
     _interpreter = BSInterpreter();
 
     //all print statements redirect to this function, allowing the results to be printed in the 'output' field
-    printCallback = (dynamic object) {
+    printCallback = (Object object) {
       output += object.toString() + '\n';
     };
 
@@ -76,13 +78,13 @@ class BetaScript {
     _interpreter.interpret(statements);
   }
 
-  static void error(dynamic value, String message) {
+  static void error(Object value, String message) {
     if (value is int) {
       _errorAtLine(value, message);
     } else if (value is Token) {
       _errorAtToken(value, message);
     } else {
-      _report(-1, "at unknown location: '${value}'", message);
+      _report(-1, "at unknown location: '$value'", message);
     }
   }
 

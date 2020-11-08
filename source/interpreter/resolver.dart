@@ -162,9 +162,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
     _resolveExpr(e.right);
   }
 
-  void resolveAll(List<Stmt> statements) {
-    for (var s in statements) _resolveStmt(s);
-  }
+  void resolveAll(List<Stmt> statements) => statements.forEach(_resolveStmt);
 
   void _resolveStmt(Stmt s) => s.accept(this);
   void _resolveExpr(Expr e) => e.accept(this);

@@ -27,7 +27,7 @@ abstract class BSSet {
 
   const BSSet();
 
-  ///returns R\this (this')
+  ///R\this (this')
   BSSet complement();
 
   bool belongs(BSFunction x);

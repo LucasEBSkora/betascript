@@ -852,7 +852,7 @@ class BSParser {
   }
   //Helper function corner
 
-  ///returns whether the current token's type is 'type', consuming it if it is
+  ///whether the current token's type is [type], consuming it if it is
   bool _match(TokenType type) {
     if (_check(type)) {
       _advance();
@@ -861,7 +861,7 @@ class BSParser {
     return false;
   }
 
-  ///returns true if the current token matches any in 'types', consuming it if it does
+  ///true if the current token matches any in [types], consuming it if it does
   bool _matchAny(List<TokenType> types) {
     for (var type in types) {
       if (_match(type)) return true;
@@ -869,13 +869,13 @@ class BSParser {
     return false;
   }
 
-  ///returns whether the current token's type matches 'type'
+  ///whether the current token's type matches [type]
   bool _check(TokenType type) {
     if (_isAtEnd()) return false;
     return _peek().type == type;
   }
 
-  ///_check for many types
+  ///[_check] for many types
   bool _checkAny(List<TokenType> types) {
     if (_isAtEnd()) return false;
     return types.contains(_peek().type);
@@ -888,17 +888,18 @@ class BSParser {
     return _previous();
   }
 
-  ///returns whether current token is the last one
+  ///whether current token is the last one
   ///not adding the eof token would simply mean checking _current >= _tokens.length
   bool _isAtEnd() => _peek().type == TokenType.EOF;
 
-  ///returns the current token without consuming it
+  ///the current token without consuming it
   Token _peek() => _tokens[_current];
 
   ///return the token immediately before _current
   Token _previous() => _tokens[_current - 1];
 
-  ///checks if the current token matches 'type' and consumes it, if it doesn't, causes an error
+  ///checks if the current token matches [type] and consumes it.
+  ///If it doesn't, causes an error
   Token _consume(TokenType type, String message) {
     if (_check(type)) return _advance();
 
@@ -917,13 +918,15 @@ class BSParser {
     return null;
   }
 
-  ///Reports an error to the general interpreter and creates a ParseError without necessarily throwing it
+  ///Reports an error to the general interpreter and creates a [ParseError] without
+  /// necessarily throwing it
   ParseError _error(Token token, String message) {
     BetaScript.error(token, message);
     return ParseError();
   }
 
-  ///When a syntax error is found, ignores the rest of the current expression by moving _current forward
+  ///When a syntax error is found, ignores the rest of the current expression by 
+  ///moving [_current] forward
   void _synchronize() {
     _advance();
 

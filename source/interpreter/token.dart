@@ -69,7 +69,7 @@ class Token {
   //the source string that generated this lexeme
   final String lexeme;
   //the literal value of the Token. Only initialized for number and string literals.
-  final dynamic literal;
+  final Object literal;
   final int line;
 
   const Token(this.type, this.lexeme, this.literal, this.line);

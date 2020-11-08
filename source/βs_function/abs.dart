@@ -30,7 +30,7 @@ class AbsoluteValue extends BSFunction {
       (sgn(operand) * operand.derivativeInternal(v));
 
   @override
-  String toString([bool handleMinus = true]) => "|${operand}|";
+  String toString() => "|$operand|";
 
   @override
   BSFunction copy([Set<Variable> params]) => AbsoluteValue._(operand, params);

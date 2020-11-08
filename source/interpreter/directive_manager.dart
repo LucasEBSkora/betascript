@@ -1,7 +1,7 @@
 class DirectiveManager {
   ///directives are commands that can affect how the rest of the program is run. Some take effect anywhere in the code (global directives),
   ///and others only affect the code after them (local directives)
-  final Map<String, Object> _globalDirectives = const {
+  final Map<String, Object> _globalDirectives =  {
     //if this directive is activated, the program will run with twitter restrictions, which means while and for loops, as well as defining
     //and calling routines and creating classes is forbidden, to avoid endless loops blocking the bot
     "bs_tt_interpret": false,
@@ -21,7 +21,7 @@ class DirectiveManager {
     }
   }
 
-  ///returns wheter the directive was set
+  ///wheter the directive was set
   bool setIfGlobal(String dir, Object value) {
     if (isGlobal(dir)) {
       _globalDirectives[dir] = value;

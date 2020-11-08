@@ -37,7 +37,7 @@ class Variable extends BSFunction implements Comparable {
   BSFunction get approx => this;
 
   @override
-  int compareTo(dynamic other) {
+  int compareTo(Object other) {
     if (other is Variable) {
       return name.compareTo(other.name);
     } else

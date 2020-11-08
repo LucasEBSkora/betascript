@@ -6,7 +6,7 @@ import 'variable.dart';
 import 'βs_function.dart';
 
 BSFunction n(num value) {
-  if (value < 0) return negative(Number._(value.abs(), null));
+  if (value < 0) return negative(Number._(value.abs()));
   return Number._(value);
 }
 
@@ -14,9 +14,9 @@ BSFunction namedNumber(num absValue, String name) =>
     Number._named(absValue, name);
 
 class constants {
-  static const Number e = Number._named(math.e, 'e', null);
-  static const Number pi = Number._named(math.pi, 'π', null);
-  static const Number infinity = Number._named(double.infinity, '∞', null);
+  static const Number e = Number._named(math.e, 'e');
+  static const Number pi = Number._named(math.pi, 'π');
+  static const Number infinity = Number._named(double.infinity, '∞');
   static const Negative negativeInfinity = Negative(infinity);
 }
 
@@ -38,7 +38,8 @@ class Number extends BSFunction {
         isInt = (absvalue is int),
         super(params);
 
-  ///creates a name from the number, but if it can be cast to a int, does it (so 1.0 is displayed as 1)
+  ///creates a name from the number, but if it can be cast to a int, 
+  ///does it (so 1.0 is displayed as 1)
   static String _makeName(num value) {
     if (value == value.toInt()) {
       return value.toInt().abs().toString();
@@ -48,7 +49,7 @@ class Number extends BSFunction {
   }
 
   @override
-  String toString([bool handleMinus = true]) => name;
+  String toString() => name;
 
   @override
   BSFunction derivativeInternal(Variable v) => n(0);
@@ -70,7 +71,7 @@ class Number extends BSFunction {
   @override
   SplayTreeSet<Variable> get defaultParameters => SplayTreeSet();
 
-  bool operator ==(dynamic other) => (other is Number) && value == other.value;
+  bool operator ==(Object other) => (other is Number) && value == other.value;
 
   @override
   BSFunction get approx => n(value);

@@ -34,7 +34,7 @@ abstract class BSFunction implements BSCallable {
   ///Returns the function with all possible aproximations made.
   BSFunction get approx;
 
-  //Returns the partial derivative of this in relation to v
+  ///Returns the partial derivative of this in relation to [v]
   BSFunction derivative(Variable v) => _merge(derivativeInternal(v), this);
 
   ///If there is a custom set of parameters, returns it. If there isn't, returns the default one
@@ -65,9 +65,15 @@ abstract class BSFunction implements BSCallable {
 
   BSFunction operator /(BSFunction other) => divide([this], [other]);
 
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
       (other is BSFunction) && toString() == other.toString();
 
+  //very lazy but works
+  int get hashCode => toString().hashCode;
+
+  ///if both values are transformable to numbers (functions without parameters), 
+  ///returns them in a pair as numbers. If either doesn't, throws an error, if the name of the operation
+  ///is passed, or returns null otherwise.
   static Pair<num, num> toNums(BSFunction a, BSFunction b, [String op]) {
     final _a = BSFunction.extractFromNegative<Number>(a);
     final _b = BSFunction.extractFromNegative<Number>(b);

@@ -18,7 +18,7 @@ class Constant extends LogicExpression {
 
   bool everyElementIsSolution(BSSet s) => value;
 
-  ///returns a set with every solution betascript can find
+  ///a set with every solution ΒScript can find
   BSSet get solution => (value) ? BSSet.R : emptySet;
 
   @override

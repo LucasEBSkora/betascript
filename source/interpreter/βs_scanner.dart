@@ -8,7 +8,7 @@ import '../βs_function/number.dart';
 class BSScanner {
   final String _source;
   final List<Token> _tokens = new List();
-  HashMap<String, Function> _charToLexeme; //see _initializeMap
+  HashMap<String, void Function()> _charToLexeme; //see _initializeMap
 
   //_start is the start of the lexeme currently being read, and _current the current value being processed.
   int _start = 0;
@@ -54,9 +54,9 @@ class BSScanner {
 
   bool _isAtEnd() => _current >= _source.length;
 
-  ///initializes the map used to replace a big ugly switch-case block in _scanToken
+  ///initializes the map used to replace a big ugly switch-case block in [_scanToken]
   void _initializeMap() {
-    _charToLexeme = HashMap.from({
+    _charToLexeme = HashMap<String, void Function()>.from({
       //these lexemes are always single character, and can be initialized with ease
       '(': () => _addToken(TokenType.leftParentheses),
       ')': () => _addToken(TokenType.rightParentheses),
@@ -170,7 +170,7 @@ class BSScanner {
     });
   }
 
-  ///scans a single token.
+  ///scans a single [Token].
   void _scanToken() {
     //gets the next character, consuming it (by moving _current forward)
     final c = _advance();
@@ -222,13 +222,14 @@ class BSScanner {
     "union": TokenType.union,
   };
 
-  ///creates a new token, using the interval from _start to _current as the token's lexeme.
-  void _addToken(TokenType type, [dynamic literal]) {
+  ///creates a new [Token], using the interval from [_start] to [_current] as the token's lexeme.
+  void _addToken(TokenType type, [Object literal]) {
     var text = _source.substring(_start, _current);
-    _tokens.add(new Token(type, text, literal, _line));
+    _tokens.add(Token(type, text, literal, _line));
   }
 
-  ///checks if the character at _current matches s (used mainly with multi-character operands). If it does, consumes it.
+  ///checks if the character at [_current] matches [s] 
+  ///(used mainly with multi-character operands). If it does, consumes it.
   bool _match(String s) {
     if (_isAtEnd()) return false;
     if (_source[_current] != s) return false;
@@ -237,10 +238,12 @@ class BSScanner {
     return true;
   }
 
-  ///basically, _advance without actually advancing. Used to check if a literal or identifier has ended.
+  ///basically, [_advance] without actually advancing. 
+  ///Used to check if a literal or identifier has ended.
   String _peek() => (_isAtEnd()) ? null : _source[_current];
 
-  ///having identified the beginning of a string literal, this function reads the rest of it.
+  ///having identified the beginning of a string literal, 
+  ///this function reads the rest of it.
   void _string() {
     while (_peek() != '"' && !_isAtEnd()) {
       //looks for the end of the literal
@@ -296,7 +299,7 @@ class BSScanner {
       ? null
       : _source.substring(_current + 1, _current + 2);
 
-  ///having found the start of a identifier, reads the rest of it and adds it to _tokens.
+  ///having found the start of a identifier, reads the rest of it and adds it to [_tokens].
   void _identifier() {
     //keeps going while it finds numbers (even though it can't start with a number)
     while (!_isAtEnd() && _isExpandedAlphanumeric(_peek())) _advance();
@@ -308,7 +311,7 @@ class BSScanner {
         (_keywords.containsKey(text)) ? _keywords[text] : TokenType.identifier);
   }
 
-  ///returns whether the character c is a underscore or a latin alphabet letter.
+  ///whether the character [c] is a underscore or a latin alphabet letter.
   static bool _isAlpha(String c) =>
       ((c?.length ?? 0) == 1) &&
       (c == "_" ||
@@ -324,15 +327,18 @@ class BSScanner {
 
   static bool _isMathSymbol(String c) => false;
 
-  //returns true if character is from the latin or greek alphabets, or if it is a valid mathematical symbol
+  ///returns true if [c] is from the latin or greek alphabets, 
+  ///or if it is a valid mathematical symbol
   static bool _isValidCharacter(String c) =>
       _isAlpha(c) || _isGreek(c) || _isMathSymbol(c);
 
-  ///returns true if the character c is a digit, from the latin or greek alphabets, or if it is a valid mathematical symbol
+  ///true if [c] is a digit, from the latin or greek alphabets, 
+  ///or if it is a valid mathematical symbol
   static bool _isExpandedAlphanumeric(String c) =>
       _isValidCharacter(c) || _IsDigit(c);
 
-  ///does the same as _identifier, but for directives, which are basically any string of characters ending in whitespace
+  ///does the same as [_identifier], but for directives, 
+  ///which are basically any string of characters ending in whitespace
   void _directive() {
     while (!_isWhitespace(_peek()) && !_isAtEnd()) _advance();
     _addToken(TokenType.hash, _source.substring(_start + 1, _current));

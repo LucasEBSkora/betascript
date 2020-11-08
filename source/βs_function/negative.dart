@@ -33,7 +33,7 @@ class Negative extends BSFunction {
   BSFunction derivativeInternal(Variable v) => negative(operand.derivative(v));
 
   @override
-  String toString([bool handleMinus = true]) => "-${operand}";
+  String toString() => "-$operand";
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>

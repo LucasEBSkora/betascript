@@ -5,7 +5,7 @@ import '../logic/logic.dart';
 import '../βs_function/variable.dart';
 import '../βs_function/βs_function.dart';
 
-BSSet builderSet(LogicExpression rule, List<Variable> parameters) {
+BSSet builderSet(LogicExpression rule, [List<Variable> parameters]) {
   final sol = rule.solution;
   if (rule.foundEverySolution) {
     return sol;

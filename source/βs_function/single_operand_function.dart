@@ -3,7 +3,8 @@ import 'dart:collection' show SplayTreeSet;
 import 'variable.dart';
 import 'βs_function.dart';
 
-///This abstract class is used to improve code reutilization in function classes that have only one operand and are printed
+///This abstract class is used to improve code reutilization in function 
+///classes that have only one operand and are printed
 ///in the following way: name('operand'), where name is the class' name
 abstract class singleOperandFunction extends BSFunction {
   final BSFunction operand;
@@ -13,7 +14,7 @@ abstract class singleOperandFunction extends BSFunction {
 
   //assumes the class name matches the function name, ignoring camel case
   @override
-  String toString([bool handleMinus = true]) =>
+  String toString() =>
       "${runtimeType.toString().toLowerCase()}($operand)";
 
   @override

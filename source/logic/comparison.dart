@@ -30,7 +30,9 @@ abstract class Comparison extends LogicExpression {
     return false;
   }
 
-  ///checks if an expression is always false(so that comparisons between numbers aren't represented by trees when they could be a boolean)
+  ///checks if an expression is always false 
+  ///(so that comparisons between numbers aren't represented by trees 
+  ///when they could be a boolean)
   bool get alwaysFalse {
     final nums = BSFunction.toNums(left.approx, right.approx);
 
@@ -45,7 +47,8 @@ abstract class Comparison extends LogicExpression {
   }
 
   ///checks if a set of values solves the expression
-  ///if the variables passed aren't suficient to evaluate the expression, simply returns false instead of throwing
+  ///if the variables passed aren't suficient to evaluate the expression, 
+  ///simply returns false instead of throwing
   bool isSolution(HashMap<String, BSFunction> p) {
     BSFunction _left, _right;
 
@@ -71,7 +74,7 @@ abstract class Comparison extends LogicExpression {
   ///Check if every element in a set is a solution (only for single variable expressions)
   bool everyElementIsSolution(BSSet s) => false;
 
-  ///returns a set with every solution betascript can find
+  ///a set with every solution ΒScript can find
   BSSet get solution {
     var solver = SingleVariableSolver(this);
     BSSet _sol = emptySet;

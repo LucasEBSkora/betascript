@@ -14,7 +14,7 @@ BSFunction sgn(BSFunction operand) {
   final _f2 = BSFunction.extractFromNegative<AbsoluteValue>(operand);
   if (_f2.second) return n(_f2.third ? -1 : 1);
 
-  return Signum._(operand, null);
+  return Signum._(operand);
 }
 
 class Signum extends BSFunction {
@@ -31,7 +31,7 @@ class Signum extends BSFunction {
   BSFunction derivativeInternal(Variable v) => n(0);
 
   @override
-  String toString([bool handleMinus = true]) => "sign($operand)";
+  String toString() => "sign($operand)";
 
   @override
   BSFunction copy([Set<Variable> params]) => Signum._(operand, params);

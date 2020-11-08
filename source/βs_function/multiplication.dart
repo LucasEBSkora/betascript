@@ -34,7 +34,7 @@ BSFunction multiply(List<BSFunction> operands) {
         ++i;
     }
 
-    if (divisions.length != 0) {
+    if (divisions.isNotEmpty) {
       final nums = <BSFunction>[...operands];
       final dens = <BSFunction>[];
 
@@ -68,7 +68,7 @@ BSFunction multiply(List<BSFunction> operands) {
 
   BSFunction _mul;
 
-  if (operands.length == 0) {
+  if (operands.isEmpty) {
     return n(0);
   } else if (operands.length == 1) {
     _mul = operands[0];
@@ -105,7 +105,7 @@ class Multiplication extends BSFunction {
       multiply(<BSFunction>[for (final f in operands) f.evaluate(p)]);
 
   @override
-  String toString([bool handleMinus = true]) {
+  String toString() {
     var s = '(';
 
     s += operands[0].toString();
@@ -131,7 +131,8 @@ class Multiplication extends BSFunction {
       multiply(<BSFunction>[for (var f in operands) f.approx]);
 }
 
-///If there are other Multiplications in the operand list, takes its operands and adds them to the list
+///If there are other [Multiplication]s in [operands], 
+///takes its operands and adds them to the list
 void _openOtherMultiplications(List<BSFunction> operands) {
   var i = 0;
   while (i < operands.length) {
@@ -147,7 +148,7 @@ void _openOtherMultiplications(List<BSFunction> operands) {
   }
 }
 
-///Returns the value of "negative" and takes all numbers be multiplied.
+///Returns the value of "negative" and makes all [Number]s be multiplied.
 bool _multiplyNumbers(List<BSFunction> operands) {
   var number = 1.0;
   var negative = false;
@@ -205,7 +206,7 @@ bool _multiplyNumbers(List<BSFunction> operands) {
     operands.insertAll(0, numbers);
 
     //if the multiplication was only numbers and the number left is 1, adds 1 to the operands.
-    if (number.abs() == 1 && operands.length == 0) operands.add(n(1));
+    if (number.abs() == 1 && operands.isEmpty) operands.add(n(1));
   }
 
   return negative;
@@ -226,7 +227,7 @@ bool _consolidateNegatives(List<BSFunction> operands) {
   return _negative;
 }
 
-///if operands can be joined as an exponentiation, does it
+///if operands can be joined as an [Exponentiation], does it
 void _createExponents(List<BSFunction> operands) {
   for (var i = 0; i < operands.length; ++i) {
     //for each operand, divides it into base and exponent, event if the exponent is 1

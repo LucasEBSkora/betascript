@@ -37,7 +37,7 @@ class Root extends BSFunction {
   }
 
   @override
-  String toString([bool handleMinus = true]) => "sqrt($operand)";
+  String toString() => "sqrt($operand)";
 
   @override
   BSFunction copy([Set<Variable> params]) => Root._(operand, params);

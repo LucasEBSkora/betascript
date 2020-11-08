@@ -37,7 +37,7 @@ int main() {
     ]),
     NodeType("Literal", [
       [
-        "dynamic",
+        "Object",
         "value",
         "Literals are numbers, strings, booleans or null. This field holds one of them."
       ],
@@ -217,13 +217,13 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
   for (NodeType e in types) {
     String className = e.name + fileName;
     source +=
-        "  dynamic visit$className($className ${fileName[0].toLowerCase()});\n";
+        "  Object visit$className($className ${fileName[0].toLowerCase()});\n";
   }
 
   source += "}\n";
 
   source +=
-      "\nabstract class $fileName {\n  const $fileName();\n  dynamic accept($visitorClassName v);\n}\n\n";
+      "\nabstract class $fileName {\n  const $fileName();\n  Object accept($visitorClassName v);\n}\n\n";
 
   for (NodeType e in types) {
     String className = e.name + fileName;
@@ -241,7 +241,7 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
     source += "this.${e.fields[i][1]});\n";
 
     source +=
-        "  dynamic accept($visitorClassName v) => v.visit$className(this);\n";
+        "  Object accept($visitorClassName v) => v.visit$className(this);\n";
 
     source += '}\n\n';
   }

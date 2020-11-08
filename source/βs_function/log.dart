@@ -46,7 +46,7 @@ class Log extends BSFunction {
   }
 
   @override
-  String toString([bool handleMinus = true]) =>
+  String toString() =>
       (base == constants.e) ? "ln($operand)" : "log($base)($operand)";
 
   @override

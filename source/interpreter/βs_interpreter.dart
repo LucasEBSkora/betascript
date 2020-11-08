@@ -13,7 +13,6 @@ import 'βs_environment.dart';
 import 'βs_instance.dart';
 import '../logic/logic.dart';
 import '../sets/sets.dart';
-import '../utils/tuples.dart';
 import '../βs_function/βs_calculus.dart';
 
 class BSInterpreter implements ExprVisitor, StmtVisitor {
@@ -43,16 +42,16 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   void _execute(Stmt stmt) => stmt.accept(this);
 
-  String _stringify(dynamic object) => object?.toString() ?? 'nil';
+  String _stringify(Object object) => object?.toString() ?? 'nil';
 
   @override
   Object visitBinaryExpr(BinaryExpr e) {
-    var leftOperand = _evaluate(e.left);
-    var rightOperand = _evaluate(e.right);
+    final leftOperand = _evaluate(e.left);
+    final rightOperand = _evaluate(e.right);
 
     //operations for functions
     if (leftOperand is BSFunction && rightOperand is BSFunction) {
-      Pair<num, num> nums = BSFunction.toNums(leftOperand, rightOperand);
+      final nums = BSFunction.toNums(leftOperand, rightOperand);
 
       //if both are numbers
       if (nums != null) {
@@ -157,16 +156,16 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   visitGroupingExpr(GroupingExpr e) => _evaluate(e.expression);
 
   @override
-  dynamic visitLiteralExpr(LiteralExpr e) => e.value;
+  Object visitLiteralExpr(LiteralExpr e) => e.value;
 
   @override
   Object visitUnaryExpr(UnaryExpr e) {
-    var operand = _evaluate(e.operand);
+    final operand = _evaluate(e.operand);
 
     switch (e.op.type) {
       case TokenType.minus:
         _checkNum(e.op, operand);
-        return -operand; //Dynamically typed language - if the conversion from operand to num fails, it is intended behavior
+        return -(operand as BSFunction); 
       case TokenType.not:
         return !_istruthy(operand);
       //"not" (!) would be here, but i decided to use it for factorials and use the "not" keyword explicitly
@@ -177,7 +176,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
             "The approximation (~) operator may only be applied to functions and builder sets");
       case TokenType.apostrophe:
         if (operand is BSFunction) {
-          var params = operand.parameters;
+          final params = operand.parameters;
           if (params.length > 1) {
             throw RuntimeError(e.op,
                 "the apostrophe operator may only be applied to functions defined in a single (or no) variables");
@@ -197,22 +196,23 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     }
   }
 
-  dynamic _evaluate(Expr e) => e.accept(this);
+  Object _evaluate(Expr e) => e.accept(this);
 
-  ///null false and emptySet are "falsy", everything else is "truthy" (isn't the value 'true' but can be used in logic as if it was)
-  static bool _istruthy(dynamic object) {
+  ///[null], [false] and [emptySet] are "falsy", everything else is "truthy" 
+  ///(isn't the value 'true' but can be used in logic as if it was)
+  static bool _istruthy(Object object) {
     if (object is bool) return object;
     return (object != null) && (object != emptySet);
   }
 
-  static _isEqual(dynamic a, dynamic b) {
+  static _isEqual(Object a, Object b) {
     if (a == null && b == null) return true; //null is only equal to null
     if (a == null || b == null) return false;
 
     return a == b;
   }
 
-  static void _checkNum(Token token, dynamic value) {
+  static void _checkNum(Token token, Object value) {
     if (!(value is BSFunction)) {
       throw RuntimeError(value, "Operand for ${token.lexeme} must be function");
     }
@@ -301,7 +301,8 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     executeBlock(s.statements, Environment(_environment));
   }
 
-  ///Parameters here are the list of statements to run and the environment in which to run them
+  ///Parameters here are the list of statements to run and 
+  ///the environment in which to run them
   void executeBlock(List<Stmt> statements, Environment environment) {
     var previous = _environment;
     try {
@@ -361,7 +362,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       for (final argument in e.arguments) _evaluate(argument)
     ];
 
-    var function = callee;
+    BSCallable function = callee;
 
     if (arguments.length != function.arity) {
       throw RuntimeError(e.paren,
@@ -393,12 +394,13 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     throw Return((s.value != null) ? _evaluate(s.value) : null);
   }
 
-  ///Adds a resolved variable from Resolver to the map
+  ///Adds a resolved variable from [Resolver] to the map
   void resolve(Expr e, int depth) {
     _locals[e] = depth;
   }
 
-  ///Retrieves a variable value from the Environment. Do remember that the resolver doesn't deal with global variables,
+  ///Retrieves a variable value from the [Environment]. Do remember that the
+  ///[Resolver] doesn't deal with global variables,
   ///which are stored directly in globals
   Object _lookUpVariable(Token name, Expr e) {
     var distance = _locals[e];
@@ -423,7 +425,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       }
     }
 
-    _environment.define(s.name.lexeme, null);
+    _environment.define(s.name.lexeme);
 
     //Creates a new closure containing super, which contains all the methods
     if (s.superclass != null) {
@@ -503,7 +505,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
             e.keyword, "Functions may only be derivated in variables");
       }
     }
-    var _value = f;
+    BSFunction _value = f;
     for (Variable v in _variables) _value = _value.derivative(v);
     return _value;
   }

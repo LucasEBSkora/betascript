@@ -47,7 +47,7 @@ class Exponentiation extends BSFunction {
   }
 
   @override
-  String toString([bool handleMinus = true]) => "(($base)^($exponent))";
+  String toString() => "(($base)^($exponent))";
 
   BSFunction copy([Set<Variable> params]) =>
       Exponentiation._(exponent, base, params);

@@ -17,7 +17,7 @@ BSFunction divide(
 
   BSFunction numerator = multiply(numeratorList);
 
-  if (denominatorList.length == 0) return numerator;
+  if (denominatorList.isEmpty) return numerator;
 
   BSFunction denominator = multiply(denominatorList);
 
@@ -69,7 +69,7 @@ class Division extends BSFunction {
   }
 
   @override
-  String toString([bool handleMinus = true]) => "(($numerator)/($denominator))";
+  String toString() => "(($numerator)/($denominator))";
 
   @override
   BSFunction copy([Set<Variable> params]) =>
@@ -102,7 +102,8 @@ class Division extends BSFunction {
   }
 }
 
-///Cancels out identical factors in the numerator and denominator lists, also opening exponentiations when possible
+///Cancels out identical factors in [numerator] and [denominator] 
+///, also opening exponentiations when possible
 void _eliminateDuplicates(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {
   for (var i = 0; i < numeratorList.length; ++i) {
@@ -208,7 +209,7 @@ void _openMultiplicationsAndDivisions(
   }
 }
 
-///if operands can be joined as an exponentiation, does it
+///if operands can be joined as an [Exponentiation], does it
 void _createExponents(List<BSFunction> operands) {
   for (var i = 0; i < operands.length; ++i) {
     //for each operand, divides it into base and exponent, event if the exponent is 1

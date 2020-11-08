@@ -13,19 +13,19 @@ BSFunction add(List<BSFunction> operands) {
   _openOtherSums(operands);
   _SumNumbers(operands);
   _createMultiplications(operands);
-  if (operands.length == 0) {
+  if (operands.isEmpty) {
     return n(0);
   } else if (operands.length == 1) {
     return operands[0];
   } else {
-    return Sum._(operands, null);
+    return Sum._(operands);
   }
 }
 
 class Sum extends BSFunction {
   final List<BSFunction> operands;
 
-  const Sum._(this.operands, params) : super(params);
+  const Sum._(this.operands, [Set<Variable> params]) : super(params);
 
   @override
   BSFunction derivativeInternal(Variable v) =>
@@ -36,7 +36,7 @@ class Sum extends BSFunction {
       add(operands.map((BSFunction f) => f.evaluate(p)).toList());
 
   @override
-  String toString([bool handleMinus = true]) {
+  String toString() {
     var s = '(';
 
     s += operands[0].toString();
@@ -69,7 +69,8 @@ class Sum extends BSFunction {
       add(<BSFunction>[for (final f in operands) f.approx]);
 }
 
-///If the List passed already has Sums in it, removes the Sum and adds its operators to the list
+///If the List passed already has [Sum]s in it, removes the [Sum] and adds its
+/// operators to the list
 void _openOtherSums(List<BSFunction> operands) {
   var i = 0;
   while (i < operands.length) {
@@ -95,7 +96,8 @@ void _openOtherSums(List<BSFunction> operands) {
   }
 }
 
-///Gets the operands, sums up all numbers and adds them to the beginning of the list (which already eliminates zeros)
+///Gets the operands, sums up all [Number]s and adds them to the beginning of the 
+///list (which already eliminates zeros)
 void _SumNumbers(List<BSFunction> operands) {
   var number = 0.0;
 
