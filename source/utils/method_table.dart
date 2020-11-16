@@ -11,7 +11,7 @@ class MethodTable<R, D> {
 
   //Can't really stop anyone from adding a type which doesn't extend D
   //or a method which isn't defined in two D variables or doesn't return R
-  void addMethod(Type t1, Type t2, Function method) =>
+  void addMethod(Type t1, Type t2,  Function method) =>
       hashMap[t1.toString() + t2.toString()] = method;
 
   R call(D first, D second) =>
@@ -39,8 +39,7 @@ class MethodTable<R, D> {
   }
 }
 
-class ComutativeMethodTable<R, D>
-    extends MethodTable<R, D> {
+class ComutativeMethodTable<R, D> extends MethodTable<R, D> {
   @override
   void addMethod(Type t1, Type t2, Function method) {
     super.addMethod(t1, t2, method);

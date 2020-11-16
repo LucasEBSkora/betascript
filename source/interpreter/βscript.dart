@@ -11,8 +11,8 @@ class BetaScript {
   static bool hadRuntimeError = false;
   static BSInterpreter _interpreter = BSInterpreter();
 
-  ///The callback used when a print statement is used. 
-  ///Might print to a string (web version), 
+  ///The callback used when a print statement is used.
+  ///Might print to a string (web version),
   ///to a file (not yet implemented) or to the console.
   static void Function(Object) printCallback;
 

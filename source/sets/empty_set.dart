@@ -12,7 +12,4 @@ class EmptySet extends BSSet {
 
   @override
   String toString() => "∅";
-
-  @override
-  bool operator ==(other) => other is EmptySet;
 }

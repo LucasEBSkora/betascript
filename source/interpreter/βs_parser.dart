@@ -355,7 +355,7 @@ class BSParser {
       var op = _previous();
       //linebreaks after 'or' keyword handled by scannner
       var right = _and();
-      expr = logicBinaryExpr(expr, op, right);
+      expr = LogicBinaryExpr(expr, op, right);
     }
 
     return expr;
@@ -369,7 +369,7 @@ class BSParser {
       var op = _previous();
       //linebreaks after 'and' keyword handled by scanner
       var right = _equality();
-      expr = logicBinaryExpr(expr, op, right);
+      expr = LogicBinaryExpr(expr, op, right);
     }
 
     return expr;
@@ -925,7 +925,7 @@ class BSParser {
     return ParseError();
   }
 
-  ///When a syntax error is found, ignores the rest of the current expression by 
+  ///When a syntax error is found, ignores the rest of the current expression by
   ///moving [_current] forward
   void _synchronize() {
     _advance();

@@ -10,6 +10,10 @@ BSSet builderSet(LogicExpression rule, [List<Variable> parameters]) {
   if (rule.foundEverySolution) {
     return sol;
   } else {
+    if (parameters == null) {
+      parameters =
+          rule.parameters.map<Variable>((element) => variable(element)).toList();
+    }
     return BuilderSet(rule, parameters);
   }
 }

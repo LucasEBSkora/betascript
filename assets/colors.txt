@@ -1,0 +1,6 @@
+Generalization: #707070
+Dependency: #0000d1
+Composition: #00ad00
+Directed Association: #cc9900
+Association: #ff00ff
+Note Link: #ff2b95

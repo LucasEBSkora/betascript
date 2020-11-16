@@ -15,10 +15,9 @@ class BSClass implements BSCallable {
   @override
   String toString() => name;
 
-  @override
-
   ///if there is a constructor, the arity is the constructors arity.
   ///If there isn't, the arity is 0 (empty constructor)
+  @override
   int get arity => (findMethod(name)?.arity ?? 0);
 
   @override

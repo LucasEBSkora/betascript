@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 
-import '../logic/logic.dart';
-import '../sets/sets.dart';
+import '../logic.dart';
+import '../../sets/sets.dart';
 
 abstract class Solver {
   final LogicExpression expr;
@@ -11,7 +11,7 @@ abstract class Solver {
   Solver(this.expr);
 
   //returns whether we're sure that every solution to the expression is found
-  bool get EverySolutionFound;
+  bool get everySolutionFound;
 
   ///Tries to solve the expression. If it can't find any solutions, returns an empty set.
   BSSet attemptSolve() => (doesApply)
@@ -20,10 +20,7 @@ abstract class Solver {
           "this type of solver does not apply to this expression", expr);
 
   ///Checks if an expression is of the type this solver is made for.
-  bool applies() {
-    doesApply = appliesInternal();
-    return doesApply;
-  }
+  bool applies() => appliesInternal();
 
   @protected
   BSSet attemptSolveInternal();

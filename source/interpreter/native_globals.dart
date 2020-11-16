@@ -54,11 +54,11 @@ final Map<String, Object> nativeGlobals = {
   "arctgh": arctgh(_x),
 
   //constant named numbers
-  "e": constants.e,
-  "pi": constants.pi,
-  "π": constants.pi,
-  "infinity": constants.infinity,
-  "∞": constants.infinity,
+  "e": Constants.e,
+  "pi": Constants.pi,
+  "π": Constants.pi,
+  "infinity": Constants.infinity,
+  "∞": Constants.infinity,
 
   //empty set
   "emptySet": emptySet,

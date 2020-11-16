@@ -23,7 +23,7 @@ abstract class BSSet {
       defineDisjoinedTable();
 
   static const R =
-      Interval(constants.negativeInfinity, constants.infinity, false, false);
+      Interval(Constants.negativeInfinity, Constants.infinity, false, false);
 
   const BSSet();
 
@@ -64,7 +64,7 @@ abstract class BSSet {
 class SetDefinitionError implements Exception {
   final String message;
 
-  SetDefinitionError(this.message);
+  const SetDefinitionError(this.message);
 
   @override
   String toString() => "Set definition error: $message";

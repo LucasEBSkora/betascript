@@ -131,7 +131,7 @@ class Multiplication extends BSFunction {
       multiply(<BSFunction>[for (var f in operands) f.approx]);
 }
 
-///If there are other [Multiplication]s in [operands], 
+///If there are other [Multiplication]s in [operands],
 ///takes its operands and adds them to the list
 void _openOtherMultiplications(List<BSFunction> operands) {
   var i = 0;

@@ -13,7 +13,7 @@ BSFunction n(num value) {
 BSFunction namedNumber(num absValue, String name) =>
     Number._named(absValue, name);
 
-class constants {
+class Constants {
   static const Number e = Number._named(math.e, 'e');
   static const Number pi = Number._named(math.pi, 'π');
   static const Number infinity = Number._named(double.infinity, '∞');
@@ -38,7 +38,7 @@ class Number extends BSFunction {
         isInt = (absvalue is int),
         super(params);
 
-  ///creates a name from the number, but if it can be cast to a int, 
+  ///creates a name from the number, but if it can be cast to a int,
   ///does it (so 1.0 is displayed as 1)
   static String _makeName(num value) {
     if (value == value.toInt()) {

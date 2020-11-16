@@ -54,7 +54,7 @@ int main() {
       ["Token", "name", "The token containing the variable's name"],
     ]),
     NodeType(
-      "logicBinary",
+      "LogicBinary",
       [
         ["Expr", "left", "operand to the left of the operator"],
         ["Token", "op", "operator"],
@@ -192,10 +192,10 @@ int main() {
 }
 
 class NodeType {
-  final name;
+  final String name;
   final List<List<String>> fields;
 
-  NodeType(this.name, this.fields);
+  const NodeType(this.name, this.fields);
 }
 
 void defineAst(String outputDir, String fileName, List<NodeType> types,

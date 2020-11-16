@@ -44,8 +44,8 @@ class Interval extends BSSet {
 
   @override
   BSSet complement() => SetUnion([
-        Interval(-constants.infinity, a, false, !leftClosed),
-        Interval(b, constants.infinity, !rightClosed, false)
+        Interval(-Constants.infinity, a, false, !leftClosed),
+        Interval(b, Constants.infinity, !rightClosed, false)
       ]);
 
   @override

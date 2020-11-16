@@ -102,7 +102,7 @@ class Division extends BSFunction {
   }
 }
 
-///Cancels out identical factors in [numerator] and [denominator] 
+///Cancels out identical factors in [numerator] and [denominator]
 ///, also opening exponentiations when possible
 void _eliminateDuplicates(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {

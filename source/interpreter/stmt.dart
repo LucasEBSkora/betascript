@@ -2,21 +2,21 @@ import 'expr.dart';
 import 'token.dart';
 
 abstract class StmtVisitor {
-  dynamic visitExpressionStmt(ExpressionStmt s);
-  dynamic visitPrintStmt(PrintStmt s);
-  dynamic visitVarStmt(VarStmt s);
-  dynamic visitBlockStmt(BlockStmt s);
-  dynamic visitIfStmt(IfStmt s);
-  dynamic visitRoutineStmt(RoutineStmt s);
-  dynamic visitWhileStmt(WhileStmt s);
-  dynamic visitReturnStmt(ReturnStmt s);
-  dynamic visitClassStmt(ClassStmt s);
-  dynamic visitDirectiveStmt(DirectiveStmt s);
+  Object visitExpressionStmt(ExpressionStmt s);
+  Object visitPrintStmt(PrintStmt s);
+  Object visitVarStmt(VarStmt s);
+  Object visitBlockStmt(BlockStmt s);
+  Object visitIfStmt(IfStmt s);
+  Object visitRoutineStmt(RoutineStmt s);
+  Object visitWhileStmt(WhileStmt s);
+  Object visitReturnStmt(ReturnStmt s);
+  Object visitClassStmt(ClassStmt s);
+  Object visitDirectiveStmt(DirectiveStmt s);
 }
 
 abstract class Stmt {
   const Stmt();
-  dynamic accept(StmtVisitor v);
+  Object accept(StmtVisitor v);
 }
 
 class ExpressionStmt extends Stmt {
@@ -24,7 +24,7 @@ class ExpressionStmt extends Stmt {
   final Expr expression;
 
   const ExpressionStmt(this.expression);
-  dynamic accept(StmtVisitor v) => v.visitExpressionStmt(this);
+  Object accept(StmtVisitor v) => v.visitExpressionStmt(this);
 }
 
 class PrintStmt extends Stmt {
@@ -32,7 +32,7 @@ class PrintStmt extends Stmt {
   final Expr expression;
 
   const PrintStmt(this.expression);
-  dynamic accept(StmtVisitor v) => v.visitPrintStmt(this);
+  Object accept(StmtVisitor v) => v.visitPrintStmt(this);
 }
 
 class VarStmt extends Stmt {
@@ -46,7 +46,7 @@ class VarStmt extends Stmt {
   final Expr initializer;
 
   const VarStmt(this.name, this.parameters, this.initializer);
-  dynamic accept(StmtVisitor v) => v.visitVarStmt(this);
+  Object accept(StmtVisitor v) => v.visitVarStmt(this);
 }
 
 class BlockStmt extends Stmt {
@@ -54,7 +54,7 @@ class BlockStmt extends Stmt {
   final List<Stmt> statements;
 
   const BlockStmt(this.statements);
-  dynamic accept(StmtVisitor v) => v.visitBlockStmt(this);
+  Object accept(StmtVisitor v) => v.visitBlockStmt(this);
 }
 
 class IfStmt extends Stmt {
@@ -68,7 +68,7 @@ class IfStmt extends Stmt {
   final Stmt elseBranch;
 
   const IfStmt(this.condition, this.thenBranch, this.elseBranch);
-  dynamic accept(StmtVisitor v) => v.visitIfStmt(this);
+  Object accept(StmtVisitor v) => v.visitIfStmt(this);
 }
 
 class RoutineStmt extends Stmt {
@@ -82,7 +82,7 @@ class RoutineStmt extends Stmt {
   final List<Stmt> body;
 
   const RoutineStmt(this.name, this.parameters, this.body);
-  dynamic accept(StmtVisitor v) => v.visitRoutineStmt(this);
+  Object accept(StmtVisitor v) => v.visitRoutineStmt(this);
 }
 
 class WhileStmt extends Stmt {
@@ -96,7 +96,7 @@ class WhileStmt extends Stmt {
   final Stmt body;
 
   const WhileStmt(this.token, this.condition, this.body);
-  dynamic accept(StmtVisitor v) => v.visitWhileStmt(this);
+  Object accept(StmtVisitor v) => v.visitWhileStmt(this);
 }
 
 class ReturnStmt extends Stmt {
@@ -107,7 +107,7 @@ class ReturnStmt extends Stmt {
   final Expr value;
 
   const ReturnStmt(this.keyword, this.value);
-  dynamic accept(StmtVisitor v) => v.visitReturnStmt(this);
+  Object accept(StmtVisitor v) => v.visitReturnStmt(this);
 }
 
 class ClassStmt extends Stmt {
@@ -121,7 +121,7 @@ class ClassStmt extends Stmt {
   final List<RoutineStmt> methods;
 
   const ClassStmt(this.name, this.superclass, this.methods);
-  dynamic accept(StmtVisitor v) => v.visitClassStmt(this);
+  Object accept(StmtVisitor v) => v.visitClassStmt(this);
 }
 
 class DirectiveStmt extends Stmt {
@@ -132,5 +132,5 @@ class DirectiveStmt extends Stmt {
   final String directive;
 
   const DirectiveStmt(this.token, this.directive);
-  dynamic accept(StmtVisitor v) => v.visitDirectiveStmt(this);
+  Object accept(StmtVisitor v) => v.visitDirectiveStmt(this);
 }

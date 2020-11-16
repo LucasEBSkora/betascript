@@ -96,7 +96,7 @@ void _openOtherSums(List<BSFunction> operands) {
   }
 }
 
-///Gets the operands, sums up all [Number]s and adds them to the beginning of the 
+///Gets the operands, sums up all [Number]s and adds them to the beginning of the
 ///list (which already eliminates zeros)
 void _SumNumbers(List<BSFunction> operands) {
   var number = 0.0;

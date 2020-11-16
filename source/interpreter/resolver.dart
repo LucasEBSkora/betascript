@@ -17,16 +17,16 @@ enum ClassType { none, classType, subClassType }
 class Resolver implements ExprVisitor, StmtVisitor {
   final BSInterpreter _interpreter;
   //Used to see if we're currently traversing a routine, which is important to check if a return statement is valid
-  var _currentRoutine = RoutineType.none;
-  var _currentClass = ClassType.none;
+  RoutineType _currentRoutine = RoutineType.none;
+  ClassType _currentClass = ClassType.none;
 
   ///A stack representing Scopes, where the key is the identifier name and the value is whether it is ready to be referenced
   ///because things like var a = a; should cause compile errors
-  final _scopes = <HashMap<String, bool>>[];
+  final List<HashMap<String, bool>> _scopes = <HashMap<String, bool>>[];
 
   ///Represents all the global values. Used to check if a global is being redefined (to avoid overriding native functions and routines)
   ///Since all native things are already define, they are added to the map from the start
-  final _globals = HashMap<String, bool>.fromIterable(nativeGlobals.keys,
+  final HashMap<String, bool> _globals = HashMap<String, bool>.fromIterable(nativeGlobals.keys,
       value: (_) => true);
 
   Resolver(this._interpreter);
@@ -157,7 +157,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
   }
 
   @override
-  void visitlogicBinaryExpr(logicBinaryExpr e) {
+  void visitLogicBinaryExpr(LogicBinaryExpr e) {
     _resolveExpr(e.left);
     _resolveExpr(e.right);
   }
@@ -275,7 +275,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
   }
 
   @override
-  visitThisExpr(ThisExpr e) {
+  void visitThisExpr(ThisExpr e) {
     if (_currentClass == ClassType.none) {
       BetaScript.error(e.keyword, "Cannot use 'this' outside of a class");
     }
@@ -301,27 +301,27 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   //at least for now, directives don't have anything to resolve
   @override
-  visitDirectiveStmt(DirectiveStmt s) {}
+  void visitDirectiveStmt(DirectiveStmt s) {}
 
   @override
-  visitBuilderDefinitionExpr(BuilderDefinitionExpr e) {
+  void visitBuilderDefinitionExpr(BuilderDefinitionExpr e) {
     _declareParameters(e.parameters);
     _resolveExpr(e.rule);
   }
 
   @override
-  visitIntervalDefinitionExpr(IntervalDefinitionExpr e) {
+  void visitIntervalDefinitionExpr(IntervalDefinitionExpr e) {
     _resolveExpr(e.a);
     _resolveExpr(e.b);
   }
 
   @override
-  visitRosterDefinitionExpr(RosterDefinitionExpr e) {
+  void visitRosterDefinitionExpr(RosterDefinitionExpr e) {
     for (Expr expr in e.elements) _resolveExpr(expr);
   }
 
   @override
-  visitSetBinaryExpr(SetBinaryExpr e) {
+  void visitSetBinaryExpr(SetBinaryExpr e) {
     _resolveExpr(e.left);
     _resolveExpr(e.right);
   }

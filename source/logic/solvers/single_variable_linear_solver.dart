@@ -1,12 +1,12 @@
 import 'solver.dart';
-import '../logic/logic.dart';
-import '../sets/sets.dart';
-import '../βs_function/multiplication.dart';
-import '../βs_function/negative.dart';
-import '../βs_function/number.dart';
-import '../βs_function/sum.dart';
-import '../βs_function/variable.dart';
-import '../βs_function/βs_function.dart';
+import '../logic.dart';
+import '../../sets/sets.dart';
+import '../../βs_function/multiplication.dart';
+import '../../βs_function/negative.dart';
+import '../../βs_function/number.dart';
+import '../../βs_function/sum.dart';
+import '../../βs_function/variable.dart';
+import '../../βs_function/βs_function.dart';
 
 //in the context of this program, ?= means ==, !=, <, >, <= or >=
 
@@ -49,7 +49,7 @@ class SingleVariableLinearSolver extends Solver {
         return _terms.fold(
             true,
             (previousValue, element) =>
-                previousValue && extractCoefficients(element));
+                previousValue && _extractCoefficients(element));
       }
     }
 
@@ -59,6 +59,7 @@ class SingleVariableLinearSolver extends Solver {
   //In checking if the comparison applies, we already determined the coefficents, so we really only have to check which type of comparison it is
   @override
   BSSet attemptSolveInternal() {
+
     //we now split it in two cases: a == 0 and a =/= 0.
     if (a == 0) {
       //in this case, the value of the variable doesn't matter, which means any value solves it or no value solves it
@@ -75,35 +76,35 @@ class SingleVariableLinearSolver extends Solver {
       if (_comp is Equal) return rosterSet([val]);
       if (_comp is NotEqual) {
         return SetUnion([
-          Interval.open(constants.negativeInfinity, val),
-          Interval.open(val, constants.infinity)
+          Interval.open(Constants.negativeInfinity, val),
+          Interval.open(val, Constants.infinity)
         ]);
       }
       if ((_comp is LessThan && !invertedInequality) ||
           (_comp is GreaterThan && invertedInequality)) {
-        return Interval.open(constants.negativeInfinity, val);
+        return Interval.open(Constants.negativeInfinity, val);
       }
 
       if ((_comp is GreaterThan && !invertedInequality) ||
           (_comp is LessThan && invertedInequality)) {
-        return Interval.open(val, constants.infinity);
+        return Interval.open(val, Constants.infinity);
       }
 
       if ((_comp is LessOrEqual && !invertedInequality) ||
           (_comp is GreaterOrEqual && invertedInequality)) {
-        return Interval(constants.negativeInfinity, val, false, true);
+        return Interval(Constants.negativeInfinity, val, false, true);
       }
 
       if ((_comp is GreaterOrEqual && !invertedInequality) ||
           (_comp is LessOrEqual && invertedInequality)) {
-        return Interval(val, constants.infinity, true, false);
+        return Interval(val, Constants.infinity, true, false);
       }
     }
 
     return emptySet;
   }
 
-  bool extractCoefficients(BSFunction term) {
+  bool _extractCoefficients(BSFunction term) {
     final _asNumber = BSFunction.extractFromNegative<Number>(term);
     //if it's a number, adds it to 'b'
     if (_asNumber.second) {
@@ -149,5 +150,5 @@ class SingleVariableLinearSolver extends Solver {
 
   //we can always get every exact solution for this type of comparison
   @override
-  bool get EverySolutionFound => true;
+  bool get everySolutionFound => true;
 }

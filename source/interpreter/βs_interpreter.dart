@@ -165,7 +165,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     switch (e.op.type) {
       case TokenType.minus:
         _checkNum(e.op, operand);
-        return -(operand as BSFunction); 
+        return -(operand as BSFunction);
       case TokenType.not:
         return !_istruthy(operand);
       //"not" (!) would be here, but i decided to use it for factorials and use the "not" keyword explicitly
@@ -198,7 +198,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   Object _evaluate(Expr e) => e.accept(this);
 
-  ///[null], [false] and [emptySet] are "falsy", everything else is "truthy" 
+  ///[null], [false] and [emptySet] are "falsy", everything else is "truthy"
   ///(isn't the value 'true' but can be used in logic as if it was)
   static bool _istruthy(Object object) {
     if (object is bool) return object;
@@ -301,7 +301,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     executeBlock(s.statements, Environment(_environment));
   }
 
-  ///Parameters here are the list of statements to run and 
+  ///Parameters here are the list of statements to run and
   ///the environment in which to run them
   void executeBlock(List<Stmt> statements, Environment environment) {
     var previous = _environment;
@@ -321,7 +321,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   }
 
   @override
-  Object visitlogicBinaryExpr(logicBinaryExpr e) {
+  Object visitLogicBinaryExpr(LogicBinaryExpr e) {
     var left = _evaluate(e.left);
 
     //Circuit-breaker logical expressions:
@@ -511,7 +511,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   }
 
   @override
-  visitDirectiveStmt(DirectiveStmt s) {
+  void visitDirectiveStmt(DirectiveStmt s) {
     directives.setDirective(s.directive, true);
     print("local directive ${s.directive} set");
   }

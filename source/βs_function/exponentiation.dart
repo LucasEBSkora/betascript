@@ -6,7 +6,7 @@ import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
 
-BSFunction exp(BSFunction exponent, [BSFunction base = constants.e]) {
+BSFunction exp(BSFunction exponent, [BSFunction base = Constants.e]) {
   if (exponent == n(1)) return base;
   if (exponent == n(0)) return n(1);
   //if both exponent and base are numbers, but neither is named, performs the operation (so that 2^2 is displayed as 4 but pi^2 is still pi^2)

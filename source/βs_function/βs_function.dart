@@ -20,6 +20,7 @@ abstract class BSFunction implements BSCallable {
 
   ///Checks if the list of parameters passed is the correct length, creates a map containing the variables in the correct place by matching the params getter and this
   ///parameter.
+  @nonVirtual
   BSFunction call(List<BSFunction> parametersList) {
     final _p = parameters;
     if (parametersList.length != _p.length) {
@@ -35,12 +36,15 @@ abstract class BSFunction implements BSCallable {
   BSFunction get approx;
 
   ///Returns the partial derivative of this in relation to [v]
+  @nonVirtual
   BSFunction derivative(Variable v) => _merge(derivativeInternal(v), this);
 
   ///If there is a custom set of parameters, returns it. If there isn't, returns the default one
+  @nonVirtual
   Set<Variable> get parameters => (_parameters ?? defaultParameters);
 
   ///Returns a copy of this function with the custom parameters passed in p, and checks if they include all needed parameters
+  @nonVirtual
   BSFunction withParameters(Set<Variable> p) {
     final _p = defaultParameters;
 
@@ -52,7 +56,7 @@ abstract class BSFunction implements BSCallable {
     }
     return copy(p);
   }
-
+  
   BSFunction operator -() => negative(this);
 
   BSFunction operator +(BSFunction other) => add([this, other]);
@@ -71,7 +75,7 @@ abstract class BSFunction implements BSCallable {
   //very lazy but works
   int get hashCode => toString().hashCode;
 
-  ///if both values are transformable to numbers (functions without parameters), 
+  ///if both values are transformable to numbers (functions without parameters),
   ///returns them in a pair as numbers. If either doesn't, throws an error, if the name of the operation
   ///is passed, or returns null otherwise.
   static Pair<num, num> toNums(BSFunction a, BSFunction b, [String op]) {
@@ -110,12 +114,12 @@ abstract class BSFunction implements BSCallable {
     return v.first > v.second;
   }
 
-  static min(BSFunction x, BSFunction y) {
+  static BSFunction min(BSFunction x, BSFunction y) {
     final v = toNums(x, y, "min");
     return (v.first < v.second) ? x : y;
   }
 
-  static max(BSFunction x, BSFunction y) {
+  static BSFunction max(BSFunction x, BSFunction y) {
     final v = toNums(x, y, "max");
     return (v.first > v.second) ? x : y;
   }
@@ -125,7 +129,7 @@ abstract class BSFunction implements BSCallable {
   @visibleForOverriding
   BSFunction derivativeInternal(Variable v);
 
-  @protected
+  @visibleForOverriding
   const BSFunction(this._parameters);
 
   ///For internal use only! To actually evaluate, use call
@@ -139,12 +143,13 @@ abstract class BSFunction implements BSCallable {
 
   ///returns the variables which this function actually needs to be evaluated ( e.g. (sin(x+y)*z).parameters returns [x, y, z]).
   ///It does, however, take into account custom parameters of its child functions
-  @protected
+  @visibleForOverriding
   SplayTreeSet<Variable> get defaultParameters;
 
   ///Creates a copy of this function, but allows you to use different values for negative and _parameters.
-  @protected
+  @visibleForOverriding
   BSFunction copy(Set<Variable> parameters);
+
 
   static BSFunction _merge(BSFunction source, BSFunction other) =>
       source.copy(other.parameters);
@@ -163,10 +168,12 @@ abstract class BSFunction implements BSCallable {
     return Trio((f is T) ? f : null, f is T, _isInNegative);
   }
 
+  @nonVirtual
   @override
   int get arity => parameters.length;
 
   //Doesn't check if the cast is succesful because it assumes the interpreter did its job
+  @nonVirtual
   Object callThing(BSInterpreter interpreter, List<Object> arguments) =>
       call(arguments.map((object) => object as BSFunction).toList());
 }

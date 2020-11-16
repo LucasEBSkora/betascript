@@ -7,13 +7,14 @@ import '../βs_function/number.dart';
 ///Scans the source for tokens, returning a list of them on a call to scanTokens, the only public routine in this class.
 class BSScanner {
   final String _source;
-  final List<Token> _tokens = new List();
+  final List<Token> _tokens = <Token>[];
   HashMap<String, void Function()> _charToLexeme; //see _initializeMap
 
-  //_start is the start of the lexeme currently being read, and _current the current value being processed.
+  ///_start is the start of the lexeme currently being read, and _current the current value being processed.
   int _start = 0;
   int _current = 0;
-  //If the source scanned is multiline, keeps the value of the current line for error reporting
+
+  ///If the source scanned is multiline, keeps the value of the current line for error reporting
   int _line = 1;
 
   BSScanner(String this._source) {
@@ -29,19 +30,20 @@ class BSScanner {
     //if the last line of the file doesn`t end with a line break, it might come up as unterminated. To solve this, we add an extra linebreak token
     //adds a end of file token in the end, although it isn't completely necessary
     _tokens.add(new Token(TokenType.EOF, "", null, _line));
-    return _removeLinebreaks(_tokens);
+    _removeLinebreaks();
+    return _tokens;
   }
 
   //many linebreaks can be removed looking at the next token, which means we have to wait until the scanner is finished to remove them
-  static List<Token> _removeLinebreaks(List<Token> tokens) {
-    for (var i = 0; i < tokens.length - 1;) {
-      if (tokens[i].type == TokenType.lineBreak) {
-        switch (tokens[i + 1].type) {
+  void _removeLinebreaks() {
+    for (var i = 0; i < _tokens.length - 1;) {
+      if (_tokens[i].type == TokenType.lineBreak) {
+        switch (_tokens[i + 1].type) {
           case TokenType.rightBrace:
           case TokenType.rightParentheses:
           case TokenType.rightSquare:
           case TokenType.elseToken:
-            tokens.removeAt(i);
+            _tokens.removeAt(i);
             continue;
           default:
             ++i;
@@ -49,7 +51,6 @@ class BSScanner {
       } else
         ++i;
     }
-    return tokens;
   }
 
   bool _isAtEnd() => _current >= _source.length;
@@ -228,7 +229,7 @@ class BSScanner {
     _tokens.add(Token(type, text, literal, _line));
   }
 
-  ///checks if the character at [_current] matches [s] 
+  ///checks if the character at [_current] matches [s]
   ///(used mainly with multi-character operands). If it does, consumes it.
   bool _match(String s) {
     if (_isAtEnd()) return false;
@@ -238,11 +239,11 @@ class BSScanner {
     return true;
   }
 
-  ///basically, [_advance] without actually advancing. 
+  ///basically, [_advance] without actually advancing.
   ///Used to check if a literal or identifier has ended.
   String _peek() => (_isAtEnd()) ? null : _source[_current];
 
-  ///having identified the beginning of a string literal, 
+  ///having identified the beginning of a string literal,
   ///this function reads the rest of it.
   void _string() {
     while (_peek() != '"' && !_isAtEnd()) {
@@ -327,17 +328,17 @@ class BSScanner {
 
   static bool _isMathSymbol(String c) => false;
 
-  ///returns true if [c] is from the latin or greek alphabets, 
+  ///returns true if [c] is from the latin or greek alphabets,
   ///or if it is a valid mathematical symbol
   static bool _isValidCharacter(String c) =>
       _isAlpha(c) || _isGreek(c) || _isMathSymbol(c);
 
-  ///true if [c] is a digit, from the latin or greek alphabets, 
+  ///true if [c] is a digit, from the latin or greek alphabets,
   ///or if it is a valid mathematical symbol
   static bool _isExpandedAlphanumeric(String c) =>
       _isValidCharacter(c) || _IsDigit(c);
 
-  ///does the same as [_identifier], but for directives, 
+  ///does the same as [_identifier], but for directives,
   ///which are basically any string of characters ending in whitespace
   void _directive() {
     while (!_isWhitespace(_peek()) && !_isAtEnd()) _advance();

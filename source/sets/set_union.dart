@@ -33,7 +33,7 @@ BSSet setUnion(Iterable<BSSet> subsets) {
       _subsets.insertAll(i, element.subsets);
     }
   }
-  _subsets = _subsets.where((element) => !(element  == emptySet)).toList();
+  _subsets = _subsets.where((element) => !(element == emptySet)).toList();
 
   var rosterElements = <BSFunction>[];
 

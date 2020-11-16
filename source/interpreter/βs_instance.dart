@@ -13,7 +13,7 @@ class BSInstance {
   @override
   String toString() => "${_class.name} instance";
 
-  get(Token name) {
+  Object get(Token name) {
     if (_fields.containsKey(name.lexeme)) return _fields[name.lexeme];
 
     var method = _class.findMethod(name.lexeme);

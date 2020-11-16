@@ -5,7 +5,7 @@ import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
 
-BSFunction log(BSFunction operand, [BSFunction base = constants.e]) {
+BSFunction log(BSFunction operand, [BSFunction base = Constants.e]) {
   //log_a(1) == 0 for every a
   if (operand == n(1)) {
     return n(0);
@@ -47,7 +47,7 @@ class Log extends BSFunction {
 
   @override
   String toString() =>
-      (base == constants.e) ? "ln($operand)" : "log($base)($operand)";
+      (base == Constants.e) ? "ln($operand)" : "log($base)($operand)";
 
   @override
   BSFunction copy([Set<Variable> params]) => Log._(operand, base, params);

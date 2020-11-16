@@ -54,7 +54,7 @@ void main() {
 
   print(first.disjoined(second));
 
-  final roster = rosterSet([n(14), constants.pi, n(0)]);
+  final roster = rosterSet([n(14), Constants.pi, n(0)]);
 
   print(roster);
 

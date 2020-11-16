@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 
 import 'logic_expression.dart';
 import '../sets/sets.dart';
-import '../solvers/single_variable_solver.dart';
+import 'solvers/single_variable_solver.dart';
 import '../βs_function/βs_calculus.dart';
 
 ///A class that represents an equation or inequality
@@ -30,8 +30,8 @@ abstract class Comparison extends LogicExpression {
     return false;
   }
 
-  ///checks if an expression is always false 
-  ///(so that comparisons between numbers aren't represented by trees 
+  ///checks if an expression is always false
+  ///(so that comparisons between numbers aren't represented by trees
   ///when they could be a boolean)
   bool get alwaysFalse {
     final nums = BSFunction.toNums(left.approx, right.approx);
@@ -47,7 +47,7 @@ abstract class Comparison extends LogicExpression {
   }
 
   ///checks if a set of values solves the expression
-  ///if the variables passed aren't suficient to evaluate the expression, 
+  ///if the variables passed aren't suficient to evaluate the expression,
   ///simply returns false instead of throwing
   bool isSolution(HashMap<String, BSFunction> p) {
     BSFunction _left, _right;
@@ -80,7 +80,7 @@ abstract class Comparison extends LogicExpression {
     BSSet _sol = emptySet;
     if (solver.applies()) {
       _sol = solver.attemptSolve();
-      _foundEverySolution = solver.EverySolutionFound;
+      _foundEverySolution = solver.everySolutionFound;
     }
     return (_sol == emptySet)
         ? BuilderSet(
