@@ -3,6 +3,7 @@ import 'stmt.dart';
 import 'token.dart';
 import 'βs_interpreter.dart';
 import 'βscript.dart';
+import '../utils/three_valued_logic.dart';
 import '../sets/sets.dart';
 
 class ParseError implements Exception {}
@@ -593,7 +594,7 @@ class BSParser {
     return DerivativeExpr(keyword, derivand, variables);
   }
 
-  /// <primary> ::= <set_definition> | number | string | "false" | "true" | "nil"
+  /// <primary> ::= <set_definition> | number | string | "false" | "true" | "unknown" | "nil"
   ///            | <(> <expression> <)>
   ///            | <identifier> | "super" <whitespace> "." <whitespace_or_linebreak> <identifier>
   ///<set_definition> ::= "set" <whitespace_or_linebreak> <set_def> | <whitespace_or_linebreak> <set_def>
@@ -621,12 +622,16 @@ class BSParser {
 
     //false
     if (_match(TokenType.falseToken)) {
-      return LiteralExpr(false);
+      return LiteralExpr(bsFalse);
     }
 
     //true
     if (_match(TokenType.trueToken)) {
-      return LiteralExpr(true);
+      return LiteralExpr(bsTrue);
+    }
+
+    if (_match(TokenType.unknown)) {
+      return LiteralExpr(bsUnknown);
     }
 
     //nil

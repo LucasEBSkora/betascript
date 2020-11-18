@@ -59,6 +59,7 @@ enum TokenType {
   thisToken,
   trueToken,
   union,
+  unknown,
   whileToken,
 
   EOF

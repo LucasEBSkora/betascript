@@ -117,7 +117,7 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 <partial_differential> ::=  "del" <(> <expression> <)>
 <derivative_parameters> ::= "del" <(> <arguments> <)>
 
-<primary> ::= <set_definition> | NUMBER | STRING | "false" | "true" | "nil" 
+<primary> ::= <set_definition> | NUMBER | STRING | "false" | "true" | "unknown" | "nil" 
             | <(> <expression> <)>
             | <identifier> | "super" <whitespace> "." <whitespace_or_linebreak> <identifier>
 

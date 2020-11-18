@@ -221,6 +221,7 @@ class BSScanner {
     "true": TokenType.trueToken,
     "while": TokenType.whileToken,
     "union": TokenType.union,
+    "unknown": TokenType.unknown,
   };
 
   ///creates a new [Token], using the interval from [_start] to [_current] as the token's lexeme.

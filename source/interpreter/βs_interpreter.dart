@@ -323,16 +323,20 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   Object visitLogicBinaryExpr(LogicBinaryExpr e) {
-    var left = _evaluate(e.left);
+    final left = _evaluate(e.left);
 
-    //Circuit-breaker logical expressions:
-    //true or other_expression should return true regardless of other_expression, so it isn't even evaluated
-    //false and other_expression should return false regardless of other_expression, so it isn't even evaluated
+    //operations with unknown always result in unknown
+    if (left == bsUnknown) return left;
+    
+    final right = _evaluate(e.right);
+
+    if (right == bsUnknown) return right;
+    
 
     if (e.op.type == TokenType.or) {
       if (_istruthy(left)) return left;
     } else if (!_istruthy(left)) return left;
-    return _evaluate(e.right);
+    return right;
   }
 
   @override
