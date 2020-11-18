@@ -14,13 +14,18 @@ abstract class Solver {
   bool get everySolutionFound;
 
   ///Tries to solve the expression. If it can't find any solutions, returns an empty set.
+  @nonVirtual
   BSSet attemptSolve() => (doesApply)
       ? attemptSolveInternal()
       : throw BetascriptSolverError(
           "this type of solver does not apply to this expression", expr);
 
   ///Checks if an expression is of the type this solver is made for.
-  bool applies() => appliesInternal();
+  @nonVirtual
+  bool applies() {
+    doesApply = appliesInternal();
+    return doesApply;
+  }
 
   @protected
   BSSet attemptSolveInternal();

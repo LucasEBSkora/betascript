@@ -26,7 +26,8 @@ class Resolver implements ExprVisitor, StmtVisitor {
 
   ///Represents all the global values. Used to check if a global is being redefined (to avoid overriding native functions and routines)
   ///Since all native things are already define, they are added to the map from the start
-  final HashMap<String, bool> _globals = HashMap<String, bool>.fromIterable(nativeGlobals.keys,
+  final HashMap<String, bool> _globals = HashMap<String, bool>.fromIterable(
+      nativeGlobals.keys,
       value: (_) => true);
 
   Resolver(this._interpreter);

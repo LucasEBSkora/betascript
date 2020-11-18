@@ -14,7 +14,7 @@ BSSet setUnion(Iterable<BSSet> subsets) {
   while (i < _subsets.length) {
     var j = i + 1;
     while (j < _subsets.length) {
-      if (i != j && !_subsets[i].disjoined(_subsets[j])) {
+      if (i != j && !_subsets[i].disjoined(_subsets[j]).asBool()) {
         _subsets[i] = _subsets[i].union(_subsets[j]);
         _subsets.removeAt(j);
         j = i +

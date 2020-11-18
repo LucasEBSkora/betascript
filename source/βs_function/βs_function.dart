@@ -56,7 +56,7 @@ abstract class BSFunction implements BSCallable {
     }
     return copy(p);
   }
-  
+
   BSFunction operator -() => negative(this);
 
   BSFunction operator +(BSFunction other) => add([this, other]);
@@ -149,7 +149,6 @@ abstract class BSFunction implements BSCallable {
   ///Creates a copy of this function, but allows you to use different values for negative and _parameters.
   @visibleForOverriding
   BSFunction copy(Set<Variable> parameters);
-
 
   static BSFunction _merge(BSFunction source, BSFunction other) =>
       source.copy(other.parameters);

@@ -8,7 +8,6 @@ import 'sum.dart';
 import 'variable.dart';
 import 'βs_function.dart';
 import '../utils/tuples.dart';
-import '../utils/xor.dart';
 
 BSFunction multiply(List<BSFunction> operands) {
   if (operands?.isEmpty ?? true) return (n(0));
@@ -61,8 +60,8 @@ BSFunction multiply(List<BSFunction> operands) {
   final negativeForNumbers = _multiplyNumbers(operands);
   final negativeOthers = _consolidateNegatives(operands);
 
-  var _negative = xor(negativeForNumbers, negativeOthers);
-  _negative = xor(_negative, divisionNegatives);
+  var _negative = negativeForNumbers ^ negativeOthers;
+  _negative = _negative ^ divisionNegatives;
 
   _createExponents(operands);
 

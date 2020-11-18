@@ -88,7 +88,7 @@ ComutativeMethodTable<BSSet, BSSet> defineIntersectionTable() {
       BuilderSet,
       (RosterSet first, BuilderSet second) => RosterSet(first.elements.where(
           (element) => second.rule.isSolution(
-              HashMap.from({second.rule.parameters.last: element})))));
+              HashMap.from({second.rule.parameters.last: element})).asBool())));
 
   //TODO: fix parameters
   methods.addMethod(

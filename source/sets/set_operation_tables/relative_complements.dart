@@ -8,7 +8,7 @@ MethodTable<BSSet, BSSet> defineRelativeComplementTable() {
   MethodTable<BSSet, BSSet> methods = MethodTable();
 
   methods.addMethod(Interval, Interval, (Interval first, Interval second) {
-    if (first.contains(second)) {
+    if (first.contains(second).asBool()) {
       //second is fully contained in first
       return SetUnion([
         interval(first.a, second.a,
@@ -56,7 +56,7 @@ MethodTable<BSSet, BSSet> defineRelativeComplementTable() {
   methods.addMethodsInLine(
       RosterSet,
       [Interval, RosterSet, BuilderSet, SetUnion, IntensionalSetIntersection],
-      (RosterSet first, BSSet second) => RosterSet(
+      (RosterSet first, BSSet second) => rosterSet(
           first.elements.where((element) => !second.belongs(element))));
 
   methods.addMethodsInLine(

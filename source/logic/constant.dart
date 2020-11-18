@@ -2,24 +2,25 @@ import 'dart:collection';
 
 import 'logic_expression.dart';
 import '../sets/sets.dart';
+import '../utils/three_valued_logic.dart';
 import '../βs_function/βs_calculus.dart';
 
 class Constant extends LogicExpression {
-  final bool value;
+  final BSLogical value;
 
   const Constant(this.value);
 
-  bool get alwaysTrue => value;
-  bool get alwaysFalse => !value;
+  BSLogical get alwaysTrue => value;
+  BSLogical get alwaysFalse => -value;
 
-  bool isSolution(HashMap<String, BSFunction> p) => value;
+  BSLogical isSolution(HashMap<String, BSFunction> p) => value;
 
-  bool containsSolution(BSSet s) => value;
+  BSLogical containsSolution(BSSet s) => value;
 
-  bool everyElementIsSolution(BSSet s) => value;
+  BSLogical everyElementIsSolution(BSSet s) => value;
 
   ///a set with every solution ΒScript can find
-  BSSet get solution => (value) ? BSSet.R : emptySet;
+  BSSet get solution => (value.asBool()) ? BSSet.R : emptySet;
 
   @override
   bool get foundEverySolution => true;

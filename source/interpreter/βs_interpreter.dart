@@ -13,6 +13,7 @@ import 'βs_environment.dart';
 import 'βs_instance.dart';
 import '../logic/logic.dart';
 import '../sets/sets.dart';
+import '../utils/three_valued_logic.dart';
 import '../βs_function/βs_calculus.dart';
 
 class BSInterpreter implements ExprVisitor, StmtVisitor {
@@ -74,10 +75,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
             return nums.first < nums.second;
           case TokenType.lessEqual:
             return nums.first <= nums.second;
-          // equals returns logic expressions for functions and bools for everything else
+          // equals returns logic expressions for functions and logical values for everything else
           case TokenType.equals:
             return nums.first == nums.second;
-          // identicallyEquals always returns booleans
+          // identicallyEquals always returns logical values
           case TokenType.identicallyEquals:
             return _isEqual(leftOperand, rightOperand);
           default:
@@ -105,10 +106,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
           return LessThan(leftOperand, rightOperand);
         case TokenType.lessEqual:
           return LessOrEqual(leftOperand, rightOperand);
-        // equals returns logic expressions for functions and bools for everything else
+        // equals returns logic expressions for functions and logical values for everything else
         case TokenType.equals:
           return Equal(leftOperand, rightOperand);
-        // identicallyEquals always returns booleans
+        // identicallyEquals always returns logical values
         case TokenType.identicallyEquals:
           return _isEqual(leftOperand, rightOperand);
         default:
@@ -128,8 +129,8 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
           return leftOperand.intersection(rightOperand);
         case TokenType.plus:
           return leftOperand.union(rightOperand);
-        // equals returns logic expressions for functions and bools for everything else
-        // identicallyEquals always returns booleans
+        // equals returns logic expressions for functions and logical values for everything else
+        // identicallyEquals always returns logical values
         case TokenType.equals:
         case TokenType.identicallyEquals:
           return _isEqual(leftOperand, rightOperand);
@@ -198,10 +199,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   Object _evaluate(Expr e) => e.accept(this);
 
-  ///[null], [false] and [emptySet] are "falsy", everything else is "truthy"
+  ///[null], [false], [unknown] and [emptySet] are "falsy", everything else is "truthy"
   ///(isn't the value 'true' but can be used in logic as if it was)
   static bool _istruthy(Object object) {
-    if (object is bool) return object;
+    if (object is BSLogical) return object.asBool();
     return (object != null) && (object != emptySet);
   }
 

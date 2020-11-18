@@ -3,15 +3,18 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 import 'constant.dart';
 import 'logic_expression.dart';
 import '../sets/sets.dart';
+import '../utils/three_valued_logic.dart';
 import '../βs_function/βs_calculus.dart';
 
 LogicExpression or(LogicExpression left, LogicExpression right) {
   // (1 || A) == 1, (0 || A) == A
   if (left is Constant) {
-    return (left.value) ? left : right;
+    if (left.value == bsUnknown) return left;
+    return (left.value.asBool()) ? left : right;
   }
   if (right is Constant) {
-    return (right.value) ? right : left;
+    if (right.value == bsUnknown) return right;
+    return (right.value.asBool()) ? right : left;
   }
 
   return Or(left, right);
@@ -23,18 +26,18 @@ class Or extends LogicExpression {
 
   const Or(this.left, this.right);
 
-  bool get alwaysTrue => left.alwaysTrue || right.alwaysTrue;
+  BSLogical get alwaysTrue => left.alwaysTrue | right.alwaysTrue;
 
-  bool get alwaysFalse => left.alwaysFalse || right.alwaysFalse;
+  BSLogical get alwaysFalse => left.alwaysFalse & right.alwaysFalse;
 
-  bool isSolution(HashMap<String, BSFunction> p) =>
-      left.isSolution(p) || right.isSolution(p);
+  BSLogical isSolution(HashMap<String, BSFunction> p) =>
+      left.isSolution(p) | right.isSolution(p);
 
-  bool containsSolution(BSSet s) =>
-      left.containsSolution(s) || right.containsSolution(s);
+  BSLogical containsSolution(BSSet s) =>
+      left.containsSolution(s) | right.containsSolution(s);
 
-  bool everyElementIsSolution(BSSet s) =>
-      left.everyElementIsSolution(s) || right.everyElementIsSolution(s);
+  BSLogical everyElementIsSolution(BSSet s) =>
+      left.everyElementIsSolution(s) | right.everyElementIsSolution(s);
 
   BSSet get solution => left.solution.union(right.solution);
 

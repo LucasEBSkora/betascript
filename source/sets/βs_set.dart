@@ -8,18 +8,19 @@ import 'set_operation_tables/intersection.dart';
 import 'set_operation_tables/relative_complements.dart';
 import 'set_operation_tables/union.dart';
 import '../utils/method_table.dart';
+import '../utils/three_valued_logic.dart';
 import '../βs_function/βs_calculus.dart';
 
 //class that represents a set in R
 abstract class BSSet {
   static final MethodTable<BSSet, BSSet> _relativeComplements =
       defineRelativeComplementTable();
-  static final MethodTable<bool, BSSet> _contains = defineContainsTable();
+  static final MethodTable<BSLogical, BSSet> _contains = defineContainsTable();
 
   static final ComutativeMethodTable<BSSet, BSSet> _unions = defineUnionTable();
   static final ComutativeMethodTable<BSSet, BSSet> _intersections =
       defineIntersectionTable();
-  static final ComutativeMethodTable<bool, BSSet> _disjoined =
+  static final ComutativeMethodTable<BSLogical, BSSet> _disjoined =
       defineDisjoinedTable();
 
   static const R =
@@ -34,9 +35,9 @@ abstract class BSSet {
 
   ///returns this\other (this without the elements in other)
   @nonVirtual
-  BSSet relativeComplement(BSSet other) => (disjoined(other))
+  BSSet relativeComplement(BSSet other) => (disjoined(other).asBool())
       ? this
-      : (other.contains(this)
+      : (other.contains(this).asBool()
           ? emptySet
           : _relativeComplements.call(this, other));
 
@@ -47,14 +48,14 @@ abstract class BSSet {
 
   @nonVirtual
   BSSet intersection(BSSet other) =>
-      (disjoined(other)) ? emptySet : _intersections.call(this, other);
+      (disjoined(other).asBool()) ? emptySet : _intersections.call(this, other);
 
   @nonVirtual
-  bool contains(BSSet b) =>
+  BSLogical contains(BSSet b) =>
       (this is EmptySet) ? (b is EmptySet) : _contains.call(this, b);
 
   @nonVirtual
-  bool disjoined(BSSet b) =>
+  BSLogical disjoined(BSSet b) =>
       (this is EmptySet || b is EmptySet) ? true : _disjoined.call(this, b);
 
   @override

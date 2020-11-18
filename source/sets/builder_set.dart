@@ -11,8 +11,9 @@ BSSet builderSet(LogicExpression rule, [List<Variable> parameters]) {
     return sol;
   } else {
     if (parameters == null) {
-      parameters =
-          rule.parameters.map<Variable>((element) => variable(element)).toList();
+      parameters = rule.parameters
+          .map<Variable>((element) => variable(element))
+          .toList();
     }
     return BuilderSet(rule, parameters);
   }
@@ -26,7 +27,7 @@ class BuilderSet extends BSSet {
 
   @override
   bool belongs(BSFunction x) =>
-      rule.isSolution(HashMap.from({rule.parameters.last: x}));
+      rule.isSolution(HashMap.from({rule.parameters.last: x})).asBool();
 
   @override
   BSSet complement() => BuilderSet(Not(rule), parameters);

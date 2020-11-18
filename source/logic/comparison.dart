@@ -3,8 +3,9 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 import 'package:meta/meta.dart';
 
 import 'logic_expression.dart';
-import '../sets/sets.dart';
 import 'solvers/single_variable_solver.dart';
+import '../sets/sets.dart';
+import '../utils/three_valued_logic.dart';
 import '../βs_function/βs_calculus.dart';
 
 ///A class that represents an equation or inequality
@@ -19,60 +20,60 @@ abstract class Comparison extends LogicExpression {
   @protected
   String get type;
 
-  bool get alwaysTrue {
+  BSLogical get alwaysTrue {
     final nums = BSFunction.toNums(left.approx, right.approx);
 
     //for now, if it can't convert both to numbers to make sure the comparison is always true, doesn't even try
     if (nums != null) {
-      return compare(nums.first, nums.second);
+      return BSLogical.fromBool(compare(nums.first, nums.second));
     }
 
-    return false;
+    return bsUnknown;
   }
 
   ///checks if an expression is always false
   ///(so that comparisons between numbers aren't represented by trees
-  ///when they could be a boolean)
-  bool get alwaysFalse {
+  ///when they could be a logical value)
+  BSLogical get alwaysFalse {
     final nums = BSFunction.toNums(left.approx, right.approx);
 
     //for now, if it can't convert both to numbers to make sure the comparison is always false, doesn't even try
     //basically gets "alwaysTrue" and inverts it
 
     if (nums != null) {
-      return compare(nums.first, nums.second);
+      return BSLogical.fromBool(compare(nums.first, nums.second));
     }
 
-    return false;
+    return bsUnknown;
   }
 
   ///checks if a set of values solves the expression
   ///if the variables passed aren't suficient to evaluate the expression,
   ///simply returns false instead of throwing
-  bool isSolution(HashMap<String, BSFunction> p) {
+  BSLogical isSolution(HashMap<String, BSFunction> p) {
     BSFunction _left, _right;
 
     try {
       _left = left.evaluate(p).approx;
       _right = right.evaluate(p).approx;
     } on BetascriptFunctionError {
-      return false;
+      return bsFalse;
     }
 
     final nums = BSFunction.toNums(_left, _right);
 
     if (nums != null) {
-      return compare(nums.first, nums.second);
+      return BSLogical.fromBool(compare(nums.first, nums.second));
     }
 
-    return false;
+    return bsUnknown;
   }
 
   ///Check if a solution exists in the set (only for single variable expressions)
-  bool containsSolution(BSSet s) => false;
+  BSLogical containsSolution(BSSet s) => bsUnknown;
 
   ///Check if every element in a set is a solution (only for single variable expressions)
-  bool everyElementIsSolution(BSSet s) => false;
+  BSLogical everyElementIsSolution(BSSet s) => bsUnknown;
 
   ///a set with every solution ΒScript can find
   BSSet get solution {

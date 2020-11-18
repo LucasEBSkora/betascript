@@ -17,6 +17,7 @@ class SingleVariableSolver extends Solver {
     if (s1.applies()) {
       solution = s1.attemptSolve();
       _everySolutionFound = s1.everySolutionFound;
+      doesApply = true;
     }
     return solution;
   }

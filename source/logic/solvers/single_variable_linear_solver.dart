@@ -24,7 +24,7 @@ class SingleVariableLinearSolver extends Solver {
 
   @override
   bool appliesInternal() {
-    if (expr.parameters.length == 1) {
+      //we're sure that the expression only uses one variable because it was checked in SingleVariableSolver
       if (expr is Comparison) {
         //f(x) ?= g(x)
         _comp = expr;
@@ -51,7 +51,6 @@ class SingleVariableLinearSolver extends Solver {
             (previousValue, element) =>
                 previousValue && _extractCoefficients(element));
       }
-    }
 
     return false;
   }
@@ -59,7 +58,6 @@ class SingleVariableLinearSolver extends Solver {
   //In checking if the comparison applies, we already determined the coefficents, so we really only have to check which type of comparison it is
   @override
   BSSet attemptSolveInternal() {
-
     //we now split it in two cases: a == 0 and a =/= 0.
     if (a == 0) {
       //in this case, the value of the variable doesn't matter, which means any value solves it or no value solves it

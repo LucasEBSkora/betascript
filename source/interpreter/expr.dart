@@ -84,7 +84,7 @@ class GroupingExpr extends Expr {
 }
 
 class LiteralExpr extends Expr {
-  ///Literals are numbers, strings, booleans or null. This field holds one of them.
+  ///Literals are numbers, strings, logical values or null. This field holds one of them.
   final Object value;
 
   const LiteralExpr(this.value);

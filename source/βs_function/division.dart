@@ -6,7 +6,6 @@ import 'negative.dart';
 import 'number.dart';
 import 'variable.dart';
 import 'βs_function.dart';
-import '../utils/xor.dart';
 
 BSFunction divide(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {
@@ -28,7 +27,7 @@ BSFunction divide(
       (numerator is Negative) ? numerator.operand : numerator,
       (denominator is Negative) ? denominator.operand : denominator);
 
-  return (xor(numerator is Negative, denominator is Negative)
+  return ((numerator is Negative) ^ (denominator is Negative)
       ? negative(div)
       : div);
 }
@@ -57,13 +56,13 @@ class Division extends BSFunction {
     if (_numNumber.second && _denNumber.second) {
       final v = _numNumber.first.value / _denNumber.first.value;
       if (v == v.toInt())
-        return n(v * (xor(_numNumber.third, _denNumber.third) ? -1 : 1));
+        return n(v * ((_numNumber.third ^ _denNumber.third) ? -1 : 1));
     }
 
     final _num = BSFunction.extractFromNegative(_n);
     final _den = BSFunction.extractFromNegative(_d);
 
-    return (xor(_num.third, _den.third))
+    return (_num.third ^ _den.third)
         ? negative(divide([_num.first], [_den.first]))
         : divide([_num.first], [_den.first]);
   }
@@ -90,13 +89,13 @@ class Division extends BSFunction {
     if (_numNumber.second && _denNumber.second) {
       return n(_numNumber.first.value /
           _denNumber.first.value *
-          (xor(_numNumber.third, _denNumber.third) ? -1 : 1));
+          ((_numNumber.third ^ _denNumber.third) ? -1 : 1));
     }
 
     final _num = BSFunction.extractFromNegative(_n);
     final _den = BSFunction.extractFromNegative(_d);
 
-    return (xor(_num.third, _den.third))
+    return (_num.third ^ _den.third)
         ? negative(divide([_num.first], [_den.first]))
         : divide([_num.first], [_den.first]);
   }

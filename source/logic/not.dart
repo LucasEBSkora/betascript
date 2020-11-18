@@ -3,10 +3,11 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 import 'constant.dart';
 import 'logic_expression.dart';
 import '../sets/sets.dart';
+import '../utils/three_valued_logic.dart';
 import '../βs_function/βs_calculus.dart';
 
 LogicExpression not(LogicExpression operand) {
-  return (operand is Constant) ? Constant(!operand.value) : Not(operand);
+  return (operand is Constant) ? Constant(-operand.value) : Not(operand);
 }
 
 class Not extends LogicExpression {
@@ -14,15 +15,15 @@ class Not extends LogicExpression {
 
   const Not(this.operand);
 
-  bool get alwaysTrue => operand.alwaysFalse;
+  BSLogical get alwaysTrue => operand.alwaysFalse;
 
-  bool get alwaysFalse => operand.alwaysTrue;
+  BSLogical get alwaysFalse => operand.alwaysTrue;
 
-  bool isSolution(HashMap<String, BSFunction> p) => !operand.isSolution(p);
+  BSLogical isSolution(HashMap<String, BSFunction> p) => -operand.isSolution(p);
 
-  bool containsSolution(BSSet s) => !operand.everyElementIsSolution(s);
+  BSLogical containsSolution(BSSet s) => -operand.everyElementIsSolution(s);
 
-  bool everyElementIsSolution(BSSet s) => !operand.containsSolution(s);
+  BSLogical everyElementIsSolution(BSSet s) => -operand.containsSolution(s);
 
   BSSet get solution => operand.solution.complement();
 

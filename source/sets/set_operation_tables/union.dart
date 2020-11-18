@@ -11,7 +11,7 @@ ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
 
   methods.addMethod(Interval, Interval, (Interval first, Interval second) {
     //calls constructor directly instead of builder function because we already know the sets are disjoint
-    if (first.disjoined(second)) return SetUnion([first, second]);
+    if (first.disjoined(second).asBool()) return SetUnion([first, second]);
     BSFunction _a = BSFunction.min(first.a, second.a);
     BSFunction _b = BSFunction.max(first.b, second.b);
 
