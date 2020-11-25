@@ -10,11 +10,9 @@ import 'number.dart';
 import 'sum.dart';
 import 'variable.dart';
 import 'βs_calculus.dart';
-import '../interpreter/βs_callable.dart';
-import '../interpreter/βs_interpreter.dart';
 import '../utils/tuples.dart';
 
-abstract class BSFunction implements BSCallable {
+abstract class BSFunction {
   ///set of parameters the function is defined in ( the previous function NEEDS x, y and z to be evaluated, but we could define it in x,y,z and w if we wanted to)
   final Set<Variable> _parameters;
 
@@ -166,15 +164,6 @@ abstract class BSFunction implements BSCallable {
 
     return Trio((f is T) ? f : null, f is T, _isInNegative);
   }
-
-  @nonVirtual
-  @override
-  int get arity => parameters.length;
-
-  //Doesn't check if the cast is succesful because it assumes the interpreter did its job
-  @nonVirtual
-  Object callThing(BSInterpreter interpreter, List<Object> arguments) =>
-      call(arguments.map((object) => object as BSFunction).toList());
 }
 
 class BetascriptFunctionError implements Exception {

@@ -1,0 +1,5 @@
+let f(x,y,z) = x^2 + cos(y) + e^z
+
+print f // imprime (((x)^(2)) + cos(y) + ((e)^(z)))
+
+print f(3, pi, 0) // imprime 9

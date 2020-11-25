@@ -2,6 +2,7 @@ import 'dart:collection' show HashMap;
 
 import 'expr.dart';
 import 'directive_manager.dart';
+import 'function_adapter.dart';
 import 'native_globals.dart';
 import 'stmt.dart';
 import 'token.dart';
@@ -49,7 +50,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   Object visitBinaryExpr(BinaryExpr e) {
     final leftOperand = _evaluate(e.left);
     final rightOperand = _evaluate(e.right);
-
+    
     //operations for functions
     if (leftOperand is BSFunction && rightOperand is BSFunction) {
       final nums = BSFunction.toNums(leftOperand, rightOperand);
@@ -203,7 +204,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   ///(isn't the value 'true' but can be used in logic as if it was)
   static bool _istruthy(Object object) {
     if (object is BSLogical) return object.asBool();
-    return (object != null) && (object != emptySet);
+    return (object != false) && (object != null) && (object != emptySet);
   }
 
   static _isEqual(Object a, Object b) {
@@ -327,11 +328,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
     //operations with unknown always result in unknown
     if (left == bsUnknown) return left;
-    
+
     final right = _evaluate(e.right);
 
     if (right == bsUnknown) return right;
-    
 
     if (e.op.type == TokenType.or) {
       if (_istruthy(left)) return left;
@@ -352,7 +352,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   Object visitCallExpr(CallExpr e) {
     var callee = _evaluate(e.callee);
 
-    if (!(callee is BSCallable)) {
+    //wraps BSFunctions in the adapter in order to use the BSCallable interface
+    if (callee is BSFunction) {
+      callee = FunctionAdapter(callee);
+    } else if (!(callee is BSCallable)) {
       throw RuntimeError(
           e.paren, "Can only call routines, functions and classes.");
     }
@@ -373,7 +376,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       throw RuntimeError(e.paren,
           "Expected ${function.arity.toString()} paramenters, but got ${arguments.length.toString()}.");
     }
-    if (callee is BSFunction) {
+    if (callee is FunctionAdapter) {
       for (Object a in arguments)
         if (!(a is BSFunction)) {
           throw RuntimeError(
