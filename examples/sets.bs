@@ -11,14 +11,22 @@ print B
 print C
 print D
 
-print A contained B
+//print A contained B - this also works, but using the unicode symbols is prettier
+print A ⊂ B
 
-print 2.5 belongs A
+//print 2.5 belongs A
+print 2.5 ∈ A
 
-print 2.5 belongs B
+//print 2.5 belongs B
+print 2.5 ∈ B
 
-print A union B
-print A intersection B
+//print A union B
+print A ∪ B
+
+//print A intersection B
+print A ∩ B
+
+//no pretty symbol for this one :(
 print A disjoined C
 
 print C'

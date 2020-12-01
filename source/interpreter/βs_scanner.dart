@@ -168,6 +168,15 @@ class BSScanner {
       '\t': () {},
       //since the _string function takes no parameters, it can be passed directly.
       '"': _string,
+      //unicode variants for math operations
+      '¬': () => _addToken(TokenType.not),
+      '⊂': () => _addToken(TokenType.contained),
+      '∈': () => _addToken(TokenType.belongs),
+      '∪': () => _addToken(TokenType.union),
+      '∩': () => _addToken(TokenType.intersection),
+      '∧': () => _addToken(TokenType.and),
+      '∨': () => _addToken(TokenType.or),
+
     });
   }
 
@@ -327,12 +336,9 @@ class BSScanner {
         (0x3B1 <= asUnicode && asUnicode <= 0x3c9); //Grek small
   }
 
-  static bool _isMathSymbol(String c) => false;
-
-  ///returns true if [c] is from the latin or greek alphabets,
-  ///or if it is a valid mathematical symbol
+  ///returns true if [c] is from the latin or greek alphabets
   static bool _isValidCharacter(String c) =>
-      _isAlpha(c) || _isGreek(c) || _isMathSymbol(c);
+      _isAlpha(c) || _isGreek(c);
 
   ///true if [c] is a digit, from the latin or greek alphabets,
   ///or if it is a valid mathematical symbol
