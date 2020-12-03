@@ -1,9 +1,9 @@
 import 'dart:collection';
 
-import 'βs_set.dart';
+import 'set.dart';
 import '../logic/logic.dart';
-import '../βs_function/variable.dart';
-import '../βs_function/βs_function.dart';
+import '../function/variable.dart';
+import '../function/function.dart';
 
 BSSet builderSet(LogicExpression rule, [List<Variable> parameters]) {
   final sol = rule.solution;

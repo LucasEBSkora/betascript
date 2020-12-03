@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'native_callable.dart';
-import 'βs_interpreter.dart';
+import 'interpreter.dart';
 import '../sets/sets.dart';
-import '../βs_function/βs_calculus.dart';
+import '../function/functions.dart';
 
 final _x = variable("x");
 final _b = variable("b");

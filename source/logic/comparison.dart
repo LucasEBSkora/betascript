@@ -6,7 +6,7 @@ import 'logic_expression.dart';
 import 'solvers/single_variable_solver.dart';
 import '../sets/sets.dart';
 import '../utils/three_valued_logic.dart';
-import '../βs_function/βs_calculus.dart';
+import '../function/functions.dart';
 
 ///A class that represents an equation or inequality
 abstract class Comparison extends LogicExpression {

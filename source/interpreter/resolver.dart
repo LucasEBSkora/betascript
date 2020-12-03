@@ -4,8 +4,8 @@ import 'expr.dart';
 import 'native_globals.dart';
 import 'stmt.dart';
 import 'token.dart';
-import 'βscript.dart';
-import 'βs_interpreter.dart';
+import 'betascript.dart';
+import 'interpreter.dart';
 
 enum RoutineType { none, routine, initializer, method }
 

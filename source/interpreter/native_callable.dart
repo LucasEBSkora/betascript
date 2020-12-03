@@ -1,5 +1,5 @@
-import 'βs_callable.dart';
-import 'βs_interpreter.dart';
+import 'callable.dart';
+import 'interpreter.dart';
 
 ///An implementation of BSCallable used to create native functions
 class NativeCallable implements BSCallable {

@@ -1,5 +1,5 @@
-import 'βs_set.dart';
-import '../βs_function/βs_function.dart';
+import 'set.dart';
+import '../function/function.dart';
 
 ///shouldn't be created directly: derived from intersections involving Builder sets where finding every solution isn't guaranteed
 class IntensionalSetIntersection extends BSSet {

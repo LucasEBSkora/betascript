@@ -1,12 +1,12 @@
 import 'solver.dart';
 import '../logic.dart';
 import '../../sets/sets.dart';
-import '../../βs_function/multiplication.dart';
-import '../../βs_function/negative.dart';
-import '../../βs_function/number.dart';
-import '../../βs_function/sum.dart';
-import '../../βs_function/variable.dart';
-import '../../βs_function/βs_function.dart';
+import '../../function/multiplication.dart';
+import '../../function/negative.dart';
+import '../../function/number.dart';
+import '../../function/sum.dart';
+import '../../function/variable.dart';
+import '../../function/function.dart';
 
 //in the context of this program, ?= means ==, !=, <, >, <= or >=
 

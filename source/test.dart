@@ -1,6 +1,6 @@
 import 'logic/logic.dart';
 import 'sets/sets.dart';
-import 'βs_function/βs_calculus.dart';
+import 'function/functions.dart';
 
 void main() {
   final x = variable("x");

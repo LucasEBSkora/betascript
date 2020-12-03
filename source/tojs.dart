@@ -2,7 +2,7 @@
 
 import 'dart:html';
 
-import 'interpreter/βscript.dart';
+import 'interpreter/betascript.dart';
 
 int main() {
   // File file = File();

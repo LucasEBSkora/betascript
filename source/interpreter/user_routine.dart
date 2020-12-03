@@ -1,8 +1,8 @@
 import 'stmt.dart';
-import 'βs_callable.dart';
-import 'βs_environment.dart';
-import 'βs_instance.dart';
-import 'βs_interpreter.dart';
+import 'callable.dart';
+import 'environment.dart';
+import 'instance.dart';
+import 'interpreter.dart';
 
 class UserRoutine implements BSCallable {
   final RoutineStmt _declaration;

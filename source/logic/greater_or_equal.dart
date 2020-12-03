@@ -1,5 +1,5 @@
 import 'comparison.dart';
-import '../βs_function/βs_function.dart';
+import '../function/function.dart';
 
 class GreaterOrEqual extends Comparison {
   GreaterOrEqual(BSFunction left, BSFunction right) : super(left, right);

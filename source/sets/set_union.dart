@@ -1,7 +1,7 @@
 import 'empty_set.dart';
 import 'roster_set.dart';
-import 'βs_set.dart';
-import '../βs_function/βs_calculus.dart';
+import 'set.dart';
+import '../function/functions.dart';
 
 BSSet setUnion(Iterable<BSSet> subsets) {
   var _subsets = subsets.where((element) => !(element == emptySet)).toList();

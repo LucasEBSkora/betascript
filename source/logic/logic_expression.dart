@@ -2,7 +2,7 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 
 import '../sets/sets.dart';
 import '../utils/three_valued_logic.dart';
-import '../βs_function/βs_calculus.dart';
+import '../function/functions.dart';
 
 ///A class used to REPRESENT a logic expression and to check if a set of values solves it, but not necessarily to solve them
 abstract class LogicExpression {

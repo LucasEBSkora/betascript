@@ -1,6 +1,6 @@
-import 'βs_callable.dart';
-import '../βs_function/βs_function.dart';
-import 'βs_interpreter.dart';
+import 'callable.dart';
+import '../function/function.dart';
+import 'interpreter.dart';
 
 class FunctionAdapter implements BSCallable {
   final BSFunction adaptee;

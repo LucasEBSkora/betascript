@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'logic_expression.dart';
 import '../sets/sets.dart';
 import '../utils/three_valued_logic.dart';
-import '../βs_function/βs_calculus.dart';
+import '../function/functions.dart';
 
 class Constant extends LogicExpression {
   final BSLogical value;

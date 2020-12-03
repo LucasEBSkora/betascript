@@ -4,7 +4,7 @@ import 'constant.dart';
 import 'logic_expression.dart';
 import '../sets/sets.dart';
 import '../utils/three_valued_logic.dart';
-import '../βs_function/βs_calculus.dart';
+import '../function/functions.dart';
 
 LogicExpression and(LogicExpression left, LogicExpression right) {
   // (1 && A) == A, (0 && A) == 0

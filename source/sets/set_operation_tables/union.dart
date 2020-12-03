@@ -3,7 +3,7 @@ import 'dart:collection';
 import '../sets.dart';
 import '../../logic/logic.dart';
 import '../../utils/method_table.dart';
-import '../../βs_function/βs_calculus.dart';
+import '../../function/functions.dart';
 
 //If we get to this function, we already now the sets are not disjoined
 ComutativeMethodTable<BSSet, BSSet> defineUnionTable() {
