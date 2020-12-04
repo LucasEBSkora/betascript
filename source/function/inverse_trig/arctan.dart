@@ -1,18 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../functions.dart';
-import '../function.dart';
 import '../trig/tan.dart';
 
 BSFunction arctan(BSFunction operand) {
   return (operand is Tan) ? operand.operand : ArcTan._(operand);
 }
 
-class ArcTan extends singleOperandFunction {
+class ArcTan extends SingleOperandFunction {
   const ArcTan._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -36,9 +36,8 @@ class ArcTan extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (operand.derivativeInternal(v) / (n(1) + (operand ^ n(2))));
+  BSFunction copy([Set<Variable> params]) => ArcTan._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcTan._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArcTan(this);
 }

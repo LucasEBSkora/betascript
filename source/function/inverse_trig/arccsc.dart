@@ -1,19 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import '../abs.dart';
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
-import '../root.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../function.dart';
 import '../trig/csc.dart';
 
 BSFunction arccsc(BSFunction operand) {
   return (operand is Csc) ? operand.operand : ArcCsc._(operand);
 }
 
-class ArcCsc extends singleOperandFunction {
+class ArcCsc extends SingleOperandFunction {
   const ArcCsc._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -37,9 +36,8 @@ class ArcCsc extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) => (operand.derivativeInternal(v) /
-      (abs(operand) * root((operand ^ n(2)) - n(1))));
+  BSFunction copy([Set<Variable> params]) => ArcCsc._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcCsc._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArcCsc(this);
 }

@@ -1,19 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
-import '../root.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../functions.dart';
-import '../function.dart';
 import '../hyperbolic/sech.dart';
 
 BSFunction arsech(BSFunction operand) {
   return (operand is SecH) ? operand.operand : ArSecH._(operand);
 }
 
-class ArSecH extends singleOperandFunction {
+class ArSecH extends SingleOperandFunction {
   const ArSecH._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -37,11 +36,10 @@ class ArSecH extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) => (-operand.derivativeInternal(v) /
-      (operand * root(n(1) - (operand ^ n(2)))));
+  BSFunction copy([Set<Variable> params]) => ArSecH._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArSecH._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArSecH(this);
 }
 
 double _arsech(double v) => math.log((1 + math.sqrt(1 - math.pow(v, 2))) / v);

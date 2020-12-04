@@ -2,11 +2,11 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 
 import 'division.dart';
 import 'exponentiation.dart';
+import 'function.dart';
+import 'visitors/function_visitor.dart';
 import 'negative.dart';
 import 'number.dart';
-import 'sum.dart';
 import 'variable.dart';
-import 'function.dart';
 import '../utils/tuples.dart';
 
 BSFunction multiply(List<BSFunction> operands) {
@@ -84,39 +84,8 @@ class Multiplication extends BSFunction {
   const Multiplication(this.operands, [Set<Variable> params]) : super(params);
 
   @override
-  BSFunction derivativeInternal(Variable v) {
-    final ops = <BSFunction>[];
-    for (int i = 0; i < operands.length; ++i) {
-      //copies list
-      final term = operands.toList();
-
-      term.insert(i, term.removeAt(i).derivative(v));
-      //removes "current" operand (which isn't derivated)
-
-      ops.add(multiply(term));
-    }
-
-    return add(ops);
-  }
-
-  @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>
       multiply(<BSFunction>[for (final f in operands) f.evaluate(p)]);
-
-  @override
-  String toString() {
-    var s = '(';
-
-    s += operands[0].toString();
-
-    for (var i = 1; i < operands.length; ++i) {
-      s += '*' + operands[i].toString();
-    }
-
-    s += ')';
-
-    return s;
-  }
 
   @override
   BSFunction copy([Set<Variable> params]) => Multiplication(operands, params);
@@ -128,6 +97,9 @@ class Multiplication extends BSFunction {
   @override
   BSFunction get approx =>
       multiply(<BSFunction>[for (var f in operands) f.approx]);
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitMultiplication(this);
 }
 
 ///If there are other [Multiplication]s in [operands],

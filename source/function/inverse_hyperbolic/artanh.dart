@@ -1,18 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../functions.dart';
-import '../function.dart';
 import '../hyperbolic/tanh.dart';
 
 BSFunction artanh(BSFunction operand) {
   return (operand is TanH) ? operand.operand : ArTanH._(operand);
 }
 
-class ArTanH extends singleOperandFunction {
+class ArTanH extends SingleOperandFunction {
   const ArTanH._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -36,11 +36,10 @@ class ArTanH extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (operand.derivativeInternal(v) / (n(1) - (operand ^ n(2))));
+  BSFunction copy([Set<Variable> params]) => ArTanH._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArTanH._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArTanH(this);
 }
 
 double _artanh(double v) => (1 / 2) * math.log((1 + v) / (1 - v));

@@ -1,18 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../functions.dart';
-import '../function.dart';
 import '../trig/ctg.dart';
 
 BSFunction arcctg(BSFunction operand) {
   return (operand is Ctg) ? operand.operand : ArcCtg._(operand);
 }
 
-class ArcCtg extends singleOperandFunction {
+class ArcCtg extends SingleOperandFunction {
   const ArcCtg._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -36,9 +36,8 @@ class ArcCtg extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (-operand.derivativeInternal(v) / (n(1) + (operand ^ n(2))));
+  BSFunction copy([Set<Variable> params]) => ArcCtg._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcCtg._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArcCtg(this);
 }

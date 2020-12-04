@@ -1,11 +1,12 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
 
 import 'exponentiation.dart';
+import 'function.dart';
+import 'visitors/function_visitor.dart';
 import 'multiplication.dart';
 import 'negative.dart';
 import 'number.dart';
 import 'variable.dart';
-import 'function.dart';
 
 BSFunction divide(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {
@@ -40,12 +41,6 @@ class Division extends BSFunction {
       : super(params);
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      ((numerator.derivativeInternal(v) * denominator -
-              denominator.derivativeInternal(v) * numerator) /
-          (denominator ^ (n(2))));
-
-  @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
     final _n = numerator.evaluate(p);
     final _d = denominator.evaluate(p);
@@ -66,9 +61,6 @@ class Division extends BSFunction {
         ? negative(divide([_num.first], [_den.first]))
         : divide([_num.first], [_den.first]);
   }
-
-  @override
-  String toString() => "(($numerator)/($denominator))";
 
   @override
   BSFunction copy([Set<Variable> params]) =>
@@ -99,6 +91,9 @@ class Division extends BSFunction {
         ? negative(divide([_num.first], [_den.first]))
         : divide([_num.first], [_den.first]);
   }
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitDivision(this);
 }
 
 ///Cancels out identical factors in [numerator] and [denominator]

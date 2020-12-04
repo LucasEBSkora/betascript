@@ -6,7 +6,7 @@ class FunctionAdapter implements BSCallable {
   final BSFunction adaptee;
 
   const FunctionAdapter(this.adaptee);
-  
+
   @override
   int get arity => adaptee.parameters.length;
 
@@ -14,8 +14,7 @@ class FunctionAdapter implements BSCallable {
   @override
   Object callThing(BSInterpreter interpreter, List<Object> arguments) =>
       adaptee(arguments.map((object) => object as BSFunction).toList());
-  
+
   @override
   String toString() => adaptee.toString();
-
 }

@@ -81,8 +81,8 @@ MethodTable<BSLogical, BSSet> defineContainsTable() {
   methods.addMethod(
       RosterSet, BuilderSet, (RosterSet first, BuilderSet second) => bsUnknown);
 
-  methods.addMethod(
-      BuilderSet, BuilderSet, (BuilderSet first, BuilderSet second) => bsUnknown);
+  methods.addMethod(BuilderSet, BuilderSet,
+      (BuilderSet first, BuilderSet second) => bsUnknown);
 
   return methods;
 }

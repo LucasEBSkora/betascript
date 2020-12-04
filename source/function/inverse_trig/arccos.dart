@@ -1,19 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
-import '../root.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../function.dart';
-import '../functions.dart';
 import '../trig/cos.dart';
 
 BSFunction arccos(BSFunction operand) {
   return (operand is Cos) ? operand.operand : ArcCos._(operand);
 }
 
-class ArcCos extends singleOperandFunction {
+class ArcCos extends SingleOperandFunction {
   const ArcCos._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -37,9 +36,8 @@ class ArcCos extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (-operand.derivativeInternal(v) / root(n(1) - (operand ^ n(2))));
+  BSFunction copy([Set<Variable> params]) => ArcCos._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcCos._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArcCos(this);
 }

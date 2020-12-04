@@ -1,9 +1,10 @@
 import 'dart:math' as math;
 import 'dart:collection' show HashMap, SplayTreeSet;
 
+import 'function.dart';
+import 'visitors/function_visitor.dart';
 import 'number.dart';
 import 'variable.dart';
-import 'function.dart';
 
 BSFunction log(BSFunction operand, [BSFunction base = Constants.e]) {
   //log_a(1) == 0 for every a
@@ -25,14 +26,6 @@ class Log extends BSFunction {
   const Log._(this.operand, this.base, [Set<Variable> params]) : super(params);
 
   @override
-  BSFunction derivativeInternal(Variable v) {
-    return (base is Number)
-        ? (operand.derivativeInternal(v) / (log(base) * operand))
-        : ((log(operand) / log(base)).derivativeInternal(v));
-    //if base is also a function, uses log_b(a) = ln(a)/ln(b) s
-  }
-
-  @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
     final b = base.evaluate(p);
     final op = operand.evaluate(p);
@@ -44,10 +37,6 @@ class Log extends BSFunction {
     }
     return log(op, b);
   }
-
-  @override
-  String toString() =>
-      (base == Constants.e) ? "ln($operand)" : "log($base)($operand)";
 
   @override
   BSFunction copy([Set<Variable> params]) => Log._(operand, base, params);
@@ -64,4 +53,7 @@ class Log extends BSFunction {
         ? n(math.log(op.value) / math.log(b.value))
         : log(op, b);
   }
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitLog(this);
 }

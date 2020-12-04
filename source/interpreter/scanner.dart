@@ -176,7 +176,8 @@ class BSScanner {
       '∩': () => _addToken(TokenType.intersection),
       '∧': () => _addToken(TokenType.and),
       '∨': () => _addToken(TokenType.or),
-
+      '∂': () => _addToken(TokenType.del),
+      '≡': () => _addToken(TokenType.identicallyEquals),
     });
   }
 
@@ -337,8 +338,7 @@ class BSScanner {
   }
 
   ///returns true if [c] is from the latin or greek alphabets
-  static bool _isValidCharacter(String c) =>
-      _isAlpha(c) || _isGreek(c);
+  static bool _isValidCharacter(String c) => _isAlpha(c) || _isGreek(c);
 
   ///true if [c] is a digit, from the latin or greek alphabets,
   ///or if it is a valid mathematical symbol

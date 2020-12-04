@@ -38,14 +38,13 @@ ComutativeMethodTable<BSLogical, BSSet> defineDisjoinedTable() {
   //looks for any elements of first contained in second.
   //if it doesn't find any, the sets are disjoined
   methods.addMethodsInLine(
-      RosterSet,
-      [Interval, RosterSet, BuilderSet, IntensionalSetIntersection],
+      RosterSet, [Interval, RosterSet, BuilderSet, IntensionalSetIntersection],
       (RosterSet first, BSSet second) {
-          for (var element in first.elements) {
-            if (second.belongs(element)) return bsFalse;
-          }
-          return bsTrue;
-      });
+    for (var element in first.elements) {
+      if (second.belongs(element)) return bsFalse;
+    }
+    return bsTrue;
+  });
 
   methods.addMethod(
       Interval, BuilderSet, (Interval first, BuilderSet second) => bsUnknown);

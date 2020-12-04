@@ -1,10 +1,11 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
 
+import 'function.dart';
+import 'visitors/function_visitor.dart';
 import 'multiplication.dart';
 import 'negative.dart';
 import 'number.dart';
 import 'variable.dart';
-import 'function.dart';
 import '../utils/tuples.dart';
 
 BSFunction add(List<BSFunction> operands) {
@@ -28,34 +29,8 @@ class Sum extends BSFunction {
   const Sum._(this.operands, [Set<Variable> params]) : super(params);
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      add(operands.map((BSFunction f) => f.derivativeInternal(v)).toList());
-
-  @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>
       add(operands.map((BSFunction f) => f.evaluate(p)).toList());
-
-  @override
-  String toString() {
-    var s = '(';
-
-    s += operands[0].toString();
-
-    for (int i = 1; i < operands.length; ++i) {
-      var _op = operands[i];
-      if (_op is Negative) {
-        s += " - ";
-        _op = (_op as Negative).operand;
-      } else
-        s += " + ";
-
-      s += _op.toString();
-    }
-
-    s += ')';
-
-    return s;
-  }
 
   @override
   BSFunction copy([Set<Variable> params]) => Sum._(operands, params);
@@ -67,6 +42,9 @@ class Sum extends BSFunction {
   @override
   BSFunction get approx =>
       add(<BSFunction>[for (final f in operands) f.approx]);
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitSum(this);
 }
 
 ///If the List passed already has [Sum]s in it, removes the [Sum] and adds its

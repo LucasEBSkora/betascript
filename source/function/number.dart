@@ -1,9 +1,10 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
 import 'dart:math' as math;
 
+import 'function.dart';
+import 'visitors/function_visitor.dart';
 import 'negative.dart';
 import 'variable.dart';
-import 'function.dart';
 
 BSFunction n(num value) {
   if (value < 0) return negative(Number._(value.abs()));
@@ -49,12 +50,6 @@ class Number extends BSFunction {
   }
 
   @override
-  String toString() => name;
-
-  @override
-  BSFunction derivativeInternal(Variable v) => n(0);
-
-  @override
   BSFunction evaluate(HashMap<String, BSFunction> p) => this;
 
   num get value => absvalue;
@@ -75,4 +70,7 @@ class Number extends BSFunction {
 
   @override
   BSFunction get approx => n(value);
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitNumber(this);
 }

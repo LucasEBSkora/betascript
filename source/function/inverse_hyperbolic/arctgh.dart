@@ -1,18 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../functions.dart';
-import '../function.dart';
 import '../hyperbolic/ctgh.dart';
 
 BSFunction arctgh(BSFunction operand) {
   return (operand is CtgH) ? operand.operand : ArCtgH._(operand);
 }
 
-class ArCtgH extends singleOperandFunction {
+class ArCtgH extends SingleOperandFunction {
   const ArCtgH._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -36,11 +36,10 @@ class ArCtgH extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (operand.derivativeInternal(v) / (n(1) - operand ^ n(2)));
+  BSFunction copy([Set<Variable> params]) => ArCtgH._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArCtgH._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArCtgH(this);
 }
 
 double _arctgh(double v) => 0.5 * math.log((v + 1) / (v - 1));

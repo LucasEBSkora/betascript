@@ -1,10 +1,11 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
 import 'dart:math' as math;
 
+import 'function.dart';
+import 'visitors/function_visitor.dart';
 import 'exponentiation.dart';
 import 'number.dart';
 import 'variable.dart';
-import 'function.dart';
 //TODO: Implement roots that aren't square roots
 
 BSFunction root(BSFunction operand) {
@@ -20,10 +21,6 @@ class Root extends BSFunction {
   const Root._(this.operand, [Set<Variable> params]) : super(params);
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (n(1 / 2) * (operand ^ n(-1 / 2)) * operand.derivativeInternal(v));
-
-  @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
     BSFunction opvalue = operand.evaluate(p);
     if (opvalue is Number) {
@@ -37,13 +34,11 @@ class Root extends BSFunction {
   }
 
   @override
-  String toString() => "sqrt($operand)";
-
-  @override
   BSFunction copy([Set<Variable> params]) => Root._(operand, params);
 
   @override
-  SplayTreeSet<Variable> get defaultParameters => operand.parameters;
+  SplayTreeSet<Variable> get defaultParameters =>
+      SplayTreeSet<Variable>.from(operand.parameters);
 
   @override
   BSFunction get approx {
@@ -55,4 +50,7 @@ class Root extends BSFunction {
       return root(opvalue); //in any other case, returns a root
     }
   }
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitRoot(this);
 }

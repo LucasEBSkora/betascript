@@ -1,24 +1,20 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import 'tanh.dart';
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../function.dart';
 import '../inverse_hyperbolic/arsech.dart';
 
 BSFunction sech(BSFunction operand) {
   return (operand is ArSecH) ? operand.operand : SecH._(operand);
 }
 
-class SecH extends singleOperandFunction {
+class SecH extends SingleOperandFunction {
   const SecH._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
-
-  @override
-  BSFunction derivativeInternal(Variable v) =>
-      (-sech(operand) * tanh(operand) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -41,6 +37,9 @@ class SecH extends singleOperandFunction {
 
   @override
   BSFunction copy([Set<Variable> params]) => SecH._(operand, params);
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitSecH(this);
 }
 
 double _sech(double v) => 2 / (math.exp(v) + math.exp(-v));

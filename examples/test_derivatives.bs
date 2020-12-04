@@ -1,0 +1,165 @@
+let f(x) = x^2
+print -f
+print ∂(-f) / ∂(x)
+print " ";
+
+let a = log(x, 2)
+print a
+print ∂(a) / ∂(x)
+print " ";
+
+let b = abs(f)
+print b
+print ∂(b) / ∂(x)
+print " ";
+
+let c = sgn(f)
+print c
+print ∂(c) / ∂(x)
+print " ";
+
+let d = sqrt(f)
+print d
+print ∂(d) / ∂(x)
+print " ";
+
+let g = ln(f)
+print g
+print ∂(g) / ∂(x)
+print " ";
+
+let h = sin(f)
+print h
+print ∂(h) / ∂(x)
+print " ";
+
+let i = cos(f)
+print i
+print ∂(i) / ∂(x)
+print " ";
+
+let j = tan(f)
+print j
+print ∂(j) / ∂(x)
+print " ";
+
+let k = sec(f)
+print k
+print ∂(k) / ∂(x)
+print " ";
+
+let l = csc(f)
+print l
+print ∂(l) / ∂(x)
+print " ";
+
+let m = ctg(f)
+print m
+print ∂(m) / ∂(x)
+print " ";
+
+let n = arcsin(f)
+print n
+print ∂(n) / ∂(x)
+print " ";
+
+let o = arccos(f)
+print o
+print ∂(o) / ∂(x)
+print " ";
+
+let p = arctan(f)
+print p
+print ∂(p) / ∂(x)
+print " ";
+
+let q = arcsec(f)
+print q
+print ∂(q) / ∂(x)
+print " ";
+
+let r = arccsc(f)
+print r
+print ∂(r) / ∂(x)
+print " ";
+
+let s = arcctg(f)
+print s
+print ∂(s) / ∂(x)
+print " ";
+
+let t = sinh(f)
+print t
+print ∂(t) / ∂(x)
+print " ";
+
+let u = cosh(f)
+print u
+print ∂(u) / ∂(x)
+print " ";
+
+let v = tanh(f)
+print v
+print ∂(v) / ∂(x)
+print " ";
+
+let w = sech(f)
+print w
+print ∂(w) / ∂(x)
+print " ";
+
+let y = csch(f)
+print y
+print ∂(y) / ∂(x)
+print " ";
+
+let z = ctgh(f)
+print z
+print ∂(z) / ∂(x)
+print " ";
+
+let α = arsinh(f)
+print α
+print ∂(α) / ∂(x)
+print " ";
+
+let β = arcosh(f)
+print β
+print ∂(β) / ∂(x)
+print " ";
+
+let γ = artanh(f)
+print γ
+print ∂(γ) / ∂(x)
+print " ";
+
+let δ = arsech(f)
+print δ
+print ∂(δ) / ∂(x)
+print " ";
+
+let ε = arcsch(f)
+print ε
+print ∂(ε) / ∂(x)
+print " ";
+
+let ζ = arctgh(f)
+print ζ
+print ∂(ζ) / ∂(x)
+print " ";
+
+let μ(x) = x^2 + 2^x
+print μ
+print ∂(μ) / ∂(x)
+print " ";
+
+let λ = sin(x)*(x^3)*ln(x)
+print λ
+print ∂(λ) / ∂(x)
+print " ";
+
+let φ = sin(x)/ln(x)
+print φ
+print ∂(φ) / ∂(x)
+print " ";
+

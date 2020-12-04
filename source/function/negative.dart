@@ -1,8 +1,10 @@
-import 'dart:collection' show HashMap, SplayTreeSet;
+import 'dart:collection' show HashMap;
 
+import 'function.dart';
+import 'single_operand_function.dart';
+import 'visitors/function_visitor.dart';
 import 'number.dart';
 import 'variable.dart';
-import 'function.dart';
 
 BSFunction negative(BSFunction op) {
   if (op is Negative) return op.operand;
@@ -12,12 +14,11 @@ BSFunction negative(BSFunction op) {
     return Negative._(op);
 }
 
-class Negative extends BSFunction {
-  final BSFunction operand;
+class Negative extends SingleOperandFunction {
+  const Negative._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
-  const Negative._(this.operand, [Set<Variable> params]) : super(params);
-
-  const Negative(this.operand) : super(null);
+  const Negative(BSFunction operand) : super(operand, null);
 
   @override
   BSFunction get approx => negative(operand.approx);
@@ -27,15 +28,9 @@ class Negative extends BSFunction {
       Negative._(operand, parameters);
 
   @override
-  SplayTreeSet<Variable> get defaultParameters => operand.parameters;
-
-  @override
-  BSFunction derivativeInternal(Variable v) => negative(operand.derivative(v));
-
-  @override
-  String toString() => "-$operand";
-
-  @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>
       negative(operand.evaluate(p));
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitNegative(this);
 }

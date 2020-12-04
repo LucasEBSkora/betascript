@@ -1,20 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import '../abs.dart';
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
-import '../root.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../functions.dart';
-import '../function.dart';
 import '../trig/sec.dart';
 
 BSFunction arcsec(BSFunction operand) {
   return (operand is Sec) ? operand.operand : ArcSec._(operand);
 }
 
-class ArcSec extends singleOperandFunction {
+class ArcSec extends SingleOperandFunction {
   const ArcSec._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -38,9 +36,8 @@ class ArcSec extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) => (operand.derivativeInternal(v) /
-      (abs(operand) * root((operand ^ n(2)) - n(1))));
+  BSFunction copy([Set<Variable> params]) => ArcSec._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcSec._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArcSec(this);
 }

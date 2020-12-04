@@ -4,13 +4,15 @@ import 'package:meta/meta.dart';
 
 import 'division.dart';
 import 'exponentiation.dart';
+import 'visitors/function_visitor.dart';
 import 'multiplication.dart';
 import 'negative.dart';
 import 'number.dart';
 import 'sum.dart';
 import 'variable.dart';
-import 'calculus.dart';
+import 'visitors/partial_derivative.dart';
 import '../utils/tuples.dart';
+import 'visitors/plain_stringifier.dart';
 
 abstract class BSFunction {
   ///set of parameters the function is defined in ( the previous function NEEDS x, y and z to be evaluated, but we could define it in x,y,z and w if we wanted to)
@@ -35,7 +37,8 @@ abstract class BSFunction {
 
   ///Returns the partial derivative of this in relation to [v]
   @nonVirtual
-  BSFunction derivative(Variable v) => _merge(derivativeInternal(v), this);
+  BSFunction derivative(Variable v) =>
+      _merge(accept(PartialDerivative(v)), this);
 
   ///If there is a custom set of parameters, returns it. If there isn't, returns the default one
   @nonVirtual
@@ -122,11 +125,6 @@ abstract class BSFunction {
     return (v.first > v.second) ? x : y;
   }
 
-  ///calculates the partial derivative of this in relation to v without merging.
-  ///Is called by 'derivative', which also merges the functions.
-  @visibleForOverriding
-  BSFunction derivativeInternal(Variable v);
-
   @visibleForOverriding
   const BSFunction(this._parameters);
 
@@ -137,7 +135,8 @@ abstract class BSFunction {
   ///for approximations, use the approx getter
   BSFunction evaluate(HashMap<String, BSFunction> p);
 
-  String toString() => throw UnimplementedError();
+  @nonVirtual
+  String toString() => accept<String>(PlainStringifier());
 
   ///returns the variables which this function actually needs to be evaluated ( e.g. (sin(x+y)*z).parameters returns [x, y, z]).
   ///It does, however, take into account custom parameters of its child functions
@@ -164,6 +163,8 @@ abstract class BSFunction {
 
     return Trio((f is T) ? f : null, f is T, _isInNegative);
   }
+
+  T accept<T>(FunctionVisitor visitor);
 }
 
 class BetascriptFunctionError implements Exception {

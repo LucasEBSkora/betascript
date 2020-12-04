@@ -1,9 +1,11 @@
-import 'dart:collection' show HashMap, SplayTreeSet;
+import 'dart:collection' show HashMap;
 
 import 'abs.dart';
+import 'function.dart';
+import 'single_operand_function.dart';
+import 'visitors/function_visitor.dart';
 import 'number.dart';
 import 'variable.dart';
-import 'function.dart';
 
 BSFunction sgn(BSFunction operand) {
   final _f1 = BSFunction.extractFromNegative<Number>(operand);
@@ -17,29 +19,22 @@ BSFunction sgn(BSFunction operand) {
   return Signum._(operand);
 }
 
-class Signum extends BSFunction {
-  final BSFunction operand;
-
-  const Signum._(this.operand, [Set<Variable> params]) : super(params);
+class Signum extends SingleOperandFunction {
+  const Signum._(BSFunction operand, [Set<Variable> params])
+      : super(operand, params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>
       sgn(operand.evaluate(p));
 
-  //The derivative of the sign function is either 0 or undefined.
-  @override
-  BSFunction derivativeInternal(Variable v) => n(0);
-
-  @override
-  String toString() => "sign($operand)";
-
   @override
   BSFunction copy([Set<Variable> params]) => Signum._(operand, params);
 
-  SplayTreeSet<Variable> get defaultParameters => operand.parameters;
-
   @override
   BSFunction get approx => sgn(operand.approx);
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitSignum(this);
 }
 
 double sign(double v) {

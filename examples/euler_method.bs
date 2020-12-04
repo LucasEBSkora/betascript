@@ -19,13 +19,3 @@ for (; t0 < tf; t0 = t0 + h) {
   y0 = ~(y0 + f(y0, t0)*h);
 }
 print("t: " + t0 + " y: " + y0);
-
-/*
-y0 = 1
-
-//second-degree Euler aproximation
-for (t0 = 0; t0 < tf; t0 = t0 + h) {
-  print "t: " + t0 + " y: " + y0 ;
-  y0 = ~(y0 + f(y0, t0)*h + (-2 - f(y0,t0)/2)*(h^2)/2);
-}
-*/

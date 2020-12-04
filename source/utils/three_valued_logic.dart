@@ -36,7 +36,6 @@ class BSLogical {
     return bsFalse;
   }
 
-
   BSLogical operator ^(BSLogical other) {
     if ((_value == _logic.bsU) | (other._value == _logic.bsU)) return bsUnknown;
     return (other != this) ? bsTrue : bsFalse;

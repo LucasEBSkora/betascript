@@ -1,24 +1,20 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import 'sec.dart';
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../function.dart';
 import '../inverse_trig/arctan.dart';
 
 BSFunction tan(BSFunction operand) {
   return (operand is ArcTan) ? operand.operand : Tan._(operand);
 }
 
-class Tan extends singleOperandFunction {
+class Tan extends SingleOperandFunction {
   const Tan._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
-
-  @override
-  BSFunction derivativeInternal(Variable v) =>
-      ((sec(operand) ^ n(2)) * operand.derivativeInternal(v));
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -40,4 +36,7 @@ class Tan extends singleOperandFunction {
 
   @override
   BSFunction copy([Set<Variable> params]) => Tan._(operand, params);
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitTan(this);
 }

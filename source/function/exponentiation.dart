@@ -1,10 +1,10 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
 import 'dart:math';
 
-import 'log.dart';
+import 'function.dart';
+import 'visitors/function_visitor.dart';
 import 'number.dart';
 import 'variable.dart';
-import 'function.dart';
 
 BSFunction exp(BSFunction exponent, [BSFunction base = Constants.e]) {
   if (exponent == n(1)) return base;
@@ -15,7 +15,9 @@ BSFunction exp(BSFunction exponent, [BSFunction base = Constants.e]) {
       !exponent.isNamed &&
       !base.isNamed) {
     return n(pow(base.value, exponent.value));
-  } else
+  } else if (base is Exponentiation)
+    return base.base ^ (exponent * base.exponent);
+  else
     return Exponentiation._(exponent, base);
 }
 
@@ -25,13 +27,6 @@ class Exponentiation extends BSFunction {
 
   const Exponentiation._(this.exponent, this.base, [Set<Variable> params])
       : super(params);
-
-  @override
-  BSFunction derivativeInternal(Variable v) {
-    return ((base ^ exponent) *
-        (exponent * (log(base).derivativeInternal(v)) +
-            exponent.derivativeInternal(v) * log(base)));
-  }
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -45,9 +40,6 @@ class Exponentiation extends BSFunction {
 
     return exp(b, expo);
   }
-
-  @override
-  String toString() => "(($base)^($exponent))";
 
   BSFunction copy([Set<Variable> params]) =>
       Exponentiation._(exponent, base, params);
@@ -68,4 +60,7 @@ class Exponentiation extends BSFunction {
       return n(pow(pair.first, pair.second));
     }
   }
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitExponentiation(this);
 }

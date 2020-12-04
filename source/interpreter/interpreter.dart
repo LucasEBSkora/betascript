@@ -50,7 +50,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   Object visitBinaryExpr(BinaryExpr e) {
     final leftOperand = _evaluate(e.left);
     final rightOperand = _evaluate(e.right);
-    
+
     //operations for functions
     if (leftOperand is BSFunction && rightOperand is BSFunction) {
       final nums = BSFunction.toNums(leftOperand, rightOperand);

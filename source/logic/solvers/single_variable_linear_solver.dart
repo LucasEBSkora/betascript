@@ -24,33 +24,33 @@ class SingleVariableLinearSolver extends Solver {
 
   @override
   bool appliesInternal() {
-      //we're sure that the expression only uses one variable because it was checked in SingleVariableSolver
-      if (expr is Comparison) {
-        //f(x) ?= g(x)
-        _comp = expr;
-        //"passes" everything to the left side of the equation
-        _left = _comp.left - _comp.right;
-        //f(x) - g(x) ?= 0
-        //if possible/necessary, gets rid of a minus sign, but keeps it saved in case the comparison is a inequation
-        if (_left is Negative) {
-          invertedInequality = true;
-          _left = (_left as Negative).operand;
-        }
-        final _terms = <BSFunction>[];
-        //if the function is a sum, separates it into terms to check if all of them are linear
-        if (_left is Sum) {
-          _terms.addAll((_left as Sum).operands);
-        } else {
-          //if it isn't, checks that single term
-          _terms.add(_left);
-        }
-
-        //checks if all terms are linear, and calculates the coefficients when they are. If all terms are linear, the solver applies
-        return _terms.fold(
-            true,
-            (previousValue, element) =>
-                previousValue && _extractCoefficients(element));
+    //we're sure that the expression only uses one variable because it was checked in SingleVariableSolver
+    if (expr is Comparison) {
+      //f(x) ?= g(x)
+      _comp = expr;
+      //"passes" everything to the left side of the equation
+      _left = _comp.left - _comp.right;
+      //f(x) - g(x) ?= 0
+      //if possible/necessary, gets rid of a minus sign, but keeps it saved in case the comparison is a inequation
+      if (_left is Negative) {
+        invertedInequality = true;
+        _left = (_left as Negative).operand;
       }
+      final _terms = <BSFunction>[];
+      //if the function is a sum, separates it into terms to check if all of them are linear
+      if (_left is Sum) {
+        _terms.addAll((_left as Sum).operands);
+      } else {
+        //if it isn't, checks that single term
+        _terms.add(_left);
+      }
+
+      //checks if all terms are linear, and calculates the coefficients when they are. If all terms are linear, the solver applies
+      return _terms.fold(
+          true,
+          (previousValue, element) =>
+              previousValue && _extractCoefficients(element));
+    }
 
     return false;
   }

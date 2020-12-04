@@ -1,24 +1,20 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import 'sin.dart';
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../function.dart';
 import '../inverse_trig/arccos.dart';
 
 BSFunction cos(BSFunction operand) {
   return (operand is ArcCos) ? operand.operand : Cos._(operand);
 }
 
-class Cos extends singleOperandFunction {
+class Cos extends SingleOperandFunction {
   const Cos._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
-
-  @override
-  BSFunction derivativeInternal(Variable v) =>
-      (-sin(operand) * (operand.derivativeInternal(v)));
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -40,4 +36,7 @@ class Cos extends singleOperandFunction {
 
   @override
   BSFunction copy([Set<Variable> params]) => Cos._(operand, params);
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitCos(this);
 }

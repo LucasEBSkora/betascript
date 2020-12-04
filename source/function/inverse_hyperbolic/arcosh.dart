@@ -1,19 +1,18 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
-import '../root.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../function.dart';
-import '../functions.dart';
 import '../hyperbolic/cosh.dart';
 
 BSFunction arcosh(BSFunction operand) {
   return (operand is CosH) ? operand.operand : ArCosH._(operand);
 }
 
-class ArCosH extends singleOperandFunction {
+class ArCosH extends SingleOperandFunction {
   const ArCosH._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
@@ -37,11 +36,10 @@ class ArCosH extends singleOperandFunction {
   }
 
   @override
-  BSFunction derivativeInternal(Variable v) =>
-      (operand.derivativeInternal(v) / root((operand ^ n(2)) - n(1)));
+  BSFunction copy([Set<Variable> params]) => ArCosH._(operand, params);
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArCosH._(operand, params);
+  T accept<T>(FunctionVisitor visitor) => visitor.visitArCosH(this);
 }
 
 double _arcosh(double v) => math.log(v + math.sqrt(math.pow(v, 2) - 1));

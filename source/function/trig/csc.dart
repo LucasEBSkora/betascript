@@ -1,24 +1,21 @@
 import 'dart:collection' show HashMap;
 import 'dart:math' as math;
 
-import 'ctg.dart';
+import '../function.dart';
+import '../visitors/function_visitor.dart';
 import '../number.dart';
 import '../single_operand_function.dart';
 import '../variable.dart';
-import '../function.dart';
 import '../inverse_trig/arccsc.dart';
 
 BSFunction csc(BSFunction operand) {
   return (operand is ArcCsc) ? operand.operand : Csc._(operand);
 }
 
-class Csc extends singleOperandFunction {
+class Csc extends SingleOperandFunction {
   const Csc._(BSFunction operand, [Set<Variable> params])
       : super(operand, params);
 
-  @override
-  BSFunction derivativeInternal(Variable v) =>
-      (-csc(operand) * ctg(operand) * operand.derivativeInternal(v));
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
     final op = operand.evaluate(p);
@@ -39,4 +36,7 @@ class Csc extends singleOperandFunction {
 
   @override
   BSFunction copy([Set<Variable> params]) => Csc._(operand, params);
+
+  @override
+  T accept<T>(FunctionVisitor visitor) => visitor.visitCsc(this);
 }
