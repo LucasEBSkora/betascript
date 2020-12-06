@@ -35,7 +35,7 @@ import '../division.dart';
 import '../abs.dart';
 import 'function_visitor.dart';
 
-class PlainStringifier implements FunctionVisitor<String> {
+class PlainFunctionStringifier implements FunctionVisitor<String> {
   @override
   String visitAbs(AbsoluteValue f) => "|${f.operand}|";
 

@@ -2,7 +2,7 @@ import 'dart:collection' show HashMap;
 
 import 'package:meta/meta.dart';
 
-///Used to effitiently store operations between subtypes of a type
+///Used to store operations between subtypes of a type
 class MethodTable<R, D> {
   @protected
   final HashMap<String, Function> hashMap = HashMap();
@@ -36,13 +36,5 @@ class MethodTable<R, D> {
         rethrow;
       }
     }
-  }
-}
-
-class ComutativeMethodTable<R, D> extends MethodTable<R, D> {
-  @override
-  void addMethod(Type t1, Type t2, Function method) {
-    super.addMethod(t1, t2, method);
-    super.addMethod(t2, t1, (first, second) => method(second, first));
   }
 }

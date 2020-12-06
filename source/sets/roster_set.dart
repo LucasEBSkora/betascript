@@ -6,21 +6,21 @@ import 'set_union.dart';
 import 'set.dart';
 import '../function/number.dart';
 import '../function/function.dart';
+import 'visitor/set_visitor.dart';
 
 BSSet rosterSet(Iterable<BSFunction> elements) {
-  if (elements.firstWhere(
-          (element) => !BSFunction.extractFromNegative<Number>(element).second,
-          orElse: () => null) !=
-      null) {
-    throw SetDefinitionError("Sets can only be defined in real numbers!");
+  if (elements.isEmpty) return emptySet;
+  print(elements);
+
+  elements = elements.map((e) => e.asConstant());
+
+  print(elements);
+  for (var element in elements) {
+    if (element == null)
+      throw SetDefinitionError("Roster sets can only be defined in constants!");
   }
 
-  if (elements.isEmpty) return emptySet;
-  return RosterSet(
-      SplayTreeSet.from(elements, (BSFunction first, BSFunction second) {
-    final _nums = BSFunction.toNums(first, second, "compare");
-    return _nums.first.compareTo(_nums.second);
-  }));
+  return RosterSet(SplayTreeSet.from(elements));
 }
 
 //a class that represents a set created by enumerating its (numeric) elemments
@@ -46,13 +46,6 @@ class RosterSet extends BSSet {
   }
 
   @override
-  String toString() {
-    var s = "{ ";
-
-    s += elements.first.toString();
-    for (var i = 1; i < elements.length; ++i) s += ", ${elements.elementAt(i)}";
-
-    s += " }";
-    return s;
-  }
+  ReturnType accept<ReturnType>(SetVisitor visitor) =>
+      visitor.visitRosterSet(this);
 }

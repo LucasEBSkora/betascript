@@ -1,11 +1,12 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
 
 import 'function.dart';
-import 'visitors/function_visitor.dart';
 import 'multiplication.dart';
 import 'negative.dart';
 import 'number.dart';
+import 'utils.dart' show extractFromNegative;
 import 'variable.dart';
+import 'visitors/function_visitor.dart';
 import '../utils/tuples.dart';
 
 BSFunction add(List<BSFunction> operands) {
@@ -52,16 +53,16 @@ class Sum extends BSFunction {
 void _openOtherSums(List<BSFunction> operands) {
   var i = 0;
   while (i < operands.length) {
-    final _op = BSFunction.extractFromNegative<Sum>(operands[i]);
+    final _op = extractFromNegative<Sum>(operands[i]);
 
     //if it finds a sum
-    if (_op.second) {
+    if (_op.first != null) {
       Sum s = operands.removeAt(i);
 
       var newOperands = <BSFunction>[];
 
       //if it finds a sum within a negative
-      if (_op.third) {
+      if (_op.second) {
         for (var f in s.operands) {
           newOperands.add(-f);
         }
@@ -129,27 +130,27 @@ void _createMultiplications(List<BSFunction> operands) {
     BSFunction h;
     BSFunction originalFactor;
     BSFunction factor;
-    final _mul = BSFunction.extractFromNegative<Multiplication>(f);
+    final _mul = extractFromNegative<Multiplication>(f);
 
-    if (_mul.second &&
+    if (_mul.first != null &&
         _mul.first.operands.length >= 2 &&
         _mul.first.operands[0] is Number) {
       //in this case, "h" must be the multiplication with all other factors excluding the number
       final otherOps = _mul.first.operands.toList();
       otherOps.removeAt(0);
       h = Multiplication(otherOps);
-      factor = originalFactor = _mul.first.operands[0] * n(_mul.third ? -1 : 1);
+      factor = originalFactor = _mul.first.operands[0] * n(_mul.second ? -1 : 1);
     } else {
-      final _f = BSFunction.extractFromNegative(f);
+      final _f = extractFromNegative(f);
       h = _f.first;
-      factor = originalFactor = n((_f.third ? -1 : 1));
+      factor = originalFactor = n((_f.second ? -1 : 1));
     }
 
     for (var j = i + 1; j < operands.length; ++j) {
       var g = operands[j];
-      final _mul = BSFunction.extractFromNegative<Multiplication>(g);
+      final _mul = extractFromNegative<Multiplication>(g);
 
-      if (_mul.second &&
+      if (_mul.first != null &&
           _mul.first.operands.length >= 2 &&
           _mul.first.operands[0] is Number) {
         //in this case, "h" must be the multiplication with all other factors excluding the number
@@ -158,13 +159,13 @@ void _createMultiplications(List<BSFunction> operands) {
         g = Multiplication(otherOps);
         if (h == g) {
           operands.removeAt(j);
-          factor += _mul.first.operands[0] * n(_mul.third ? -1 : 1);
+          factor += _mul.first.operands[0] * n(_mul.second ? -1 : 1);
         }
       } else {
-        final _g = BSFunction.extractFromNegative(g);
+        final _g = extractFromNegative(g);
         if (_g.first == h) {
           operands.removeAt(j);
-          factor += n((_g.third ? -1 : 1));
+          factor += n((_g.second ? -1 : 1));
         }
       }
     }

@@ -4,11 +4,13 @@ import 'set_union.dart';
 import 'set.dart';
 import '../function/number.dart';
 import '../function/function.dart';
+import 'visitor/set_visitor.dart';
 
 BSSet interval(BSFunction a, BSFunction b,
     {bool leftClosed = true, bool rightClosed = true}) {
-  if (!BSFunction.extractFromNegative<Number>(a).second ||
-      !BSFunction.extractFromNegative<Number>(b).second) {
+  a = a.asConstant();
+  b = b.asConstant();
+  if (a == null || b == null) {
     throw BetascriptFunctionError("sets can only be defined in numbers");
   }
   if (a == b) {
@@ -49,6 +51,6 @@ class Interval extends BSSet {
       ]);
 
   @override
-  String toString() =>
-      "${(leftClosed) ? '[' : '('}$a,$b${(rightClosed) ? ']' : ')'}";
+  ReturnType accept<ReturnType>(SetVisitor visitor) =>
+      visitor.visitInterval(this);
 }

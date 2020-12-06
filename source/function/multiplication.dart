@@ -3,10 +3,11 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 import 'division.dart';
 import 'exponentiation.dart';
 import 'function.dart';
-import 'visitors/function_visitor.dart';
 import 'negative.dart';
 import 'number.dart';
+import 'utils.dart';
 import 'variable.dart';
+import 'visitors/function_visitor.dart';
 import '../utils/tuples.dart';
 
 BSFunction multiply(List<BSFunction> operands) {
@@ -22,11 +23,11 @@ BSFunction multiply(List<BSFunction> operands) {
     final divisions = <Division>[];
 
     for (var i = 0; i < operands.length;) {
-      final _op = BSFunction.extractFromNegative<Division>(operands[i]);
-      if (_op.second) {
+      final _op = extractFromNegative<Division>(operands[i]);
+      if (_op.first != null) {
         operands.removeAt(i);
 
-        if (_op.third) divisionNegatives = !divisionNegatives;
+        if (_op.second) divisionNegatives = !divisionNegatives;
 
         divisions.add(_op.first);
       } else
@@ -107,13 +108,13 @@ class Multiplication extends BSFunction {
 void _openOtherMultiplications(List<BSFunction> operands) {
   var i = 0;
   while (i < operands.length) {
-    final _op = BSFunction.extractFromNegative<Multiplication>(operands[i]);
+    final _op = extractFromNegative<Multiplication>(operands[i]);
 
-    if (_op.second) {
+    if (_op.first != null) {
       operands.removeAt(i);
       var m = _op.first;
       operands.insertAll(i, m.operands);
-      if (_op.third) operands.add(n(-1));
+      if (_op.second) operands.add(n(-1));
     } else
       ++i;
   }
@@ -133,14 +134,14 @@ bool _multiplyNumbers(List<BSFunction> operands) {
   while (i < operands.length) {
     //if the operand is a number, removes it and
 
-    final _op = BSFunction.extractFromNegative<Number>(operands[i]);
+    final _op = extractFromNegative<Number>(operands[i]);
 
-    if (_op.second) {
+    if (_op.first != null) {
       operands.removeAt(i);
       final n = _op.first;
       //if it's a regular number, just multiplies the accumulator
       if (!n.isNamed) {
-        number *= n.value * (_op.third ? -1 : 1);
+        number *= n.value * (_op.second ? -1 : 1);
       } else {
         //if it's named, adds it to the map.
 
@@ -150,7 +151,7 @@ bool _multiplyNumbers(List<BSFunction> operands) {
 
         ++namedNumbers[n.name].second;
 
-        if (_op.third) number *= -1;
+        if (_op.second) number *= -1;
       }
     } else
       ++i;
@@ -187,8 +188,8 @@ bool _consolidateNegatives(List<BSFunction> operands) {
   var _negative = false;
 
   final newOperands = operands.map((BSFunction f) {
-    final _op = BSFunction.extractFromNegative(f);
-    if (_op.third) _negative = !_negative;
+    final _op = extractFromNegative(f);
+    if (_op.second) _negative = !_negative;
     return _op.first;
   }).toList();
 

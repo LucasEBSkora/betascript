@@ -1,12 +1,13 @@
 import 'solver.dart';
 import '../logic.dart';
 import '../../sets/sets.dart';
+import '../../function/function.dart';
 import '../../function/multiplication.dart';
 import '../../function/negative.dart';
 import '../../function/number.dart';
 import '../../function/sum.dart';
+import '../../function/utils.dart';
 import '../../function/variable.dart';
-import '../../function/function.dart';
 
 //in the context of this program, ?= means ==, !=, <, >, <= or >=
 
@@ -15,8 +16,8 @@ class SingleVariableLinearSolver extends Solver {
   BSFunction _left;
 
   //as in, ax + b ?= 0
-  num a = 0;
-  num b = 0;
+  BSFunction a = n(0);
+  BSFunction b = n(0);
   //keeps note of whether we multiplied the comparison by -1, because that inverts inequations
   bool invertedInequality = false;
 
@@ -59,18 +60,19 @@ class SingleVariableLinearSolver extends Solver {
   @override
   BSSet attemptSolveInternal() {
     //we now split it in two cases: a == 0 and a =/= 0.
-    if (a == 0) {
+    if (a == n(0)) {
       //in this case, the value of the variable doesn't matter, which means any value solves it or no value solves it
 
-      if ((expr as Comparison).compare(b, 0)) {
+      if ((expr as Comparison).compare(b.toNum(), 0)) {
         return BSSet.R;
       } else {
         return emptySet;
       }
     } else {
       //we rewrite the comparison as x ?= -b/a, remembering that if a < 0, then we must invert the inequation
-      if (a < 0) invertedInequality = !invertedInequality;
-      final val = n(-b / a);
+      final aWithoutNegative = extractFromNegative(a);
+      if (aWithoutNegative.second) invertedInequality = !invertedInequality;
+      final val = -b / aWithoutNegative.first;
       if (_comp is Equal) return rosterSet([val]);
       if (_comp is NotEqual) {
         return SetUnion([
@@ -103,42 +105,41 @@ class SingleVariableLinearSolver extends Solver {
   }
 
   bool _extractCoefficients(BSFunction term) {
-    final _asNumber = BSFunction.extractFromNegative<Number>(term);
-    //if it's a number, adds it to 'b'
-    if (_asNumber.second) {
-      if (_asNumber.third) {
-        b -= _asNumber.first.value;
-      } else {
-        b += _asNumber.first.value;
-      }
-
+    final _asNumber = term.asConstant();
+    //if it's a constant, adds it to 'b'
+    if (_asNumber != null) {
+      b += _asNumber;
       return true;
     }
 
-    final _asVar = BSFunction.extractFromNegative<Variable>(term);
+    final _asVar = extractFromNegative<Variable>(term);
 
-    if (_asVar.second) {
-      if (_asNumber.third) {
-        a -= 1;
-      } else {
-        a += 1;
-      }
+    if (_asVar.first != null) {
+      a += n(1);
       return true;
     }
 
-    final _asMul = BSFunction.extractFromNegative<Multiplication>(term);
+    //if it got here, we already know the multiplication isn't constant, so there is at least one term that involves the variable
+    final _asMul = extractFromNegative<Multiplication>(term);
 
-    //since multiplications are guaranteed to have at least two terms, and any constants in them to be in the first term,
-    //we can simply check that the first operand is a number and the second a variable
-    //(which we know is the one we're using because we already checked the function is defined in a single variable)
-    if (_asMul.second) {
-      final op = _asMul.first.operands;
-      if (op.length == 2 && op.first is Number && op.last is Variable) {
-        if (_asMul.third) {
-          a -= (op.first as Number).value;
+    if (_asMul.first != null) {
+      final constants = <BSFunction>[];
+      final dependentTerms = <BSFunction>[];
+
+      for (var op in _asMul.first.operands) {
+        final constOp = op.asConstant();
+        if (constOp != null) {
+          constants.add(constOp);
         } else {
-          a += (op.first as Number).value;
+          dependentTerms.add(op);
         }
+      }
+      final dependentTerm =
+          extractFromNegative<Variable>(multiply(dependentTerms));
+      if (dependentTerm.first == null) {
+        return false;
+      } else {
+        a += multiply(constants);
         return true;
       }
     }

@@ -1,5 +1,6 @@
 import 'set.dart';
 import '../function/function.dart';
+import 'visitor/set_visitor.dart';
 
 ///shouldn't be created directly: derived from intersections involving Builder sets where finding every solution isn't guaranteed
 class IntensionalSetIntersection extends BSSet {
@@ -15,5 +16,6 @@ class IntensionalSetIntersection extends BSSet {
   BSSet complement() => first.complement().union(second.complement());
 
   @override
-  String toString() => "($first) ∩ ($second)";
+  ReturnType accept<ReturnType>(SetVisitor visitor) =>
+      visitor.visitIntensionalSetIntersection(this);
 }

@@ -9,3 +9,4 @@ export 'inverse_hyperbolic/inverse_hyperbolic.dart';
 export 'inverse_trig/inverse_trig.dart';
 export 'hyperbolic/hyperbolic_functions.dart';
 export 'trig/trig_functions.dart';
+export 'utils.dart';

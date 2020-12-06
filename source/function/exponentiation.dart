@@ -1,10 +1,11 @@
 import 'dart:collection' show HashMap, SplayTreeSet;
-import 'dart:math';
+import 'dart:math' show pow;
 
 import 'function.dart';
-import 'visitors/function_visitor.dart';
 import 'number.dart';
+import 'utils.dart' show toNums;
 import 'variable.dart';
+import 'visitors/function_visitor.dart';
 
 BSFunction exp(BSFunction exponent, [BSFunction base = Constants.e]) {
   if (exponent == n(1)) return base;
@@ -32,7 +33,7 @@ class Exponentiation extends BSFunction {
   BSFunction evaluate(HashMap<String, BSFunction> p) {
     final b = base.evaluate(p);
     final expo = exponent.evaluate(p);
-    final pair = BSFunction.toNums(b, expo);
+    final pair = toNums(b, expo);
     if (pair != null) {
       double v = pow(pair.first, pair.second);
       if (v == v.toInt()) return n(v);
@@ -53,7 +54,7 @@ class Exponentiation extends BSFunction {
     final b = base.approx;
     final expo = exponent.approx;
 
-    final pair = BSFunction.toNums(b, expo);
+    final pair = toNums(b, expo);
     if (pair == null) {
       return exp(b, expo);
     } else {

@@ -6,7 +6,7 @@ import 'visitors/function_visitor.dart';
 Variable variable(String name, [Set<Variable> params]) =>
     Variable._(name, params);
 
-class Variable extends BSFunction implements Comparable {
+class Variable extends BSFunction {
   final String name;
 
   const Variable._(this.name, Set<Variable> params) : super(params);

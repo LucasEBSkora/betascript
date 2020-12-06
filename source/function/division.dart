@@ -2,11 +2,12 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 
 import 'exponentiation.dart';
 import 'function.dart';
-import 'visitors/function_visitor.dart';
 import 'multiplication.dart';
 import 'negative.dart';
 import 'number.dart';
+import 'utils.dart' show extractFromNegative;
 import 'variable.dart';
+import 'visitors/function_visitor.dart';
 
 BSFunction divide(
     List<BSFunction> numeratorList, List<BSFunction> denominatorList) {
@@ -23,6 +24,13 @@ BSFunction divide(
 
   if (numerator == denominator) return n(1);
   if (numerator == n(0)) return n(0);
+  if (denominator.asConstant()?.approx == n(0) ?? false) {
+    if ((numerator is Negative) ^ (denominator is Negative)) {
+      return Constants.negativeInfinity;
+    } else {
+      return Constants.infinity;
+    }
+  }
 
   Division div = Division._(
       (numerator is Negative) ? numerator.operand : numerator,
@@ -44,20 +52,20 @@ class Division extends BSFunction {
   BSFunction evaluate(HashMap<String, BSFunction> p) {
     final _n = numerator.evaluate(p);
     final _d = denominator.evaluate(p);
-    final _numNumber = BSFunction.extractFromNegative<Number>(_n);
+    final _numNumber = extractFromNegative<Number>(_n);
 
-    final _denNumber = BSFunction.extractFromNegative<Number>(_d);
+    final _denNumber = extractFromNegative<Number>(_d);
 
-    if (_numNumber.second && _denNumber.second) {
+    if (_numNumber.first != null && _denNumber.first != null) {
       final v = _numNumber.first.value / _denNumber.first.value;
       if (v == v.toInt())
-        return n(v * ((_numNumber.third ^ _denNumber.third) ? -1 : 1));
+        return n(v * ((_numNumber.second ^ _denNumber.second) ? -1 : 1));
     }
 
-    final _num = BSFunction.extractFromNegative(_n);
-    final _den = BSFunction.extractFromNegative(_d);
+    final _num = extractFromNegative(_n);
+    final _den = extractFromNegative(_d);
 
-    return (_num.third ^ _den.third)
+    return (_num.second ^ _den.second)
         ? negative(divide([_num.first], [_den.first]))
         : divide([_num.first], [_den.first]);
   }
@@ -74,20 +82,20 @@ class Division extends BSFunction {
   BSFunction get approx {
     final _n = numerator.approx;
     final _d = denominator.approx;
-    final _numNumber = BSFunction.extractFromNegative<Number>(_n);
+    final _numNumber = extractFromNegative<Number>(_n);
 
-    final _denNumber = BSFunction.extractFromNegative<Number>(_d);
+    final _denNumber = extractFromNegative<Number>(_d);
 
-    if (_numNumber.second && _denNumber.second) {
+    if (_numNumber.first == null && _denNumber.first == null) {
       return n(_numNumber.first.value /
           _denNumber.first.value *
-          ((_numNumber.third ^ _denNumber.third) ? -1 : 1));
+          ((_numNumber.second ^ _denNumber.second) ? -1 : 1));
     }
 
-    final _num = BSFunction.extractFromNegative(_n);
-    final _den = BSFunction.extractFromNegative(_d);
+    final _num = extractFromNegative(_n);
+    final _den = extractFromNegative(_d);
 
-    return (_num.third ^ _den.third)
+    return (_num.second ^ _den.second)
         ? negative(divide([_num.first], [_den.first]))
         : divide([_num.first], [_den.first]);
   }

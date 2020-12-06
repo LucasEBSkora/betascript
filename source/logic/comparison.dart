@@ -7,6 +7,7 @@ import 'solvers/single_variable_solver.dart';
 import '../sets/sets.dart';
 import '../utils/three_valued_logic.dart';
 import '../function/functions.dart';
+import '../function/utils.dart';
 
 ///A class that represents an equation or inequality
 abstract class Comparison extends LogicExpression {
@@ -21,7 +22,7 @@ abstract class Comparison extends LogicExpression {
   String get type;
 
   BSLogical get alwaysTrue {
-    final nums = BSFunction.toNums(left.approx, right.approx);
+    final nums = toNums(left.approx, right.approx);
 
     //for now, if it can't convert both to numbers to make sure the comparison is always true, doesn't even try
     if (nums != null) {
@@ -35,7 +36,7 @@ abstract class Comparison extends LogicExpression {
   ///(so that comparisons between numbers aren't represented by trees
   ///when they could be a logical value)
   BSLogical get alwaysFalse {
-    final nums = BSFunction.toNums(left.approx, right.approx);
+    final nums = toNums(left.approx, right.approx);
 
     //for now, if it can't convert both to numbers to make sure the comparison is always false, doesn't even try
     //basically gets "alwaysTrue" and inverts it
@@ -60,7 +61,7 @@ abstract class Comparison extends LogicExpression {
       return bsFalse;
     }
 
-    final nums = BSFunction.toNums(_left, _right);
+    final nums = toNums(_left, _right);
 
     if (nums != null) {
       return BSLogical.fromBool(compare(nums.first, nums.second));

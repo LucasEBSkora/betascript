@@ -4,6 +4,7 @@ import 'set.dart';
 import '../logic/logic.dart';
 import '../function/variable.dart';
 import '../function/function.dart';
+import 'visitor/set_visitor.dart';
 
 BSSet builderSet(LogicExpression rule, [List<Variable> parameters]) {
   final sol = rule.solution;
@@ -35,6 +36,6 @@ class BuilderSet extends BSSet {
   BSSet get knownElements => rule.solution;
 
   @override
-  String toString() =>
-      "{${rule.parameters.reduce((previousValue, element) => "$previousValue, $element")} | $rule}";
+  ReturnType accept<ReturnType>(SetVisitor visitor) =>
+      visitor.visitBuilderSet(this);
 }

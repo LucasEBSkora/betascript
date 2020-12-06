@@ -2,6 +2,7 @@ import 'empty_set.dart';
 import 'roster_set.dart';
 import 'set.dart';
 import '../function/functions.dart';
+import 'visitor/set_visitor.dart';
 
 BSSet setUnion(Iterable<BSSet> subsets) {
   var _subsets = subsets.where((element) => !(element == emptySet)).toList();
@@ -76,6 +77,6 @@ class SetUnion extends BSSet {
       BSSet.R, (value, element) => value.relativeComplement(element));
 
   @override
-  String toString() => subsets.sublist(1).fold<String>(subsets[0].toString(),
-      (previousValue, element) => previousValue + " ∪ $element");
+  ReturnType accept<ReturnType>(SetVisitor visitor) =>
+      visitor.visitSetUnion(this);
 }

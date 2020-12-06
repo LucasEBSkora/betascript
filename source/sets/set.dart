@@ -2,26 +2,25 @@ import 'package:meta/meta.dart';
 
 import 'empty_set.dart';
 import 'interval.dart';
-import 'set_operation_tables/contains.dart';
-import 'set_operation_tables/disjoined.dart';
-import 'set_operation_tables/intersection.dart';
-import 'set_operation_tables/relative_complements.dart';
-import 'set_operation_tables/union.dart';
-import '../utils/method_table.dart';
+import 'set_operations/contains.dart';
+import 'set_operations/disjoined.dart';
+import 'set_operations/intersection.dart';
+import 'set_operations/relative_complements.dart';
+import 'set_operations/union.dart';
 import '../utils/three_valued_logic.dart';
 import '../function/functions.dart';
+import 'visitor/plain_set_stringifier.dart';
+import 'visitor/set_visitor.dart';
+
+//TODO: Propagate Intensionality properly
 
 //class that represents a set in R
 abstract class BSSet {
-  static final MethodTable<BSSet, BSSet> _relativeComplements =
-      defineRelativeComplementTable();
-  static final MethodTable<BSLogical, BSSet> _contains = defineContainsTable();
-
-  static final ComutativeMethodTable<BSSet, BSSet> _unions = defineUnionTable();
-  static final ComutativeMethodTable<BSSet, BSSet> _intersections =
-      defineIntersectionTable();
-  static final ComutativeMethodTable<BSLogical, BSSet> _disjoined =
-      defineDisjoinedTable();
+  static final _union = Union();
+  static final _intersection = Intersection();
+  static final _relativeComplement = RelativeComplement();
+  static final _disjoined = Disjoined();
+  static final _contains = Contains();
 
   static const R =
       Interval(Constants.negativeInfinity, Constants.infinity, false, false);
@@ -32,6 +31,8 @@ abstract class BSSet {
   BSSet complement();
 
   bool belongs(BSFunction x);
+  
+  //TODO: let SetOperation decide how to deal with empty sets
 
   ///returns this\other (this without the elements in other)
   @nonVirtual
@@ -39,16 +40,16 @@ abstract class BSSet {
       ? this
       : (other.contains(this).asBool()
           ? emptySet
-          : _relativeComplements.call(this, other));
+          : _relativeComplement(this, other));
 
   //Doesn't check for disjoint sets here because that would decrease performance instead of increasing it
   //(in some cases we can peform the union without checking for it, or checking would be done more than once)
   @nonVirtual
-  BSSet union(BSSet other) => _unions.call(this, other);
+  BSSet union(BSSet other) => _union(this, other);
 
   @nonVirtual
   BSSet intersection(BSSet other) =>
-      (disjoined(other).asBool()) ? emptySet : _intersections.call(this, other);
+      (disjoined(other).asBool()) ? emptySet : _intersection(this, other);
 
   @nonVirtual
   BSLogical contains(BSSet b) =>
@@ -58,8 +59,11 @@ abstract class BSSet {
   BSLogical disjoined(BSSet b) =>
       (this is EmptySet || b is EmptySet) ? true : _disjoined.call(this, b);
 
+  ReturnType accept<ReturnType>(SetVisitor visitor);
+
   @override
-  String toString() => "Subset of R";
+  @nonVirtual
+  String toString() => accept(PlainSetStringifier());
 }
 
 class SetDefinitionError implements Exception {

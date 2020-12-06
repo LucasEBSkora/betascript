@@ -16,6 +16,7 @@ import '../logic/logic.dart';
 import '../sets/sets.dart';
 import '../utils/three_valued_logic.dart';
 import '../function/functions.dart';
+import '../function/utils.dart' show toNums;
 
 class BSInterpreter implements ExprVisitor, StmtVisitor {
   final Environment globals = Environment(); //Global scope
@@ -53,9 +54,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
     //operations for functions
     if (leftOperand is BSFunction && rightOperand is BSFunction) {
-      final nums = BSFunction.toNums(leftOperand, rightOperand);
-
-      //if both are numbers
+      final nums = toNums(leftOperand, rightOperand);
       if (nums != null) {
         switch (e.op.type) {
           case TokenType.minus:
@@ -557,7 +556,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
   visitIntervalDefinitionExpr(IntervalDefinitionExpr e) {
     var _a = _evaluate(e.a);
     var _b = _evaluate(e.b);
-    var nums = BSFunction.toNums(_a, _b);
+    var nums = toNums(_a, _b);
     if (nums == null) {
       throw RuntimeError(
           e.left, "Interval definitions must have both edges be numbers");
@@ -574,17 +573,19 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
     for (var expr in e.elements) {
       var el = _evaluate(expr);
       if (el is BSFunction) {
-        var number = BSFunction.extractFromNegative<Number>(el);
-        if (number.second) {
-          elements.add(el);
-          continue;
-        }
+        elements.add(el.asConstant());
+        continue;
       }
+
       throw RuntimeError(
-          e.left, "Roster Set definitions must have all elements as numbers");
+          e.left, "Roster sets can only be defined in constants!");
     }
 
-    return rosterSet(elements);
+    try {
+      return rosterSet(elements);
+    } on SetDefinitionError catch (exception) {
+      throw RuntimeError(e.left, exception.message);
+    }
   }
 
   @override
@@ -614,7 +615,7 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
       } else {
         if (left is BSFunction &&
             e.operator.type == TokenType.belongs &&
-            BSFunction.extractFromNegative<Number>(left).second) {
+            left.toNum() != null) {
           return right.belongs(left);
         }
         throw RuntimeError(
