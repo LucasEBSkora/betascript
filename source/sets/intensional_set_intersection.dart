@@ -18,4 +18,10 @@ class IntensionalSetIntersection extends BSSet {
   @override
   ReturnType accept<ReturnType>(SetVisitor visitor) =>
       visitor.visitIntensionalSetIntersection(this);
+
+  @override
+  bool get isIntensional => first.isIntensional && second.isIntensional;
+
+  @override
+  BSSet get knownElements => first.knownElements.union(second.knownElements);
 }

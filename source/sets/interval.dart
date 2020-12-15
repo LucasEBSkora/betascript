@@ -53,4 +53,10 @@ class Interval extends BSSet {
   @override
   ReturnType accept<ReturnType>(SetVisitor visitor) =>
       visitor.visitInterval(this);
+
+  @override
+  bool get isIntensional => false;
+
+  @override
+  BSSet get knownElements => this;
 }

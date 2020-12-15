@@ -6,7 +6,7 @@ import '../../logic/logic.dart';
 import '../../function/functions.dart';
 import 'set_operation.dart';
 
-class Union extends ComutativeSetOperation<BSSet> {
+class Union extends EmptyFilteringComutativeSetOperation<BSSet> {
   
   @override
   BSSet operateBuilderSetBuilderSet(BuilderSet first, BuilderSet second) =>
@@ -14,19 +14,10 @@ class Union extends ComutativeSetOperation<BSSet> {
           <Variable>[...first.parameters, ...second.parameters]);
 
   @override
-  BSSet operateEmptySetBuilderSet(EmptySet first, BuilderSet second) => second;
-  @override
-  BSSet operateEmptySetEmptySet(EmptySet first, EmptySet second) => emptySet;
-
-  @override
   BSSet operateIntensionalSetIntersectionBuilderSet(
           IntensionalSetIntersection first, BuilderSet second) =>
       setUnion([first, second]);
 
-  @override
-  BSSet operateIntensionalSetIntersectionEmptySet(
-          IntensionalSetIntersection first, EmptySet second) =>
-      first;
 
   @override
   BSSet operateIntensionalSetIntersectionIntensionalSetIntersection(
@@ -43,8 +34,6 @@ class Union extends ComutativeSetOperation<BSSet> {
   BSSet operateIntervalBuilderSet(Interval first, BuilderSet second) =>
       SetUnion([second, first.relativeComplement(second.knownElements)]);
 
-  @override
-  BSSet operateIntervalEmptySet(Interval first, EmptySet second) => first;
 
   @override
   BSSet operateIntervalIntensionalSetIntersection(
@@ -81,8 +70,6 @@ class Union extends ComutativeSetOperation<BSSet> {
   BSSet operateRosterSetBuilderSet(RosterSet first, BuilderSet second) =>
       SetUnion([second, first.relativeComplement(second.knownElements)]);
 
-  @override
-  BSSet operateRosterSetEmptySet(RosterSet first, EmptySet second) => first;
 
   @override
   BSSet operateRosterSetIntensionalSetIntersection(
@@ -115,8 +102,6 @@ class Union extends ComutativeSetOperation<BSSet> {
   BSSet operateSetUnionBuilderSet(SetUnion first, BuilderSet second) =>
       setUnion([...first.subsets, second]);
 
-  @override
-  BSSet operateSetUnionEmptySet(SetUnion first, EmptySet second) => first;
 
   @override
   BSSet operateSetUnionIntensionalSetIntersection(
@@ -134,4 +119,8 @@ class Union extends ComutativeSetOperation<BSSet> {
   @override
   BSSet operateSetUnionSetUnion(SetUnion first, SetUnion second) =>
       setUnion([...first.subsets, ...second.subsets]);
+
+  @override
+  BSSet onEmpty(BSSet first, BSSet second) => (first == emptySet) ? second : first;
+  
 }

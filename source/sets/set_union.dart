@@ -79,4 +79,14 @@ class SetUnion extends BSSet {
   @override
   ReturnType accept<ReturnType>(SetVisitor visitor) =>
       visitor.visitSetUnion(this);
+
+  //if any element is intensional, the set is intensional
+  @override
+  bool get isIntensional {
+    for (var subset in subsets) if (subset.isIntensional) return true;
+    return false;
+  }
+
+  @override
+  BSSet get knownElements => subsets.fold<BSSet>(emptySet, (previousValue, element) => previousValue.union(element));
 }

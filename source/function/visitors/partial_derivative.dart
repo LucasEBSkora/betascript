@@ -184,7 +184,7 @@ class PartialDerivative implements FunctionVisitor<BSFunction> {
   BSFunction visitSignum(Signum f) => n(0);
 
   @override
-  BSFunction visitSin(Sin f) => (cos(f.operand) * _derivative(f.operand));
+  BSFunction visitSin(Sin f) => cos(f.operand) * _derivative(f.operand);
 
   @override
   BSFunction visitSum(Sum f) =>

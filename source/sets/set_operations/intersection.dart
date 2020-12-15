@@ -4,18 +4,11 @@ import '../../logic/logic.dart';
 import '../../function/functions.dart';
 import 'set_operation.dart';
 
-class Intersection extends ComutativeSetOperation<BSSet> {
+class Intersection extends EmptyFilteringComutativeSetOperation<BSSet> {
   @override
   BSSet operateBuilderSetBuilderSet(BuilderSet first, BuilderSet second) =>
       builderSet(And(first.rule, second.rule),
           <Variable>[...first.parameters, ...second.parameters]);
-
-  @override
-  BSSet operateEmptySetBuilderSet(EmptySet first, BuilderSet second) =>
-      emptySet;
-
-  @override
-  BSSet operateEmptySetEmptySet(EmptySet first, EmptySet second) => emptySet;
 
   BSSet _groupNotIntensional(BSSet first, BSSet second, BSSet other) {
     if (first is BuilderSet) {
@@ -39,11 +32,6 @@ class Intersection extends ComutativeSetOperation<BSSet> {
       _groupIntensional(first.first, first.second, second);
 
   @override
-  BSSet operateIntensionalSetIntersectionEmptySet(
-          IntensionalSetIntersection first, EmptySet second) =>
-      emptySet;
-
-  @override
   BSSet operateIntensionalSetIntersectionIntensionalSetIntersection(
           IntensionalSetIntersection first,
           IntensionalSetIntersection second) =>
@@ -52,9 +40,6 @@ class Intersection extends ComutativeSetOperation<BSSet> {
   @override
   BSSet operateIntervalBuilderSet(Interval first, BuilderSet second) =>
       IntensionalSetIntersection(first, second);
-
-  @override
-  BSSet operateIntervalEmptySet(Interval first, EmptySet second) => second;
 
   @override
   BSSet operateIntervalIntensionalSetIntersection(
@@ -92,9 +77,6 @@ class Intersection extends ComutativeSetOperation<BSSet> {
           second);
 
   @override
-  BSSet operateRosterSetEmptySet(RosterSet first, EmptySet second) => emptySet;
-
-  @override
   BSSet operateRosterSetIntensionalSetIntersection(
           RosterSet first, IntensionalSetIntersection second) =>
       _groupNotIntensional(second.first, second.second, first);
@@ -112,9 +94,6 @@ class Intersection extends ComutativeSetOperation<BSSet> {
       IntensionalSetIntersection(first, second);
 
   @override
-  BSSet operateSetUnionEmptySet(SetUnion first, EmptySet second) => emptySet;
-
-  @override
   BSSet operateSetUnionIntensionalSetIntersection(
           SetUnion first, IntensionalSetIntersection second) =>
       _groupNotIntensional(second.first, second.second, first);
@@ -130,4 +109,7 @@ class Intersection extends ComutativeSetOperation<BSSet> {
   @override
   BSSet operateSetUnionSetUnion(SetUnion first, SetUnion second) =>
       setUnion(second.subsets.map((e) => first.intersection(e)));
+
+  @override
+  BSSet onEmpty(BSSet first, BSSet second) => emptySet;
 }

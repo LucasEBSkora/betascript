@@ -4,8 +4,7 @@ import '../sets.dart';
 import 'set_operation.dart';
 
 ///returns whether FIRST CONTAINS SECOND: first ⊃ second
-class Contains extends SetOperation<BSLogical> {
-
+class Contains extends EmptyTreatingSetOperation<BSLogical> {
   @override
   BSLogical operateBuilderSetBuilderSet(BuilderSet first, BuilderSet second) =>
       bsUnknown;
@@ -14,11 +13,13 @@ class Contains extends SetOperation<BSLogical> {
   BSLogical operateBuilderSetEmptySet(BuilderSet first, EmptySet second) =>
       bsTrue;
 
-  //TODO: slightly wrong
+  //if it contains both, it definetely contains the intersection. otherwise, can't really be sure
   @override
   BSLogical operateBuilderSetIntensionalSetIntersection(
           BuilderSet first, IntensionalSetIntersection second) =>
-      first.contains(second.first) & first.contains(second.second);
+      ((first.contains(second.first) & first.contains(second.second)).asBool())
+          ? bsTrue
+          : bsUnknown;
 
   @override
   BSLogical operateBuilderSetInterval(BuilderSet first, Interval second) =>
@@ -41,7 +42,7 @@ class Contains extends SetOperation<BSLogical> {
     return bsTrue;
   }
 
-  //needs to check if
+  //needs to check if any of the elements of
   @override
   BSLogical operateEmptySetBuilderSet(EmptySet first, BuilderSet second) =>
       (second.knownElements != emptySet) ? bsFalse : bsUnknown;
@@ -49,18 +50,10 @@ class Contains extends SetOperation<BSLogical> {
   @override
   BSLogical operateEmptySetEmptySet(EmptySet first, EmptySet second) => bsTrue;
 
-  //TODO:: Needs to go through the tree properly - make a visitor to check for elements
   @override
   BSLogical operateEmptySetIntensionalSetIntersection(
-      EmptySet first, IntensionalSetIntersection second) {
-    final left = second.first;
-    final right = second.second;
-    if (left is BuilderSet && right is BuilderSet) {
-      if (left.knownElements == emptySet && right.knownElements == emptySet)
-        return bsUnknown;
-    }
-    return bsFalse;
-  }
+          EmptySet first, IntensionalSetIntersection second) =>
+      (second.knownElements != emptySet) ? bsUnknown : bsFalse;
 
   @override
   BSLogical operateEmptySetInterval(EmptySet first, Interval second) => bsFalse;
@@ -69,10 +62,13 @@ class Contains extends SetOperation<BSLogical> {
   BSLogical operateEmptySetRosterSet(EmptySet first, RosterSet second) =>
       bsFalse;
 
-  //TODO: needs to go through the tree
   @override
-  BSLogical operateEmptySetSetUnion(EmptySet first, SetUnion second) => bsFalse;
+  BSLogical operateEmptySetSetUnion(EmptySet first, SetUnion second) =>
+      (second.isIntensional && second.knownElements == emptySet)
+          ? bsUnknown
+          : bsFalse;
 
+  //basically impossible to simplify
   @override
   BSLogical operateIntensionalSetIntersectionBuilderSet(
           IntensionalSetIntersection first, BuilderSet second) =>
@@ -83,7 +79,7 @@ class Contains extends SetOperation<BSLogical> {
           IntensionalSetIntersection first, EmptySet second) =>
       bsTrue;
 
-  //TODO: think about this one
+  //basically impossible to simplify
   @override
   BSLogical operateIntensionalSetIntersectionIntensionalSetIntersection(
           IntensionalSetIntersection first,
@@ -124,7 +120,7 @@ class Contains extends SetOperation<BSLogical> {
   @override
   BSLogical operateIntervalIntensionalSetIntersection(
           Interval first, IntensionalSetIntersection second) =>
-      first.contains(second.first) & first.contains(second.second);
+      (first.contains(second.knownElements) == bsFalse) ? bsFalse : bsUnknown;
 
   @override
   BSLogical operateIntervalInterval(Interval first, Interval second) =>
@@ -156,7 +152,7 @@ class Contains extends SetOperation<BSLogical> {
 
   @override
   BSLogical operateRosterSetBuilderSet(RosterSet first, BuilderSet second) =>
-      bsUnknown;
+      (first.contains(second.knownElements) == bsFalse) ? bsFalse : bsUnknown;
 
   @override
   BSLogical operateRosterSetEmptySet(RosterSet first, EmptySet second) =>
@@ -165,7 +161,7 @@ class Contains extends SetOperation<BSLogical> {
   @override
   BSLogical operateRosterSetIntensionalSetIntersection(
           RosterSet first, IntensionalSetIntersection second) =>
-      first.contains(second.first) & first.contains(second.second);
+      (first.contains(second.knownElements) == bsFalse) ? bsFalse : bsUnknown;
 
   @override
   BSLogical operateRosterSetInterval(RosterSet first, Interval second) =>
@@ -190,7 +186,10 @@ class Contains extends SetOperation<BSLogical> {
 
   @override
   BSLogical operateSetUnionBuilderSet(SetUnion first, BuilderSet second) =>
-      second.relativeComplement(first) == emptySet ? bsTrue : bsFalse;
+      (first.isIntensional &&
+              second.knownElements.relativeComplement(first) != emptySet)
+          ? bsFalse
+          : bsUnknown;
 
   @override
   BSLogical operateSetUnionEmptySet(SetUnion first, EmptySet second) => bsTrue;
@@ -198,7 +197,10 @@ class Contains extends SetOperation<BSLogical> {
   @override
   BSLogical operateSetUnionIntensionalSetIntersection(
           SetUnion first, IntensionalSetIntersection second) =>
-      second.relativeComplement(first) == emptySet ? bsTrue : bsFalse;
+      (first.isIntensional &&
+              second.knownElements.relativeComplement(first) != emptySet)
+          ? bsFalse
+          : bsUnknown;
 
   @override
   BSLogical operateSetUnionInterval(SetUnion first, Interval second) =>

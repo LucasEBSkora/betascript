@@ -1,13 +1,11 @@
 import 'dart:collection' show SplayTreeSet;
 
 import 'set_operation.dart';
-import '../empty_set.dart';
 import '../sets.dart';
 import '../../function/function.dart';
 import '../../utils/three_valued_logic.dart';
 
-class Disjoined extends ComutativeSetOperation<BSLogical> {
-
+class Disjoined extends EmptyFilteringComutativeSetOperation<BSLogical> {
   BSLogical _disjoinedPositivesAsUnknown(BSSet first, BSSet second) =>
       (first.disjoined(second) == bsFalse) ? bsFalse : bsUnknown;
 
@@ -24,42 +22,24 @@ class Disjoined extends ComutativeSetOperation<BSLogical> {
       _disjoinedPositivesAsUnknown(first.knownElements, second.knownElements);
 
   @override
-  BSLogical operateEmptySetBuilderSet(EmptySet first, BuilderSet second) =>
-      bsTrue;
-
-  @override
-  BSLogical operateEmptySetEmptySet(EmptySet first, EmptySet second) => bsTrue;
-
-  @override
   BSLogical operateIntensionalSetIntersectionBuilderSet(
           IntensionalSetIntersection first, BuilderSet second) =>
       _disjoinedPositivesAsUnknown(first, second.knownElements);
 
   @override
-  BSLogical operateIntensionalSetIntersectionEmptySet(
-          IntensionalSetIntersection first, EmptySet second) =>
-      bsTrue;
-
-  @override
   BSLogical operateIntensionalSetIntersectionIntensionalSetIntersection(
-      IntensionalSetIntersection first, IntensionalSetIntersection second) {
-    // TODO: implement operateIntensionalSetIntersectionIntensionalSetIntersection
-    return bsUnknown;
-  }
+          IntensionalSetIntersection first,
+          IntensionalSetIntersection second) =>
+      _disjoinedPositivesAsUnknown(first.knownElements, second.knownElements);
 
   @override
   BSLogical operateIntervalBuilderSet(Interval first, BuilderSet second) =>
       _disjoinedPositivesAsUnknown(first, second.knownElements);
 
   @override
-  BSLogical operateIntervalEmptySet(Interval first, EmptySet second) => bsTrue;
-
-  @override
   BSLogical operateIntervalIntensionalSetIntersection(
-      Interval first, IntensionalSetIntersection second) {
-    // TODO: implement operateIntervalIntensionalSetIntersection
-    return bsUnknown;
-  }
+          Interval first, IntensionalSetIntersection second) =>
+      _disjoinedPositivesAsUnknown(first, second.knownElements);
 
   @override
   BSLogical operateIntervalInterval(
@@ -79,10 +59,6 @@ class Disjoined extends ComutativeSetOperation<BSLogical> {
   @override
   BSLogical operateRosterSetBuilderSet(RosterSet first, BuilderSet second) =>
       _testRosterElements(first.elements, second);
-
-  @override
-  BSLogical operateRosterSetEmptySet(RosterSet first, EmptySet second) =>
-      bsTrue;
 
   @override
   BSLogical operateRosterSetIntensionalSetIntersection(
@@ -110,10 +86,6 @@ class Disjoined extends ComutativeSetOperation<BSLogical> {
       _testSubsets(first.subsets, second);
 
   @override
-  BSLogical operateSetUnionEmptySet(SetUnion first, EmptySet second) =>
-      _testSubsets(first.subsets, second);
-
-  @override
   BSLogical operateSetUnionIntensionalSetIntersection(
           SetUnion first, IntensionalSetIntersection second) =>
       _testSubsets(first.subsets, second);
@@ -129,4 +101,7 @@ class Disjoined extends ComutativeSetOperation<BSLogical> {
   @override
   BSLogical operateSetUnionSetUnion(SetUnion first, SetUnion second) =>
       _testSubsets(first.subsets, second);
+
+  @override
+  BSLogical onEmpty(BSSet first, BSSet second) => bsTrue;
 }

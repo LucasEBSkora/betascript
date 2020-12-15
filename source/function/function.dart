@@ -38,7 +38,7 @@ abstract class BSFunction implements Comparable {
   ///Returns the partial derivative of this in relation to [v]
   @nonVirtual
   BSFunction derivative(Variable v) =>
-      _merge(accept(PartialDerivative(v)), this);
+      _merge(accept<BSFunction>(PartialDerivative(v)), this);
 
   ///If there is a custom set of parameters, returns it. If there isn't, returns the default one
   @nonVirtual

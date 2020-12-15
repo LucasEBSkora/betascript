@@ -12,8 +12,6 @@ import '../function/functions.dart';
 import 'visitor/plain_set_stringifier.dart';
 import 'visitor/set_visitor.dart';
 
-//TODO: Propagate Intensionality properly
-
 //class that represents a set in R
 abstract class BSSet {
   static final _union = Union();
@@ -30,9 +28,14 @@ abstract class BSSet {
   ///R\this (this')
   BSSet complement();
 
+  ///returns whether the element [x] belongs to [this]
   bool belongs(BSFunction x);
-  
-  //TODO: let SetOperation decide how to deal with empty sets
+
+  ///returns whether [this] is an intensional set (a set defined in terms of a rule which can be used to determine whether an element
+  ///belongs to it, without necessarily knowing every element in it)
+  bool get isIntensional;
+
+  BSSet get knownElements;
 
   ///returns this\other (this without the elements in other)
   @nonVirtual
@@ -52,12 +55,10 @@ abstract class BSSet {
       (disjoined(other).asBool()) ? emptySet : _intersection(this, other);
 
   @nonVirtual
-  BSLogical contains(BSSet b) =>
-      (this is EmptySet) ? (b is EmptySet) : _contains.call(this, b);
+  BSLogical contains(BSSet b) => _contains.call(this, b);
 
   @nonVirtual
-  BSLogical disjoined(BSSet b) =>
-      (this is EmptySet || b is EmptySet) ? true : _disjoined.call(this, b);
+  BSLogical disjoined(BSSet b) => _disjoined.call(this, b);
 
   ReturnType accept<ReturnType>(SetVisitor visitor);
 

@@ -33,9 +33,13 @@ class BuilderSet extends BSSet {
   @override
   BSSet complement() => BuilderSet(Not(rule), parameters);
 
+  @override
   BSSet get knownElements => rule.solution;
 
   @override
   ReturnType accept<ReturnType>(SetVisitor visitor) =>
       visitor.visitBuilderSet(this);
+
+  @override
+  bool get isIntensional => true;
 }

@@ -6,8 +6,7 @@ import '../sets.dart';
 import '../../function/functions.dart';
 import '../../logic/logic.dart';
 
-class RelativeComplement extends SetOperation<BSSet> {
-
+class RelativeComplement extends EmptyFilteringSetOperation<BSSet> {
   BSSet _throughDefinition(BSSet first, BSSet second) =>
       first.intersection(second.complement());
 
@@ -17,9 +16,6 @@ class RelativeComplement extends SetOperation<BSSet> {
   @override
   BSSet operateBuilderSetBuilderSet(BuilderSet first, BuilderSet second) =>
       builderSet(And(first.rule, Not(second.rule)));
-
-  @override
-  BSSet operateBuilderSetEmptySet(BuilderSet first, EmptySet second) => first;
 
   @override
   BSSet operateBuilderSetIntensionalSetIntersection(
@@ -44,36 +40,13 @@ class RelativeComplement extends SetOperation<BSSet> {
   BSSet operateBuilderSetSetUnion(BuilderSet first, SetUnion second) =>
       _throughDefinition(first, second);
 
-  @override
-  BSSet operateEmptySetBuilderSet(EmptySet first, BuilderSet second) =>
-      emptySet;
 
-  @override
-  BSSet operateEmptySetEmptySet(EmptySet first, EmptySet second) => emptySet;
-
-  @override
-  BSSet operateEmptySetIntensionalSetIntersection(
-          EmptySet first, IntensionalSetIntersection second) =>
-      emptySet;
-
-  @override
-  BSSet operateEmptySetInterval(EmptySet first, Interval second) => emptySet;
-
-  @override
-  BSSet operateEmptySetRosterSet(EmptySet first, RosterSet second) => emptySet;
-
-  @override
-  BSSet operateEmptySetSetUnion(EmptySet first, SetUnion second) => emptySet;
 
   @override
   BSSet operateIntensionalSetIntersectionBuilderSet(
           IntensionalSetIntersection first, BuilderSet second) =>
       _throughDefinition(first, second);
 
-  @override
-  BSSet operateIntensionalSetIntersectionEmptySet(
-          IntensionalSetIntersection first, EmptySet second) =>
-      first;
 
   @override
   BSSet operateIntensionalSetIntersectionIntensionalSetIntersection(
@@ -100,8 +73,6 @@ class RelativeComplement extends SetOperation<BSSet> {
   BSSet operateIntervalBuilderSet(Interval first, BuilderSet second) =>
       _throughDefinition(first, second);
 
-  @override
-  BSSet operateIntervalEmptySet(Interval first, EmptySet second) => first;
 
   @override
   BSSet operateIntervalIntensionalSetIntersection(
@@ -157,9 +128,6 @@ class RelativeComplement extends SetOperation<BSSet> {
       rosterSet(_removeWhereBelongs(first.elements, second));
 
   @override
-  BSSet operateRosterSetEmptySet(RosterSet first, EmptySet second) => first;
-
-  @override
   BSSet operateRosterSetIntensionalSetIntersection(
           RosterSet first, IntensionalSetIntersection second) =>
       rosterSet(_removeWhereBelongs(first.elements, second));
@@ -182,9 +150,6 @@ class RelativeComplement extends SetOperation<BSSet> {
       _throughDefinition(first, second);
 
   @override
-  BSSet operateSetUnionEmptySet(SetUnion first, EmptySet second) => first;
-
-  @override
   BSSet operateSetUnionIntensionalSetIntersection(
           SetUnion first, IntensionalSetIntersection second) =>
       _throughDefinition(first, second);
@@ -203,4 +168,8 @@ class RelativeComplement extends SetOperation<BSSet> {
   @override
   BSSet operateSetUnionSetUnion(SetUnion first, SetUnion second) =>
       SetUnion(_complementFromEvery(first.subsets, second));
+
+  @override
+  BSSet onEmpty(BSSet first, BSSet second) =>
+      (first == emptySet) ? emptySet : second;
 }
