@@ -14,7 +14,7 @@ import 'variable.dart';
 import 'visitors/partial_derivative.dart';
 import 'visitors/plain_function_stringifier.dart';
 
-abstract class BSFunction implements Comparable {
+abstract class BSFunction implements Comparable<BSFunction> {
   ///set of parameters the function is defined in ( the previous function NEEDS x, y and z to be evaluated, but we could define it in x,y,z and w if we wanted to)
   final Set<Variable> _parameters;
 

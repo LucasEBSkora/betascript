@@ -139,7 +139,8 @@ void _createMultiplications(List<BSFunction> operands) {
       final otherOps = _mul.first.operands.toList();
       otherOps.removeAt(0);
       h = Multiplication(otherOps);
-      factor = originalFactor = _mul.first.operands[0] * n(_mul.second ? -1 : 1);
+      factor =
+          originalFactor = _mul.first.operands[0] * n(_mul.second ? -1 : 1);
     } else {
       final _f = extractFromNegative(f);
       h = _f.first;

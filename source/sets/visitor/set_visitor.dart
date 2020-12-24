@@ -1,4 +1,3 @@
-
 import '../empty_set.dart';
 import '../sets.dart';
 
@@ -11,5 +10,4 @@ abstract class SetVisitor<ReturnType> {
   ReturnType visitInterval(Interval a);
   ReturnType visitRosterSet(RosterSet a);
   ReturnType visitSetUnion(SetUnion a);
-  
 }

@@ -47,7 +47,6 @@ abstract class Comparison extends LogicExpression {
 
     return bsUnknown;
   }
-
   ///checks if a set of values solves the expression
   ///if the variables passed aren't suficient to evaluate the expression,
   ///simply returns false instead of throwing

@@ -57,7 +57,7 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 
 <print_stmt> ::= <unterminated_print_stmt> <delimitator>
 
-<unterminated_print_stmt> ::= "print" <expression>
+<unterminated_print_stmt> ::= "print" <whitespace> <expression>
 
 <return_stmt> ::= "return" <whitespace> <expression> <whitespace> ";"
                 | "return" <whitespace> ";"
@@ -76,17 +76,20 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 
 <calls> ::= <call> <whitespace> "." <whitespace_or_linebreak> <calls> | ""
 
-<logic_or> ::= <logic_and> | <logic_and> <whitespace> "or" <whitespace_or_linebreak> <logic_or>
-<logic_and> ::= <equality> | <equality> <whitespace> "and" <whitespace_or_linebreak> <logic_and>
+<logic_or> ::= <logic_and> | <logic_and> <whitespace> <or> <whitespace_or_linebreak> <logic_or>
+<logic_and> ::= <equality> | <equality> <whitespace> <and> <whitespace_or_linebreak> <logic_and>
+
+<or> ::= "or" | "∨"
+<and> ::= "and" | "∧"
 
 <equality> ::= <comparison> | <comparison> <whitespace> <equality_operator> <whitespace_or_linebreak> <equality>
-<equality_operator> ::= "==" | "==="
+<equality_operator> ::= "==" | "===" | "≡"
 
 <comparison> ::= <set_binary> | <set_binary> <whitespace> <comparison_operator> <whitespace_or_linebreak> <comparison>
 <comparison_operator> ::= ">" | ">=" | "<" | "<="
 
 <set_binary> ::= <addition> | <addition> <whitespace> <set_operator> <whitespace_or_linebreak> <set_binary>
-<set_operator> ::= "union" | "intersection" | "\" | "contained" | "disjoined" | "belongs"
+<set_operator> ::= "union" | "intersection" | "\" | "contained" | "disjoined" | "belongs" | "⊂" | "∈" | "∪" | "∩"
 
 <addition> ::= <multiplication> | <multiplication> <whitespace> <addition_operator> <whitespace_or_linebreak> <addition>
 <addition_operator> ::= "-" | "+"
@@ -97,7 +100,7 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 <exponentiation> ::= <unary_left> | <unary_left> <whitespace> "^" <whitespace_or_linebreak> <exponentiation>
 
 <unary_left> ::= <unary_right> | <unary_left_operator> <whitespace_or_linebreak> <unary_left>
-<unary_left_operator> ::= "not" | "-" | "~"
+<unary_left_operator> ::= "not" | "-" | "~" | "¬", 
 
 <unary_right> ::= <call> | <derivative> | <unary_right> <whitespace> <unary_right_operator>
 <unary_right_operator> ::= "!" | "'"
@@ -114,8 +117,10 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 
 
 <derivative> ::= <partial_differential> <whitespace> "/" <whitespace_or_linebreak> <derivative_parameters>
-<partial_differential> ::=  "del" <(> <expression> <)>
-<derivative_parameters> ::= "del" <(> <arguments> <)>
+<partial_differential> ::=  <del> <(> <expression> <)>
+<derivative_parameters> ::= <del> <(> <arguments> <)>
+
+<del> ::= "del" | "∂"
 
 <primary> ::= <set_definition> | NUMBER | STRING | "false" | "true" | "unknown" | "nil" 
             | <(> <expression> <)>

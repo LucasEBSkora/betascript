@@ -7,7 +7,6 @@ import '../../function/functions.dart';
 import 'set_operation.dart';
 
 class Union extends EmptyFilteringComutativeSetOperation<BSSet> {
-  
   @override
   BSSet operateBuilderSetBuilderSet(BuilderSet first, BuilderSet second) =>
       builderSet(Or(first.rule, second.rule),
@@ -17,7 +16,6 @@ class Union extends EmptyFilteringComutativeSetOperation<BSSet> {
   BSSet operateIntensionalSetIntersectionBuilderSet(
           IntensionalSetIntersection first, BuilderSet second) =>
       setUnion([first, second]);
-
 
   @override
   BSSet operateIntensionalSetIntersectionIntensionalSetIntersection(
@@ -33,7 +31,6 @@ class Union extends EmptyFilteringComutativeSetOperation<BSSet> {
   @override
   BSSet operateIntervalBuilderSet(Interval first, BuilderSet second) =>
       SetUnion([second, first.relativeComplement(second.knownElements)]);
-
 
   @override
   BSSet operateIntervalIntensionalSetIntersection(
@@ -70,7 +67,6 @@ class Union extends EmptyFilteringComutativeSetOperation<BSSet> {
   BSSet operateRosterSetBuilderSet(RosterSet first, BuilderSet second) =>
       SetUnion([second, first.relativeComplement(second.knownElements)]);
 
-
   @override
   BSSet operateRosterSetIntensionalSetIntersection(
           RosterSet first, IntensionalSetIntersection second) =>
@@ -102,7 +98,6 @@ class Union extends EmptyFilteringComutativeSetOperation<BSSet> {
   BSSet operateSetUnionBuilderSet(SetUnion first, BuilderSet second) =>
       setUnion([...first.subsets, second]);
 
-
   @override
   BSSet operateSetUnionIntensionalSetIntersection(
           SetUnion first, IntensionalSetIntersection second) =>
@@ -121,6 +116,6 @@ class Union extends EmptyFilteringComutativeSetOperation<BSSet> {
       setUnion([...first.subsets, ...second.subsets]);
 
   @override
-  BSSet onEmpty(BSSet first, BSSet second) => (first == emptySet) ? second : first;
-  
+  BSSet onEmpty(BSSet first, BSSet second) =>
+      (first == emptySet) ? second : first;
 }

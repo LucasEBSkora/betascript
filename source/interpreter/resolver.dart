@@ -168,7 +168,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
   void _resolveStmt(Stmt s) => s.accept(this);
   void _resolveExpr(Expr e) => e.accept(this);
 
-  void _beginScope() => _scopes.add(new HashMap());
+  void _beginScope() => _scopes.add(HashMap());
   void _endScope() => _scopes.removeLast();
 
   //Creates a variable in current scope without saying it is ready to be referenced
@@ -300,9 +300,12 @@ class Resolver implements ExprVisitor, StmtVisitor {
     for (Expr exp in e.variables) _resolveExpr(exp);
   }
 
-  //at least for now, directives don't have anything to resolve
   @override
-  void visitDirectiveStmt(DirectiveStmt s) {}
+  void visitDirectiveStmt(DirectiveStmt s) {
+    //if the directive is global, it is set directly in the global directives
+    //if they're local, the interpreter will deal with it in time
+    _interpreter.directives.setIfGlobal(s.directive, true);
+  }
 
   @override
   void visitBuilderDefinitionExpr(BuilderDefinitionExpr e) {

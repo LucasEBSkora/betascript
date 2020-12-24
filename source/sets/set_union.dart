@@ -88,5 +88,6 @@ class SetUnion extends BSSet {
   }
 
   @override
-  BSSet get knownElements => subsets.fold<BSSet>(emptySet, (previousValue, element) => previousValue.union(element));
+  BSSet get knownElements => subsets.fold<BSSet>(
+      emptySet, (previousValue, element) => previousValue.union(element));
 }

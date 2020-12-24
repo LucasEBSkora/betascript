@@ -40,13 +40,10 @@ class RelativeComplement extends EmptyFilteringSetOperation<BSSet> {
   BSSet operateBuilderSetSetUnion(BuilderSet first, SetUnion second) =>
       _throughDefinition(first, second);
 
-
-
   @override
   BSSet operateIntensionalSetIntersectionBuilderSet(
           IntensionalSetIntersection first, BuilderSet second) =>
       _throughDefinition(first, second);
-
 
   @override
   BSSet operateIntensionalSetIntersectionIntensionalSetIntersection(
@@ -72,7 +69,6 @@ class RelativeComplement extends EmptyFilteringSetOperation<BSSet> {
   @override
   BSSet operateIntervalBuilderSet(Interval first, BuilderSet second) =>
       _throughDefinition(first, second);
-
 
   @override
   BSSet operateIntervalIntensionalSetIntersection(

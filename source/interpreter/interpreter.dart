@@ -519,8 +519,10 @@ class BSInterpreter implements ExprVisitor, StmtVisitor {
 
   @override
   void visitDirectiveStmt(DirectiveStmt s) {
-    directives.setDirective(s.directive, true);
-    print("local directive ${s.directive} set");
+    if (!directives.isGlobal(s.directive)) {
+      directives.setDirective(s.directive, true);
+      print("local directive ${s.directive} set");
+    }
   }
 
   @override

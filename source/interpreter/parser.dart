@@ -1,8 +1,8 @@
+import 'package:meta/meta.dart';
+
 import 'expr.dart';
 import 'stmt.dart';
 import 'token.dart';
-import 'interpreter.dart';
-import 'betascript.dart';
 import '../utils/three_valued_logic.dart';
 import '../sets/sets.dart';
 
@@ -12,11 +12,11 @@ class ParseError implements Exception {}
 class BSParser {
   ///The list of tokens being parsed
   final List<Token> _tokens;
-  final BSInterpreter _interpreter;
+  final Function _errorCallback;
   //The token currently being parsed
   int _current = 0;
 
-  BSParser(this._tokens, this._interpreter);
+  BSParser(this._tokens, this._errorCallback);
 
   //The parser works by implementing the rules in the language's formal grammar,
   //which are described in 'formal grammar representation.txt'
@@ -28,7 +28,7 @@ class BSParser {
 
     //ignores linebreaks here so it doesn't have to go all the way down the recursion to do it
     while (!_isAtEnd()) {
-      if (_match(TokenType.lineBreak)) continue;
+      if (match(TokenType.lineBreak)) continue;
       var declaration = _declaration();
       if (declaration != null) statements.add(declaration);
     }
@@ -39,12 +39,12 @@ class BSParser {
   ///<declaration> ::= <class_decl> | <rou_decl> | <var_decl_stmt> | <statement>
   Stmt _declaration() {
     try {
-      if (_match(TokenType.classToken)) return _classDeclaration();
+      if (match(TokenType.classToken)) return _classDeclaration();
 
       ///<rou_decl> ::= "routine" <routine>
-      if (_match(TokenType.routine)) return _routine("routine");
-      if (_match(TokenType.let)) return _varDeclaration();
-      return _statement();
+      if (match(TokenType.routine)) return _routine("routine");
+      if (match(TokenType.let)) return varDeclaration();
+      return statement();
     } on ParseError {
       _synchronize();
       return null;
@@ -58,29 +58,29 @@ class BSParser {
   ///<class_decl> ::= "class" <whitespace> <identifier> <{> <routines> <}>
   ///             | "class" <whitespace> <identifier> <whitespace> "<" <whitespace> <identifier> <{> <routines>  <}>
   Stmt _classDeclaration() {
-    var name = _consume(TokenType.identifier, "Expect class name");
+    var name = consume(TokenType.identifier, "Expect class name");
 
     //"<" <whitespace> <identifier>
     VariableExpr superclass;
-    if (_match(TokenType.less)) {
-      _consume(TokenType.identifier, "Expect superclass name");
-      superclass = VariableExpr(_previous());
+    if (match(TokenType.less)) {
+      consume(TokenType.identifier, "Expect superclass name");
+      superclass = VariableExpr(previous());
     }
 
     //linebreaks after { dealt with by scanner
-    _consume(TokenType.leftBrace, "Expect '{' before class body");
+    consume(TokenType.leftBrace, "Expect '{' before class body");
 
     var methods = <RoutineStmt>[];
 
     //<routines> ::= routine <routines> | <whitespace_or_linebreak> <routines> ""
-    while (!_check(TokenType.rightBrace) && !_isAtEnd())
-      if (_check(TokenType.lineBreak)) {
+    while (!check(TokenType.rightBrace) && !_isAtEnd())
+      if (check(TokenType.lineBreak)) {
         _advance();
       } else {
         methods.add(_routine("method"));
       }
 
-    _consume(TokenType.rightBrace, "Expect '}' after class body");
+    consume(TokenType.rightBrace, "Expect '}' after class body");
 
     return ClassStmt(name, superclass, methods);
   }
@@ -89,26 +89,26 @@ class BSParser {
   ///<routine> ::= <identifier> <(> <parameters> <)> <whitespace_or_linebreak> <block>
   ///            | <identifier> <(> <)> <whitespace_or_linebreak> <block>
   RoutineStmt _routine(String kind) {
-    var name = _consume(TokenType.identifier, "Expect $kind name.");
+    var name = consume(TokenType.identifier, "Expect $kind name.");
 
     //linebreaks after this dealt with by scanner
-    _consume(TokenType.leftParentheses, "Expect '(' after $kind name;");
+    consume(TokenType.leftParentheses, "Expect '(' after $kind name;");
 
     var parameters = <Token>[];
 
     //<parameters> ::= <identifier> | <identifier> <whitespace> "," <whitespace_or_linebreak> <parameters>
-    if (!_check(TokenType.rightParentheses)) {
+    if (!check(TokenType.rightParentheses)) {
       do {
-        if (_match(TokenType.lineBreak)) continue;
-        parameters.add(_consume(TokenType.identifier, "Expect parameter name"));
-      } while (_match(TokenType.comma));
+        if (match(TokenType.lineBreak)) continue;
+        parameters.add(consume(TokenType.identifier, "Expect parameter name"));
+      } while (match(TokenType.comma));
     }
 
     //possible linebreak here handled by the scanner
-    _consume(TokenType.rightParentheses, "Expect ')' after parameters.");
+    consume(TokenType.rightParentheses, "Expect ')' after parameters.");
 
-    _match(TokenType.lineBreak);
-    _consume(TokenType.leftBrace, "Expect '{' after routine parameters");
+    match(TokenType.lineBreak);
+    consume(TokenType.leftBrace, "Expect '{' after routine parameters");
     var body = _block();
     return RoutineStmt(name, parameters, body);
   }
@@ -121,30 +121,30 @@ class BSParser {
   ///                               | <let> <identifier> <(> <parameters> <)> <assigment_operator> <expression>
   ///<let> ::= "let" <whitespace>
   ///<assigment_operator> ::= <whitespace> "=" <whitespace_or_linebreak>
-
-  Stmt _varDeclaration() {
-    var name = _consume(TokenType.identifier, "Expect variable name");
+  @protected
+  Stmt varDeclaration() {
+    var name = consume(TokenType.identifier, "Expect variable name");
 
     List<Token> parameters;
-    if (_match(TokenType.leftParentheses)) {
+    if (match(TokenType.leftParentheses)) {
       parameters = <Token>[];
 
       do {
-        if (_check(TokenType.rightParentheses)) break;
+        if (check(TokenType.rightParentheses)) break;
         //linebreaks after ( and , handled by scanner
-        parameters.add(_consume(TokenType.identifier, "Expect parameter name"));
-      } while (_match(TokenType.comma));
+        parameters.add(consume(TokenType.identifier, "Expect parameter name"));
+      } while (match(TokenType.comma));
 
       //linebreaks right before ) handled by scanner
 
-      _consume(TokenType.rightParentheses, "Expect ')' after parameters.");
+      consume(TokenType.rightParentheses, "Expect ')' after parameters.");
     }
     if (parameters?.isEmpty ?? true) parameters = null;
 
     Expr initializer;
-    if (_match(TokenType.assigment)) {
+    if (match(TokenType.assigment)) {
       //linebreak after = handled by scanner
-      initializer = _expression();
+      initializer = expression();
     }
 
     _consumeAny([TokenType.semicolon, TokenType.lineBreak],
@@ -153,22 +153,24 @@ class BSParser {
   }
 
   ///<statement> ::= <expr_stmt> | <for_stmt> | <if_stmt> | <print_stmt> | <return_stmt> | <while_stmt> | <block> | <directive>
-  Stmt _statement() {
-    if (_match(TokenType.forToken)) return _forStatement();
-    if (_match(TokenType.ifToken)) return _ifStatement();
-    if (_match(TokenType.print)) return _printStatement();
-    if (_match(TokenType.returnToken)) return _returnStatement();
-    if (_match(TokenType.whileToken)) return _whileStatement();
+  @protected
+  Stmt statement() {
+    if (match(TokenType.forToken)) return forStatement();
+    if (match(TokenType.ifToken)) return _ifStatement();
+    if (match(TokenType.print)) return _printStatement();
+    if (match(TokenType.returnToken)) return _returnStatement();
+    if (match(TokenType.whileToken)) return _whileStatement();
     //might be an expression statement with a Set definition or a block
-    if (_match(TokenType.leftBrace)) return _parseLeftBrace();
-    if (_match(TokenType.hash)) return _directive();
-    return _expressionStatement();
+    if (match(TokenType.leftBrace)) return _parseLeftBrace();
+    if (match(TokenType.hash)) return _directive();
+    return expressionStatement();
   }
 
   ///<expr_stmt> ::= <expression> <delimitator>
-  Stmt _expressionStatement() {
-    var expr = _expression();
-    _checkTerminator("expression");
+  @protected
+  Stmt expressionStatement() {
+    var expr = expression();
+    checkTerminator("expression");
     return ExpressionStmt(expr);
   }
 
@@ -176,43 +178,48 @@ class BSParser {
   ///               <whitespace_or_linebreak> <for_stmt__clause>  <)> <whitespace_or_linebreak> <statement>
   ///<for_stmt_init_clause> ::= <var_decl> | <expression> | ""
   ///<for_stmt__clause> ::= <expression> | ""
-  Stmt _forStatement() {
-    var token = _previous();
+  @protected
+  Stmt forStatement() {
+    final token = previous();
 
-    _consume(TokenType.leftParentheses, "Expect '(' after 'for'.");
+    consume(TokenType.leftParentheses, "Expect '(' after 'for'.");
 
     //linebreaks after left parentheses handled by the parser
 
     Stmt initializer;
 
     //the initializer may be empty, a variable declaration or any other expression
-    if (!_match(TokenType.semicolon)) {
-      if (_match(TokenType.let)) {
-        initializer = _varDeclaration();
+    if (!match(TokenType.semicolon)) {
+      if (match(TokenType.let)) {
+        initializer = varDeclaration();
       } else {
-        initializer = _expressionStatement();
+        initializer = expressionStatement();
       }
     }
 
     //linebreaks after semicolons handled by the parser
 
     //The condition may be any expression, but may also be left empty
-    var condition = (_check(TokenType.semicolon)) ? null : _expression();
+    var condition = (check(TokenType.semicolon)) ? null : expression();
 
-    _consume(TokenType.semicolon, "Expect ';' after loop condition.");
+    consume(TokenType.semicolon, "Expect ';' after loop condition.");
 
     //linebreaks after semicolons handled by the parser
 
-    var increment = (_check(TokenType.rightParentheses)) ? null : _expression();
+    var increment = (check(TokenType.rightParentheses)) ? null : expression();
 
     //linebreaks before ) handled by scanner
 
-    _consume(TokenType.rightParentheses,
+    consume(TokenType.rightParentheses,
         "Expect ')' after increment in for statement");
-    var body = _statement();
+    var body = statement();
 
     if (increment != null) {
-      body = BlockStmt([body, ExpressionStmt(increment)]);
+      body = BlockStmt(<Stmt>[
+        if (body is BlockStmt) ...body.statements,
+        if (!(body is BlockStmt)) body,
+        ExpressionStmt(increment)
+      ]);
     }
 
     condition ??= LiteralExpr(true);
@@ -228,21 +235,21 @@ class BSParser {
   ///<if_clause> ::= "if" <(> <expression> <)> <whitespace_or_linebreak> <statement>
   ///<else_clause> ::= "else" <whitespace_or_linebreak> <statement>
   Stmt _ifStatement() {
-    _consume(TokenType.leftParentheses, "Expect '(' after 'if'.");
+    consume(TokenType.leftParentheses, "Expect '(' after 'if'.");
     //linebreaks after left parentheses handled by the parser
-    var condition = _expression();
+    var condition = expression();
 
     //linebreak before ) handled by scanner
 
-    _consume(TokenType.rightParentheses, "Expect ')' after if condition.");
+    consume(TokenType.rightParentheses, "Expect ')' after if condition.");
 
-    _match(TokenType.lineBreak);
+    match(TokenType.lineBreak);
 
-    var thenBranch = _statement();
+    var thenBranch = statement();
 
     //linebreak before else handled by scanner
 
-    var elseBranch = (_match(TokenType.elseToken)) ? _statement() : null;
+    var elseBranch = (match(TokenType.elseToken)) ? statement() : null;
 
     return IfStmt(condition, thenBranch, elseBranch);
   }
@@ -250,12 +257,12 @@ class BSParser {
   ///<print_stmt> ::= <unterminated_print_stmt> <delimitator>
   ///<unterminated_print_stmt> ::= "print" <expression>
   Stmt _printStatement() {
-    if (_match(TokenType.lineBreak)) {
-      _error(_previous(),
+    if (match(TokenType.lineBreak)) {
+      _error(previous(),
           "linebreak right after 'print' keyword not allowed. Please start the target expression in the same line.");
     }
-    var value = _expression();
-    _checkTerminator("print");
+    var value = expression();
+    checkTerminator("print");
     return PrintStmt(value);
   }
 
@@ -264,35 +271,34 @@ class BSParser {
   ///                | "return" <whitespace> <expression> <whitespace> <linebreak>
   ///<unterminated_return_stmt> ::= "return" | "return" <whitespace> <expression>
   Stmt _returnStatement() {
-    var keyword = _previous();
-    if (_match(TokenType.lineBreak)) {
-      _error(_previous(),
+    var keyword = previous();
+    if (match(TokenType.lineBreak)) {
+      _error(previous(),
           "linebreak not allowed immediately after return keyword! If you want to end the routine early, either write 'return null' or 'return;'");
     }
-    var value =
-        (_check(TokenType.semicolon)) ? LiteralExpr(null) : _expression();
+    var value = (check(TokenType.semicolon)) ? LiteralExpr(null) : expression();
 
-    _checkTerminator("return");
+    checkTerminator("return");
 
     return ReturnStmt(keyword, value);
   }
 
   ///<while_stmt> ::= "while" <(> <expression> <)> <statement>
   Stmt _whileStatement() {
-    var token = _previous();
-    _consume(TokenType.leftParentheses, "Expect '(' after 'while'.");
+    var token = previous();
+    consume(TokenType.leftParentheses, "Expect '(' after 'while'.");
 
     //linebreak after left parentheses handled by parser
 
-    var condition = _expression();
+    var condition = expression();
 
     //linebreak before ) handled by scanner
 
-    _consume(TokenType.rightParentheses, "Expect ')' after while condition.");
+    consume(TokenType.rightParentheses, "Expect ')' after while condition.");
 
-    _match(TokenType.lineBreak);
+    match(TokenType.lineBreak);
 
-    var body = _statement();
+    var body = statement();
 
     return WhileStmt(token, condition, body);
   }
@@ -300,21 +306,22 @@ class BSParser {
   ///<block> ::= <{> <block_body> <}> | <{> <block_body> <unterminated_optional_stmt> <}>
   ///<block_body> ::= <whitespace_or_linebreak> <block_body> | <statement> <block_body> | ""
   List<Stmt> _block() {
-    //The left brace was already consumed in _statement or _routine
+    //The left brace was already consumed in statement or _routine
     var statements = <Stmt>[];
 
-    while (!_check(TokenType.rightBrace) && !_isAtEnd()) {
-      if (_match(TokenType.lineBreak)) continue;
+    while (!check(TokenType.rightBrace) && !_isAtEnd()) {
+      if (match(TokenType.lineBreak)) continue;
       statements.add(_declaration());
     }
 
-    _consume(TokenType.rightBrace, "Expect '}' after block.");
+    consume(TokenType.rightBrace, "Expect '}' after block.");
 
     return statements;
   }
 
   ///<expression> ::= <assigment>
-  Expr _expression() {
+  @protected
+  Expr expression() {
     return _assigment();
   }
 
@@ -329,8 +336,8 @@ class BSParser {
 
     var expr = _or();
 
-    if (_match(TokenType.assigment)) {
-      var equals = _previous();
+    if (match(TokenType.assigment)) {
+      var equals = previous();
       //linebreaks here handled by scanner
       var value = _assigment();
 
@@ -352,8 +359,8 @@ class BSParser {
   Expr _or() {
     var expr = _and();
 
-    while (_match(TokenType.or)) {
-      var op = _previous();
+    while (match(TokenType.or)) {
+      var op = previous();
       //linebreaks after 'or' keyword handled by scannner
       var right = _and();
       expr = LogicBinaryExpr(expr, op, right);
@@ -366,8 +373,8 @@ class BSParser {
   Expr _and() {
     var expr = _equality();
 
-    while (_match(TokenType.and)) {
-      var op = _previous();
+    while (match(TokenType.and)) {
+      var op = previous();
       //linebreaks after 'and' keyword handled by scanner
       var right = _equality();
       expr = LogicBinaryExpr(expr, op, right);
@@ -381,8 +388,8 @@ class BSParser {
   Expr _equality() {
     var expr = _comparison();
 
-    while (_matchAny([TokenType.equals, TokenType.identicallyEquals])) {
-      var op = _previous();
+    while (matchAny([TokenType.equals, TokenType.identicallyEquals])) {
+      var op = previous();
       //linebreaks after '==' operator handled by scanner
       var right = _comparison();
       expr = BinaryExpr(expr, op, right);
@@ -398,14 +405,14 @@ class BSParser {
 
     var expr = _setBinary();
 
-    while (_matchAny([
+    while (matchAny([
       TokenType.greater,
       TokenType.greaterEqual,
       TokenType.less,
       TokenType.lessEqual
     ])) {
       //linebreaks after the operators listed above handled by scanner
-      expr = BinaryExpr(expr, _previous(), _setBinary());
+      expr = BinaryExpr(expr, previous(), _setBinary());
     }
 
     return expr;
@@ -415,7 +422,7 @@ class BSParser {
   ///<set_operator> ::= "union" | "intersection" | "\" | "contained" | "disjoined" | "belongs"
   Expr _setBinary() {
     var expr = _addition();
-    while (_matchAny([
+    while (matchAny([
       TokenType.union,
       TokenType.intersection,
       TokenType.invertedSlash,
@@ -424,7 +431,7 @@ class BSParser {
       TokenType.belongs
     ])) {
       //linebreaks after these tokens handled by the scanner
-      expr = SetBinaryExpr(expr, _previous(), _addition());
+      expr = SetBinaryExpr(expr, previous(), _addition());
     }
 
     return expr;
@@ -437,8 +444,8 @@ class BSParser {
 
     var expr = _multiplication();
 
-    while (_matchAny([TokenType.minus, TokenType.plus])) {
-      var op = _previous();
+    while (matchAny([TokenType.minus, TokenType.plus])) {
+      var op = previous();
       //linebreaks after the operators listed above handled by scanner
       var right = _multiplication();
       expr = BinaryExpr(expr, op, right);
@@ -453,8 +460,8 @@ class BSParser {
 
     var expr = _exponentiation();
 
-    while (_matchAny([TokenType.slash, TokenType.star])) {
-      var op = _previous();
+    while (matchAny([TokenType.slash, TokenType.star])) {
+      var op = previous();
       //linebreaks after the operators listed above handled by scanner
       var right = _exponentiation();
       expr = BinaryExpr(expr, op, right);
@@ -468,8 +475,8 @@ class BSParser {
 
     var expr = _unary_left();
 
-    while (_match(TokenType.exp)) {
-      var op = _previous();
+    while (match(TokenType.exp)) {
+      var op = previous();
       //linebreaks after '^' operator handled by scanner
       var right = _unary_left();
       expr = BinaryExpr(expr, op, right);
@@ -483,8 +490,8 @@ class BSParser {
     //this rule is a little different, and actually uses recursion. When you reach this rule, if you immediately find  '!', '-' or '~',
     //go back to the 'unary' rule
 
-    if (_matchAny([TokenType.minus, TokenType.not, TokenType.approx])) {
-      var op = _previous();
+    if (matchAny([TokenType.minus, TokenType.not, TokenType.approx])) {
+      var op = previous();
       //linebreaks after the operators listed above handled by scanner
       var right = _unary_left();
       return UnaryExpr(op, right);
@@ -499,15 +506,15 @@ class BSParser {
   Expr _unary_right() {
     var operand;
     //if it finds a 'del' token, parses a derivative
-    if (_match(TokenType.del)) {
+    if (match(TokenType.del)) {
       operand = _derivative();
     } else {
       //in any other case, go to the 'call' rule
       operand = _call();
     }
     //keeps composing it until it's done
-    while (_matchAny([TokenType.apostrophe, TokenType.factorial]))
-      operand = UnaryExpr(_previous(), operand);
+    while (matchAny([TokenType.apostrophe, TokenType.factorial]))
+      operand = UnaryExpr(previous(), operand);
 
     return operand;
   }
@@ -523,13 +530,13 @@ class BSParser {
     //if after a primary expression you find a parentheses, parses it as a function call, and keeps doing it until you don't find more parentheses
     //to allow for things like getFunction()();
     while (true) {
-      if (_match(TokenType.leftParentheses)) {
+      if (match(TokenType.leftParentheses)) {
         //linebreak after ( handled by scanner
         expr = _finishCall(expr);
-      } else if (_match(TokenType.dot)) {
+      } else if (match(TokenType.dot)) {
         //linebreak after . handled by scanner
         var name =
-            _consume(TokenType.identifier, "Expect property name after '.'");
+            consume(TokenType.identifier, "Expect property name after '.'");
         expr = GetExpr(expr, name);
       } else
         break;
@@ -543,19 +550,19 @@ class BSParser {
     var arguments = <Expr>[];
     //If you immediately find the ')' token, there are no arguments to the function call
 
-    if (!_check(TokenType.rightParentheses)) {
+    if (!check(TokenType.rightParentheses)) {
       //and if there are arguments, they are separeted by commas
       //do note that there is no max number of arguments. That might be a problem when (if) translating the interpreter to a lower level language.
       do {
         //linebreaks after '(' and ',' handled by scanner
-        arguments.add(_expression());
-      } while (_match(TokenType.comma));
+        arguments.add(expression());
+      } while (match(TokenType.comma));
     }
 
     //linebreak before ) handled by scanner
 
     var paren =
-        _consume(TokenType.rightParentheses, "Expect ')' after arguments.");
+        consume(TokenType.rightParentheses, "Expect ')' after arguments.");
 
     return CallExpr(callee, paren, arguments);
   }
@@ -564,31 +571,31 @@ class BSParser {
   ///<partial_differential> ::=  "del" <(> <expression> <)>
   ///<derivative_parameters> ::= "del" <(> <arguments> <)>
   Expr _derivative() {
-    var keyword = _consume(TokenType.leftParentheses,
+    var keyword = consume(TokenType.leftParentheses,
         "Expect '(' after del keyword - linebreaks not allowed between 'del' and '('");
     //linebreaks after '(' handled by scanner
-    var derivand = _expression();
+    var derivand = expression();
     //linebreak before ) handled by scanner
-    _consume(TokenType.rightParentheses, "Expect ')' after derivand");
-    _consume(TokenType.slash,
+    consume(TokenType.rightParentheses, "Expect ')' after derivand");
+    consume(TokenType.slash,
         "expect '/' after derivand - if you wanted to add a linebreak between ')' and '/', do it after the slash");
     //linebreaks after '/' handled by scanner
-    _consume(TokenType.del, "expect second 'del' after derivand");
-    _consume(TokenType.leftParentheses, "expect '(' after second del keyword");
+    consume(TokenType.del, "expect second 'del' after derivand");
+    consume(TokenType.leftParentheses, "expect '(' after second del keyword");
     //linebreaks after '(' handled by scanner
     var variables = <Expr>[];
-    if (_check(TokenType.rightParentheses)) {
-      _error(_previous(),
+    if (check(TokenType.rightParentheses)) {
+      _error(previous(),
           "at least one variable is necessary in derivative expression");
     }
     do {
       //linebreaks after '(' and ',' handled by scanner
-      variables.add(_expression());
-    } while (_match(TokenType.comma));
+      variables.add(expression());
+    } while (match(TokenType.comma));
 
     //linebreaks before ')' handled by scanner
 
-    _consume(
+    consume(
         TokenType.rightParentheses, "expect ')' after derivative variables");
 
     return DerivativeExpr(keyword, derivand, variables);
@@ -605,7 +612,7 @@ class BSParser {
   ///<roster_set_definition> ::= <{> <}> | <{> <arguments> <}>
   ///<builder_set_definition> ::= <{> "|" <whitespace_or_linebreak> <logic_or> <}>
   ///                           | <{> <arguments> <whitespace> "|" <whitespace_or_linebreak> <logic_or> <}>
-
+  @protected
   Expr _primary() {
     //since some tokens may both be sets and other types of syntax
     //(braces may be sets or blocks, parentheses may be groupings or intervals,
@@ -613,34 +620,34 @@ class BSParser {
     //we have to parse them assuming it can be either until we can be sure.
 
     //the "set" keyword MUST mean a set definition follows. If it doesn't, it's an error.
-    if (_match(TokenType.setToken)) return _setDefinition();
+    if (match(TokenType.setToken)) return _setDefinition();
 
     //number | string
-    if (_matchAny([TokenType.number, TokenType.string])) {
-      return LiteralExpr(_previous().literal);
+    if (matchAny([TokenType.number, TokenType.string])) {
+      return LiteralExpr(previous().literal);
     }
 
     //false
-    if (_match(TokenType.falseToken)) {
+    if (match(TokenType.falseToken)) {
       return LiteralExpr(bsFalse);
     }
 
     //true
-    if (_match(TokenType.trueToken)) {
+    if (match(TokenType.trueToken)) {
       return LiteralExpr(bsTrue);
     }
 
-    if (_match(TokenType.unknown)) {
+    if (match(TokenType.unknown)) {
       return LiteralExpr(bsUnknown);
     }
 
     //nil
-    if (_match(TokenType.nil)) return LiteralExpr(null);
+    if (match(TokenType.nil)) return LiteralExpr(null);
 
     //<(> <expression> <)>
     //or
     //<interval_definition> ::= <(> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
-    if (_match(TokenType.leftParentheses)) return _parseLeftParentheses();
+    if (match(TokenType.leftParentheses)) return _parseLeftParentheses();
 
     //<roster_set_definition> ::= <{> <}> | <{> <arguments> <}>
     //or
@@ -648,29 +655,29 @@ class BSParser {
     //                           | <{> <arguments> <whitespace> "|" <whitespace_or_linebreak> <logic_or> <}>
     //or
     //just a block
-    if (_match(TokenType.leftBrace)) return _parseLeftBrace(true);
+    if (match(TokenType.leftBrace)) return _parseLeftBrace(true);
 
     //<interval_definition> ::= <[> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
-    if (_match(TokenType.leftSquare)) return _parseLeftSquare();
+    if (match(TokenType.leftSquare)) return _parseLeftSquare();
 
     //identifier
-    if (_match(TokenType.identifier)) return VariableExpr(_previous());
-    if (_match(TokenType.thisToken)) return ThisExpr(_previous());
+    if (match(TokenType.identifier)) return VariableExpr(previous());
+    if (match(TokenType.thisToken)) return ThisExpr(previous());
 
     //"super" <whitespace> "." <whitespace_or_linebreak> <identifier>
-    if (_match(TokenType.superToken)) {
-      var keyword = _previous();
-      _consume(TokenType.dot,
+    if (match(TokenType.superToken)) {
+      var keyword = previous();
+      consume(TokenType.dot,
           "Expect '.' after 'super' - if you want to add a linebreak, do it after the dot");
       //linebreaks after '.' handled by scanner
       var method =
-          _consume(TokenType.identifier, "Expect superclass method name");
+          consume(TokenType.identifier, "Expect superclass method name");
       return SuperExpr(keyword, method);
     }
 
     //if you get to this rule and don't find any of the above, you found a syntax error instead
-    if (_previous().type == TokenType.lineBreak &&
-        _checkAny([
+    if (previous().type == TokenType.lineBreak &&
+        checkAny([
           TokenType.comma,
           TokenType.dot,
           TokenType.minus,
@@ -698,51 +705,51 @@ class BSParser {
   }
 
   Expr _setDefinition() {
-    if (_match(TokenType.leftParentheses)) return _parseLeftParentheses(true);
-    if (_match(TokenType.leftSquare)) return _parseLeftSquare(true);
-    if (_match(TokenType.leftBrace)) return _parseLeftBrace(true);
-    throw _error(_previous(), "Expecting Set definition after 'set' keyword");
+    if (match(TokenType.leftParentheses)) return _parseLeftParentheses(true);
+    if (match(TokenType.leftSquare)) return _parseLeftSquare(true);
+    if (match(TokenType.leftBrace)) return _parseLeftBrace(true);
+    throw _error(previous(), "Expecting Set definition after 'set' keyword");
   }
 
   ///<(> <expression> <)>
   ///or
   ///<interval_definition> ::= <(> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
   Expr _parseLeftParentheses([bool mustBeSet = false]) {
-    var _left = _previous();
+    var _left = previous();
     //linebreaks after '(' handled by scanner
-    var expr = _expression();
+    var expr = expression();
 
-    if (_match(TokenType.comma)) {
+    if (match(TokenType.comma)) {
       //in here we're sure that we're parsing an Interval
-      var _expr = _expression();
+      var _expr = expression();
       //linebreaks before ']' and ')' handled by scanner
       _consumeAny([TokenType.rightBrace, TokenType.rightParentheses],
           "Expected ] or ) ending interval definition");
-      return IntervalDefinitionExpr(_left, expr, _expr, _previous());
+      return IntervalDefinitionExpr(_left, expr, _expr, previous());
     }
-    if (mustBeSet) throw _error(_previous(), "Expecting Interval definition");
+    if (mustBeSet) throw _error(previous(), "Expecting Interval definition");
 
     //linebreaks before ')' handled by scanner
     //if the ')' is not there, it's an error
-    _consume(TokenType.rightParentheses, "Expect ')' after expression");
+    consume(TokenType.rightParentheses, "Expect ')' after expression");
     return GroupingExpr(expr);
   }
 
   ///<interval_definition> ::= <[> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
   Expr _parseLeftSquare([bool mustBeSet = false]) {
-    var left = _previous();
+    var left = previous();
 
-    var expr = _expression();
+    var expr = expression();
 
-    _consume(TokenType.comma, "Expecting comma in Interval definition");
+    consume(TokenType.comma, "Expecting comma in Interval definition");
 
-    var _expr = _expression();
+    var _expr = expression();
 
     //linebreaks before ']' and ')' handled by scanner
 
     _consumeAny([TokenType.rightBrace, TokenType.rightParentheses],
         "Expected ] or ) ending interval definition");
-    return IntervalDefinitionExpr(left, expr, _expr, _previous());
+    return IntervalDefinitionExpr(left, expr, _expr, previous());
   }
 
   ///rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
@@ -751,11 +758,11 @@ class BSParser {
   ///or
   ///block -> "{" (declaration | linebreak)* "}"
   Object _parseLeftBrace([bool expectSet = false]) {
-    var _leftBrace = _previous();
+    var _leftBrace = previous();
     Expr _setReturn;
 
     //{} -> empty set
-    if (_match(TokenType.rightBrace)) {
+    if (match(TokenType.rightBrace)) {
       if (expectSet) {
         return LiteralExpr(emptySet);
       } else {
@@ -770,42 +777,42 @@ class BSParser {
 
     var first;
 
-    if (!_check(TokenType.verticalBar)) first = _declaration();
+    if (!check(TokenType.verticalBar)) first = _declaration();
 
     //assumes it is a block
 
     var isSet = false;
 
-    if (_match(TokenType.comma)) {
-      if (first == null) _error(_previous(), "expect token before comma");
+    if (match(TokenType.comma)) {
+      if (first == null) _error(previous(), "expect token before comma");
       if (first is ExpressionStmt) {
         expressions.add(first.expression);
       } else {
-        _error(_previous(),
+        _error(previous(),
             "all elements in a roster set definition must evaluate to a number");
       }
       isSet = true;
       do {
         //linebreaks after ','  handled by scanner
-        expressions.add(_expression());
-      } while (_match(TokenType.comma));
+        expressions.add(expression());
+      } while (match(TokenType.comma));
     }
 
     //is a builder set
-    if (_match(TokenType.verticalBar)) {
+    if (match(TokenType.verticalBar)) {
       if (first != null) {
         if (first is ExpressionStmt) {
           expressions.add(first.expression);
         } else {
-          _error(_previous(),
+          _error(previous(),
               "all parameters in a builder set definition must evaluate to a variable");
         }
       }
 
-      var bar = _previous();
-      var logic = _expression();
+      var bar = previous();
+      var logic = expression();
       //linebreak before } handled by scanner
-      _consume(TokenType.rightBrace, "Expect '}' after builder set definition");
+      consume(TokenType.rightBrace, "Expect '}' after builder set definition");
       List<Token> parameters;
       if (expressions.isNotEmpty) {
         parameters = <Token>[];
@@ -818,22 +825,22 @@ class BSParser {
         }
       }
 
-      _setReturn = BuilderDefinitionExpr(
-          _leftBrace, parameters, logic, bar, _previous());
+      _setReturn =
+          BuilderDefinitionExpr(_leftBrace, parameters, logic, bar, previous());
     } else if (isSet) {
       //Roster set
       //linebreak before } handled by scanner
-      _consume(TokenType.rightBrace, "Expect '}' after roster set definition");
+      consume(TokenType.rightBrace, "Expect '}' after roster set definition");
 
-      _setReturn = RosterDefinitionExpr(_leftBrace, expressions, _previous());
+      _setReturn = RosterDefinitionExpr(_leftBrace, expressions, previous());
     }
 
     //if there is a single element, and it is a expression statement, assumes it's a RosterSet with a single element
     //if it isn't, assumes it is a block with a single
-    if (_match(TokenType.rightBrace)) {
+    if (match(TokenType.rightBrace)) {
       if (first is ExpressionStmt) {
         _setReturn =
-            RosterDefinitionExpr(_leftBrace, [first.expression], _previous());
+            RosterDefinitionExpr(_leftBrace, [first.expression], previous());
       } else
         return BlockStmt([first]);
     }
@@ -847,19 +854,19 @@ class BSParser {
 
     var statements = <Stmt>[first];
 
-    while (!_check(TokenType.rightBrace) && !_isAtEnd()) {
-      if (_match(TokenType.lineBreak)) continue;
+    while (!check(TokenType.rightBrace) && !_isAtEnd()) {
+      if (match(TokenType.lineBreak)) continue;
       statements.add(_declaration());
     }
 
-    _consume(TokenType.rightBrace, "Expect '}' after block.");
+    consume(TokenType.rightBrace, "Expect '}' after block.");
     return BlockStmt(statements);
   }
   //Helper function corner
 
   ///whether the current token's type is [type], consuming it if it is
-  bool _match(TokenType type) {
-    if (_check(type)) {
+  bool match(TokenType type) {
+    if (check(type)) {
       _advance();
       return true;
     }
@@ -867,21 +874,23 @@ class BSParser {
   }
 
   ///true if the current token matches any in [types], consuming it if it does
-  bool _matchAny(List<TokenType> types) {
+  bool matchAny(List<TokenType> types) {
     for (var type in types) {
-      if (_match(type)) return true;
+      if (match(type)) return true;
     }
     return false;
   }
 
   ///whether the current token's type matches [type]
-  bool _check(TokenType type) {
+  @protected
+  bool check(TokenType type) {
     if (_isAtEnd()) return false;
     return _peek().type == type;
   }
 
-  ///[_check] for many types
-  bool _checkAny(List<TokenType> types) {
+  ///[check] for many types
+  @protected
+  bool checkAny(List<TokenType> types) {
     if (_isAtEnd()) return false;
     return types.contains(_peek().type);
   }
@@ -890,7 +899,7 @@ class BSParser {
   ///(remember that, in theory, every list of tokens generated by BSScanner ends with an eof token)
   Token _advance() {
     if (!_isAtEnd()) _current++;
-    return _previous();
+    return previous();
   }
 
   ///whether current token is the last one
@@ -901,12 +910,14 @@ class BSParser {
   Token _peek() => _tokens[_current];
 
   ///return the token immediately before _current
-  Token _previous() => _tokens[_current - 1];
+  @protected
+  Token previous() => _current > 0 ? _tokens[_current - 1] : null;
 
   ///checks if the current token matches [type] and consumes it.
   ///If it doesn't, causes an error
-  Token _consume(TokenType type, String message) {
-    if (_check(type)) return _advance();
+  @protected
+  Token consume(TokenType type, String message) {
+    if (check(type)) return _advance();
 
     //doesn't actually throw the error
     //So that it keeps parsing
@@ -916,7 +927,7 @@ class BSParser {
 
   Token _consumeAny(List<TokenType> types, String message) {
     for (var type in types) {
-      if (_check(type)) return _advance();
+      if (check(type)) return _advance();
     }
 
     _error(_peek(), message);
@@ -926,7 +937,7 @@ class BSParser {
   ///Reports an error to the general interpreter and creates a [ParseError] without
   /// necessarily throwing it
   ParseError _error(Token token, String message) {
-    BetaScript.error(token, message);
+    _errorCallback(token, message);
     return ParseError();
   }
 
@@ -936,7 +947,7 @@ class BSParser {
     _advance();
 
     while (!_isAtEnd()) {
-      if (_previous().type == TokenType.semicolon) return;
+      if (previous().type == TokenType.semicolon) return;
 
       switch (_peek().type) {
         case TokenType.classToken:
@@ -958,28 +969,20 @@ class BSParser {
   ///<directive> ::= "#" directiveName
   ///<directive_name ::=  a directive name is composed of anything that isn't whitespace. There is probably a simple way of expressing this in regEx,
   ///                     but i unforgivably don't know how to use them. basically, if it can be a twitter hashtag, it counts
-  Stmt _directive() {
-    var stmt = DirectiveStmt(_previous(), _previous().literal);
-    //if the directive is global, it is set directly in the global directives
-    //if they're local, the interpreter will deal with it in time
-    if (!_interpreter.directives.setIfGlobal(stmt.directive, true)) {
-      return stmt;
-    } else
-      return null;
-  }
+  Stmt _directive() => DirectiveStmt(previous(), previous().literal);
 
   ///delimitator ::= <linebreak> | <;>
-  void _checkTerminator(String type) {
+  void checkTerminator(String type) {
     //'}' and eof are unconsumed terminators to deal with the fact something at the end of a program or block might not have a linebreak,
     //which should work. ',' and '|' are unconsumed terminator as a crutch to make sure that they the first expression after an ambiguous
     //'{'. Since none of these are consumed, they will still cause an error when in the wrong place, so this isn't going to allow weird stuff
     //(i hope)
-    if (_checkAny([TokenType.semicolon, TokenType.lineBreak])) {
+    if (checkAny([TokenType.semicolon, TokenType.lineBreak])) {
       _advance();
       return;
     }
     if (_isAtEnd() ||
-        _checkAny(
+        checkAny(
             [TokenType.rightBrace, TokenType.comma, TokenType.verticalBar])) {
       return;
     }

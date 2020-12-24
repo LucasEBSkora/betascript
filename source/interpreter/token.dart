@@ -62,7 +62,12 @@ enum TokenType {
   unknown,
   whileToken,
 
-  EOF
+  EOF,
+
+  //ONLY USED FOR FORMATTER SCANNER - see betascript-tools repository
+  multilineComment,
+  comment,
+  wordComment
 }
 
 class Token {
@@ -76,5 +81,5 @@ class Token {
   const Token(this.type, this.lexeme, this.literal, this.line);
 
   @override
-  String toString() => "$type '$lexeme' $literal";
+  String toString() => "$type '$lexeme' ${literal != null ? literal : ""}";
 }

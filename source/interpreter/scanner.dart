@@ -1,40 +1,50 @@
 import 'dart:collection' show HashMap;
 
+import 'package:meta/meta.dart';
+
 import 'token.dart';
-import 'betascript.dart';
 import '../function/number.dart';
 
 ///Scans the source for tokens, returning a list of them on a call to scanTokens, the only public routine in this class.
 class BSScanner {
-  final String _source;
+  @protected
+  final String source;
   final List<Token> _tokens = <Token>[];
-  HashMap<String, void Function()> _charToLexeme; //see _initializeMap
+  @protected
+  final Function errorCallback;
+  @protected
+  HashMap<String, void Function()> charToLexeme; //see _initializeMap
 
-  ///_start is the start of the lexeme currently being read, and _current the current value being processed.
-  int _start = 0;
-  int _current = 0;
+  ///[start] is the start of the lexeme currently being read
+  @protected
+  int start = 0;
+
+  /// [current] is the current value being processed.
+  @protected
+  int current = 0;
 
   ///If the source scanned is multiline, keeps the value of the current line for error reporting
-  int _line = 1;
+  @protected
+  int line = 1;
 
-  BSScanner(String this._source) {
+  BSScanner(String this.source, Function this.errorCallback) {
     _initializeMap();
   }
 
   List<Token> scanTokens() {
-    while (!_isAtEnd()) {
-      _start = _current;
+    while (!isAtEnd()) {
+      start = current;
       _scanToken();
     }
 
-    //if the last line of the file doesn`t end with a line break, it might come up as unterminated. To solve this, we add an extra linebreak token
-    //adds a end of file token in the end, although it isn't completely necessary
-    _tokens.add(new Token(TokenType.EOF, "", null, _line));
+    //adds a end of file token in the end
+    _tokens.add(Token(TokenType.EOF, "", null, line));
     _removeLinebreaks();
     return _tokens;
   }
 
-  //many linebreaks can be removed looking at the next token, which means we have to wait until the scanner is finished to remove them
+  //many linebreaks can be removed looking at the next token,
+  //which means we have to wait until the scanner is finished to remove them
   void _removeLinebreaks() {
     for (var i = 0; i < _tokens.length - 1;) {
       if (_tokens[i].type == TokenType.lineBreak) {
@@ -53,76 +63,76 @@ class BSScanner {
     }
   }
 
-  bool _isAtEnd() => _current >= _source.length;
+  @protected
+  bool isAtEnd() => current >= source.length;
 
   ///initializes the map used to replace a big ugly switch-case block in [_scanToken]
   void _initializeMap() {
-    _charToLexeme = HashMap<String, void Function()>.from({
+    charToLexeme = HashMap<String, void Function()>.from({
       //these lexemes are always single character, and can be initialized with ease
-      '(': () => _addToken(TokenType.leftParentheses),
-      ')': () => _addToken(TokenType.rightParentheses),
-      '{': () => _addToken(TokenType.leftBrace),
-      '}': () => _addToken(TokenType.rightBrace),
-      '[': () => _addToken(TokenType.leftSquare),
-      ']': () => _addToken(TokenType.rightSquare),
-      ',': () => _addToken(TokenType.comma),
-      '-': () => _addToken(TokenType.minus),
-      '~': () => _addToken(TokenType.approx),
-      '+': () => _addToken(TokenType.plus),
-      ';': () => _addToken(TokenType.semicolon),
-      ';': () => _addToken(TokenType.semicolon), //greek question mark
-      '*': () => _addToken(TokenType.star),
-      '!': () => _addToken(TokenType.factorial),
-      "'": () => _addToken(TokenType.apostrophe),
-      '^': () => _addToken(TokenType.exp),
-      '|': () => _addToken(TokenType.verticalBar),
+      '(': () => addToken(TokenType.leftParentheses),
+      ')': () => addToken(TokenType.rightParentheses),
+      '{': () => addToken(TokenType.leftBrace),
+      '}': () => addToken(TokenType.rightBrace),
+      '[': () => addToken(TokenType.leftSquare),
+      ']': () => addToken(TokenType.rightSquare),
+      ',': () => addToken(TokenType.comma),
+      '-': () => addToken(TokenType.minus),
+      '~': () => addToken(TokenType.approx),
+      '+': () => addToken(TokenType.plus),
+      ';': () => addToken(TokenType.semicolon),
+      ';': () => addToken(TokenType.semicolon), //greek question mark
+      '*': () => addToken(TokenType.star),
+      '!': () => addToken(TokenType.factorial),
+      "'": () => addToken(TokenType.apostrophe),
+      '^': () => addToken(TokenType.exp),
+      '|': () => addToken(TokenType.verticalBar),
       '@': () {
         //word comments ignore everything up to the next character of whitespace (but can be used normally inside strings)
-        while (_peek() != '\n' &&
-            _peek() != ' ' &&
-            _peek() != '\r' &&
-            _peek() != '\t' &&
-            !_isAtEnd()) _advance();
+        while (peek() != '\n' &&
+            peek() != ' ' &&
+            peek() != '\r' &&
+            peek() != '\t' &&
+            !isAtEnd()) advance();
       },
       '#': _directive,
       //since things like .01 are valid numeric literals, '.' needs to be checked to be sure it's a dot or part of a literal.
       '.': () {
-        if (_IsDigit(_peek())) {
+        if (_IsDigit(peek())) {
           _number();
         } else {
-          _addToken(TokenType.dot);
+          addToken(TokenType.dot);
         }
       },
       //for these, we need to check if they are followed by a '=' or not (since = and ==, < and <=, > and >= are different things)
       //specially '=', which can be '=', '==' or '==='
-      '=': () => _addToken((_match('=')
-          ? (_match('=') ? TokenType.identicallyEquals : TokenType.equals)
+      '=': () => addToken((match('=')
+          ? (match('=') ? TokenType.identicallyEquals : TokenType.equals)
           : TokenType.assigment)),
-      '<': () =>
-          _addToken((_match('=') ? TokenType.lessEqual : TokenType.less)),
+      '<': () => addToken((match('=') ? TokenType.lessEqual : TokenType.less)),
       '>': () =>
-          _addToken((_match('=') ? TokenType.greaterEqual : TokenType.greater)),
+          addToken((match('=') ? TokenType.greaterEqual : TokenType.greater)),
       '/': () {
         //if the slash is followed by another slash, it's actually a comment, and the rest of the line should be ignored
-        if (_match('/')) {
-          while (_peek() != '\n' && !_isAtEnd()) _advance();
+        if (match('/')) {
+          while (peek() != '\n' && !isAtEnd()) advance();
         }
         //if it's followed by a star, it's a multiline comment, and everything up to the next */ should be ignored
-        else if (_match('*')) {
-          while (!_match('*') || _peek() != '/') {
-            if (_isAtEnd()) {
-              BetaScript.error(_line, "unterminated multiline comment");
+        else if (match('*')) {
+          while (!match('*') || peek() != '/') {
+            if (isAtEnd()) {
+              errorCallback(line, "unterminated multiline comment");
               break;
             }
-            _advance();
+            advance();
           }
           //consumes those last  '*/' characters
-          _advance();
-          _advance();
+          advance();
+          advance();
         } else //in any other case we just have a normal slash
-          _addToken(TokenType.slash);
+          addToken(TokenType.slash);
       },
-      '\\': () => _addToken(TokenType.invertedSlash),
+      '\\': () => addToken(TokenType.invertedSlash),
       //sometimes can be ignored, sometimes used as delimitator, but always increases the line counter.
       '\n': () {
         if (!_tokens.isEmpty) {
@@ -158,9 +168,9 @@ class BSScanner {
             TokenType.setToken, // set
             TokenType.union, // union
             TokenType.intersection, // intersection
-          ].contains(last)) _addToken(TokenType.lineBreak);
+          ].contains(last)) addToken(TokenType.lineBreak);
         }
-        _line++;
+        line++;
       },
       //whitespace. Ignored.
       ' ': () {},
@@ -169,26 +179,26 @@ class BSScanner {
       //since the _string function takes no parameters, it can be passed directly.
       '"': _string,
       //unicode variants for math operations
-      '¬': () => _addToken(TokenType.not),
-      '⊂': () => _addToken(TokenType.contained),
-      '∈': () => _addToken(TokenType.belongs),
-      '∪': () => _addToken(TokenType.union),
-      '∩': () => _addToken(TokenType.intersection),
-      '∧': () => _addToken(TokenType.and),
-      '∨': () => _addToken(TokenType.or),
-      '∂': () => _addToken(TokenType.del),
-      '≡': () => _addToken(TokenType.identicallyEquals),
+      '¬': () => addToken(TokenType.not),
+      '⊂': () => addToken(TokenType.contained),
+      '∈': () => addToken(TokenType.belongs),
+      '∪': () => addToken(TokenType.union),
+      '∩': () => addToken(TokenType.intersection),
+      '∧': () => addToken(TokenType.and),
+      '∨': () => addToken(TokenType.or),
+      '∂': () => addToken(TokenType.del),
+      '≡': () => addToken(TokenType.identicallyEquals),
     });
   }
 
   ///scans a single [Token].
   void _scanToken() {
-    //gets the next character, consuming it (by moving _current forward)
-    final c = _advance();
+    //gets the next character, consuming it (by moving current forward)
+    final c = advance();
 
-    //checks if it's one of the characters in _charToLexeme
-    if (_charToLexeme.containsKey(c)) {
-      _charToLexeme[c]();
+    //checks if it's one of the characters in charToLexeme
+    if (charToLexeme.containsKey(c)) {
+      charToLexeme[c]();
     } else {
       //if it isn't, it's either the start of a numeric literal, a identifier (or keyword), or an unexpected character.
       if (_IsDigit(c)) {
@@ -196,13 +206,14 @@ class BSScanner {
       } else if (_isValidCharacter(c)) {
         _identifier();
       } else
-        BetaScript.error(_line, "Error: Unexpected character " + c);
+        errorCallback(line, "Error: Unexpected character " + c);
     }
   }
 
   ///returns the current character and moving forward to the next
-  String _advance() {
-    return _source[_current++];
+  @protected
+  String advance() {
+    return source[current++];
   }
 
   ///a map containing keywords and the corresponding token type
@@ -234,43 +245,46 @@ class BSScanner {
     "unknown": TokenType.unknown,
   };
 
-  ///creates a new [Token], using the interval from [_start] to [_current] as the token's lexeme.
-  void _addToken(TokenType type, [Object literal]) {
-    var text = _source.substring(_start, _current);
-    _tokens.add(Token(type, text, literal, _line));
+  ///creates a new [Token], using the interval from [start] to [current] as the token's lexeme.
+  @protected
+  void addToken(TokenType type, [Object literal]) {
+    var text = source.substring(start, current);
+    _tokens.add(Token(type, text, literal, line));
   }
 
-  ///checks if the character at [_current] matches [s]
+  ///checks if the character at [current] matches [s]
   ///(used mainly with multi-character operands). If it does, consumes it.
-  bool _match(String s) {
-    if (_isAtEnd()) return false;
-    if (_source[_current] != s) return false;
+  @protected
+  bool match(String s) {
+    if (isAtEnd()) return false;
+    if (source[current] != s) return false;
 
-    _current++;
+    current++;
     return true;
   }
 
-  ///basically, [_advance] without actually advancing.
+  ///basically, [advance] without actually advancing.
   ///Used to check if a literal or identifier has ended.
-  String _peek() => (_isAtEnd()) ? null : _source[_current];
+  @protected
+  String peek() => (isAtEnd()) ? null : source[current];
 
   ///having identified the beginning of a string literal,
   ///this function reads the rest of it.
   void _string() {
-    while (_peek() != '"' && !_isAtEnd()) {
+    while (peek() != '"' && !isAtEnd()) {
       //looks for the end of the literal
-      if (_peek() == '\n') _line++;
-      _advance();
+      if (peek() == '\n') line++;
+      advance();
     }
 
     //if the source ended without another '"' to close the string, causes an error.
-    if (_isAtEnd()) {
-      BetaScript.error(_line, "Unterminated String.");
+    if (isAtEnd()) {
+      errorCallback(line, "Unterminated String.");
     } else {
       //if the string is properly formed, adds it to the token list, with the literal value having both '"' characters stripped off.
-      _advance();
-      var value = _source.substring(_start + 1, _current - 1);
-      _addToken(TokenType.string, value);
+      advance();
+      var value = source.substring(start + 1, current - 1);
+      addToken(TokenType.string, value);
     }
   }
 
@@ -292,34 +306,34 @@ class BSScanner {
   ///having found the start of a numeric literal, reads the rest of it and adds it to _tokens.
   void _number() {
     //keeps going while only reading numbers
-    while (_IsDigit(_peek())) _advance();
+    while (_IsDigit(peek())) advance();
 
     //if it reads a dot and after it more numbers, keeps going
-    if (_peek() == '.' && _IsDigit(_peekNext())) {
-      _advance();
+    if (peek() == '.' && _IsDigit(peekNext())) {
+      advance();
 
       //consumes the rest of source after the dot.
-      while (_IsDigit(_peek())) _advance();
+      while (_IsDigit(peek())) advance();
     }
 
-    _addToken(
-        TokenType.number, n(double.parse(_source.substring(_start, _current))));
+    addToken(
+        TokenType.number, n(double.parse(source.substring(start, current))));
   }
 
   ///checks the character after current, returning null if it is after the end of the source.
-  String _peekNext() => (_current + 1 >= _source.length)
+  String peekNext() => (current + 1 >= source.length)
       ? null
-      : _source.substring(_current + 1, _current + 2);
+      : source.substring(current + 1, current + 2);
 
   ///having found the start of a identifier, reads the rest of it and adds it to [_tokens].
   void _identifier() {
     //keeps going while it finds numbers (even though it can't start with a number)
-    while (!_isAtEnd() && _isExpandedAlphanumeric(_peek())) _advance();
+    while (!isAtEnd() && _isExpandedAlphanumeric(peek())) advance();
 
-    var text = _source.substring(_start, _current);
+    var text = source.substring(start, current);
 
     //if the identifier is a keyword, adds a token of the appropriate type.
-    _addToken(
+    addToken(
         (_keywords.containsKey(text)) ? _keywords[text] : TokenType.identifier);
   }
 
@@ -348,8 +362,8 @@ class BSScanner {
   ///does the same as [_identifier], but for directives,
   ///which are basically any string of characters ending in whitespace
   void _directive() {
-    while (!_isWhitespace(_peek()) && !_isAtEnd()) _advance();
-    _addToken(TokenType.hash, _source.substring(_start + 1, _current));
+    while (!_isWhitespace(peek()) && !isAtEnd()) advance();
+    addToken(TokenType.hash, source.substring(start + 1, current));
   }
 
   bool _isWhitespace(String c) =>

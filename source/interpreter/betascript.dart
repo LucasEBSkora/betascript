@@ -64,10 +64,10 @@ class BetaScript {
   }
 
   static void _run(String source) {
-    final scanner = BSScanner(source);
+    final scanner = BSScanner(source, error);
     final tokens = scanner.scanTokens(); //lexical analysis
     // for (Token token in tokens) print(token);
-    final parser = BSParser(tokens, _interpreter);
+    final parser = BSParser(tokens, error);
     final statements = parser.parse(); //Syntax analysis
     if (hadError) return;
 
