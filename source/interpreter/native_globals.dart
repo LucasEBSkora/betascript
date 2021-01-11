@@ -62,4 +62,5 @@ final Map<String, Object> nativeGlobals = {
 
   //empty set
   "emptySet": emptySet,
+  "∅": emptySet,
 };

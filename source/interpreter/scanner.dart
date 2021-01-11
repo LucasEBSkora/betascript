@@ -9,7 +9,8 @@ import '../function/number.dart';
 class BSScanner {
   @protected
   final String source;
-  final List<Token> _tokens = <Token>[];
+  @protected
+  final List<Token> tokens = <Token>[];
   @protected
   final Function errorCallback;
   @protected
@@ -34,26 +35,28 @@ class BSScanner {
   List<Token> scanTokens() {
     while (!isAtEnd()) {
       start = current;
-      _scanToken();
+      scanToken();
     }
 
     //adds a end of file token in the end
-    _tokens.add(Token(TokenType.EOF, "", null, line));
-    _removeLinebreaks();
-    return _tokens;
+    tokens.add(Token(TokenType.EOF, "", null, line));
+    removeLinebreaks();
+    return tokens;
   }
 
   //many linebreaks can be removed looking at the next token,
   //which means we have to wait until the scanner is finished to remove them
-  void _removeLinebreaks() {
-    for (var i = 0; i < _tokens.length - 1;) {
-      if (_tokens[i].type == TokenType.lineBreak) {
-        switch (_tokens[i + 1].type) {
+  @protected
+  void removeLinebreaks() {
+    for (var i = 0; i < tokens.length - 1;) {
+      if (tokens[i].type == TokenType.lineBreak) {
+        switch (tokens[i + 1].type) {
           case TokenType.rightBrace:
           case TokenType.rightParentheses:
           case TokenType.rightSquare:
           case TokenType.elseToken:
-            _tokens.removeAt(i);
+          case TokenType.EOF:
+            tokens.removeAt(i);
             continue;
           default:
             ++i;
@@ -66,7 +69,7 @@ class BSScanner {
   @protected
   bool isAtEnd() => current >= source.length;
 
-  ///initializes the map used to replace a big ugly switch-case block in [_scanToken]
+  ///initializes the map used to replace a big ugly switch-case block in [scanToken]
   void _initializeMap() {
     charToLexeme = HashMap<String, void Function()>.from({
       //these lexemes are always single character, and can be initialized with ease
@@ -95,11 +98,11 @@ class BSScanner {
             peek() != '\t' &&
             !isAtEnd()) advance();
       },
-      '#': _directive,
+      '#': directive,
       //since things like .01 are valid numeric literals, '.' needs to be checked to be sure it's a dot or part of a literal.
       '.': () {
-        if (_IsDigit(peek())) {
-          _number();
+        if (IsDigit(peek())) {
+          number();
         } else {
           addToken(TokenType.dot);
         }
@@ -126,8 +129,7 @@ class BSScanner {
             }
             advance();
           }
-          //consumes those last  '*/' characters
-          advance();
+          //consumes the last  '*/' characters
           advance();
         } else //in any other case we just have a normal slash
           addToken(TokenType.slash);
@@ -135,8 +137,8 @@ class BSScanner {
       '\\': () => addToken(TokenType.invertedSlash),
       //sometimes can be ignored, sometimes used as delimitator, but always increases the line counter.
       '\n': () {
-        if (!_tokens.isEmpty) {
-          TokenType last = _tokens.last.type;
+        if (!tokens.isEmpty) {
+          TokenType last = tokens.last.type;
           if (![
             TokenType.leftParentheses, //(
             TokenType.leftBrace, // [
@@ -146,7 +148,7 @@ class BSScanner {
             TokenType.minus, // -
             TokenType.plus, // +
             TokenType.semicolon, // ;
-            TokenType.lineBreak, //
+            TokenType.lineBreak, // '\n'
             TokenType.slash, // /
             TokenType.star, // *
             TokenType.approx, // ~
@@ -164,6 +166,7 @@ class BSScanner {
             TokenType.not, // not
             TokenType.elseToken, // else
             TokenType.contained, // contained
+            TokenType.belongs,
             TokenType.disjoined, // disjoined
             TokenType.setToken, // set
             TokenType.union, // union
@@ -176,8 +179,8 @@ class BSScanner {
       ' ': () {},
       '\r': () {},
       '\t': () {},
-      //since the _string function takes no parameters, it can be passed directly.
-      '"': _string,
+      //since the string function takes no parameters, it can be passed directly.
+      '"': string,
       //unicode variants for math operations
       '¬': () => addToken(TokenType.not),
       '⊂': () => addToken(TokenType.contained),
@@ -192,7 +195,8 @@ class BSScanner {
   }
 
   ///scans a single [Token].
-  void _scanToken() {
+  @protected
+  void scanToken() {
     //gets the next character, consuming it (by moving current forward)
     final c = advance();
 
@@ -201,10 +205,10 @@ class BSScanner {
       charToLexeme[c]();
     } else {
       //if it isn't, it's either the start of a numeric literal, a identifier (or keyword), or an unexpected character.
-      if (_IsDigit(c)) {
-        _number();
-      } else if (_isValidCharacter(c)) {
-        _identifier();
+      if (IsDigit(c)) {
+        number();
+      } else if (isValidCharacter(c)) {
+        identifier();
       } else
         errorCallback(line, "Error: Unexpected character " + c);
     }
@@ -217,7 +221,7 @@ class BSScanner {
   }
 
   ///a map containing keywords and the corresponding token type
-  static const Map<String, TokenType> _keywords = {
+  static const Map<String, TokenType> keywords = {
     "and": TokenType.and,
     "belongs": TokenType.belongs,
     "class": TokenType.classToken,
@@ -249,7 +253,7 @@ class BSScanner {
   @protected
   void addToken(TokenType type, [Object literal]) {
     var text = source.substring(start, current);
-    _tokens.add(Token(type, text, literal, line));
+    tokens.add(Token(type, text, literal, line));
   }
 
   ///checks if the character at [current] matches [s]
@@ -270,7 +274,8 @@ class BSScanner {
 
   ///having identified the beginning of a string literal,
   ///this function reads the rest of it.
-  void _string() {
+  @protected
+  void string() {
     while (peek() != '"' && !isAtEnd()) {
       //looks for the end of the literal
       if (peek() == '\n') line++;
@@ -300,20 +305,22 @@ class BSScanner {
   //if the string passed is null or has a different length than 1, returns false
 
   ///checks if a character is a digit (0 to 9)
-  static bool _IsDigit(String c) =>
+  @protected
+  static bool IsDigit(String c) =>
       ((c?.length ?? 0) == 1) && ((c.codeUnitAt(0) ^ 0x30) <= 9);
 
-  ///having found the start of a numeric literal, reads the rest of it and adds it to _tokens.
-  void _number() {
+  ///having found the start of a numeric literal, reads the rest of it and adds it to tokens.
+  @protected
+  void number() {
     //keeps going while only reading numbers
-    while (_IsDigit(peek())) advance();
+    while (IsDigit(peek())) advance();
 
     //if it reads a dot and after it more numbers, keeps going
-    if (peek() == '.' && _IsDigit(peekNext())) {
+    if (peek() == '.' && IsDigit(peekNext())) {
       advance();
 
       //consumes the rest of source after the dot.
-      while (_IsDigit(peek())) advance();
+      while (IsDigit(peek())) advance();
     }
 
     addToken(
@@ -321,51 +328,65 @@ class BSScanner {
   }
 
   ///checks the character after current, returning null if it is after the end of the source.
+  @protected
   String peekNext() => (current + 1 >= source.length)
       ? null
       : source.substring(current + 1, current + 2);
 
-  ///having found the start of a identifier, reads the rest of it and adds it to [_tokens].
-  void _identifier() {
+  ///having found the start of a identifier, reads the rest of it and adds it to [tokens].
+  @protected
+  void identifier() {
     //keeps going while it finds numbers (even though it can't start with a number)
-    while (!isAtEnd() && _isExpandedAlphanumeric(peek())) advance();
+    while (!isAtEnd() && isExpandedAlphanumeric(peek())) advance();
 
     var text = source.substring(start, current);
 
     //if the identifier is a keyword, adds a token of the appropriate type.
     addToken(
-        (_keywords.containsKey(text)) ? _keywords[text] : TokenType.identifier);
+        (keywords.containsKey(text)) ? keywords[text] : TokenType.identifier);
   }
 
   ///whether the character [c] is a underscore or a latin alphabet letter.
-  static bool _isAlpha(String c) =>
+  @protected
+  static bool isAlpha(String c) =>
       ((c?.length ?? 0) == 1) &&
-      (c == "_" ||
+      (c == "" ||
           ("a".compareTo(c) <= 0 && "z".compareTo(c) >= 0) ||
           ("A".compareTo(c) <= 0 && "Z".compareTo(c) >= 0));
 
   //as per https://stackoverflow.com/a/47956543/14011990
-  static bool _isGreek(String c) {
+  @protected
+  static bool isGreek(String c) {
     final int asUnicode = c.runes.single;
     return (0x391 <= asUnicode && asUnicode <= 0x3a9) || //Greek capitals
         (0x3B1 <= asUnicode && asUnicode <= 0x3c9); //Grek small
   }
 
+  @protected
+  static bool isMath(String c) {
+    return c == '∞' || c == "∅";
+  }
+
   ///returns true if [c] is from the latin or greek alphabets
-  static bool _isValidCharacter(String c) => _isAlpha(c) || _isGreek(c);
+  @protected
+  static bool isValidCharacter(String c) =>
+      isAlpha(c) || isGreek(c) || isMath(c);
 
   ///true if [c] is a digit, from the latin or greek alphabets,
   ///or if it is a valid mathematical symbol
-  static bool _isExpandedAlphanumeric(String c) =>
-      _isValidCharacter(c) || _IsDigit(c);
+  @protected
+  static bool isExpandedAlphanumeric(String c) =>
+      isValidCharacter(c) || IsDigit(c);
 
-  ///does the same as [_identifier], but for directives,
+  ///does the same as [identifier], but for directives,
   ///which are basically any string of characters ending in whitespace
-  void _directive() {
-    while (!_isWhitespace(peek()) && !isAtEnd()) advance();
+  @protected
+  void directive() {
+    while (!isWhitespace(peek()) && !isAtEnd()) advance();
     addToken(TokenType.hash, source.substring(start + 1, current));
   }
 
-  bool _isWhitespace(String c) =>
+  @protected
+  bool isWhitespace(String c) =>
       c == '\n' || c == '\t' || c == '\r' || c == ' ';
 }

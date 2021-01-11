@@ -42,6 +42,7 @@ class Number extends BSFunction {
   ///creates a name from the number, but if it can be cast to a int,
   ///does it (so 1.0 is displayed as 1)
   static String _makeName(num value) {
+    if (value == double.infinity) return "∞";
     if (value == value.toInt()) {
       return value.toInt().abs().toString();
     } else {

@@ -15,7 +15,7 @@
 <class_decl> ::= "class" <whitespace> <identifier> <{> <routines> <}> 
                | "class" <whitespace> <identifier> <whitespace> "<" <whitespace> <identifier> <{> <routines>  <}> 
 
-<routines> ::= routine <routines> | <whitespace_or_linebreak> <routines> ""
+<routines> ::= routine <routines> | <whitespace_or_linebreak> <routines> | ""
 
 <rou_decl> ::= "routine" <routine>
 <routine> ::= <identifier> <(> <parameters> <)> <whitespace_or_linebreak> <block>

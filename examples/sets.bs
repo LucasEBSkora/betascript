@@ -34,3 +34,8 @@ print C'
 print A\B
 
 print {x| cos(4)*x > e^2}
+
+
+print ∅
+
+print (-infinity, ∞)

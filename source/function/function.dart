@@ -91,6 +91,8 @@ abstract class BSFunction implements Comparable<BSFunction> {
   @nonVirtual
   num toNum() {
     final BSFunction _const = asConstant();
+    if (_const == Constants.infinity) return double.infinity;
+    if (_const == Constants.negativeInfinity) return double.negativeInfinity;
     if (_const == null) return null;
     final _approx = extractFromNegative<Number>(_const.approx);
     return (_approx.second) ? -_approx.first.value : _approx.first.value;
