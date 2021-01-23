@@ -147,8 +147,7 @@ class BSParser {
       initializer = expression();
     }
 
-    _consumeAny([TokenType.semicolon, TokenType.lineBreak],
-        "Expect ';' or line break after variable declaration");
+    checkTerminator("variable declaration");
     return VarStmt(name, parameters, initializer);
   }
 

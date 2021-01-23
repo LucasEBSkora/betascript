@@ -10518,7 +10518,7 @@
       if (t1 !== false)
         parameters = _null;
       initializer = _this.match$1(C.TokenType_20) ? _this._assigment$0() : _null;
-      _this._consumeAny$2(H.setRuntimeTypeInfo([C.TokenType_10, C.TokenType_11], type$.JSArray_legacy_TokenType), "Expect ';' or line break after variable declaration");
+      _this.checkTerminator$1("variable declaration");
       return new F.VarStmt($name, parameters, initializer);
     },
     statement$0: function() {
