@@ -13,7 +13,7 @@ BSFunction ctgh(BSFunction operand) {
 }
 
 class CtgH extends SingleOperandFunction {
-  const CtgH._(BSFunction operand, [Set<Variable> params])
+  const CtgH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,11 +36,11 @@ class CtgH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => CtgH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => CtgH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitCtgH(this);
 }
 
-double _ctgh(double v) =>
+double _ctgh(num v) =>
     (math.exp(v) + math.exp(-v)) / (math.exp(v) - math.exp(-v));

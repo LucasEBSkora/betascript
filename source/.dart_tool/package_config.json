@@ -3,17 +3,18 @@
   "packages": [
     {
       "name": "meta",
-      "rootUri": "file:///home/lucass/.pub-cache/hosted/pub.dartlang.org/meta-1.1.8",
+      "rootUri": "file:///home/lucass/.pub-cache/hosted/pub.dartlang.org/meta-1.3.0",
       "packageUri": "lib/",
-      "languageVersion": "1.12"
+      "languageVersion": "2.12"
     },
     {
       "name": "betascript",
       "rootUri": "../",
-      "packageUri": "lib/"
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     }
   ],
-  "generated": "2020-11-07T20:52:42.006664Z",
+  "generated": "2021-03-24T01:07:49.876063Z",
   "generator": "pub",
-  "generatorVersion": "2.10.3"
+  "generatorVersion": "2.12.1"
 }

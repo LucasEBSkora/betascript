@@ -13,7 +13,7 @@ BSFunction sech(BSFunction operand) {
 }
 
 class SecH extends SingleOperandFunction {
-  const SecH._(BSFunction operand, [Set<Variable> params])
+  const SecH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,10 +36,10 @@ class SecH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => SecH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => SecH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitSecH(this);
 }
 
-double _sech(double v) => 2 / (math.exp(v) + math.exp(-v));
+double _sech(num v) => 2 / (math.exp(v) + math.exp(-v));

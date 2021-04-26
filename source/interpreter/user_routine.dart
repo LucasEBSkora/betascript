@@ -15,7 +15,7 @@ class UserRoutine implements BSCallable {
   int get arity => _declaration.parameters.length;
 
   @override
-  Object callThing(BSInterpreter interpreter, List<Object> arguments) {
+  callThing(BSInterpreter interpreter, List<Object?> arguments) {
     //Creates routine scope
     var environment = Environment(_closure);
 

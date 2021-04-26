@@ -12,11 +12,13 @@ BSSet rosterSet(Iterable<BSFunction> elements) {
   if (elements.isEmpty) return emptySet;
   print(elements);
 
-  elements = elements.map((e) => e.asConstant());
+  final setOfElements = SplayTreeSet<BSFunction>();
 
-  print(elements);
   for (var element in elements) {
-    if (element == null)
+    var el = element.asConstant();
+    if (el is BSFunction)
+      setOfElements.add(el);
+    else
       throw SetDefinitionError("Roster sets can only be defined in constants!");
   }
 

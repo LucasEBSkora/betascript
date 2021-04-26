@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'native_callable.dart';
 import 'interpreter.dart';
 import '../sets/sets.dart';
@@ -18,7 +16,7 @@ final Map<String, Object> nativeGlobals = {
   "abs": abs(_x),
   "sgn": sgn(_x),
   "sqrt": root(_x),
-  "log": log(_x, _b),
+  "log": log(_x, _b).withParameters(<Variable>{_x, _b}),
   "ln": log(_x),
 
   //trig

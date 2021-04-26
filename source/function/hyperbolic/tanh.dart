@@ -13,7 +13,7 @@ BSFunction tanh(BSFunction operand) {
 }
 
 class TanH extends SingleOperandFunction {
-  const TanH._(BSFunction operand, [Set<Variable> params])
+  const TanH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,11 +36,11 @@ class TanH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => TanH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => TanH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitTanH(this);
 }
 
-double _tanh(double v) =>
+double _tanh(num v) =>
     (math.exp(v) - math.exp(-v)) / (math.exp(v) + math.exp(-v));

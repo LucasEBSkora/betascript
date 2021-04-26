@@ -77,7 +77,7 @@ class Union extends EmptyFilteringComutativeSetOperation<BSSet> {
     //checks if we can "close" an interval edge with the elements of the roster set.
     second = interval(second.a, second.b,
         leftClosed: second.leftClosed || first.belongs(second.a),
-        rightClosed: second.rightClosed || first.belongs(second.b));
+        rightClosed: second.rightClosed || first.belongs(second.b)) as Interval;
 
     BSSet _second =
         rosterSet(first.elements.where((element) => !first.belongs(element)));

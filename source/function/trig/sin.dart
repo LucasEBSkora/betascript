@@ -13,7 +13,7 @@ BSFunction sin(BSFunction operand) {
 }
 
 class Sin extends SingleOperandFunction {
-  const Sin._(BSFunction operand, [Set<Variable> params])
+  const Sin._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -35,7 +35,7 @@ class Sin extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Sin._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Sin._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitSin(this);

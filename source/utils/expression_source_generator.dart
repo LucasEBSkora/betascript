@@ -37,7 +37,7 @@ int main() {
     ]),
     NodeType("Literal", [
       [
-        "Object",
+        "",
         "value",
         "Literals are numbers, strings, booleans or null. This field holds one of them."
       ],
@@ -105,8 +105,12 @@ int main() {
       ["Token", "operator", "token containing operator"],
       ["Expr", "right", "right operand"],
     ]),
+    NodeType("Explain", [
+      ["Token", "keyword", "'explain' keyword"],
+      ["Expr", "operand", "what should be understood"]
+    ])
   ], [
-    'token'
+    'token',
   ]);
 
   defineAst("../interpreter", "Stmt", [
@@ -132,7 +136,7 @@ int main() {
         "for functions, the list of variables it is defined in"
       ],
       [
-        "Expr",
+        "Expr?",
         "initializer",
         "If the variable is initialized on declaration, the inicializer is stored here"
       ],
@@ -151,7 +155,7 @@ int main() {
         "If this condition evaluates to True, execute ThenBranch. If it doesn't, execute elseBranch"
       ],
       ["Stmt", "thenBranch", ""],
-      ["Stmt", "elseBranch", ""],
+      ["Stmt?", "elseBranch", ""],
     ]),
     NodeType("Routine", [
       ["Token", "name", "The routine's name"],
@@ -174,7 +178,7 @@ int main() {
     NodeType("Class", [
       ["Token", "name", "Token containing the class' name"],
       [
-        "VariableExpr",
+        "VariableExpr?",
         "superclass",
         "A variable containing a reference to the superclass"
       ],
@@ -212,18 +216,18 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
 
   String visitorClassName = fileName + "Visitor";
 
-  source += "\nabstract class $visitorClassName {\n";
+  source += "\nabstract class $visitorClassName<T> {\n";
 
   for (NodeType e in types) {
     String className = e.name + fileName;
     source +=
-        "  Object visit$className($className ${fileName[0].toLowerCase()});\n";
+        "  T visit$className($className ${fileName[0].toLowerCase()});\n";
   }
 
   source += "}\n";
 
   source +=
-      "\nabstract class $fileName {\n  const $fileName();\n  Object accept($visitorClassName v);\n}\n\n";
+      "\nabstract class $fileName {\n  const $fileName();\n  T accept<T>($visitorClassName v);\n}\n\n";
 
   for (NodeType e in types) {
     String className = e.name + fileName;
@@ -241,7 +245,7 @@ void defineAst(String outputDir, String fileName, List<NodeType> types,
     source += "this.${e.fields[i][1]});\n";
 
     source +=
-        "  Object accept($visitorClassName v) => v.visit$className(this);\n";
+        "  T accept<T>($visitorClassName v) => v.visit$className(this);\n";
 
     source += '}\n\n';
   }

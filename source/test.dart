@@ -72,4 +72,7 @@ void main() {
   final e1 = Or(LessOrEqual(-x + n(3), n(0)), Equal(x, n(0)));
   print(e1);
   print(e1.solution);
+
+  print((n(1) + (x^n(2))).explainedDerivative(x));
+
 }

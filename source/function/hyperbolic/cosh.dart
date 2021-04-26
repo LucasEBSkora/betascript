@@ -13,7 +13,7 @@ BSFunction cosh(BSFunction operand) {
 }
 
 class CosH extends SingleOperandFunction {
-  const CosH._(BSFunction operand, [Set<Variable> params])
+  const CosH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,10 +36,10 @@ class CosH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => CosH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => CosH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitCosH(this);
 }
 
-double _cosh(double v) => (math.exp(v) + math.exp(-v)) / 2;
+double _cosh(num v) => (math.exp(v) + math.exp(-v)) / 2;

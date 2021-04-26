@@ -14,7 +14,7 @@ class BSScanner {
   @protected
   final Function errorCallback;
   @protected
-  HashMap<String, void Function()> charToLexeme; //see _initializeMap
+  var charToLexeme = HashMap<String, void Function()>(); //see _initializeMap
 
   ///[start] is the start of the lexeme currently being read
   @protected
@@ -71,7 +71,7 @@ class BSScanner {
 
   ///initializes the map used to replace a big ugly switch-case block in [scanToken]
   void _initializeMap() {
-    charToLexeme = HashMap<String, void Function()>.from({
+    charToLexeme.addAll({
       //these lexemes are always single character, and can be initialized with ease
       '(': () => addToken(TokenType.leftParentheses),
       ')': () => addToken(TokenType.rightParentheses),
@@ -202,7 +202,7 @@ class BSScanner {
 
     //checks if it's one of the characters in charToLexeme
     if (charToLexeme.containsKey(c)) {
-      charToLexeme[c]();
+      charToLexeme[c]!();
     } else {
       //if it isn't, it's either the start of a numeric literal, a identifier (or keyword), or an unexpected character.
       if (IsDigit(c)) {
@@ -229,6 +229,7 @@ class BSScanner {
     "del": TokenType.del,
     "disjoined": TokenType.disjoined,
     "else": TokenType.elseToken,
+    "explain": TokenType.explain,
     "false": TokenType.falseToken,
     "for": TokenType.forToken,
     "if": TokenType.ifToken,
@@ -251,7 +252,7 @@ class BSScanner {
 
   ///creates a new [Token], using the interval from [start] to [current] as the token's lexeme.
   @protected
-  void addToken(TokenType type, [Object literal]) {
+  void addToken(TokenType type, [literal]) {
     var text = source.substring(start, current);
     tokens.add(Token(type, text, literal, line));
   }
@@ -270,7 +271,7 @@ class BSScanner {
   ///basically, [advance] without actually advancing.
   ///Used to check if a literal or identifier has ended.
   @protected
-  String peek() => (isAtEnd()) ? null : source[current];
+  String peek() => (isAtEnd()) ? source[source.length - 1] : source[current];
 
   ///having identified the beginning of a string literal,
   ///this function reads the rest of it.
@@ -307,7 +308,7 @@ class BSScanner {
   ///checks if a character is a digit (0 to 9)
   @protected
   static bool IsDigit(String c) =>
-      ((c?.length ?? 0) == 1) && ((c.codeUnitAt(0) ^ 0x30) <= 9);
+      (c.length == 1) && ((c.codeUnitAt(0) ^ 0x30) <= 9);
 
   ///having found the start of a numeric literal, reads the rest of it and adds it to tokens.
   @protected
@@ -327,11 +328,11 @@ class BSScanner {
         TokenType.number, n(double.parse(source.substring(start, current))));
   }
 
-  ///checks the character after current, returning null if it is after the end of the source.
+  ///checks the character after current, returning EOF if it is after the end of the source.
   @protected
   String peekNext() => (current + 1 >= source.length)
-      ? null
-      : source.substring(current + 1, current + 2);
+      ? source[source.length - 1]
+      : source[current + 1];
 
   ///having found the start of a identifier, reads the rest of it and adds it to [tokens].
   @protected
@@ -343,13 +344,13 @@ class BSScanner {
 
     //if the identifier is a keyword, adds a token of the appropriate type.
     addToken(
-        (keywords.containsKey(text)) ? keywords[text] : TokenType.identifier);
+        (keywords.containsKey(text)) ? keywords[text]! : TokenType.identifier);
   }
 
   ///whether the character [c] is a underscore or a latin alphabet letter.
   @protected
   static bool isAlpha(String c) =>
-      ((c?.length ?? 0) == 1) &&
+      c.length == 1 &&
       (c == "" ||
           ("a".compareTo(c) <= 0 && "z".compareTo(c) >= 0) ||
           ("A".compareTo(c) <= 0 && "Z".compareTo(c) >= 0));

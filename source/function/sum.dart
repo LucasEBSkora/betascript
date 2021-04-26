@@ -10,7 +10,7 @@ import 'visitors/function_visitor.dart';
 import '../utils/tuples.dart';
 
 BSFunction add(List<BSFunction> operands) {
-  if (operands?.isEmpty ?? true) return n(0);
+  if (operands.isEmpty) return n(0);
 
   _openOtherSums(operands);
   _SumNumbers(operands);
@@ -27,14 +27,16 @@ BSFunction add(List<BSFunction> operands) {
 class Sum extends BSFunction {
   final List<BSFunction> operands;
 
-  const Sum._(this.operands, [Set<Variable> params]) : super(params);
+  const Sum._(this.operands, [Set<Variable> params = const <Variable>{}])
+      : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>
       add(operands.map((BSFunction f) => f.evaluate(p)).toList());
 
   @override
-  BSFunction copy([Set<Variable> params]) => Sum._(operands, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) =>
+      Sum._(operands, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters => SplayTreeSet<Variable>.from(
@@ -53,11 +55,13 @@ class Sum extends BSFunction {
 void _openOtherSums(List<BSFunction> operands) {
   var i = 0;
   while (i < operands.length) {
-    final _op = extractFromNegative<Sum>(operands[i]);
+    final _op = extractFromNegative(operands[i]);
 
     //if it finds a sum
-    if (_op.first != null) {
-      Sum s = operands.removeAt(i);
+    if (_op.first is Sum) {
+      operands.removeAt(i);
+
+      final s = _op.first as Sum;
 
       var newOperands = <BSFunction>[];
 
@@ -80,7 +84,7 @@ void _openOtherSums(List<BSFunction> operands) {
 void _SumNumbers(List<BSFunction> operands) {
   var number = 0.0;
 
-  final namedNumbers = HashMap<String, Pair<double, int>>();
+  final namedNumbers = HashMap<String, Pair<num, num>>();
 
   var i = 0;
   while (i < operands.length) {
@@ -94,10 +98,10 @@ void _SumNumbers(List<BSFunction> operands) {
         number += n.value * (_negative ? -1 : 1);
       } else {
         if (!namedNumbers.containsKey(n.name)) {
-          namedNumbers[n.name] = Pair<double, int>(n.value, 0);
+          namedNumbers[n.name] = Pair<num, num>(n.value, 0);
         }
 
-        namedNumbers[n.name].second += (_negative ? -1 : 1);
+        namedNumbers[n.name]?.second += (_negative ? -1 : 1);
       }
     } else
       ++i;
@@ -110,9 +114,9 @@ void _SumNumbers(List<BSFunction> operands) {
   } else if (number < 0) operands.add(n(number));
 
   for (final key in namedNumbers.keys) {
-    if (namedNumbers[key].second != 0) {
-      numbers.add(n(namedNumbers[key].second) *
-          namedNumber(namedNumbers[key].first, key));
+    final pair = namedNumbers[key]!;
+    if (pair.second != 0) {
+      numbers.add(n(pair.second) * namedNumber(pair.first, key));
     }
   }
 
@@ -130,17 +134,17 @@ void _createMultiplications(List<BSFunction> operands) {
     BSFunction h;
     BSFunction originalFactor;
     BSFunction factor;
-    final _mul = extractFromNegative<Multiplication>(f);
+    final _mul = extractFromNegative(f);
 
-    if (_mul.first != null &&
-        _mul.first.operands.length >= 2 &&
-        _mul.first.operands[0] is Number) {
+    if (_mul.first is Multiplication &&
+        (_mul.first as Multiplication).operands.length >= 2 &&
+        (_mul.first as Multiplication).operands[0] is Number) {
       //in this case, "h" must be the multiplication with all other factors excluding the number
-      final otherOps = _mul.first.operands.toList();
+      final otherOps = (_mul.first as Multiplication).operands.toList();
       otherOps.removeAt(0);
       h = Multiplication(otherOps);
       factor =
-          originalFactor = _mul.first.operands[0] * n(_mul.second ? -1 : 1);
+          originalFactor = (_mul.first as Multiplication).operands[0] * n(_mul.second ? -1 : 1);
     } else {
       final _f = extractFromNegative(f);
       h = _f.first;
@@ -149,18 +153,18 @@ void _createMultiplications(List<BSFunction> operands) {
 
     for (var j = i + 1; j < operands.length; ++j) {
       var g = operands[j];
-      final _mul = extractFromNegative<Multiplication>(g);
+      final _mul = extractFromNegative(g);
 
-      if (_mul.first != null &&
-          _mul.first.operands.length >= 2 &&
-          _mul.first.operands[0] is Number) {
+      if (_mul.first is Multiplication &&
+          (_mul.first as Multiplication).operands.length >= 2 &&
+          (_mul.first as Multiplication).operands[0] is Number) {
         //in this case, "h" must be the multiplication with all other factors excluding the number
-        final otherOps = _mul.first.operands.toList();
+        final otherOps = (_mul.first as Multiplication).operands.toList();
         otherOps.removeAt(0);
         g = Multiplication(otherOps);
         if (h == g) {
           operands.removeAt(j);
-          factor += _mul.first.operands[0] * n(_mul.second ? -1 : 1);
+          factor += (_mul.first as Multiplication).operands[0] * n(_mul.second ? -1 : 1);
         }
       } else {
         final _g = extractFromNegative(g);

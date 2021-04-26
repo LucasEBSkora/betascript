@@ -29,8 +29,7 @@ class BSParser {
     //ignores linebreaks here so it doesn't have to go all the way down the recursion to do it
     while (!isAtEnd()) {
       if (match(TokenType.lineBreak)) continue;
-      final decl = declaration();
-      if (decl != null) statements.add(decl);
+      statements.add(declaration());
     }
 
     return statements;
@@ -47,11 +46,12 @@ class BSParser {
       return statement();
     } on ParseError {
       _synchronize();
-      return null;
+      //this value doesn't matter
+      return ExpressionStmt(LiteralExpr(null));
     } on SetDefinitionError catch (e) {
       print(e.message);
       _synchronize();
-      return null;
+      return ExpressionStmt(LiteralExpr(null));
     }
   }
 
@@ -61,10 +61,10 @@ class BSParser {
     var name = consume(TokenType.identifier, "Expect class name");
 
     //"<" <whitespace> <identifier>
-    VariableExpr superclass;
+    VariableExpr? superclass;
     if (match(TokenType.less)) {
       consume(TokenType.identifier, "Expect superclass name");
-      superclass = VariableExpr(previous());
+      superclass = VariableExpr(previous()!);
     }
 
     //linebreaks after { dealt with by scanner
@@ -125,10 +125,8 @@ class BSParser {
   Stmt varDeclaration() {
     var name = consume(TokenType.identifier, "Expect variable name");
 
-    List<Token> parameters;
+    List<Token> parameters = <Token>[];
     if (match(TokenType.leftParentheses)) {
-      parameters = <Token>[];
-
       do {
         if (check(TokenType.rightParentheses)) break;
         //linebreaks after ( and , handled by scanner
@@ -139,9 +137,8 @@ class BSParser {
 
       consume(TokenType.rightParentheses, "Expect ')' after parameters.");
     }
-    if (parameters?.isEmpty ?? true) parameters = null;
 
-    Expr initializer;
+    Expr? initializer;
     if (match(TokenType.assigment)) {
       //linebreak after = handled by scanner
       initializer = expression();
@@ -160,7 +157,11 @@ class BSParser {
     if (match(TokenType.returnToken)) return _returnStatement();
     if (match(TokenType.whileToken)) return _whileStatement();
     //might be an expression statement with a Set definition or a block
-    if (match(TokenType.leftBrace)) return _parseLeftBrace();
+    if (match(TokenType.leftBrace)) {
+      Object obj = _parseLeftBrace();
+      if (obj is Stmt) return obj;
+      if (obj is Expr) return ExpressionStmt(obj);
+    }
     if (match(TokenType.hash)) return _directive();
     return expressionStatement();
   }
@@ -179,13 +180,13 @@ class BSParser {
   ///<for_stmt__clause> ::= <expression> | ""
   @protected
   Stmt forStatement() {
-    final token = previous();
+    final token = previous()!;
 
     consume(TokenType.leftParentheses, "Expect '(' after 'for'.");
 
     //linebreaks after left parentheses handled by the parser
 
-    Stmt initializer;
+    Stmt? initializer;
 
     //the initializer may be empty, a variable declaration or any other expression
     if (!match(TokenType.semicolon)) {
@@ -205,7 +206,7 @@ class BSParser {
 
     //linebreaks after semicolons handled by the parser
 
-    var increment = (check(TokenType.rightParentheses)) ? null : expression();
+    final increment = (check(TokenType.rightParentheses)) ? null : expression();
 
     //linebreaks before ) handled by scanner
 
@@ -257,7 +258,7 @@ class BSParser {
   ///<unterminated_print_stmt> ::= "print" <expression>
   Stmt _printStatement() {
     if (match(TokenType.lineBreak)) {
-      _error(previous(),
+      _error(previous()!,
           "linebreak right after 'print' keyword not allowed. Please start the target expression in the same line.");
     }
     var value = expression();
@@ -270,9 +271,9 @@ class BSParser {
   ///                | "return" <whitespace> <expression> <whitespace> <linebreak>
   ///<unterminated_return_stmt> ::= "return" | "return" <whitespace> <expression>
   Stmt _returnStatement() {
-    var keyword = previous();
+    var keyword = previous()!;
     if (match(TokenType.lineBreak)) {
-      _error(previous(),
+      _error(previous()!,
           "linebreak not allowed immediately after return keyword! If you want to end the routine early, either write 'return null' or 'return;'");
     }
     var value = (check(TokenType.semicolon)) ? LiteralExpr(null) : expression();
@@ -284,7 +285,7 @@ class BSParser {
 
   ///<while_stmt> ::= "while" <(> <expression> <)> <statement>
   Stmt _whileStatement() {
-    var token = previous();
+    var token = previous()!;
     consume(TokenType.leftParentheses, "Expect '(' after 'while'.");
 
     //linebreak after left parentheses handled by parser
@@ -336,7 +337,7 @@ class BSParser {
     var expr = _or();
 
     if (match(TokenType.assigment)) {
-      var equals = previous();
+      var equals = previous()!;
       //linebreaks here handled by scanner
       var value = _assigment();
 
@@ -359,7 +360,7 @@ class BSParser {
     var expr = _and();
 
     while (match(TokenType.or)) {
-      var op = previous();
+      var op = previous()!;
       //linebreaks after 'or' keyword handled by scannner
       var right = _and();
       expr = LogicBinaryExpr(expr, op, right);
@@ -373,7 +374,7 @@ class BSParser {
     var expr = _equality();
 
     while (match(TokenType.and)) {
-      var op = previous();
+      var op = previous()!;
       //linebreaks after 'and' keyword handled by scanner
       var right = _equality();
       expr = LogicBinaryExpr(expr, op, right);
@@ -388,7 +389,7 @@ class BSParser {
     var expr = _comparison();
 
     while (matchAny([TokenType.equals, TokenType.identicallyEquals])) {
-      var op = previous();
+      var op = previous()!;
       //linebreaks after '==' operator handled by scanner
       var right = _comparison();
       expr = BinaryExpr(expr, op, right);
@@ -411,7 +412,7 @@ class BSParser {
       TokenType.lessEqual
     ])) {
       //linebreaks after the operators listed above handled by scanner
-      expr = BinaryExpr(expr, previous(), _setBinary());
+      expr = BinaryExpr(expr, previous()!, _setBinary());
     }
 
     return expr;
@@ -430,7 +431,7 @@ class BSParser {
       TokenType.belongs
     ])) {
       //linebreaks after these tokens handled by the scanner
-      expr = SetBinaryExpr(expr, previous(), _addition());
+      expr = SetBinaryExpr(expr, previous()!, _addition());
     }
 
     return expr;
@@ -444,7 +445,7 @@ class BSParser {
     var expr = _multiplication();
 
     while (matchAny([TokenType.minus, TokenType.plus])) {
-      var op = previous();
+      var op = previous()!;
       //linebreaks after the operators listed above handled by scanner
       var right = _multiplication();
       expr = BinaryExpr(expr, op, right);
@@ -460,7 +461,7 @@ class BSParser {
     var expr = _exponentiation();
 
     while (matchAny([TokenType.slash, TokenType.star])) {
-      var op = previous();
+      var op = previous()!;
       //linebreaks after the operators listed above handled by scanner
       var right = _exponentiation();
       expr = BinaryExpr(expr, op, right);
@@ -475,7 +476,7 @@ class BSParser {
     var expr = _unary_left();
 
     while (match(TokenType.exp)) {
-      var op = previous();
+      var op = previous()!;
       //linebreaks after '^' operator handled by scanner
       var right = _unary_left();
       expr = BinaryExpr(expr, op, right);
@@ -490,7 +491,7 @@ class BSParser {
     //go back to the 'unary' rule
 
     if (matchAny([TokenType.minus, TokenType.not, TokenType.approx])) {
-      var op = previous();
+      var op = previous()!;
       //linebreaks after the operators listed above handled by scanner
       var right = _unary_left();
       return UnaryExpr(op, right);
@@ -513,7 +514,7 @@ class BSParser {
     }
     //keeps composing it until it's done
     while (matchAny([TokenType.apostrophe, TokenType.factorial]))
-      operand = UnaryExpr(previous(), operand);
+      operand = UnaryExpr(previous()!, operand);
 
     return operand;
   }
@@ -584,7 +585,7 @@ class BSParser {
     //linebreaks after '(' handled by scanner
     var variables = <Expr>[];
     if (check(TokenType.rightParentheses)) {
-      _error(previous(),
+      _error(previous()!,
           "at least one variable is necessary in derivative expression");
     }
     do {
@@ -601,7 +602,7 @@ class BSParser {
   }
 
   /// <primary> ::= <set_definition> | number | string | "false" | "true" | "unknown" | "nil"
-  ///            | <(> <expression> <)>
+  ///            | <(> <expression> <)> | <explain_expr>
   ///            | <identifier> | "super" <whitespace> "." <whitespace_or_linebreak> <identifier>
   ///<set_definition> ::= "set" <whitespace_or_linebreak> <set_def> | <whitespace_or_linebreak> <set_def>
   ///<set_def> ::= <interval_definition> | <roster_set_definition> | <builder_set_definition>
@@ -623,7 +624,7 @@ class BSParser {
 
     //number | string
     if (matchAny([TokenType.number, TokenType.string])) {
-      return LiteralExpr(previous().literal);
+      return LiteralExpr(previous()!.literal);
     }
 
     //false
@@ -654,18 +655,18 @@ class BSParser {
     //                           | <{> <arguments> <whitespace> "|" <whitespace_or_linebreak> <logic_or> <}>
     //or
     //just a block
-    if (match(TokenType.leftBrace)) return _parseLeftBrace(true);
+    if (match(TokenType.leftBrace)) return _parseLeftBrace(true) as Expr;
 
     //<interval_definition> ::= <[> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
     if (match(TokenType.leftSquare)) return _parseLeftSquare();
 
     //identifier
-    if (match(TokenType.identifier)) return VariableExpr(previous());
-    if (match(TokenType.thisToken)) return ThisExpr(previous());
+    if (match(TokenType.identifier)) return VariableExpr(previous()!);
+    if (match(TokenType.thisToken)) return ThisExpr(previous()!);
 
     //"super" <whitespace> "." <whitespace_or_linebreak> <identifier>
     if (match(TokenType.superToken)) {
-      var keyword = previous();
+      var keyword = previous()!;
       consume(TokenType.dot,
           "Expect '.' after 'super' - if you want to add a linebreak, do it after the dot");
       //linebreaks after '.' handled by scanner
@@ -674,8 +675,10 @@ class BSParser {
       return SuperExpr(keyword, method);
     }
 
+    if (match(TokenType.explain)) return explainExpr();
+
     //if you get to this rule and don't find any of the above, you found a syntax error instead
-    if (previous().type == TokenType.lineBreak &&
+    if (previous()!.type == TokenType.lineBreak &&
         checkAny([
           TokenType.comma,
           TokenType.dot,
@@ -703,18 +706,21 @@ class BSParser {
       throw _error(_peek(), "Expect expression.");
   }
 
+  @protected
+  Expr explainExpr() => ExplainExpr(previous()!, expression());
+
   Expr _setDefinition() {
     if (match(TokenType.leftParentheses)) return _parseLeftParentheses(true);
     if (match(TokenType.leftSquare)) return _parseLeftSquare(true);
-    if (match(TokenType.leftBrace)) return _parseLeftBrace(true);
-    throw _error(previous(), "Expecting Set definition after 'set' keyword");
+    if (match(TokenType.leftBrace)) return _parseLeftBrace(true) as Expr;
+    throw _error(previous()!, "Expecting Set definition after 'set' keyword");
   }
 
   ///<(> <expression> <)>
   ///or
   ///<interval_definition> ::= <(> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
   Expr _parseLeftParentheses([bool mustBeSet = false]) {
-    var _left = previous();
+    var _left = previous()!;
     //linebreaks after '(' handled by scanner
     var expr = expression();
 
@@ -724,9 +730,9 @@ class BSParser {
       //linebreaks before ']' and ')' handled by scanner
       _consumeAny([TokenType.rightBrace, TokenType.rightParentheses],
           "Expected ] or ) ending interval definition");
-      return IntervalDefinitionExpr(_left, expr, _expr, previous());
+      return IntervalDefinitionExpr(_left, expr, _expr, previous()!);
     }
-    if (mustBeSet) throw _error(previous(), "Expecting Interval definition");
+    if (mustBeSet) throw _error(previous()!, "Expecting Interval definition");
 
     //linebreaks before ')' handled by scanner
     //if the ')' is not there, it's an error
@@ -736,7 +742,7 @@ class BSParser {
 
   ///<interval_definition> ::= <[> expression <whitespace> "," <whitespace_or_linebreak> expression <right_interval_edge>
   Expr _parseLeftSquare([bool mustBeSet = false]) {
-    var left = previous();
+    var left = previous()!;
 
     var expr = expression();
 
@@ -748,7 +754,7 @@ class BSParser {
 
     _consumeAny([TokenType.rightBrace, TokenType.rightParentheses],
         "Expected ] or ) ending interval definition");
-    return IntervalDefinitionExpr(left, expr, _expr, previous());
+    return IntervalDefinitionExpr(left, expr, _expr, previous()!);
   }
 
   ///rosterSetDefinition -> "{" linebreak? ( expression ("," linebreak? expression)*)? linebreak? "}"
@@ -757,8 +763,8 @@ class BSParser {
   ///or
   ///block -> "{" (declaration | linebreak)* "}"
   Object _parseLeftBrace([bool expectSet = false]) {
-    var _leftBrace = previous();
-    Expr _setReturn;
+    var _leftBrace = previous()!;
+    Expr? _setReturn;
 
     //{} -> empty set
     if (match(TokenType.rightBrace)) {
@@ -783,11 +789,11 @@ class BSParser {
     var isSet = false;
 
     if (match(TokenType.comma)) {
-      if (first == null) _error(previous(), "expect token before comma");
+      if (first == null) _error(previous()!, "expect token before comma");
       if (first is ExpressionStmt) {
         expressions.add(first.expression);
       } else {
-        _error(previous(),
+        _error(previous()!,
             "all elements in a roster set definition must evaluate to a number");
       }
       isSet = true;
@@ -803,18 +809,17 @@ class BSParser {
         if (first is ExpressionStmt) {
           expressions.add(first.expression);
         } else {
-          _error(previous(),
+          _error(previous()!,
               "all parameters in a builder set definition must evaluate to a variable");
         }
       }
 
-      var bar = previous();
+      var bar = previous()!;
       var logic = expression();
       //linebreak before } handled by scanner
       consume(TokenType.rightBrace, "Expect '}' after builder set definition");
-      List<Token> parameters;
+      List<Token> parameters = <Token>[];
       if (expressions.isNotEmpty) {
-        parameters = <Token>[];
         for (Expr parameter in expressions) {
           if (parameter is VariableExpr) {
             parameters.add(parameter.name);
@@ -824,14 +829,14 @@ class BSParser {
         }
       }
 
-      _setReturn =
-          BuilderDefinitionExpr(_leftBrace, parameters, logic, bar, previous());
+      _setReturn = BuilderDefinitionExpr(
+          _leftBrace, parameters, logic, bar, previous()!);
     } else if (isSet) {
       //Roster set
       //linebreak before } handled by scanner
       consume(TokenType.rightBrace, "Expect '}' after roster set definition");
 
-      _setReturn = RosterDefinitionExpr(_leftBrace, expressions, previous());
+      _setReturn = RosterDefinitionExpr(_leftBrace, expressions, previous()!);
     }
 
     //if there is a single element, and it is a expression statement, assumes it's a RosterSet with a single element
@@ -839,7 +844,7 @@ class BSParser {
     if (match(TokenType.rightBrace)) {
       if (first is ExpressionStmt) {
         _setReturn =
-            RosterDefinitionExpr(_leftBrace, [first.expression], previous());
+            RosterDefinitionExpr(_leftBrace, [first.expression], previous()!);
       } else
         return BlockStmt([first]);
     }
@@ -898,7 +903,7 @@ class BSParser {
   ///(remember that, in theory, every list of tokens generated by BSScanner ends with an eof token)
   Token _advance() {
     if (!isAtEnd()) _current++;
-    return previous();
+    return previous()!;
   }
 
   ///whether current token is the last one
@@ -911,18 +916,14 @@ class BSParser {
 
   ///return the token immediately before _current
   @protected
-  Token previous() => _current > 0 ? _tokens[_current - 1] : null;
+  Token? previous() => _current > 0 ? _tokens[_current - 1] : null;
 
   ///checks if the current token matches [type] and consumes it.
   ///If it doesn't, causes an error
   @protected
   Token consume(TokenType type, String message) {
-    if (check(type)) return _advance();
-
-    //doesn't actually throw the error
-    //So that it keeps parsing
-    _error(_peek(), message);
-    return null;
+    if (!check(type)) _error(_peek(), message);
+    return _advance();
   }
 
   Token _consumeAny(List<TokenType> types, String message) {
@@ -931,7 +932,7 @@ class BSParser {
     }
 
     _error(_peek(), message);
-    return null;
+    return _advance();
   }
 
   ///Reports an error to the general interpreter and creates a [ParseError] without
@@ -947,7 +948,7 @@ class BSParser {
     _advance();
 
     while (!isAtEnd()) {
-      if (previous().type == TokenType.semicolon) return;
+      if (previous()!.type == TokenType.semicolon) return;
 
       switch (_peek().type) {
         case TokenType.classToken:
@@ -969,7 +970,7 @@ class BSParser {
   ///<directive> ::= "#" directiveName
   ///<directive_name ::=  a directive name is composed of anything that isn't whitespace. There is probably a simple way of expressing this in regEx,
   ///                     but i unforgivably don't know how to use them. basically, if it can be a twitter hashtag, it counts
-  Stmt _directive() => DirectiveStmt(previous(), previous().literal);
+  Stmt _directive() => DirectiveStmt(previous()!, previous()!.literal as String);
 
   ///delimitator ::= <linebreak> | <;>
   void checkTerminator(String type) {

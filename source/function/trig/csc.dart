@@ -13,7 +13,7 @@ BSFunction csc(BSFunction operand) {
 }
 
 class Csc extends SingleOperandFunction {
-  const Csc._(BSFunction operand, [Set<Variable> params])
+  const Csc._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -35,7 +35,7 @@ class Csc extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Csc._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Csc._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitCsc(this);

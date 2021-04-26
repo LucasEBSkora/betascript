@@ -1,28 +1,29 @@
 import 'token.dart';
 
-abstract class ExprVisitor {
-  Object visitAssignExpr(AssignExpr e);
-  Object visitBinaryExpr(BinaryExpr e);
-  Object visitCallExpr(CallExpr e);
-  Object visitGetExpr(GetExpr e);
-  Object visitGroupingExpr(GroupingExpr e);
-  Object visitLiteralExpr(LiteralExpr e);
-  Object visitUnaryExpr(UnaryExpr e);
-  Object visitVariableExpr(VariableExpr e);
-  Object visitLogicBinaryExpr(LogicBinaryExpr e);
-  Object visitSetExpr(SetExpr e);
-  Object visitThisExpr(ThisExpr e);
-  Object visitSuperExpr(SuperExpr e);
-  Object visitDerivativeExpr(DerivativeExpr e);
-  Object visitIntervalDefinitionExpr(IntervalDefinitionExpr e);
-  Object visitRosterDefinitionExpr(RosterDefinitionExpr e);
-  Object visitBuilderDefinitionExpr(BuilderDefinitionExpr e);
-  Object visitSetBinaryExpr(SetBinaryExpr e);
+abstract class ExprVisitor<T> {
+  T visitAssignExpr(AssignExpr e);
+  T visitBinaryExpr(BinaryExpr e);
+  T visitCallExpr(CallExpr e);
+  T visitGetExpr(GetExpr e);
+  T visitGroupingExpr(GroupingExpr e);
+  T visitLiteralExpr(LiteralExpr e);
+  T visitUnaryExpr(UnaryExpr e);
+  T visitVariableExpr(VariableExpr e);
+  T visitLogicBinaryExpr(LogicBinaryExpr e);
+  T visitSetExpr(SetExpr e);
+  T visitThisExpr(ThisExpr e);
+  T visitSuperExpr(SuperExpr e);
+  T visitDerivativeExpr(DerivativeExpr e);
+  T visitIntervalDefinitionExpr(IntervalDefinitionExpr e);
+  T visitRosterDefinitionExpr(RosterDefinitionExpr e);
+  T visitBuilderDefinitionExpr(BuilderDefinitionExpr e);
+  T visitSetBinaryExpr(SetBinaryExpr e);
+  T visitExplainExpr(ExplainExpr e);
 }
 
 abstract class Expr {
   const Expr();
-  Object accept(ExprVisitor v);
+  T accept<T>(ExprVisitor v);
 }
 
 class AssignExpr extends Expr {
@@ -33,7 +34,7 @@ class AssignExpr extends Expr {
   final Expr value;
 
   const AssignExpr(this.name, this.value);
-  Object accept(ExprVisitor v) => v.visitAssignExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitAssignExpr(this);
 }
 
 class BinaryExpr extends Expr {
@@ -47,7 +48,7 @@ class BinaryExpr extends Expr {
   final Expr right;
 
   const BinaryExpr(this.left, this.op, this.right);
-  Object accept(ExprVisitor v) => v.visitBinaryExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitBinaryExpr(this);
 }
 
 class CallExpr extends Expr {
@@ -61,7 +62,7 @@ class CallExpr extends Expr {
   final List<Expr> arguments;
 
   const CallExpr(this.callee, this.paren, this.arguments);
-  Object accept(ExprVisitor v) => v.visitCallExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitCallExpr(this);
 }
 
 class GetExpr extends Expr {
@@ -72,7 +73,7 @@ class GetExpr extends Expr {
   final Token name;
 
   const GetExpr(this.object, this.name);
-  Object accept(ExprVisitor v) => v.visitGetExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitGetExpr(this);
 }
 
 class GroupingExpr extends Expr {
@@ -80,15 +81,15 @@ class GroupingExpr extends Expr {
   final Expr expression;
 
   const GroupingExpr(this.expression);
-  Object accept(ExprVisitor v) => v.visitGroupingExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitGroupingExpr(this);
 }
 
 class LiteralExpr extends Expr {
-  ///Literals are numbers, strings, logical values or null. This field holds one of them.
-  final Object value;
+  ///Literals are numbers, strings, booleans or null. This field holds one of them.
+  final  value;
 
   const LiteralExpr(this.value);
-  Object accept(ExprVisitor v) => v.visitLiteralExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitLiteralExpr(this);
 }
 
 class UnaryExpr extends Expr {
@@ -99,7 +100,7 @@ class UnaryExpr extends Expr {
   final Expr operand;
 
   const UnaryExpr(this.op, this.operand);
-  Object accept(ExprVisitor v) => v.visitUnaryExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitUnaryExpr(this);
 }
 
 class VariableExpr extends Expr {
@@ -107,7 +108,7 @@ class VariableExpr extends Expr {
   final Token name;
 
   const VariableExpr(this.name);
-  Object accept(ExprVisitor v) => v.visitVariableExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitVariableExpr(this);
 }
 
 class LogicBinaryExpr extends Expr {
@@ -121,7 +122,7 @@ class LogicBinaryExpr extends Expr {
   final Expr right;
 
   const LogicBinaryExpr(this.left, this.op, this.right);
-  Object accept(ExprVisitor v) => v.visitLogicBinaryExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitLogicBinaryExpr(this);
 }
 
 class SetExpr extends Expr {
@@ -135,7 +136,7 @@ class SetExpr extends Expr {
   final Expr value;
 
   const SetExpr(this.object, this.name, this.value);
-  Object accept(ExprVisitor v) => v.visitSetExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitSetExpr(this);
 }
 
 class ThisExpr extends Expr {
@@ -143,7 +144,7 @@ class ThisExpr extends Expr {
   final Token keyword;
 
   const ThisExpr(this.keyword);
-  Object accept(ExprVisitor v) => v.visitThisExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitThisExpr(this);
 }
 
 class SuperExpr extends Expr {
@@ -154,7 +155,7 @@ class SuperExpr extends Expr {
   final Token method;
 
   const SuperExpr(this.keyword, this.method);
-  Object accept(ExprVisitor v) => v.visitSuperExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitSuperExpr(this);
 }
 
 class DerivativeExpr extends Expr {
@@ -168,11 +169,11 @@ class DerivativeExpr extends Expr {
   final List<Expr> variables;
 
   const DerivativeExpr(this.keyword, this.derivand, this.variables);
-  Object accept(ExprVisitor v) => v.visitDerivativeExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitDerivativeExpr(this);
 }
 
 class IntervalDefinitionExpr extends Expr {
-  ///token containing '[' or '('
+  ///token containing '[' or '(' 
   final Token left;
 
   ///left bound
@@ -181,29 +182,29 @@ class IntervalDefinitionExpr extends Expr {
   ///right bound
   final Expr b;
 
-  ///token containing ']' or ')'
+  ///token containing ']' or ')' 
   final Token right;
 
   const IntervalDefinitionExpr(this.left, this.a, this.b, this.right);
-  Object accept(ExprVisitor v) => v.visitIntervalDefinitionExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitIntervalDefinitionExpr(this);
 }
 
 class RosterDefinitionExpr extends Expr {
-  ///token containing '{'
+  ///token containing '{' 
   final Token left;
 
   ///elements of the set
   final List<Expr> elements;
 
-  ///token containing '}'
+  ///token containing '}' 
   final Token right;
 
   const RosterDefinitionExpr(this.left, this.elements, this.right);
-  Object accept(ExprVisitor v) => v.visitRosterDefinitionExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitRosterDefinitionExpr(this);
 }
 
 class BuilderDefinitionExpr extends Expr {
-  ///token containing '{'
+  ///token containing '{' 
   final Token left;
 
   ///parameters used in the rule
@@ -212,15 +213,14 @@ class BuilderDefinitionExpr extends Expr {
   ///rule used to test for membership
   final Expr rule;
 
-  ///token containing '|'
+  ///token containing '|' 
   final Token bar;
 
-  ///token containing '}'
+  ///token containing '}' 
   final Token right;
 
-  const BuilderDefinitionExpr(
-      this.left, this.parameters, this.rule, this.bar, this.right);
-  Object accept(ExprVisitor v) => v.visitBuilderDefinitionExpr(this);
+  const BuilderDefinitionExpr(this.left, this.parameters, this.rule, this.bar, this.right);
+  T accept<T>(ExprVisitor v) => v.visitBuilderDefinitionExpr(this);
 }
 
 class SetBinaryExpr extends Expr {
@@ -234,5 +234,17 @@ class SetBinaryExpr extends Expr {
   final Expr right;
 
   const SetBinaryExpr(this.left, this.operator, this.right);
-  Object accept(ExprVisitor v) => v.visitSetBinaryExpr(this);
+  T accept<T>(ExprVisitor v) => v.visitSetBinaryExpr(this);
 }
+
+class ExplainExpr extends Expr {
+  ///'explain' keyword
+  final Token keyword;
+
+  ///what should be understood
+  final Expr operand;
+
+  const ExplainExpr(this.keyword, this.operand);
+  T accept<T>(ExprVisitor v) => v.visitExplainExpr(this);
+}
+

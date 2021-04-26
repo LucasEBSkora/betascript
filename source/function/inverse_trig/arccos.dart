@@ -13,7 +13,7 @@ BSFunction arccos(BSFunction operand) {
 }
 
 class ArcCos extends SingleOperandFunction {
-  const ArcCos._(BSFunction operand, [Set<Variable> params])
+  const ArcCos._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,7 +36,7 @@ class ArcCos extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcCos._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArcCos._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArcCos(this);

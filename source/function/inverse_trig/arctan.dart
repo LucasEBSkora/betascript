@@ -13,7 +13,7 @@ BSFunction arctan(BSFunction operand) {
 }
 
 class ArcTan extends SingleOperandFunction {
-  const ArcTan._(BSFunction operand, [Set<Variable> params])
+  const ArcTan._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,7 +36,7 @@ class ArcTan extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcTan._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArcTan._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArcTan(this);

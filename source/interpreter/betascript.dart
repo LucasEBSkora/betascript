@@ -14,16 +14,16 @@ class BetaScript {
   ///The callback used when a print statement is used.
   ///Might print to a string (web version),
   ///to a file (not yet implemented) or to the console.
-  static void Function(Object) printCallback;
+  ///Default is print to console
+  static void Function(Object) printCallback = print;
 
   static void runFile(String path) {
-    printCallback = print;
     final file = File(path);
     String fileContents;
     try {
       fileContents = file.readAsStringSync();
     } on FileSystemException catch (e) {
-      if (e.osError.errorCode == 2) {
+      if (e.osError?.errorCode == 2) {
         //no such file or directory
         print("file $path not found!");
         return;
@@ -37,10 +37,9 @@ class BetaScript {
   }
 
   static void runPrompt() {
-    printCallback = print;
     while (true) {
       stdout.write("> ");
-      _run(stdin.readLineSync());
+      _run(stdin.readLineSync()!);
       hadError = false;
     }
   }

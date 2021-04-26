@@ -13,7 +13,7 @@ BSFunction ctg(BSFunction operand) {
 }
 
 class Ctg extends SingleOperandFunction {
-  const Ctg._(BSFunction operand, [Set<Variable> params])
+  const Ctg._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -35,7 +35,7 @@ class Ctg extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Ctg._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Ctg._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitCtg(this);

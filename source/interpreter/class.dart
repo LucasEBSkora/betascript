@@ -7,7 +7,7 @@ import 'interpreter.dart';
 
 class BSClass implements BSCallable {
   final String name;
-  final BSClass _superclass;
+  final BSClass? _superclass;
   final HashMap<String, UserRoutine> _methods;
 
   const BSClass(this.name, this._superclass, this._methods);
@@ -21,7 +21,7 @@ class BSClass implements BSCallable {
   int get arity => (findMethod(name)?.arity ?? 0);
 
   @override
-  Object callThing(BSInterpreter interpreter, List<Object> arguments) {
+  Object callThing(BSInterpreter interpreter, List<Object?> arguments) {
     //Crates a new instance
     var instance = BSInstance(this);
     //finds the constructor method
@@ -34,9 +34,9 @@ class BSClass implements BSCallable {
   }
 
   ///Looks for methods in the class, and them in the superclass
-  UserRoutine findMethod(String name) {
-    if (_methods.containsKey(name)) return _methods[name];
-    if (_superclass != null) return _superclass.findMethod(name);
+  UserRoutine? findMethod(String name) {
+    if (_methods.containsKey(name)) return _methods[name]!;
+    if (_superclass != null) return _superclass?.findMethod(name);
     return null;
   }
 }

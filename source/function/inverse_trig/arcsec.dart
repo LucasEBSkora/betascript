@@ -13,7 +13,7 @@ BSFunction arcsec(BSFunction operand) {
 }
 
 class ArcSec extends SingleOperandFunction {
-  const ArcSec._(BSFunction operand, [Set<Variable> params])
+  const ArcSec._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,7 +36,7 @@ class ArcSec extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcSec._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArcSec._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArcSec(this);

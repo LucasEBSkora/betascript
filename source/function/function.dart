@@ -5,7 +5,9 @@ import 'package:meta/meta.dart';
 import 'division.dart';
 import 'exponentiation.dart';
 import 'functions.dart';
+// import 'unknown.dart';
 import 'utils.dart';
+import 'visitors/explained_partial_derivative.dart';
 import 'visitors/function_visitor.dart';
 import 'multiplication.dart';
 import 'negative.dart';
@@ -40,9 +42,13 @@ abstract class BSFunction implements Comparable<BSFunction> {
   BSFunction derivative(Variable v) =>
       _merge(accept<BSFunction>(PartialDerivative(v)), this);
 
+  @nonVirtual
+  String explainedDerivative(Variable v) =>
+      accept<String>(ExplainedPartialDerivative(v));
+
   ///If there is a custom set of parameters, returns it. If there isn't, returns the default one
   @nonVirtual
-  Set<Variable> get parameters => (_parameters ?? defaultParameters);
+  Set<Variable> get parameters => (_parameters.isEmpty ? defaultParameters: _parameters);
 
   ///Returns a copy of this function with the custom parameters passed in p, and checks if they include all needed parameters
   @nonVirtual
@@ -79,7 +85,8 @@ abstract class BSFunction implements Comparable<BSFunction> {
   ///if the function can be evaluated with no variables, simplifies it as much as possible without any parameters.
   ///if it can't, returns [null]
   @nonVirtual
-  BSFunction asConstant() {
+  BSFunction? asConstant() {
+    // if (this is Unknown || this is DerivativeOfUnknown) return null;
     try {
       return evaluate(HashMap.from({}));
     } on BetascriptFunctionError {
@@ -89,32 +96,35 @@ abstract class BSFunction implements Comparable<BSFunction> {
 
   ///if the function can be made constant, approximates it and turns it to a Dart num
   @nonVirtual
-  num toNum() {
-    final BSFunction _const = asConstant();
+  num? toNum() {
+    final BSFunction? _const = asConstant();
     if (_const == Constants.infinity) return double.infinity;
     if (_const == Constants.negativeInfinity) return double.negativeInfinity;
     if (_const == null) return null;
-    final _approx = extractFromNegative<Number>(_const.approx);
-    return (_approx.second) ? -_approx.first.value : _approx.first.value;
+    // print(this.runtimeType);
+    // print(_const);
+    final _approx = extractFromNegative(_const.approx);
+    final value = (_approx.first as Number).value;    
+    return (_approx.second) ? -value  : value;
   }
 
   bool operator <=(BSFunction other) {
-    final v = toNums(this, other, "<=");
+    final v = toNums(this, other, "<=")!; //toNums would throw if it was null
     return v.first <= v.second;
   }
 
   bool operator <(BSFunction other) {
-    final v = toNums(this, other, "<");
+    final v = toNums(this, other, "<")!; //toNums would throw if it was null
     return v.first < v.second;
   }
 
   bool operator >=(BSFunction other) {
-    final v = toNums(this, other, ">=");
+    final v = toNums(this, other, ">=")!; //toNums would throw if it was null
     return v.first >= v.second;
   }
 
   bool operator >(BSFunction other) {
-    final v = toNums(this, other, ">");
+    final v = toNums(this, other, ">")!; //toNums would throw if it was null
     return v.first > v.second;
   }
 

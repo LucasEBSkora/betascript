@@ -3,7 +3,7 @@ import 'dart:collection' show HashMap, SplayTreeSet;
 import 'function.dart';
 import 'visitors/function_visitor.dart';
 
-Variable variable(String name, [Set<Variable> params]) =>
+Variable variable(String name, [Set<Variable> params = const <Variable>{}]) =>
     Variable._(name, params);
 
 class Variable extends BSFunction {
@@ -15,13 +15,13 @@ class Variable extends BSFunction {
   BSFunction evaluate(HashMap<String, BSFunction> p) {
     if (!p.containsKey(name)) {
       throw BetascriptFunctionError(
-          "Error! Missing arguments in call call: " + name + " not defined");
+          "Error! Missing arguments in function call: " + name + " not defined");
     }
-    return p[name];
+    return p[name]!;
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Variable._(name, parameters);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Variable._(name, parameters);
 
   @override
   SplayTreeSet<Variable> get defaultParameters => SplayTreeSet.from([this]);

@@ -1,4 +1,5 @@
 import '../function.dart';
+import '../unknown.dart';
 import '../variable.dart';
 import '../trig/tan.dart';
 import '../trig/sin.dart';
@@ -44,7 +45,8 @@ class PartialDerivative implements FunctionVisitor<BSFunction> {
   BSFunction _derivative(BSFunction f) => f.accept<BSFunction>(this);
 
   @override
-  BSFunction visitAbs(AbsoluteValue f) => (sgn(f) * _derivative(f.operand));
+  BSFunction visitAbs(AbsoluteValue f) =>
+      (sgn(f.operand) * _derivative(f.operand));
 
   @override
   BSFunction visitArCosH(ArCosH f) =>
@@ -90,9 +92,12 @@ class PartialDerivative implements FunctionVisitor<BSFunction> {
 
   //if base is also a function, uses log_b(a) = ln(a)/ln(b) s
   @override
-  BSFunction visitLog(Log f) => (f.base is Number)
+  BSFunction visitLog(Log f) {
+    print(f.operand);
+    return (f.base is Number)
       ? (_derivative(f.operand) / (log(f.base) * f.operand))
       : _derivative(log(f.operand) / log(f.base));
+  }
 
   @override
   BSFunction visitSecH(SecH f) =>
@@ -193,4 +198,11 @@ class PartialDerivative implements FunctionVisitor<BSFunction> {
   @override
   BSFunction visitTan(Tan f) =>
       (sec(f.operand) ^ n(2)) * _derivative(f.operand);
+
+  @override
+  BSFunction visitDerivativeOfUnknown(DerivativeOfUnknown f) =>
+      DerivativeOfUnknown(f.name, f.variables, [...f.variables, v]);
+
+  @override
+  BSFunction visitUnknown(Unknown f) => DerivativeOfUnknown(f.name, f.variables, [v]);
 }

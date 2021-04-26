@@ -11,7 +11,7 @@ import 'visitors/function_visitor.dart';
 import '../utils/tuples.dart';
 
 BSFunction multiply(List<BSFunction> operands) {
-  if (operands?.isEmpty ?? true) return (n(0));
+  if (operands.isEmpty) return (n(0));
 
   _openOtherMultiplications(operands);
 
@@ -23,13 +23,13 @@ BSFunction multiply(List<BSFunction> operands) {
     final divisions = <Division>[];
 
     for (var i = 0; i < operands.length;) {
-      final _op = extractFromNegative<Division>(operands[i]);
-      if (_op.first != null) {
+      final _op = extractFromNegative(operands[i]);
+      if (_op.first is Division) {
         operands.removeAt(i);
 
         if (_op.second) divisionNegatives = !divisionNegatives;
 
-        divisions.add(_op.first);
+        divisions.add(_op.first as Division);
       } else
         ++i;
     }
@@ -82,14 +82,17 @@ BSFunction multiply(List<BSFunction> operands) {
 class Multiplication extends BSFunction {
   final List<BSFunction> operands;
 
-  const Multiplication(this.operands, [Set<Variable> params]) : super(params);
+  const Multiplication(this.operands,
+      [Set<Variable> params = const <Variable>{}])
+      : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) =>
       multiply(<BSFunction>[for (final f in operands) f.evaluate(p)]);
 
   @override
-  BSFunction copy([Set<Variable> params]) => Multiplication(operands, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) =>
+      Multiplication(operands, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters => SplayTreeSet<Variable>.from(
@@ -108,11 +111,11 @@ class Multiplication extends BSFunction {
 void _openOtherMultiplications(List<BSFunction> operands) {
   var i = 0;
   while (i < operands.length) {
-    final _op = extractFromNegative<Multiplication>(operands[i]);
+    final _op = extractFromNegative(operands[i]);
 
-    if (_op.first != null) {
+    if (_op.first is Multiplication) {
       operands.removeAt(i);
-      var m = _op.first;
+      final m = _op.first as Multiplication;
       operands.insertAll(i, m.operands);
       if (_op.second) operands.add(n(-1));
     } else
@@ -128,17 +131,17 @@ bool _multiplyNumbers(List<BSFunction> operands) {
   //used to store named numbers, because they shouldn't be multiplied with the others
   //the key is the name of the number, the double is its value, and the int is the power
   //to which it should be raised
-  final namedNumbers = HashMap<String, Pair<double, int>>();
+  final namedNumbers = HashMap<String, Pair<num, num>>();
 
   var i = 0;
   while (i < operands.length) {
     //if the operand is a number, removes it and
 
-    final _op = extractFromNegative<Number>(operands[i]);
+    final _op = extractFromNegative(operands[i]);
 
-    if (_op.first != null) {
+    if (_op.first is Number) {
       operands.removeAt(i);
-      final n = _op.first;
+      final n = _op.first as Number;
       //if it's a regular number, just multiplies the accumulator
       if (!n.isNamed) {
         number *= n.value * (_op.second ? -1 : 1);
@@ -146,10 +149,10 @@ bool _multiplyNumbers(List<BSFunction> operands) {
         //if it's named, adds it to the map.
 
         if (!namedNumbers.containsKey(n.name)) {
-          namedNumbers[n.name] = Pair<double, int>(n.absvalue, 0);
+          namedNumbers[n.name] = Pair<num, num>(n.absvalue, 0);
         }
 
-        ++namedNumbers[n.name].second;
+        ++namedNumbers[n.name]?.second;
 
         if (_op.second) number *= -1;
       }
@@ -168,9 +171,9 @@ bool _multiplyNumbers(List<BSFunction> operands) {
 
     //adds the named numbers
     for (final key in namedNumbers.keys) {
-      if (namedNumbers[key].second != 0) {
-        numbers.add(namedNumber(namedNumbers[key].first, key) ^
-            n(namedNumbers[key].second));
+      final pair = namedNumbers[key]!;
+      if (pair.second != 0) {
+        numbers.add(namedNumber(pair.first, key) ^ n(pair.second));
       }
     }
 

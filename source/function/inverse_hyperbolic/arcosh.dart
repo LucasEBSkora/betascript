@@ -13,7 +13,7 @@ BSFunction arcosh(BSFunction operand) {
 }
 
 class ArCosH extends SingleOperandFunction {
-  const ArCosH._(BSFunction operand, [Set<Variable> params])
+  const ArCosH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,10 +36,10 @@ class ArCosH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArCosH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArCosH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArCosH(this);
 }
 
-double _arcosh(double v) => math.log(v + math.sqrt(math.pow(v, 2) - 1));
+double _arcosh(num v) => math.log(v + math.sqrt(math.pow(v, 2) - 1));

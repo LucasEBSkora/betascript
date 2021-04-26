@@ -117,7 +117,8 @@ class RelativeComplement extends EmptyFilteringSetOperation<BSSet> {
 
   SplayTreeSet<BSFunction> _removeWhereBelongs(
           SplayTreeSet<BSFunction> elements, BSSet second) =>
-      elements.where((element) => !second.belongs(element));
+      SplayTreeSet<BSFunction>.from(
+          elements.where((element) => !second.belongs(element)));
 
   @override
   BSSet operateRosterSetBuilderSet(RosterSet first, BuilderSet second) =>
@@ -151,7 +152,7 @@ class RelativeComplement extends EmptyFilteringSetOperation<BSSet> {
       _throughDefinition(first, second);
 
   List<BSSet> _complementFromEvery(List<BSSet> subsets, BSSet other) =>
-      subsets.map((e) => e.relativeComplement(other));
+      subsets.map((e) => e.relativeComplement(other)).toList();
 
   @override
   BSSet operateSetUnionInterval(SetUnion first, Interval second) =>

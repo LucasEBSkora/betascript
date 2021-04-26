@@ -7,5 +7,5 @@ abstract class BSCallable {
 
   const BSCallable();
 
-  Object callThing(BSInterpreter interpreter, List<Object> arguments);
+  callThing(BSInterpreter interpreter, List<Object?> arguments);
 }

@@ -15,16 +15,16 @@ BSFunction negative(BSFunction op) {
 }
 
 class Negative extends SingleOperandFunction {
-  const Negative._(BSFunction operand, [Set<Variable> params])
+  const Negative._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
-  const Negative(BSFunction operand) : super(operand, null);
+  const Negative(BSFunction operand) : super(operand, const <Variable>{});
 
   @override
   BSFunction get approx => negative(operand.approx);
 
   @override
-  BSFunction copy([Set<Variable> parameters]) =>
+  BSFunction copy([Set<Variable> parameters = const <Variable>{}]) =>
       Negative._(operand, parameters);
 
   @override

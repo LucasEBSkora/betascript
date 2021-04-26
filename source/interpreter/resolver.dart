@@ -90,7 +90,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
     //note that here, we evaluate both branches, unlike actual interpreting
     _resolveExpr(s.condition);
     _resolveStmt(s.thenBranch);
-    if (s.elseBranch != null) _resolveStmt(s.elseBranch);
+    if (s.elseBranch != null) _resolveStmt(s.elseBranch!);
   }
 
   @override
@@ -131,7 +131,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
     _declare(s.name);
     _declareParameters(s.parameters);
 
-    if (s.initializer != null) _resolveExpr(s.initializer);
+    if (s.initializer != null) _resolveExpr(s.initializer!);
     _define(s.name);
   }
 
@@ -144,7 +144,7 @@ class Resolver implements ExprVisitor, StmtVisitor {
         BetaScript.error(e.name, "Cannot read variable in its own initializer");
       }
     } else if (_globals.containsKey(e.name.lexeme) &&
-        !_globals[e.name.lexeme]) {
+        !_globals[e.name.lexeme]!) {
       BetaScript.error(e.name, "Cannot read variable in its own initializer");
     }
 
@@ -236,12 +236,12 @@ class Resolver implements ExprVisitor, StmtVisitor {
     _define(s.name);
 
     if (s.superclass != null) {
-      if (s.name.lexeme == s.superclass.name.lexeme)
+      if (s.name.lexeme == s.superclass!.name.lexeme)
         BetaScript.error(
-            s.superclass.name, "A class cannot inherit from itself");
+            s.superclass!.name, "A class cannot inherit from itself");
 
       _currentClass = ClassType.subClassType;
-      _resolveExpr(s.superclass);
+      _resolveExpr(s.superclass!);
 
       //Creates a new closure containing super, which contains all the methods
       _beginScope();
@@ -331,15 +331,16 @@ class Resolver implements ExprVisitor, StmtVisitor {
   }
 
   void _declareParameters(List<Token> variables) {
-    if (variables != null) {
-      for (Token parameter in variables) {
-        //if a parameter has a name not yet declared, defines it in current scope
-        if (!(!_scopes.isEmpty && _scopes.last.containsKey(parameter.lexeme)) &&
-            !_globals.containsKey(parameter.lexeme)) {
-          _declare(parameter);
-          _define(parameter);
-        }
+    for (Token parameter in variables) {
+      //if a parameter has a name not yet declared, defines it in current scope
+      if (!(!_scopes.isEmpty && _scopes.last.containsKey(parameter.lexeme)) &&
+          !_globals.containsKey(parameter.lexeme)) {
+        _declare(parameter);
+        _define(parameter);
       }
     }
   }
+
+  @override
+  void visitExplainExpr(ExplainExpr e) => _resolveExpr(e.operand);
 }

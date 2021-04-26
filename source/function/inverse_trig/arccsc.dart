@@ -13,7 +13,7 @@ BSFunction arccsc(BSFunction operand) {
 }
 
 class ArcCsc extends SingleOperandFunction {
-  const ArcCsc._(BSFunction operand, [Set<Variable> params])
+  const ArcCsc._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,7 +36,7 @@ class ArcCsc extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcCsc._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArcCsc._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArcCsc(this);

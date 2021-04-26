@@ -27,14 +27,14 @@ class Number extends BSFunction {
   final String name;
   final bool isInt;
 
-  Number._(num value, [Set<Variable> params])
+  Number._(num value, [Set<Variable> params = const <Variable>{}])
       : absvalue = value.abs(),
         name = _makeName(value),
         isInt = (value == value.toInt()),
         isNamed = false,
         super(params);
 
-  const Number._named(this.absvalue, this.name, [Set<Variable> params])
+  const Number._named(this.absvalue, this.name, [Set<Variable> params = const <Variable>{}])
       : isNamed = true,
         isInt = (absvalue is int),
         super(params);
@@ -56,7 +56,7 @@ class Number extends BSFunction {
   num get value => absvalue;
 
   @override
-  BSFunction copy([Set<Variable> params]) {
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) {
     if (isNamed) {
       return Number._named(absvalue, name, params);
     } else {

@@ -13,7 +13,7 @@ BSFunction arsinh(BSFunction operand) {
 }
 
 class ArSinH extends SingleOperandFunction {
-  const ArSinH._(BSFunction operand, [Set<Variable> params])
+  const ArSinH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,10 +36,10 @@ class ArSinH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArSinH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArSinH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArSinH(this);
 }
 
-double _arsinh(double v) => math.log(v + math.sqrt(1 + math.pow(v, 2)));
+double _arsinh(num v) => math.log(v + math.sqrt(1 + math.pow(v, 2)));

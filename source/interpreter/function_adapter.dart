@@ -12,7 +12,7 @@ class FunctionAdapter implements BSCallable {
 
   //Doesn't check if the cast is succesful because it assumes the interpreter did its job
   @override
-  Object callThing(BSInterpreter interpreter, List<Object> arguments) =>
+  Object callThing(BSInterpreter interpreter, List<Object?> arguments) =>
       adaptee(arguments.map((object) => object as BSFunction).toList());
 
   @override

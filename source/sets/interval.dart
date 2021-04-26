@@ -8,17 +8,17 @@ import 'visitor/set_visitor.dart';
 
 BSSet interval(BSFunction a, BSFunction b,
     {bool leftClosed = true, bool rightClosed = true}) {
-  a = a.asConstant();
-  b = b.asConstant();
-  if (a == null || b == null) {
+  BSFunction? _a = a.asConstant();
+  BSFunction? _b = b.asConstant();
+  if (_a == null || _b == null) {
     throw BetascriptFunctionError("sets can only be defined in numbers");
   }
-  if (a == b) {
+  if (_a == _b) {
     return (leftClosed && rightClosed) ? rosterSet([a]) : emptySet;
-  } else if (a > b) {
+  } else if (_a > _b) {
     return emptySet;
   } else {
-    return Interval(a, b, leftClosed, rightClosed);
+    return Interval(_a, _b, leftClosed, rightClosed);
   }
 }
 

@@ -13,7 +13,7 @@ BSFunction sinh(BSFunction operand) {
 }
 
 class SinH extends SingleOperandFunction {
-  const SinH._(BSFunction operand, [Set<Variable> params])
+  const SinH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,10 +36,10 @@ class SinH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => SinH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => SinH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitSinH(this);
 }
 
-double _sinh(double v) => (math.exp(v) - math.exp(-v)) / 2;
+double _sinh(num v) => (math.exp(v) - math.exp(-v)) / 2;

@@ -9,19 +9,18 @@ import 'variable.dart';
 import 'visitors/function_visitor.dart';
 
 BSFunction sgn(BSFunction operand) {
-  final _f1 = extractFromNegative<Number>(operand);
-  if (_f1.first != null) {
-    return (_f1.first.value == 0) ? n(0) : n(_f1.second ? -1 : 1);
+  final _f1 = extractFromNegative(operand);
+  if (_f1.first is Number) {
+    return ((_f1.first as Number).value == 0) ? n(0) : n(_f1.second ? -1 : 1);
   }
 
-  final _f2 = extractFromNegative<AbsoluteValue>(operand);
-  if (_f2.second) return n(_f2.second ? -1 : 1);
+  if (_f1.first is AbsoluteValue) return n(_f1.second ? -1 : 1);
 
   return Signum._(operand);
 }
 
 class Signum extends SingleOperandFunction {
-  const Signum._(BSFunction operand, [Set<Variable> params])
+  const Signum._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -29,7 +28,7 @@ class Signum extends SingleOperandFunction {
       sgn(operand.evaluate(p));
 
   @override
-  BSFunction copy([Set<Variable> params]) => Signum._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Signum._(operand, params);
 
   @override
   BSFunction get approx => sgn(operand.approx);
@@ -38,6 +37,6 @@ class Signum extends SingleOperandFunction {
   T accept<T>(FunctionVisitor visitor) => visitor.visitSignum(this);
 }
 
-double sign(double v) {
+double sign(num v) {
   return (v == 0) ? 0 : ((v > 0) ? 1 : -1);
 }

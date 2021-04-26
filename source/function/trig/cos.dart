@@ -13,7 +13,7 @@ BSFunction cos(BSFunction operand) {
 }
 
 class Cos extends SingleOperandFunction {
-  const Cos._(BSFunction operand, [Set<Variable> params])
+  const Cos._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -35,7 +35,7 @@ class Cos extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Cos._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Cos._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitCos(this);

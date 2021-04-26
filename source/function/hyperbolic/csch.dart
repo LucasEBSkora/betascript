@@ -13,7 +13,7 @@ BSFunction csch(BSFunction operand) {
 }
 
 class CscH extends SingleOperandFunction {
-  const CscH._(BSFunction operand, [Set<Variable> params])
+  const CscH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,10 +36,10 @@ class CscH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => CscH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => CscH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitCscH(this);
 }
 
-double _csch(double v) => 2 / (math.exp(v) - math.exp(-v));
+double _csch(num v) => 2 / (math.exp(v) - math.exp(-v));

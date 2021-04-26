@@ -31,7 +31,7 @@ class DirectiveManager {
     }
   }
 
-  Object getDirective(String dir) {
+  Object? getDirective(String dir) {
     if (_globalDirectives.containsKey(dir)) return _globalDirectives[dir];
     if (_localDirectives.containsKey(dir)) return _localDirectives[dir];
     return null;

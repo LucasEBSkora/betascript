@@ -13,7 +13,7 @@ BSFunction arcctg(BSFunction operand) {
 }
 
 class ArcCtg extends SingleOperandFunction {
-  const ArcCtg._(BSFunction operand, [Set<Variable> params])
+  const ArcCtg._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,7 +36,7 @@ class ArcCtg extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcCtg._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArcCtg._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArcCtg(this);

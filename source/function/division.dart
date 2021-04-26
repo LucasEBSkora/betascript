@@ -24,7 +24,7 @@ BSFunction divide(
 
   if (numerator == denominator) return n(1);
   if (numerator == n(0)) return n(0);
-  if (denominator.asConstant()?.approx == n(0) ?? false) {
+  if (denominator.asConstant()?.approx == n(0)) {
     if ((numerator is Negative) ^ (denominator is Negative)) {
       return Constants.negativeInfinity;
     } else {
@@ -45,25 +45,25 @@ class Division extends BSFunction {
   final BSFunction numerator;
   final BSFunction denominator;
 
-  const Division._(this.numerator, this.denominator, [Set<Variable> params])
+  const Division._(this.numerator, this.denominator,
+      [Set<Variable> params = const <Variable>{}])
       : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
     final _n = numerator.evaluate(p);
     final _d = denominator.evaluate(p);
-    final _numNumber = extractFromNegative<Number>(_n);
-
-    final _denNumber = extractFromNegative<Number>(_d);
-
-    if (_numNumber.first != null && _denNumber.first != null) {
-      final v = _numNumber.first.value / _denNumber.first.value;
-      if (v == v.toInt())
-        return n(v * ((_numNumber.second ^ _denNumber.second) ? -1 : 1));
-    }
 
     final _num = extractFromNegative(_n);
     final _den = extractFromNegative(_d);
+
+    if (_num.first is Number && _den.first is Number) {
+      final _numNumber = _num.first as Number;
+      final _denNumber = _den.first as Number;
+
+      final v = _numNumber.value / _denNumber.value;
+      if (v == v.toInt()) return n(v * ((_num.second ^ _den.second) ? -1 : 1));
+    }
 
     return (_num.second ^ _den.second)
         ? negative(divide([_num.first], [_den.first]))
@@ -71,7 +71,7 @@ class Division extends BSFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) =>
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) =>
       Division._(numerator, denominator, params);
 
   @override
@@ -82,18 +82,17 @@ class Division extends BSFunction {
   BSFunction get approx {
     final _n = numerator.approx;
     final _d = denominator.approx;
-    final _numNumber = extractFromNegative<Number>(_n);
-
-    final _denNumber = extractFromNegative<Number>(_d);
-
-    if (_numNumber.first == null && _denNumber.first == null) {
-      return n(_numNumber.first.value /
-          _denNumber.first.value *
-          ((_numNumber.second ^ _denNumber.second) ? -1 : 1));
-    }
 
     final _num = extractFromNegative(_n);
     final _den = extractFromNegative(_d);
+
+    if (_num.first is Number && _den.first is Number) {
+      final _numNumber = _num.first as Number;
+      final _denNumber = _den.first as Number;
+      return n(_numNumber.value /
+          _denNumber.value *
+          ((_num.second ^ _den.second) ? -1 : 1));
+    }
 
     return (_num.second ^ _den.second)
         ? negative(divide([_num.first], [_den.first]))

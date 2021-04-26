@@ -12,8 +12,8 @@ import '../../function/variable.dart';
 //in the context of this program, ?= means ==, !=, <, >, <= or >=
 
 class SingleVariableLinearSolver extends Solver {
-  Comparison _comp;
-  BSFunction _left;
+  Comparison? _comp;
+  BSFunction? _left;
 
   //as in, ax + b ?= 0
   BSFunction a = n(0);
@@ -28,9 +28,9 @@ class SingleVariableLinearSolver extends Solver {
     //we're sure that the expression only uses one variable because it was checked in SingleVariableSolver
     if (expr is Comparison) {
       //f(x) ?= g(x)
-      _comp = expr;
+      _comp = expr as Comparison;
       //"passes" everything to the left side of the equation
-      _left = _comp.left - _comp.right;
+      _left = _comp!.left - _comp!.right;
       //f(x) - g(x) ?= 0
       //if possible/necessary, gets rid of a minus sign, but keeps it saved in case the comparison is a inequation
       if (_left is Negative) {
@@ -43,7 +43,7 @@ class SingleVariableLinearSolver extends Solver {
         _terms.addAll((_left as Sum).operands);
       } else {
         //if it isn't, checks that single term
-        _terms.add(_left);
+        _terms.add(_left!);
       }
 
       //checks if all terms are linear, and calculates the coefficients when they are. If all terms are linear, the solver applies
@@ -63,7 +63,7 @@ class SingleVariableLinearSolver extends Solver {
     if (a == n(0)) {
       //in this case, the value of the variable doesn't matter, which means any value solves it or no value solves it
 
-      if ((expr as Comparison).compare(b.toNum(), 0)) {
+      if ((expr as Comparison).compare(b.toNum()!, 0)) {
         return BSSet.R;
       } else {
         return emptySet;
@@ -112,21 +112,20 @@ class SingleVariableLinearSolver extends Solver {
       return true;
     }
 
-    final _asVar = extractFromNegative<Variable>(term);
+    final _extracted = extractFromNegative(term);
 
-    if (_asVar.first != null) {
+    if (_extracted.first is Variable) {
       a += n(1);
       return true;
     }
 
     //if it got here, we already know the multiplication isn't constant, so there is at least one term that involves the variable
-    final _asMul = extractFromNegative<Multiplication>(term);
-
-    if (_asMul.first != null) {
+    if (_extracted.first is Multiplication) {
+      Multiplication mul = _extracted.first as Multiplication;
       final constants = <BSFunction>[];
       final dependentTerms = <BSFunction>[];
 
-      for (var op in _asMul.first.operands) {
+      for (var op in mul.operands) {
         final constOp = op.asConstant();
         if (constOp != null) {
           constants.add(constOp);
@@ -134,9 +133,8 @@ class SingleVariableLinearSolver extends Solver {
           dependentTerms.add(op);
         }
       }
-      final dependentTerm =
-          extractFromNegative<Variable>(multiply(dependentTerms));
-      if (dependentTerm.first == null) {
+      final dependentTerm = extractFromNegative(multiply(dependentTerms));
+      if (dependentTerm.first is Variable) {
         return false;
       } else {
         a += multiply(constants);

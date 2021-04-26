@@ -13,7 +13,7 @@ BSFunction tan(BSFunction operand) {
 }
 
 class Tan extends SingleOperandFunction {
-  const Tan._(BSFunction operand, [Set<Variable> params])
+  const Tan._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -35,7 +35,7 @@ class Tan extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Tan._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Tan._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitTan(this);

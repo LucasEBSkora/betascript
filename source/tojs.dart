@@ -43,10 +43,10 @@ print A'
 
   //Sets a listener for "interpretButton", which gets the text in the textarea "source", runs it through the interpreter and writes the
   //results to the "output" textarea
-  document.getElementById("interpretButton").onClick.listen((event) {
-    TextAreaElement output = document.getElementById("output");
-    TextAreaElement source = document.getElementById("source");
-    output.value = BetaScript.runForWeb(source.value);
+  document.getElementById("interpretButton")!.onClick.listen((event) {
+    TextAreaElement output = document.getElementById("output") as TextAreaElement;
+    TextAreaElement source = document.getElementById("source") as TextAreaElement;
+    output.value = BetaScript.runForWeb(source.value!);
   });
 
   return 0;

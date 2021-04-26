@@ -1,22 +1,22 @@
 import 'expr.dart';
 import 'token.dart';
 
-abstract class StmtVisitor {
-  Object visitExpressionStmt(ExpressionStmt s);
-  Object visitPrintStmt(PrintStmt s);
-  Object visitVarStmt(VarStmt s);
-  Object visitBlockStmt(BlockStmt s);
-  Object visitIfStmt(IfStmt s);
-  Object visitRoutineStmt(RoutineStmt s);
-  Object visitWhileStmt(WhileStmt s);
-  Object visitReturnStmt(ReturnStmt s);
-  Object visitClassStmt(ClassStmt s);
-  Object visitDirectiveStmt(DirectiveStmt s);
+abstract class StmtVisitor<T> {
+  T visitExpressionStmt(ExpressionStmt s);
+  T visitPrintStmt(PrintStmt s);
+  T visitVarStmt(VarStmt s);
+  T visitBlockStmt(BlockStmt s);
+  T visitIfStmt(IfStmt s);
+  T visitRoutineStmt(RoutineStmt s);
+  T visitWhileStmt(WhileStmt s);
+  T visitReturnStmt(ReturnStmt s);
+  T visitClassStmt(ClassStmt s);
+  T visitDirectiveStmt(DirectiveStmt s);
 }
 
 abstract class Stmt {
   const Stmt();
-  Object accept(StmtVisitor v);
+  T accept<T>(StmtVisitor v);
 }
 
 class ExpressionStmt extends Stmt {
@@ -24,7 +24,7 @@ class ExpressionStmt extends Stmt {
   final Expr expression;
 
   const ExpressionStmt(this.expression);
-  Object accept(StmtVisitor v) => v.visitExpressionStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitExpressionStmt(this);
 }
 
 class PrintStmt extends Stmt {
@@ -32,7 +32,7 @@ class PrintStmt extends Stmt {
   final Expr expression;
 
   const PrintStmt(this.expression);
-  Object accept(StmtVisitor v) => v.visitPrintStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitPrintStmt(this);
 }
 
 class VarStmt extends Stmt {
@@ -43,10 +43,10 @@ class VarStmt extends Stmt {
   final List<Token> parameters;
 
   ///If the variable is initialized on declaration, the inicializer is stored here
-  final Expr initializer;
+  final Expr? initializer;
 
   const VarStmt(this.name, this.parameters, this.initializer);
-  Object accept(StmtVisitor v) => v.visitVarStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitVarStmt(this);
 }
 
 class BlockStmt extends Stmt {
@@ -54,7 +54,7 @@ class BlockStmt extends Stmt {
   final List<Stmt> statements;
 
   const BlockStmt(this.statements);
-  Object accept(StmtVisitor v) => v.visitBlockStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitBlockStmt(this);
 }
 
 class IfStmt extends Stmt {
@@ -65,10 +65,10 @@ class IfStmt extends Stmt {
   final Stmt thenBranch;
 
   ///
-  final Stmt elseBranch;
+  final Stmt? elseBranch;
 
   const IfStmt(this.condition, this.thenBranch, this.elseBranch);
-  Object accept(StmtVisitor v) => v.visitIfStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitIfStmt(this);
 }
 
 class RoutineStmt extends Stmt {
@@ -82,7 +82,7 @@ class RoutineStmt extends Stmt {
   final List<Stmt> body;
 
   const RoutineStmt(this.name, this.parameters, this.body);
-  Object accept(StmtVisitor v) => v.visitRoutineStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitRoutineStmt(this);
 }
 
 class WhileStmt extends Stmt {
@@ -96,7 +96,7 @@ class WhileStmt extends Stmt {
   final Stmt body;
 
   const WhileStmt(this.token, this.condition, this.body);
-  Object accept(StmtVisitor v) => v.visitWhileStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitWhileStmt(this);
 }
 
 class ReturnStmt extends Stmt {
@@ -107,7 +107,7 @@ class ReturnStmt extends Stmt {
   final Expr value;
 
   const ReturnStmt(this.keyword, this.value);
-  Object accept(StmtVisitor v) => v.visitReturnStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitReturnStmt(this);
 }
 
 class ClassStmt extends Stmt {
@@ -115,13 +115,13 @@ class ClassStmt extends Stmt {
   final Token name;
 
   ///A variable containing a reference to the superclass
-  final VariableExpr superclass;
+  final VariableExpr? superclass;
 
   ///A list of the class' methods
   final List<RoutineStmt> methods;
 
   const ClassStmt(this.name, this.superclass, this.methods);
-  Object accept(StmtVisitor v) => v.visitClassStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitClassStmt(this);
 }
 
 class DirectiveStmt extends Stmt {
@@ -132,5 +132,6 @@ class DirectiveStmt extends Stmt {
   final String directive;
 
   const DirectiveStmt(this.token, this.directive);
-  Object accept(StmtVisitor v) => v.visitDirectiveStmt(this);
+  T accept<T>(StmtVisitor v) => v.visitDirectiveStmt(this);
 }
+

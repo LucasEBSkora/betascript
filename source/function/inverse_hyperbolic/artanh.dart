@@ -13,7 +13,7 @@ BSFunction artanh(BSFunction operand) {
 }
 
 class ArTanH extends SingleOperandFunction {
-  const ArTanH._(BSFunction operand, [Set<Variable> params])
+  const ArTanH._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,10 +36,10 @@ class ArTanH extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArTanH._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArTanH._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArTanH(this);
 }
 
-double _artanh(double v) => (1 / 2) * math.log((1 + v) / (1 - v));
+double _artanh(num v) => (1 / 2) * math.log((1 + v) / (1 - v));

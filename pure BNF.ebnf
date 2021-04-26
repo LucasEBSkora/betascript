@@ -68,7 +68,7 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 <while_stmt> ::= "while" <(> <expression> <)> <statement>
 
 <block> ::= <{> <block_body> <}> | <{> <block_body> <unterminated_optional_stmt> <}> 
-<block_body> ::= <whitespace_or_linebreak> <block_body> | <statement> <block_body> | ""
+<block_body> ::= <whitespace_or_linebreak> <block_body> | <declaration> <block_body> | ""
 
 <expression> ::= <assigment>
 
@@ -83,7 +83,7 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 <and> ::= "and" | "∧"
 
 <equality> ::= <comparison> | <comparison> <whitespace> <equality_operator> <whitespace_or_linebreak> <equality>
-<equality_operator> ::= "==" | "===" | "≡"
+<equality_operator> ::= "==" | "===" | "≡" | "!="
 
 <comparison> ::= <set_binary> | <set_binary> <whitespace> <comparison_operator> <whitespace_or_linebreak> <comparison>
 <comparison_operator> ::= ">" | ">=" | "<" | "<="
@@ -115,7 +115,6 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 
 <arguments> ::= <expression> | <expression> <whitespace> "," <whitespace_or_linebreak> <arguments>
 
-
 <derivative> ::= <partial_differential> <whitespace> "/" <whitespace_or_linebreak> <derivative_parameters>
 <partial_differential> ::=  <del> <(> <expression> <)>
 <derivative_parameters> ::= <del> <(> <arguments> <)>
@@ -123,8 +122,10 @@ but i unforgivably don't know how to use them. basically, if it can be a twitter
 <del> ::= "del" | "∂"
 
 <primary> ::= <set_definition> | NUMBER | STRING | "false" | "true" | "unknown" | "nil" 
-            | <(> <expression> <)>
+            | <(> <expression> <)> | <explain_expr>
             | <identifier> | "super" <whitespace> "." <whitespace_or_linebreak> <identifier>
+
+<explain_expr> ::= "explain" <whitespace> <expression>
 
 <set_definition> ::= "set" <whitespace_or_linebreak> <set_def> | <whitespace_or_linebreak> <set_def>
 <set_def> ::= <interval_definition> | <roster_set_definition> | <builder_set_definition>

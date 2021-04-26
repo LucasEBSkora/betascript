@@ -5,7 +5,7 @@ import 'negative.dart';
 ///if both values are transformable to numbers (functions without parameters),
 ///returns them in a pair as numbers. If either doesn't, throws an error, if the name of the operation
 ///is passed, or returns null otherwise.
-Pair<num, num> toNums(BSFunction a, BSFunction b, [String op]) {
+Pair<num, num>? toNums(BSFunction a, BSFunction b, [String? op]) {
   final _a = a.toNum();
   final _b = b.toNum();
   if (_a == null || _b == null) {
@@ -20,24 +20,36 @@ Pair<num, num> toNums(BSFunction a, BSFunction b, [String op]) {
 }
 
 BSFunction min(BSFunction x, BSFunction y) {
-  final v = toNums(x, y, "min");
+  final v = toNums(x, y, "min")!; //isn't null because  toNums would throw
   return (v.first < v.second) ? x : y;
 }
 
 BSFunction max(BSFunction x, BSFunction y) {
-  final v = toNums(x, y, "max");
+  final v = toNums(x, y, "max")!;
   return (v.first > v.second) ? x : y;
 }
 
 ///Checks if the function f is of Type 'type', or if it is of type Negative and its operand of type 'type'.
 ///if it manages to find something of the 'type', first is set to it. If it doesn't, it is set to null
 ///If it is contained inside a negative, second is set to true.
-Pair<T, bool> extractFromNegative<T extends BSFunction>(BSFunction f) {
+// Pair<T?, bool> extractFromNegative<T extends BSFunction>(BSFunction f) {
+//   var _isInNegative = false;
+//   if (f is Negative) {
+//     f = f.operand;
+//     _isInNegative = true;
+//   }
+
+//   return Pair((f is T) ? f : null, _isInNegative);
+// }
+
+///new null-safe version
+/// if f = -g (explicitly in the object tree) returns <g,true>, else return <f, false>. 
+Pair<BSFunction, bool> extractFromNegative(BSFunction f) {
   var _isInNegative = false;
   if (f is Negative) {
-    f = (f as Negative).operand;
+    f = f.operand;
     _isInNegative = true;
   }
 
-  return Pair((f is T) ? f : null, _isInNegative);
+  return Pair(f, _isInNegative);
 }

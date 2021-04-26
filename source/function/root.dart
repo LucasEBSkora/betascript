@@ -18,7 +18,7 @@ BSFunction root(BSFunction operand) {
 class Root extends BSFunction {
   final BSFunction operand;
 
-  const Root._(this.operand, [Set<Variable> params]) : super(params);
+  const Root._(this.operand, [Set<Variable> params = const <Variable>{}]) : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -34,7 +34,7 @@ class Root extends BSFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Root._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Root._(operand, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters =>

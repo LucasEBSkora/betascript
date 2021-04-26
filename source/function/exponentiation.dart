@@ -26,7 +26,7 @@ class Exponentiation extends BSFunction {
   final BSFunction base;
   final BSFunction exponent;
 
-  const Exponentiation._(this.exponent, this.base, [Set<Variable> params])
+  const Exponentiation._(this.exponent, this.base, [Set<Variable> params = const <Variable>{}])
       : super(params);
 
   @override
@@ -35,14 +35,14 @@ class Exponentiation extends BSFunction {
     final expo = exponent.evaluate(p);
     final pair = toNums(b, expo);
     if (pair != null) {
-      double v = pow(pair.first, pair.second);
+      num v = pow(pair.first, pair.second);
       if (v == v.toInt()) return n(v);
     }
 
     return exp(b, expo);
   }
 
-  BSFunction copy([Set<Variable> params]) =>
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) =>
       Exponentiation._(exponent, base, params);
 
   @override

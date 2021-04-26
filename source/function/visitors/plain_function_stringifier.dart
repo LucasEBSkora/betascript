@@ -1,3 +1,4 @@
+import '../unknown.dart';
 import '../variable.dart';
 import '../trig/tan.dart';
 import '../trig/sin.dart';
@@ -139,7 +140,7 @@ class PlainFunctionStringifier implements FunctionVisitor<String> {
   String visitSignum(Signum f) => "sign(${f.operand})";
 
   @override
-  String visitSin(Sin f) => "sec(${f.operand})";
+  String visitSin(Sin f) => "sin(${f.operand})";
 
   @override
   String visitSinH(SinH f) => "sinh(${f.operand})";
@@ -154,7 +155,7 @@ class PlainFunctionStringifier implements FunctionVisitor<String> {
       var _op = f.operands[i];
       if (_op is Negative) {
         s += " - ";
-        _op = (_op as Negative).operand;
+        _op = _op.operand;
       } else
         s += " + ";
 
@@ -174,4 +175,29 @@ class PlainFunctionStringifier implements FunctionVisitor<String> {
 
   @override
   String visitVariable(Variable f) => f.name;
+
+  @override
+  String visitDerivativeOfUnknown(DerivativeOfUnknown f) {
+    var derivand = (f.order > 1) ? "∂${f.order}(${f.name})" : "∂(${f.name})";
+
+    List<String> parameters = [];
+    for (var i = 0; i < f.derivationVariables.length; ++i) {
+      var name = f.derivationVariables[i].name;
+      int order = 1;
+      while (i < f.derivationVariables.length - 1 && f.derivationVariables[i + 1].name == name) {
+        ++i;
+        ++order;
+      }
+      parameters.add("∂" + (order > 1 ? "$order" : "") + name);
+    }
+    if (parameters.length == 1) return derivand + ' / ' + parameters.single;
+    var result = derivand + '/(';
+    result += parameters.first;
+    for (var param in parameters.sublist(1)) result += "*" + param;
+    result += ')';
+    return result;
+  }
+
+  @override
+  String visitUnknown(Unknown f) => f.name;
 }

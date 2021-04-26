@@ -6,17 +6,13 @@ import '../function/variable.dart';
 import '../function/function.dart';
 import 'visitor/set_visitor.dart';
 
-BSSet builderSet(LogicExpression rule, [List<Variable> parameters]) {
+BSSet builderSet(LogicExpression rule, [List<Variable> parameters = const <Variable>[]]) {
   final sol = rule.solution;
   if (rule.foundEverySolution) {
     return sol;
   } else {
-    if (parameters == null) {
-      parameters = rule.parameters
-          .map<Variable>((element) => variable(element))
-          .toList();
-    }
-    return BuilderSet(rule, parameters);
+    return BuilderSet(rule,
+        rule.parameters.map<Variable>((element) => variable(element)).toList());
   }
 }
 

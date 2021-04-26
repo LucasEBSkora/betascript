@@ -13,7 +13,7 @@ BSFunction arcsin(BSFunction operand) {
 }
 
 class ArcSin extends SingleOperandFunction {
-  const ArcSin._(BSFunction operand, [Set<Variable> params])
+  const ArcSin._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -36,7 +36,7 @@ class ArcSin extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => ArcSin._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => ArcSin._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitArcSin(this);

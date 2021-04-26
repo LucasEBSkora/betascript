@@ -32,6 +32,7 @@ import '../hyperbolic/ctgh.dart';
 import '../hyperbolic/sech.dart';
 import '../hyperbolic/sinh.dart';
 import '../hyperbolic/tanh.dart';
+import '../unknown.dart';
 import '../variable.dart';
 
 abstract class FunctionVisitor<ReturnType> {
@@ -71,4 +72,6 @@ abstract class FunctionVisitor<ReturnType> {
   ReturnType visitSin(Sin f);
   ReturnType visitTan(Tan f);
   ReturnType visitVariable(Variable f);
+  ReturnType visitUnknown(Unknown f);
+  ReturnType visitDerivativeOfUnknown(DerivativeOfUnknown f);
 }

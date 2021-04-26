@@ -27,14 +27,10 @@ class MethodTable<R, D> {
 
   @protected
   Function findMethod(Type t1, Type t2) {
-    try {
-      return hashMap[t1.toString() + t2.toString()];
-    } catch (e) {
-      if (!hashMap.containsKey(t1.toString() + t2.toString())) {
-        throw UnimplementedError();
-      } else {
-        rethrow;
-      }
-    }
+    final key = t1.toString() + t2.toString();
+    if (hashMap.containsKey(key)) {
+      return hashMap[key]!;
+    } else
+      throw UnimplementedError();
   }
 }

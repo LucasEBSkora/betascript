@@ -23,7 +23,7 @@ class Log extends BSFunction {
   final BSFunction base;
   final BSFunction operand;
 
-  const Log._(this.operand, this.base, [Set<Variable> params]) : super(params);
+  const Log._(this.operand, this.base, [Set<Variable> params = const <Variable>{}]) : super(params);
 
   @override
   BSFunction evaluate(HashMap<String, BSFunction> p) {
@@ -39,7 +39,7 @@ class Log extends BSFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Log._(operand, base, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Log._(operand, base, params);
 
   @override
   SplayTreeSet<Variable> get defaultParameters => SplayTreeSet<Variable>.from(

@@ -13,7 +13,7 @@ BSFunction sec(BSFunction operand) {
 }
 
 class Sec extends SingleOperandFunction {
-  const Sec._(BSFunction operand, [Set<Variable> params])
+  const Sec._(BSFunction operand, [Set<Variable> params = const <Variable>{}])
       : super(operand, params);
 
   @override
@@ -35,7 +35,7 @@ class Sec extends SingleOperandFunction {
   }
 
   @override
-  BSFunction copy([Set<Variable> params]) => Sec._(operand, params);
+  BSFunction copy([Set<Variable> params = const <Variable>{}]) => Sec._(operand, params);
 
   @override
   T accept<T>(FunctionVisitor visitor) => visitor.visitSec(this);
